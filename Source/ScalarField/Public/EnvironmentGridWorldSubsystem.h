@@ -29,8 +29,4 @@ private:
 
 	TMap<FCellCoordinates, TSet<FCellCoordinates>> _adjacencyList;
 	TMap<FCellCoordinates, TObjectPtr<AEnvironmentCell>> _cells;
-
-	static constexpr uint32 GRID_HEIGHT = 9;
-	static constexpr uint32 GRID_WIDTH = 9;
-	static constexpr uint32 N_CELLS = GRID_HEIGHT * GRID_WIDTH;
 };

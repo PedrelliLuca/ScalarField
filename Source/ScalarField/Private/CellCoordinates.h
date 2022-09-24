@@ -7,11 +7,11 @@
 struct FCellCoordinates {
 public:
 	bool operator==(const FCellCoordinates& other) const {
-		return (X == other.X) && (Y == other.Y);
+		return FMath::IsNearlyEqual(X, other.X) && FMath::IsNearlyEqual(Y, other.Y);
 	}
 
-	int32 X;
-	int32 Y;
+	double X;
+	double Y;
 };
 
 #if UE_BUILD_DEBUG

@@ -19,10 +19,9 @@ public:
 	AEnvironmentCell();
 
 	TWeakObjectPtr<UBoxComponent> GetBox() { return _boxC; }
-	double GetSide() { return _side; }
+	double GetSide() const { return _side; }
 
 private:
-	UPROPERTY(EditDefaultsOnly)
 	double _side;
 
 	TObjectPtr<UBoxComponent> _boxC;
