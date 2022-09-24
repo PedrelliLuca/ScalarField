@@ -9,6 +9,7 @@
 #include "EnvironmentCell.generated.h"
 
 class UBoxComponent;
+class UMaterialInstanceDynamic;
 
 UCLASS()
 class SCALARFIELD_API AEnvironmentCell : public AActor
@@ -28,5 +29,9 @@ private:
 	double _side;
 
 	TObjectPtr<UBoxComponent> _boxC;
+
+	// Placeholder stuff
+	TObjectPtr<UStaticMeshComponent> _staticMeshC;
+	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 };
 

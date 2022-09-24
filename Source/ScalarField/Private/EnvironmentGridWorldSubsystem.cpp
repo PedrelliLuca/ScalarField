@@ -4,19 +4,17 @@
 #include "EnvironmentGridWorldSubsystem.h"
 
 #include "EnvironmentCell.h"
+#include "EnvironmentCellSettings.h"
 #include "EnvironmentGridSettings.h"
 
-void UEnvironmentGridWorldSubsystem::PostInitialize() {
-	Super::PostInitialize();
-
+void UEnvironmentGridWorldSubsystem::OnMapStart() {
 	_allocateGrid();
 
-	// TODO: change this so that the cells' spawn location depends on the player spawn location
-	_initializeGridByLocation(FVector::ZeroVector);
+	_initializeGridByLocation(GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation());
 }
 
 void UEnvironmentGridWorldSubsystem::_initializeGridByLocation(const FVector location) {
-	const double CellSide = GetDefault<UEnvironmentGridSettings>()->GetCellSide();
+	const double CellSide = GetDefault<UEnvironmentCellSettings>()->GetCellSide();
 
 	double shortestDistance = TNumericLimits<double>::Max();
 	const FCellCoordinates* closestCoords = nullptr;
@@ -51,6 +49,8 @@ void UEnvironmentGridWorldSubsystem::_allocateGrid() {
 	const UEnvironmentGridSettings* gridSettings = GetDefault<UEnvironmentGridSettings>();
 	_adjacencyList.Reserve(gridSettings->GetGridYCells() * gridSettings->GetGridXCells());
 
+	const double CellSide = GetDefault<UEnvironmentCellSettings>()->GetCellSide();
+
 	const int32 gridYExtension = gridSettings->GetGridYCells() / 2;
 	const int32 gridXExtension = gridSettings->GetGridXCells() / 2;
 
@@ -59,7 +59,8 @@ void UEnvironmentGridWorldSubsystem::_allocateGrid() {
 			FCellCoordinates currentCellCoords{ i, j };
 
 			// Cell creation
-			TObjectPtr<AEnvironmentCell> currentCell = NewObject<AEnvironmentCell>(this, FName{ currentCellCoords.ToString() });
+			const FVector cellLocation = FVector{ static_cast<FVector2D>(currentCellCoords), 0.5 } *CellSide;
+			TObjectPtr<AEnvironmentCell> currentCell = GetWorld()->SpawnActor<AEnvironmentCell>(cellLocation, FRotator::ZeroRotator);
 			currentCell->FreezeTime();
 			_cells.Emplace(currentCellCoords, MoveTemp(currentCell));
 

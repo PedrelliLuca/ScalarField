@@ -19,7 +19,9 @@ class SCALARFIELD_API UEnvironmentGridWorldSubsystem : public UWorldSubsystem
 	GENERATED_BODY()
 
 public:
-	void PostInitialize() override;
+	/* Called from maps that have an environment grid */
+	UFUNCTION(BlueprintCallable)
+	void OnMapStart();
 
 private:
 	void _initializeGridByLocation(FVector location);
