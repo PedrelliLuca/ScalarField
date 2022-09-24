@@ -21,12 +21,15 @@ class SCALARFIELD_API UEnvironmentGridWorldSubsystem : public UWorldSubsystem
 public:
 	/* Called from maps that have an environment grid */
 	UFUNCTION(BlueprintCallable)
-	void OnMapStart();
+	void OnMapStart(FVector playerLocation);
 
 private:
-	void _initializeGridByLocation(FVector location);
-	void _allocateGrid();
+	void _spawnGrid();
+	void _activateCellsSurroundingLocation(FVector location);
+	void _onCellEntered(FCellCoordinates cellEntered);
+	void _onCellLeft(FCellCoordinates cellLeft);
 
 	TMap<FCellCoordinates, TSet<FCellCoordinates>> _adjacencyList;
 	TMap<FCellCoordinates, TObjectPtr<AEnvironmentCell>> _cells;
+	FCellCoordinates _lastEnteredCell;
 };

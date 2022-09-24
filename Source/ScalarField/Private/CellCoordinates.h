@@ -13,6 +13,10 @@ public:
 		return (X == other.X) && (Y == other.Y);
 	}
 
+	bool operator!=(const FCellCoordinates& other) const {
+		return !(*this == other);
+	}
+
 	operator FVector2D() const {
 		return FVector2D{ static_cast<double>(X), static_cast<double>(Y)};
 	}
