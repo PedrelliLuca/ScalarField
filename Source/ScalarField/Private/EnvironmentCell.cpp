@@ -5,8 +5,7 @@
 
 #include "EnvironmentGridSettings.h"
 
-AEnvironmentCell::AEnvironmentCell()
-{
+AEnvironmentCell::AEnvironmentCell() {
 	PrimaryActorTick.bCanEverTick = false;
 
 	_boxC = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
@@ -15,3 +14,10 @@ AEnvironmentCell::AEnvironmentCell()
 	_side = GetDefault<UEnvironmentGridSettings>()->GetCellSide();
 }
 
+void AEnvironmentCell::FreezeTime() {
+
+}
+
+void AEnvironmentCell::UnfreezeTime() {
+
+}

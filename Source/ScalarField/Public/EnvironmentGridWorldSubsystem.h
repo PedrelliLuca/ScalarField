@@ -21,11 +21,9 @@ class SCALARFIELD_API UEnvironmentGridWorldSubsystem : public UWorldSubsystem
 public:
 	void PostInitialize() override;
 
-	void ActivateCellsSurroundingLocation(FVector location);
-
-
 private:
-	void _adjacencyListInitialization();
+	void _initializeGridByLocation(FVector location);
+	void _allocateGrid();
 
 	TMap<FCellCoordinates, TSet<FCellCoordinates>> _adjacencyList;
 	TMap<FCellCoordinates, TObjectPtr<AEnvironmentCell>> _cells;

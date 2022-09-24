@@ -18,6 +18,9 @@ class SCALARFIELD_API AEnvironmentCell : public AActor
 public:	
 	AEnvironmentCell();
 
+	void FreezeTime();
+	void UnfreezeTime();
+
 	TWeakObjectPtr<UBoxComponent> GetBox() { return _boxC; }
 	double GetSide() const { return _side; }
 
