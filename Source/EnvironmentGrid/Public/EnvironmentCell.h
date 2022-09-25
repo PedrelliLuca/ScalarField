@@ -22,7 +22,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnCellEndingOverlap, FCellCoordinates);
 * player is negligible, stop ticking.
 */
 UCLASS()
-class SCALARFIELD_API AEnvironmentCell : public AActor
+class ENVIRONMENTGRID_API AEnvironmentCell : public AActor
 {
 	GENERATED_BODY()
 	

@@ -11,7 +11,7 @@
  * \brief Allows us to set up the geometrical properties of the environment cells and how they're visualized
  */
 UCLASS(Config = "EnvironmentSystem", defaultconfig, meta = (DisplayName = "Environment Cell Settings"))
-class SCALARFIELD_API UEnvironmentCellSettings : public UDeveloperSettings
+class ENVIRONMENTGRID_API UEnvironmentCellSettings : public UDeveloperSettings
 {
 	GENERATED_BODY()
 

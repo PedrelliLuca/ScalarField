@@ -14,7 +14,7 @@ class AEnvironmentCell;
  * \brief Spawns and manages all environment cells in the world by (un)freezing them depending on the player's location
  */
 UCLASS()
-class SCALARFIELD_API UEnvironmentGridWorldSubsystem : public UWorldSubsystem
+class ENVIRONMENTGRID_API UEnvironmentGridWorldSubsystem : public UWorldSubsystem
 {
 	GENERATED_BODY()
 

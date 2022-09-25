@@ -12,8 +12,9 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
 					"Core",
-                    "CoreUObject", 
-					"Engine"
+                    "CoreUObject",
+					"Engine",
+                    "DeveloperSettings"
                 }
 				);
 
