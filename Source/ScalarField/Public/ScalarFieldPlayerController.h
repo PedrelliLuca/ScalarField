@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Templates/SubclassOf.h"
 #include "GameFramework/PlayerController.h"
+
 #include "ScalarFieldPlayerController.generated.h"
 
 /** Forward declaration to improve compiling times */

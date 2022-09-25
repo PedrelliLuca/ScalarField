@@ -4,8 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "ScalarFieldCharacter.generated.h"
 
+/*!
+* \brief Character structured for a top-view game.
+*/
 UCLASS(Blueprintable)
 class AScalarFieldCharacter : public ACharacter
 {
@@ -14,13 +18,13 @@ class AScalarFieldCharacter : public ACharacter
 public:
 	AScalarFieldCharacter();
 
-	// Called every frame.
-	virtual void Tick(float DeltaSeconds) override;
+	void Tick(float DeltaSeconds) override;
 
-	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
-	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+protected:
+	void BeginPlay() override;
 
 private:
 	/** Top down camera */

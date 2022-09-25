@@ -1,18 +1,24 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ScalarFieldCharacter.h"
-#include "UObject/ConstructorHelpers.h"
+
 #include "Camera/CameraComponent.h"
-#include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/DecalComponent.h"
+#include "Engine/World.h"
+#include "EnvironmentCell.h"
+#include "EnvironmentGridWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
-#include "Engine/World.h"
+#include "UObject/ConstructorHelpers.h"
 
 AScalarFieldCharacter::AScalarFieldCharacter()
 {
+	// This is what makes the scalar field character interact with the environment grid
+	GetCapsuleComponent()->SetCollisionProfileName("GridInteractingPawn");
+
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -47,5 +53,23 @@ AScalarFieldCharacter::AScalarFieldCharacter()
 
 void AScalarFieldCharacter::Tick(float DeltaSeconds)
 {
-    Super::Tick(DeltaSeconds);
+	Super::Tick(DeltaSeconds);
+}
+
+void AScalarFieldCharacter::BeginPlay() {
+	Super::BeginPlay();
+
+	// Retrieve all environment cells being overlapped at startup
+	TSet<AActor*> overlappingActors;
+	GetCapsuleComponent()->GetOverlappingActors(overlappingActors, AEnvironmentCell::StaticClass());
+
+	TSet<AEnvironmentCell*> overlappingCells;
+	Algo::Transform(overlappingActors, overlappingCells, [](AActor* const overlappingActor) {
+		AEnvironmentCell* overlappingCell = Cast<AEnvironmentCell>(overlappingActor);
+		check(overlappingCell != nullptr);
+		return overlappingCell;
+	});
+
+	// Send the cells to the grid subsystem to unfreeze them
+	GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>()->ActivateOverlappedCells(overlappingCells);
 }
