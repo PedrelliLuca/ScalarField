@@ -30,12 +30,12 @@ public:
 	AEnvironmentCell();
 
 	/*!
-	* \brief Freezes this cell in time, making it stop ticking 
+	* \brief Freezes this cell in time, making it stop ticking.
 	*/
 	void FreezeTime();
 
 	/*!
-	* \brief Unfreezes this cell in time, making its ticking resume
+	* \brief Unfreezes this cell in time, making its ticking resume. The cell immediately makes up for all the frames it lost.
 	*/
 	void UnfreezeTime();
 
@@ -67,9 +67,12 @@ private:
 	void _onCellEndingOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	double _side;
+	bool _isFrozen;
 	TObjectPtr<UBoxComponent> _boxC;
 	FCellCoordinates _coordinates;
-	bool _isFrozen;
+
+	/*! \brief Moment FreezeTime() was called */
+	FDateTime _freezingTime;
 
 	// I am not sure if these are meant to stay at the moment, but they're useful for debugging purposes
 	TObjectPtr<UStaticMeshComponent> _staticMeshC;

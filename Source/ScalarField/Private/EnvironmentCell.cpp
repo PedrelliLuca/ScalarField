@@ -6,6 +6,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "EnvironmentCellSettings.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Misc/DateTime.h"
+#include "Misc/Timespan.h"
 #include "ScalarFieldCharacter.h"
 
 AEnvironmentCell::AEnvironmentCell() {
@@ -36,7 +38,8 @@ void AEnvironmentCell::FreezeTime() {
 	if (_isFrozen) {
 		return;
 	}
-
+	_freezingTime = FDateTime::Now();
+	
 	_isFrozen = true;
 	SetActorTickEnabled(_isFrozen);
 	_materialInstance->SetVectorParameterValue(TEXT("ActivationColor"), GetDefault<UEnvironmentCellSettings>()->GetCellFrozenColor());
@@ -46,6 +49,9 @@ void AEnvironmentCell::UnfreezeTime() {
 	if (!_isFrozen) {
 		return;
 	}
+
+	// TODO: to be used in the future for gameplay logic
+	FTimespan freezeTimeSpan = FDateTime::Now() - _freezingTime;
 
 	_isFrozen = false;
 	SetActorTickEnabled(_isFrozen);
