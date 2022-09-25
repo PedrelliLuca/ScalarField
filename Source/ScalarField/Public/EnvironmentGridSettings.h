@@ -7,8 +7,8 @@
 
 #include "EnvironmentGridSettings.generated.h"
 
-/**
- *
+/*!
+ * \brief Allows us to setup the properties of the grid settings
  */
 UCLASS(Config = "EnvironmentSystem", defaultconfig, meta = (DisplayName = "Environment Grid Settings"))
 class SCALARFIELD_API UEnvironmentGridSettings : public UDeveloperSettings

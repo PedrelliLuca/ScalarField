@@ -1,12 +1,13 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "ScalarFieldPlayerController.h"
-#include "GameFramework/Pawn.h"
+
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "NiagaraSystem.h"
-#include "NiagaraFunctionLibrary.h"
-#include "ScalarFieldCharacter.h"
 #include "Engine/World.h"
+#include "GameFramework/Pawn.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraSystem.h"
+#include "ScalarFieldCharacter.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController()
 {

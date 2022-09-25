@@ -15,6 +15,12 @@ class UMaterialInstanceDynamic;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCellBeginningOverlap, FCellCoordinates);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCellEndingOverlap, FCellCoordinates);
 
+/*!
+* \brief Actor representing a cell partitioning the environment (level). These cells are used to manage the ticking of actors in ScalarField.
+* ScalarField aims at simulating a realistic environment for the player, which implies having many actors ticking in the scene. These cells'
+* purpose is to make sure that the game runs smoothly by making the environment away from the player, i.e. actors whose interaction with the
+* player is negligible, stop ticking.
+*/
 UCLASS()
 class SCALARFIELD_API AEnvironmentCell : public AActor
 {
@@ -23,16 +29,35 @@ class SCALARFIELD_API AEnvironmentCell : public AActor
 public:	
 	AEnvironmentCell();
 
-	void SetCoordinates(FCellCoordinates coordinates) { _coordinates = coordinates; }
-
+	/*!
+	* \brief Freezes this cell in time, making it stop ticking 
+	*/
 	void FreezeTime();
+
+	/*!
+	* \brief Unfreezes this cell in time, making its ticking resume
+	*/
 	void UnfreezeTime();
+
+	/*!
+	* \brief Returns wheter or not this cell is ticking
+	*/
 	bool IsFrozen() const { return _isFrozen; }
 
-	TWeakObjectPtr<UBoxComponent> GetBox() { return _boxC; }
 	double GetSide() const { return _side; }
+	TWeakObjectPtr<UBoxComponent> GetBox() { return _boxC; }
 
+	void SetCoordinates(FCellCoordinates coordinates) { _coordinates = coordinates; }
+	const FCellCoordinates& GetCoordinates() const { return _coordinates; }
+
+	/*!
+	* \brief Broadcasts when the cell starts being overlapped by the player character
+	*/
 	FOnCellBeginningOverlap OnCellBeginningOverlap;
+
+	/*!
+	* \brief Broadcasts when the cell stops being overlapped by the player character
+	*/
 	FOnCellEndingOverlap OnCellEndingOverlap;
 
 private:
@@ -46,7 +71,7 @@ private:
 	FCellCoordinates _coordinates;
 	bool _isFrozen;
 
-	// Placeholder stuff
+	// I am not sure if these are meant to stay at the moment, but they're useful for debugging purposes
 	TObjectPtr<UStaticMeshComponent> _staticMeshC;
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 };

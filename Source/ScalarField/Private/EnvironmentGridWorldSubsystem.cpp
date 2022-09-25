@@ -8,17 +8,11 @@
 #include "EnvironmentCellSettings.h"
 #include "EnvironmentGridSettings.h"
 
-void UEnvironmentGridWorldSubsystem::OnMapStart(const FVector playerLocation) {
-	_spawnGrid();
-
-	_activateCellsSurroundingLocation(playerLocation);
-}
-
-void UEnvironmentGridWorldSubsystem::_spawnGrid() {
+void UEnvironmentGridWorldSubsystem::SpawnGrid() {
 	const UEnvironmentGridSettings* gridSettings = GetDefault<UEnvironmentGridSettings>();
 	_adjacencyList.Reserve(gridSettings->GetGridYCells() * gridSettings->GetGridXCells());
 
-	const double CellSide = GetDefault<UEnvironmentCellSettings>()->GetCellSide();
+	const double cellSide = GetDefault<UEnvironmentCellSettings>()->GetCellSide();
 
 	const int32 gridYExtension = gridSettings->GetGridYCells() / 2;
 	const int32 gridXExtension = gridSettings->GetGridXCells() / 2;
@@ -27,16 +21,10 @@ void UEnvironmentGridWorldSubsystem::_spawnGrid() {
 		for (int32 i = gridXExtension; i >= -gridXExtension; --i) {
 			FCellCoordinates currentCellCoords{ i, j };
 
-			// Cell creation
-			const FVector cellLocation = FVector{ static_cast<FVector2D>(currentCellCoords), 0.5 } *CellSide;
-			TObjectPtr<AEnvironmentCell> currentCell = GetWorld()->SpawnActor<AEnvironmentCell>(cellLocation, FRotator::ZeroRotator);
-			currentCell->FreezeTime();
-			currentCell->SetCoordinates(currentCellCoords);
-			currentCell->OnCellBeginningOverlap.AddUObject(this, &UEnvironmentGridWorldSubsystem::_onCellEntered);
-			currentCell->OnCellEndingOverlap.AddUObject(this, &UEnvironmentGridWorldSubsystem::_onCellLeft);
-			_cells.Emplace(currentCellCoords, MoveTemp(currentCell));
+			// Spawning the cell
+			_spawnCellAtCoordinates(currentCellCoords, cellSide);
 
-			// Neighbors setup
+			// Setup of the cell's adjacency list
 			TSet<FCellCoordinates> neighbors;
 
 			// X
@@ -88,61 +76,67 @@ void UEnvironmentGridWorldSubsystem::_spawnGrid() {
 	}
 }
 
-void UEnvironmentGridWorldSubsystem::_activateCellsSurroundingLocation(const FVector location) {
-	const double CellSide = GetDefault<UEnvironmentCellSettings>()->GetCellSide();
+void UEnvironmentGridWorldSubsystem::ActivateOverlappedCells(const TSet<AEnvironmentCell*>& cellsToActivate) {
+	for (AEnvironmentCell* const cell : cellsToActivate) {
+		// Unfreezing the given cell
+		auto coords = cell->GetCoordinates();
+		_overlappedCells.Emplace(coords);
+		cell->UnfreezeTime();
 
-	double shortestDistance = TNumericLimits<double>::Max();
-	const FCellCoordinates* closestCoords = nullptr;
-	const TSet<FCellCoordinates>* neighborsOfClosestCell = nullptr;
-
-	const FVector2D location2D{ location };
-	for (const auto& cellAndNeighbors : _adjacencyList) {
-		const auto& cellCoords = cellAndNeighbors.Key;
-		const FVector2D cellLocation = static_cast<FVector2D>(cellCoords) * CellSide;
-
-		const double cellDistanceFromLocation = FVector2D::Distance(location2D, cellLocation);
-		if (cellDistanceFromLocation < shortestDistance) {
-			shortestDistance = cellDistanceFromLocation;
-			closestCoords = &cellCoords;
-			neighborsOfClosestCell = &cellAndNeighbors.Value;
+		// Unfreezing its neighbors
+		const auto* const neighborsOfCell = _adjacencyList.Find(coords);
+		check(neighborsOfCell != nullptr);
+		for (const auto& neighborCoords : *neighborsOfCell) {
+			check(_cells.Contains(neighborCoords));
+			_cells[neighborCoords]->UnfreezeTime();
 		}
 	}
+}
 
-	check(closestCoords != nullptr && _cells.Contains(*closestCoords));
+void UEnvironmentGridWorldSubsystem::_spawnCellAtCoordinates(const FCellCoordinates coordinates, const double cellSide) {
+	// Cell spawn
+	const FVector cellLocation = FVector{ static_cast<FVector2D>(coordinates), 0.5 } * cellSide;
+	TObjectPtr<AEnvironmentCell> currentCell = GetWorld()->SpawnActor<AEnvironmentCell>(cellLocation, FRotator::ZeroRotator);
 
-	_overlappedCells.Emplace(*closestCoords);
-	_cells[*closestCoords]->UnfreezeTime();
+	// Cells are frozen by default
+	currentCell->FreezeTime();
 
-	check(neighborsOfClosestCell != nullptr);
-	for (const auto& neighborCoords : *neighborsOfClosestCell) {
-		check(_cells.Contains(neighborCoords));
-		_cells[neighborCoords]->UnfreezeTime();
-	}
+	// Coordinates setup
+	currentCell->SetCoordinates(coordinates);
+
+	// Bindings' setup
+	currentCell->OnCellBeginningOverlap.AddUObject(this, &UEnvironmentGridWorldSubsystem::_onCellEntered);
+	currentCell->OnCellEndingOverlap.AddUObject(this, &UEnvironmentGridWorldSubsystem::_onCellLeft);
+
+	// Cache setup
+	_cells.Emplace(coordinates, MoveTemp(currentCell));
 }
 
 void UEnvironmentGridWorldSubsystem::_onCellEntered(FCellCoordinates cellEntered) {
 	_overlappedCells.Emplace(cellEntered);
 	const auto& neighborsOfEntered = _adjacencyList[cellEntered];
 	for (const auto& neighborCoords : neighborsOfEntered) {
-		if (_cells[neighborCoords]->IsFrozen()) {
-			_cells[neighborCoords]->UnfreezeTime();
-		}
+		_cells[neighborCoords]->UnfreezeTime();
 	}
 }
 
 void UEnvironmentGridWorldSubsystem::_onCellLeft(FCellCoordinates cellLeft) {
 	_overlappedCells.Remove(cellLeft);
 	const auto& neighborsOfLeft = _adjacencyList[cellLeft];
+
+	// Retrieve all cells that are currently overlapped and their neighbors
 	TSet<FCellCoordinates> overlappedAndNeighbors = _overlappedCells;
 	for (const auto& overlappedCell : _overlappedCells) {
 		overlappedAndNeighbors.Append(_adjacencyList[overlappedCell]);
 	}
 
+	// Determine the left cell neighbors that aren't among the set retrieved above
 	TSet<FCellCoordinates> uncommonNeighbors;
 	Algo::CopyIf(neighborsOfLeft, uncommonNeighbors, [&overlappedAndNeighbors](const FCellCoordinates& neighborOfLeft) {
 		return overlappedAndNeighbors.Find(neighborOfLeft) == nullptr;
-	});
+		});
 
+	// Freezing
 	for (const auto& neighborCoords : uncommonNeighbors) {
 		_cells[neighborCoords]->FreezeTime();
 	}

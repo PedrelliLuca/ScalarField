@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 
 /*!
-* \brief A simple struct that stores the coordinates of a cell in 2D space. The coordinates are int32s to make hashing deterministic.
+* \brief Struct that stores the integer coordinates of a cell in 2D space.
 */
 struct FCellCoordinates {
 public:
+	/*! \brief This is needed for the struct to be hashable. */
 	bool operator==(const FCellCoordinates& other) const {
 		return (X == other.X) && (Y == other.Y);
 	}
@@ -36,6 +37,7 @@ uint32 GetTypeHash(const FCellCoordinates& cellCoords);
 
 #else // optimize by inlining in shipping and development builds
 
+/*! \brief This is needed for FCellCoordinates to be hashable. */
 FORCEINLINE uint32 GetTypeHash(const FCellCoordinates& cellCoords) {
 	return HashCombine(GetTypeHash(cellCoords.X), GetTypeHash(cellCoords.Y));
 }
