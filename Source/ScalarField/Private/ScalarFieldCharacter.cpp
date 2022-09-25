@@ -16,6 +16,9 @@
 
 AScalarFieldCharacter::AScalarFieldCharacter()
 {
+	// This is what makes the scalar field character interact with the environment grid
+	GetCapsuleComponent()->SetCollisionProfileName("GridInteractingPawn");
+
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 

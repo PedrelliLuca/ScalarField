@@ -8,7 +8,6 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Misc/DateTime.h"
 #include "Misc/Timespan.h"
-#include "ScalarFieldCharacter.h"
 
 AEnvironmentCell::AEnvironmentCell() {
 	PrimaryActorTick.bCanEverTick = true;
@@ -21,6 +20,9 @@ AEnvironmentCell::AEnvironmentCell() {
 	// Box component setup. The box is the actual cell and its purpose is to ping the environment grid whenever the player character enters/leaves the cell
 	_boxC = CreateDefaultSubobject<UBoxComponent>(TEXT("Box Component"));
 	SetRootComponent(_boxC);
+
+	// This is what makes the environment cell interact with the scalar field character
+	_boxC->SetCollisionProfileName("EnvironmentCell");
 	_boxC->SetBoxExtent(FVector::OneVector * _side * 0.5);
 	_boxC->OnComponentBeginOverlap.AddDynamic(this, &AEnvironmentCell::_onCellBeginningOverlap);
 	_boxC->OnComponentEndOverlap.AddDynamic(this, &AEnvironmentCell::_onCellEndingOverlap);
@@ -59,15 +61,13 @@ void AEnvironmentCell::UnfreezeTime() {
 }
 
 void AEnvironmentCell::_onCellBeginningOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-	if (Cast<AScalarFieldCharacter>(OtherActor)) {
-		UE_LOG(LogTemp, Warning, TEXT("Cell %s _onCellBeginningOverlap"), *_coordinates.ToString());
-		OnCellBeginningOverlap.Broadcast(_coordinates);
-	}
+	// Because of how collisions have been set up, OtherComp has object channel GridInteractingPawn
+	UE_LOG(LogTemp, Warning, TEXT("Cell %s _onCellBeginningOverlap"), *_coordinates.ToString());
+	OnCellBeginningOverlap.Broadcast(_coordinates);
 }
 
 void AEnvironmentCell::_onCellEndingOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
-	if (Cast<AScalarFieldCharacter>(OtherActor)) {
-		UE_LOG(LogTemp, Warning, TEXT("Cell %s _onCellEndingOverlap"), *_coordinates.ToString());
-		OnCellEndingOverlap.Broadcast(_coordinates);
-	}
+	// Because of how collisions have been set up, OtherComp has object channel GridInteractingPawn
+	UE_LOG(LogTemp, Warning, TEXT("Cell %s _onCellEndingOverlap"), *_coordinates.ToString());
+	OnCellEndingOverlap.Broadcast(_coordinates);
 }
