@@ -110,6 +110,7 @@ void UEnvironmentGridWorldSubsystem::_activateCellsSurroundingLocation(const FVe
 
 	check(closestCoords != nullptr && _cells.Contains(*closestCoords));
 
+	_overlappedCells.Emplace(*closestCoords);
 	_cells[*closestCoords]->UnfreezeTime();
 
 	check(neighborsOfClosestCell != nullptr);
@@ -120,7 +121,7 @@ void UEnvironmentGridWorldSubsystem::_activateCellsSurroundingLocation(const FVe
 }
 
 void UEnvironmentGridWorldSubsystem::_onCellEntered(FCellCoordinates cellEntered) {
-	_lastEnteredCell = cellEntered;
+	_overlappedCells.Emplace(cellEntered);
 	const auto& neighborsOfEntered = _adjacencyList[cellEntered];
 	for (const auto& neighborCoords : neighborsOfEntered) {
 		if (_cells[neighborCoords]->IsFrozen()) {
@@ -130,12 +131,16 @@ void UEnvironmentGridWorldSubsystem::_onCellEntered(FCellCoordinates cellEntered
 }
 
 void UEnvironmentGridWorldSubsystem::_onCellLeft(FCellCoordinates cellLeft) {
+	_overlappedCells.Remove(cellLeft);
 	const auto& neighborsOfLeft = _adjacencyList[cellLeft];
-	const auto& neighborsOfCurrent = _adjacencyList[_lastEnteredCell];
+	TSet<FCellCoordinates> overlappedAndNeighbors = _overlappedCells;
+	for (const auto& overlappedCell : _overlappedCells) {
+		overlappedAndNeighbors.Append(_adjacencyList[overlappedCell]);
+	}
 
 	TSet<FCellCoordinates> uncommonNeighbors;
-	Algo::CopyIf(neighborsOfLeft, uncommonNeighbors, [&neighborsOfCurrent, lastEnteredCell = _lastEnteredCell](const FCellCoordinates& neighborOfLeft) {
-		return neighborOfLeft != lastEnteredCell && neighborsOfCurrent.Find(neighborOfLeft) == nullptr;
+	Algo::CopyIf(neighborsOfLeft, uncommonNeighbors, [&overlappedAndNeighbors](const FCellCoordinates& neighborOfLeft) {
+		return overlappedAndNeighbors.Find(neighborOfLeft) == nullptr;
 	});
 
 	for (const auto& neighborCoords : uncommonNeighbors) {

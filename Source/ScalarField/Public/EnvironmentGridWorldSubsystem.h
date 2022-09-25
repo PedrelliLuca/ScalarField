@@ -31,5 +31,5 @@ private:
 
 	TMap<FCellCoordinates, TSet<FCellCoordinates>> _adjacencyList;
 	TMap<FCellCoordinates, TObjectPtr<AEnvironmentCell>> _cells;
-	FCellCoordinates _lastEnteredCell;
+	TSet<FCellCoordinates> _overlappedCells;
 };
