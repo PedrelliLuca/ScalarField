@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
 
@@ -34,5 +35,8 @@ private:
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
+
+	UPROPERTY()
+	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
 };
 
