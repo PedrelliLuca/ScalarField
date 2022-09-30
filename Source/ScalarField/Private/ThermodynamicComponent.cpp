@@ -51,11 +51,12 @@ double UThermodynamicComponent::_getTemperatureDelta(const TArray<TObjectPtr<UPr
 	for (const auto& otherC : overlappingComponents) {
 		const TObjectPtr<UThermodynamicComponent> otherTermoC = Cast<UThermodynamicComponent>(otherC);
 		check(otherTermoC != nullptr);
-		otherTermoC->_increaseInteractorsCount();
 
 		/* When this is hotter than other, the delta is negative since we emit heat
 		 * When this is colder than other, the delta is positive since we absorb heat. */
 		deltaTemperature += (otherTermoC->_currentTemperature - _currentTemperature);
+
+		otherTermoC->_increaseInteractorsCount();
 	}
 
 	deltaTemperature *= ROD_CONSTANT * deltaTime / _heatCapacity;
