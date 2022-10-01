@@ -18,10 +18,13 @@ class SCALARFIELD_API AThermodynamicActor : public AActor {
 public:
 	AThermodynamicActor();
 
+protected:
+	void BeginPlay() override;
+
 private:
 	void _updateMaterialBasedOnTemperature(double temperature);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Thermodynamics, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> _staticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Thermodynamics, meta = (AllowPrivateAccess = "true"))

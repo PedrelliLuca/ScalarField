@@ -52,8 +52,6 @@ void UThermodynamicComponent::_setTemperature(double temperature) {
 
 	_currentTemperature = _initialTemperature;
 	_nextTemperature = _initialTemperature;
-
-	OnTemperatureChanged.Broadcast(_currentTemperature);
 }
 
 double UThermodynamicComponent::_getTemperatureDelta(const TArray<TObjectPtr<UPrimitiveComponent>>& overlappingComponents, const float deltaTime) {
