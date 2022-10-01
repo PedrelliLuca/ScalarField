@@ -19,9 +19,14 @@ public:
 	AThermodynamicActor();
 
 private:
+	void _updateMaterialBasedOnTemperature(double temperature);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Thermodynamics, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> _mesh;
+	TObjectPtr<UStaticMeshComponent> _staticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Thermodynamics, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 };

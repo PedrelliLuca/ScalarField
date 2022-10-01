@@ -6,6 +6,8 @@
 #include "Components/CapsuleComponent.h"
 #include "ThermodynamicComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTemperatureChanged, double);
+
 /**
  *
  */
@@ -25,6 +27,8 @@ public:
 
 	double GetTemperature() const { return _currentTemperature; }
 
+	FOnTemperatureChanged OnTemperatureChanged;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Thermodynamics")
 	double _heatCapacity = 4184.;
@@ -33,13 +37,7 @@ protected:
 	double _initialTemperature = 298.15;
 
 private:
-	void _setTemperature(double temperature) {
-		// Updating _initialTemperature just to give a visual feedback in the editor, this value doesn't matter during play
-		_initialTemperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
-
-		_currentTemperature = _initialTemperature;
-		_nextTemperature = _initialTemperature;
-	}
+	void _setTemperature(double temperature);
 	void _setHeatCapacity(double heatCapacity) {
 		_heatCapacity = FMath::Clamp(heatCapacity, 1., TNumericLimits<double>::Max());
 	}

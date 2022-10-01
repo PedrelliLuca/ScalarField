@@ -68,6 +68,7 @@ private:
 
 	double _side;
 	bool _isFrozen;
+	UPROPERTY()
 	TObjectPtr<UBoxComponent> _boxC;
 	FCellCoordinates _coordinates;
 
@@ -75,7 +76,9 @@ private:
 	FDateTime _freezingTime;
 
 	// I am not sure if these are meant to stay at the moment, but they're useful for debugging purposes
+	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> _staticMeshC;
+	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 };
 

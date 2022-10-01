@@ -46,6 +46,16 @@ void UThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& prop
 }
 #endif
 
+void UThermodynamicComponent::_setTemperature(double temperature) {
+	// Updating _initialTemperature just to give a visual feedback in the editor, this value doesn't matter during play
+	_initialTemperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
+
+	_currentTemperature = _initialTemperature;
+	_nextTemperature = _initialTemperature;
+
+	OnTemperatureChanged.Broadcast(_currentTemperature);
+}
+
 double UThermodynamicComponent::_getTemperatureDelta(const TArray<TObjectPtr<UPrimitiveComponent>>& overlappingComponents, const float deltaTime) {
 	double deltaTemperature = 0.;
 	for (const auto& otherC : overlappingComponents) {
@@ -72,6 +82,7 @@ void UThermodynamicComponent::_increaseInteractorsCount() {
 
 void UThermodynamicComponent::_setCurrentTempAsNext() {
 	_currentTemperature = _nextTemperature;
+	OnTemperatureChanged.Broadcast(_currentTemperature);
 
 	_counterOfInteractors = 0;
 	_numOfInteractors = TNumericLimits<uint32>::Max();
