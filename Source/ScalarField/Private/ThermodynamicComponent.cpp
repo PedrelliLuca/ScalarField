@@ -33,7 +33,7 @@ void UThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& prop
 	FName propertyName = property != nullptr ? property->GetFName() : NAME_None;
 	if (propertyName == GET_MEMBER_NAME_CHECKED(UThermodynamicComponent, _initialTemperature)) {
 		if (const auto initTempProperty = CastFieldChecked<FDoubleProperty>(property)) {
-			_setTemperature(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)));
+			SetTemperature(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)));
 		}
 	}
 	else if (propertyName == GET_MEMBER_NAME_CHECKED(UThermodynamicComponent, _heatCapacity)) {
@@ -46,13 +46,18 @@ void UThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& prop
 }
 #endif
 
-void UThermodynamicComponent::_setTemperature(double temperature) {
+void UThermodynamicComponent::SetTemperature(double temperature, const bool updateInitialTemp /*= true*/) {
 	// Updating _initialTemperature just to give a visual feedback in the editor, this value doesn't matter during play
-	_initialTemperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
+	temperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
+
+	if (updateInitialTemp) {
+		_initialTemperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
+	}
 
 	_currentTemperature = _initialTemperature;
 	_nextTemperature = _initialTemperature;
 }
+
 
 double UThermodynamicComponent::_getTemperatureDelta(const TArray<TObjectPtr<UPrimitiveComponent>>& overlappingComponents, const float deltaTime) {
 	double deltaTemperature = 0.;

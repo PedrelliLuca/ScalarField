@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2020 Zuru Tech HK Limited and Archbox S.r.l., All rights reserved.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 #include "EnvironmentGridModule.h"

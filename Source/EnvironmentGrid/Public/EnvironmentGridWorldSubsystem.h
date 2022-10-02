@@ -30,6 +30,8 @@ public:
 	* \brief Spawns a grid of environment cells in the current map.
 	*/
 	void SpawnGrid(FGridSpawnAttributes gridAttributes);
+
+	TMap<FCellCoordinates, TWeakObjectPtr<const AEnvironmentCell>> GetGrid() const;
 	
 	/*!
 	* \brief Given a set of environment cells that are being overlapped, activates them and their neighbors

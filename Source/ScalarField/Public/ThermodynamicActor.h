@@ -9,14 +9,18 @@
 #include "ThermodynamicActor.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Blueprintable)
 class SCALARFIELD_API AThermodynamicActor : public AActor {
 	GENERATED_BODY()
-	
+
 public:
 	AThermodynamicActor();
+
+	void SetTemperature(double temperature, bool updateInitialTemperature = true) { _thermodynamicC->SetTemperature(temperature, updateInitialTemperature); }
+	void SetHeatCapacity(double heatCapacity) { _thermodynamicC->SetHeatCapacity(heatCapacity); }
+	void SetThermicCapsuleDimensions(double radius, double halfHeight);
 
 protected:
 	void BeginPlay() override;

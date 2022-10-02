@@ -25,7 +25,10 @@ public:
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
+	void SetTemperature(double temperature, const bool updateInitialTemp = true);
 	double GetTemperature() const { return _currentTemperature; }
+
+	void SetHeatCapacity(double heatCapacity) { _heatCapacity = heatCapacity; }
 
 	FOnTemperatureChanged OnTemperatureChanged;
 
@@ -37,7 +40,6 @@ protected:
 	double _initialTemperature = 298.15;
 
 private:
-	void _setTemperature(double temperature);
 	void _setHeatCapacity(double heatCapacity) {
 		_heatCapacity = FMath::Clamp(heatCapacity, 1., TNumericLimits<double>::Max());
 	}

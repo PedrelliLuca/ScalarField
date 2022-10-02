@@ -16,6 +16,11 @@ AThermodynamicActor::AThermodynamicActor() {
 	_thermodynamicC->SetupAttachment(RootComponent);
 }
 
+void AThermodynamicActor::SetThermicCapsuleDimensions(const double radius, const double halfHeight) {
+	_thermodynamicC->SetCapsuleRadius(radius);
+	_thermodynamicC->SetCapsuleHalfHeight(halfHeight);
+}
+
 void AThermodynamicActor::BeginPlay() {
 	Super::BeginPlay();
 

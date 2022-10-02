@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "EnvironmentGridWorldSubsystem.h"
 
 #include "Algo/Copy.h"
@@ -78,6 +77,17 @@ void UEnvironmentGridWorldSubsystem::SpawnGrid(FGridSpawnAttributes gridAttribut
 	}
 }
 
+TMap<FCellCoordinates, TWeakObjectPtr<const AEnvironmentCell>> UEnvironmentGridWorldSubsystem::GetGrid() const {
+	TMap<FCellCoordinates, TWeakObjectPtr<const AEnvironmentCell>> constCells;
+	constCells.Reserve(_cells.Num());
+
+	Algo::Transform(_cells, constCells, [](const auto& coordCellPair) {
+		return TPair<FCellCoordinates, TWeakObjectPtr<const AEnvironmentCell>>{coordCellPair.Key, coordCellPair.Value};
+		});
+
+	return constCells;
+}
+
 void UEnvironmentGridWorldSubsystem::ActivateOverlappedCells(const TSet<AEnvironmentCell*>& cellsToActivate) {
 	for (AEnvironmentCell* const cell : cellsToActivate) {
 		// Unfreezing the given cell
@@ -105,7 +115,7 @@ void UEnvironmentGridWorldSubsystem::_spawnCellAtCoordinates(const FCellCoordina
 	currentCell->FreezeTime();
 	currentCell->SetSide(step);
 	currentCell->SetCoordinates(coordinates);
-	
+
 	// Bindings' setup
 	currentCell->OnCellBeginningOverlap.AddUObject(this, &UEnvironmentGridWorldSubsystem::_onCellEntered);
 	currentCell->OnCellEndingOverlap.AddUObject(this, &UEnvironmentGridWorldSubsystem::_onCellLeft);
