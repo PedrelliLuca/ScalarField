@@ -21,6 +21,7 @@ class ENVIRONMENTGRID_API UEnvironmentGridWorldSubsystem : public UWorldSubsyste
 public:
 	struct FGridSpawnAttributes {
 		FVector2D GridCenter = FVector2D::ZeroVector;
+		double ZExtension = 0.;
 		double Step = 0.;
 		int32 NCellsX = 0;
 		int32 NCellsY = 0;
@@ -42,7 +43,7 @@ private:
 	/*!
 	* \brief Employs the given coordinates and side to spawn a cell via SpawnActor
 	*/
-	void _spawnCellAtCoordinates(FCellCoordinates coordinates, FVector2D gridCenter, double step, FVector diagonalCorrection);
+	void _spawnCellAtCoordinates(FCellCoordinates coordinates, FVector2D gridCenter, double side, double z, FVector diagonalCorrection);
 
 	/*!
 	* \brief Unfreeze all neighbors of the given cell. Hypothesis: the given cell is unfrozen.

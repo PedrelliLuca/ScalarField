@@ -23,7 +23,7 @@ void UEnvironmentGridWorldSubsystem::SpawnGrid(FGridSpawnAttributes gridAttribut
 			FCellCoordinates currentCellCoords{ i, j };
 
 			// Spawning the cell
-			_spawnCellAtCoordinates(currentCellCoords, gridAttributes.GridCenter, gridAttributes.Step, diagonalCorrection);
+			_spawnCellAtCoordinates(currentCellCoords, gridAttributes.GridCenter, gridAttributes.Step, gridAttributes.ZExtension, diagonalCorrection);
 
 			// Setup of the cell's adjacency list
 			TSet<FCellCoordinates> neighbors;
@@ -105,15 +105,15 @@ void UEnvironmentGridWorldSubsystem::ActivateOverlappedCells(const TSet<AEnviron
 	}
 }
 
-void UEnvironmentGridWorldSubsystem::_spawnCellAtCoordinates(const FCellCoordinates coordinates, const FVector2D gridCenter, const double step, const FVector diagonalCorrection) {
+void UEnvironmentGridWorldSubsystem::_spawnCellAtCoordinates(const FCellCoordinates coordinates, const FVector2D gridCenter, const double side, const double z, const FVector diagonalCorrection) {
 	// Cell spawn
-	const FVector cellLocation = FVector{ gridCenter, 0. } + FVector{ static_cast<FVector2D>(coordinates), 0.5 } *step + diagonalCorrection;
+	const FVector cellLocation = FVector{ gridCenter, 0. } + FVector{ static_cast<FVector2D>(coordinates) * side, z } + diagonalCorrection;
 	const FTransform cellTransform{ cellLocation };
 	TObjectPtr<AEnvironmentCell> currentCell = GetWorld()->SpawnActorDeferred<AEnvironmentCell>(AEnvironmentCell::StaticClass(), cellTransform);
 
 	// Cells are frozen by default
 	currentCell->FreezeTime();
-	currentCell->SetSide(step);
+	currentCell->SetSide(side);
 	currentCell->SetCoordinates(coordinates);
 
 	// Bindings' setup

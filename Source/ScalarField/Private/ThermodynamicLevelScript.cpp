@@ -40,9 +40,11 @@ UEnvironmentGridWorldSubsystem::FGridSpawnAttributes AThermodynamicLevelScript::
 	gridAttributes.GridCenter = FVector2D{ gridTriggerBox->GetActorLocation() };
 
 	auto gridBox = CastChecked<UBoxComponent>(gridTriggerBox->GetCollisionComponent());
-	const FVector boxDimensions = gridBox->GetUnscaledBoxExtent() * 2;
+	const FVector boxExtent = gridBox->GetUnscaledBoxExtent();
+	gridAttributes.ZExtension = gridTriggerBox->GetActorLocation().Z;
 
 	// The step can't be greater than any of the dimensions of the box
+	const FVector boxDimensions = boxExtent * 2;
 	gridAttributes.Step = _gridStep;
 	if (gridAttributes.Step > FMath::Min(boxDimensions.X, boxDimensions.Y)) {
 		gridAttributes.Step = FMath::Min(boxDimensions.X, boxDimensions.Y);
