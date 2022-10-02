@@ -19,10 +19,17 @@ class ENVIRONMENTGRID_API UEnvironmentGridWorldSubsystem : public UWorldSubsyste
 	GENERATED_BODY()
 
 public:
+	struct FGridSpawnAttributes {
+		FVector2D GridCenter = FVector2D::ZeroVector;
+		double Step = 0.;
+		int32 NCellsX = 0;
+		int32 NCellsY = 0;
+	};
+
 	/*!
 	* \brief Spawns a grid of environment cells in the current map.
 	*/
-	void SpawnGrid();
+	void SpawnGrid(FGridSpawnAttributes gridAttributes);
 	
 	/*!
 	* \brief Given a set of environment cells that are being overlapped, activates them and their neighbors
@@ -33,7 +40,7 @@ private:
 	/*!
 	* \brief Employs the given coordinates and side to spawn a cell via SpawnActor
 	*/
-	void _spawnCellAtCoordinates(FCellCoordinates coordinates, double cellSide);
+	void _spawnCellAtCoordinates(FCellCoordinates coordinates, FVector2D gridCenter, double step, FVector diagonalCorrection);
 
 	/*!
 	* \brief Unfreeze all neighbors of the given cell. Hypothesis: the given cell is unfrozen.
