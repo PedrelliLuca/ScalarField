@@ -20,9 +20,8 @@ class ENVIRONMENTGRID_API UEnvironmentGridWorldSubsystem : public UWorldSubsyste
 
 public:
 	/*!
-	* \brief Spawns a grid of environment cells in the current map. This should be called from the level BP.
+	* \brief Spawns a grid of environment cells in the current map.
 	*/
-	UFUNCTION(BlueprintCallable)
 	void SpawnGrid();
 	
 	/*!
