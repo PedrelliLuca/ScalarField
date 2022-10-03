@@ -24,20 +24,17 @@ void AThermodynamicActor::SetThermicCapsuleDimensions(const double radius, const
 void AThermodynamicActor::BeginPlay() {
 	Super::BeginPlay();
 
+	// Setting up the DMI that changes the mesh color based on temperature
 	const UThermodynamicsSettings* const thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
 	_materialInstance = _staticMesh->CreateDynamicMaterialInstance(0, thermodynamicsSettings->GetThermodynamicsMaterial(), TEXT("Thermodynamics Material"));
 
 	if (_materialInstance != nullptr) {
 		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
+		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AThermodynamicActor::_updateMaterialBasedOnTemperature);
 	}
-
-	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AThermodynamicActor::_updateMaterialBasedOnTemperature);
 }
 
 void AThermodynamicActor::_updateMaterialBasedOnTemperature(const double temperature) {
-	if (_materialInstance == nullptr) {
-		return;
-	}
-
+	check(!_materialInstance.IsNull())
 	_materialInstance->SetVectorParameterValue(TEXT("temperature"), FColorizer::GenerateColorFromTemperature(temperature));
 }

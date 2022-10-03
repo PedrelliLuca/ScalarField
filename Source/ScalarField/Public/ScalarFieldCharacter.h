@@ -28,6 +28,8 @@ protected:
 	void BeginPlay() override;
 
 private:
+	void _updateMaterialBasedOnTemperature(double temperature);
+
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* _topDownCameraComponent;
@@ -38,5 +40,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Thermodynamics, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 };
 

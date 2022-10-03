@@ -3,6 +3,7 @@
 #include "ScalarFieldCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Colorizer.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "Engine/World.h"
@@ -12,6 +13,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
+#include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
 
 AScalarFieldCharacter::AScalarFieldCharacter()
@@ -63,6 +65,15 @@ void AScalarFieldCharacter::Tick(float DeltaSeconds)
 void AScalarFieldCharacter::BeginPlay() {
 	Super::BeginPlay();
 
+	// Setting up the DMI that changes the mesh color based on temperature
+	auto thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
+	_materialInstance = GetMesh()->CreateDynamicMaterialInstance(0, GetMesh()->GetMaterial(0), TEXT("Thermodynamics Material"));
+
+	if (_materialInstance != nullptr) {
+		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
+		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_updateMaterialBasedOnTemperature);
+	}
+
 	// Retrieve all environment cells being overlapped at startup
 	TSet<AActor*> overlappingActors;
 	GetCapsuleComponent()->GetOverlappingActors(overlappingActors, AEnvironmentCell::StaticClass());
@@ -76,4 +87,9 @@ void AScalarFieldCharacter::BeginPlay() {
 
 	// Send the cells to the grid subsystem to unfreeze them
 	GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>()->ActivateOverlappedCells(overlappingCells);
+}
+
+void AScalarFieldCharacter::_updateMaterialBasedOnTemperature(double temperature) {
+	check(!_materialInstance.IsNull())
+	_materialInstance->SetVectorParameterValue(TEXT("Tint"), FColorizer::GenerateColorFromTemperature(temperature));
 }
