@@ -36,11 +36,6 @@ void UThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& prop
 			SetTemperature(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)));
 		}
 	}
-	else if (propertyName == GET_MEMBER_NAME_CHECKED(UThermodynamicComponent, _heatCapacity)) {
-		if (const auto heatCapProperty = CastFieldChecked<FDoubleProperty>(property)) {
-			_setHeatCapacity(heatCapProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)));
-		}
-	}
 
 	Super::PostEditChangeProperty(propertyChangedEvent);
 }

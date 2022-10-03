@@ -33,7 +33,7 @@ public:
 	FOnTemperatureChanged OnTemperatureChanged;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Thermodynamics")
+	UPROPERTY(EditAnywhere, Category = "Thermodynamics", meta = (ClampMin = "1"))
 	double _heatCapacity = 4184.;
 
 	UPROPERTY(EditAnywhere, Category = "Thermodynamics")

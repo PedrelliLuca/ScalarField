@@ -23,16 +23,16 @@ public:
 protected:
 	void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Environment Grid")
+	UPROPERTY(EditAnywhere, Category = "Environment Grid", meta = (ClampMin = "100"))
 	double _gridStep = 100.;
 
-	UPROPERTY(EditAnywhere, Category = "Air")
+	UPROPERTY(EditAnywhere, Category = "Air", meta = (ClampMin = "0"))
 	double _airTemperature = 298.15;
 
-	UPROPERTY(EditAnywhere, Category = "Air")
+	UPROPERTY(EditAnywhere, Category = "Air", meta = (ClampMin = "1"))
 	double _airHeatCapacity = 700.;
 
-	UPROPERTY(EditAnywhere, Category = "Air")
+	UPROPERTY(EditAnywhere, Category = "Air", meta = (ClampMin = "2"))
 	int32 _moleculesPerCellSide = 3;
 
 	UPROPERTY(EditAnywhere, NoClear, Category = "Air")
