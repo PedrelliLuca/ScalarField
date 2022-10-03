@@ -61,6 +61,10 @@ void UThermodynamicComponent::SetTemperature(double temperature, const bool upda
 
 double UThermodynamicComponent::_getTemperatureDelta(const TArray<TObjectPtr<UPrimitiveComponent>>& overlappingComponents, const float deltaTime) {
 	double deltaTemperature = 0.;
+	if (overlappingComponents.Num() == 0) {
+		return deltaTemperature;
+	}
+
 	for (const auto& otherC : overlappingComponents) {
 		const TObjectPtr<UThermodynamicComponent> otherTermoC = Cast<UThermodynamicComponent>(otherC);
 		check(otherTermoC != nullptr);
@@ -72,6 +76,7 @@ double UThermodynamicComponent::_getTemperatureDelta(const TArray<TObjectPtr<UPr
 		otherTermoC->_increaseInteractorsCount();
 	}
 
+	deltaTemperature /= overlappingComponents.Num();
 	deltaTemperature *= ROD_CONSTANT * deltaTime / _heatCapacity;
 	return deltaTemperature;
 }
