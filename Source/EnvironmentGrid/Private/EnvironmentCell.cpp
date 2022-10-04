@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "EnvironmentCell.h"
 
 #include "Components/StaticMeshComponent.h"
@@ -14,7 +13,6 @@ AEnvironmentCell::AEnvironmentCell() {
 
 	const UEnvironmentCellSettings* const cellSettings = GetDefault<UEnvironmentCellSettings>();
 
-	_side = cellSettings->GetCellSide();
 	_isFrozen = false;
 
 	// Box component setup. The box is the actual cell and its purpose is to ping the environment grid whenever the player character enters/leaves the cell
@@ -23,7 +21,6 @@ AEnvironmentCell::AEnvironmentCell() {
 
 	// This is what makes the environment cell interact with the scalar field character
 	_boxC->SetCollisionProfileName("EnvironmentCell");
-	_boxC->SetBoxExtent(FVector::OneVector * _side * 0.5);
 	_boxC->OnComponentBeginOverlap.AddDynamic(this, &AEnvironmentCell::_onCellBeginningOverlap);
 	_boxC->OnComponentEndOverlap.AddDynamic(this, &AEnvironmentCell::_onCellEndingOverlap);
 

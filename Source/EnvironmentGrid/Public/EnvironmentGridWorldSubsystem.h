@@ -19,11 +19,20 @@ class ENVIRONMENTGRID_API UEnvironmentGridWorldSubsystem : public UWorldSubsyste
 	GENERATED_BODY()
 
 public:
+	struct FGridSpawnAttributes {
+		FVector2D GridCenter = FVector2D::ZeroVector;
+		double ZExtension = 0.;
+		double Step = 0.;
+		int32 NCellsX = 0;
+		int32 NCellsY = 0;
+	};
+
 	/*!
-	* \brief Spawns a grid of environment cells in the current map. This should be called from the level BP.
+	* \brief Spawns a grid of environment cells in the current map.
 	*/
-	UFUNCTION(BlueprintCallable)
-	void SpawnGrid();
+	void SpawnGrid(FGridSpawnAttributes gridAttributes);
+
+	TMap<FCellCoordinates, TWeakObjectPtr<const AEnvironmentCell>> GetGrid() const;
 	
 	/*!
 	* \brief Given a set of environment cells that are being overlapped, activates them and their neighbors
@@ -34,7 +43,7 @@ private:
 	/*!
 	* \brief Employs the given coordinates and side to spawn a cell via SpawnActor
 	*/
-	void _spawnCellAtCoordinates(FCellCoordinates coordinates, double cellSide);
+	void _spawnCellAtCoordinates(FCellCoordinates coordinates, FVector2D gridCenter, double side, double z, FVector diagonalCorrection);
 
 	/*!
 	* \brief Unfreeze all neighbors of the given cell. Hypothesis: the given cell is unfrozen.

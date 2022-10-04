@@ -44,8 +44,8 @@ public:
 	*/
 	bool IsFrozen() const { return _isFrozen; }
 
-	double GetSide() const { return _side; }
-	TWeakObjectPtr<UBoxComponent> GetBox() { return _boxC; }
+	void SetSide(double side) { _boxC->SetBoxExtent(FVector::OneVector * side * 0.5); }
+	double GetSide() const { return _boxC->GetUnscaledBoxExtent().X * 2; }
 
 	void SetCoordinates(FCellCoordinates coordinates) { _coordinates = coordinates; }
 	const FCellCoordinates& GetCoordinates() const { return _coordinates; }
@@ -66,8 +66,8 @@ private:
 	UFUNCTION()
 	void _onCellEndingOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	double _side;
 	bool _isFrozen;
+	UPROPERTY()
 	TObjectPtr<UBoxComponent> _boxC;
 	FCellCoordinates _coordinates;
 
@@ -75,7 +75,9 @@ private:
 	FDateTime _freezingTime;
 
 	// I am not sure if these are meant to stay at the moment, but they're useful for debugging purposes
+	UPROPERTY()
 	TObjectPtr<UStaticMeshComponent> _staticMeshC;
+	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 };
 
