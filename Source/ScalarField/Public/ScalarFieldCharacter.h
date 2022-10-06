@@ -24,6 +24,8 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return _topDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return _cameraBoom; }
 
+	void CastSkillAtIndex(uint32 index);
+
 protected:
 	void BeginPlay() override;
 

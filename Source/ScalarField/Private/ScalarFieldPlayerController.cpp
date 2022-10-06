@@ -9,97 +9,92 @@
 #include "NiagaraSystem.h"
 #include "ScalarFieldCharacter.h"
 
-AScalarFieldPlayerController::AScalarFieldPlayerController()
-{
+AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
 }
 
-void AScalarFieldPlayerController::PlayerTick(float DeltaTime)
-{
-	Super::PlayerTick(DeltaTime);
+void AScalarFieldPlayerController::PlayerTick(float deltaTime) {
+	Super::PlayerTick(deltaTime);
 
-	if(bInputPressed)
-	{
-		FollowTime += DeltaTime;
+	if(_bInputPressed) {
+		_followTime += deltaTime;
 
 		// Look for the touch location
-		FVector HitLocation = FVector::ZeroVector;
-		FHitResult Hit;
-		if(bIsTouch)
-		{
-			GetHitResultUnderFinger(ETouchIndex::Touch1, ECC_Visibility, true, Hit);
+		FVector hitLocation = FVector::ZeroVector;
+		FHitResult hit;
+		if(_bIsTouch) {
+			GetHitResultUnderFinger(ETouchIndex::Touch1, ECC_Visibility, true, hit);
 		}
-		else
-		{
-			GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+		else {
+			GetHitResultUnderCursor(ECC_Visibility, true, hit);
 		}
-		HitLocation = Hit.Location;
+		hitLocation = hit.Location;
 
 		// Direct the Pawn towards that location
-		APawn* const MyPawn = GetPawn();
-		if(MyPawn)
-		{
-			FVector WorldDirection = (HitLocation - MyPawn->GetActorLocation()).GetSafeNormal();
-			MyPawn->AddMovementInput(WorldDirection, 1.f, false);
+		APawn* const myPawn = GetPawn();
+		if(myPawn) {
+			FVector worldDirection = (hitLocation - myPawn->GetActorLocation()).GetSafeNormal();
+			myPawn->AddMovementInput(worldDirection, 1.f, false);
 		}
 	}
-	else
-	{
-		FollowTime = 0.f;
+	else {
+		_followTime = 0.f;
 	}
 }
 
-void AScalarFieldPlayerController::SetupInputComponent()
-{
+void AScalarFieldPlayerController::SetupInputComponent() {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AScalarFieldPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AScalarFieldPlayerController::OnSetDestinationReleased);
+	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AScalarFieldPlayerController::_onSetDestinationPressed);
+	InputComponent->BindAction("SetDestination", IE_Released, this, &AScalarFieldPlayerController::_onSetDestinationReleased);
+
+	InputComponent->BindAction("Skill1Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill1Cast);
 
 	// support touch devices 
-	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AScalarFieldPlayerController::OnTouchPressed);
-	InputComponent->BindTouch(EInputEvent::IE_Released, this, &AScalarFieldPlayerController::OnTouchReleased);
+	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AScalarFieldPlayerController::_onTouchPressed);
+	InputComponent->BindTouch(EInputEvent::IE_Released, this, &AScalarFieldPlayerController::_onTouchReleased);
 
 }
 
-void AScalarFieldPlayerController::OnSetDestinationPressed()
-{
+void AScalarFieldPlayerController::_onSetDestinationPressed() {
 	// We flag that the input is being pressed
-	bInputPressed = true;
+	_bInputPressed = true;
 	// Just in case the character was moving because of a previous short press we stop it
 	StopMovement();
 }
 
-void AScalarFieldPlayerController::OnSetDestinationReleased()
-{
+void AScalarFieldPlayerController::_onSetDestinationReleased() {
 	// Player is no longer pressing the input
-	bInputPressed = false;
+	_bInputPressed = false;
 
 	// If it was a short press
-	if(FollowTime <= ShortPressThreshold)
-	{
+	if(_followTime <= _shortPressThreshold) {
 		// We look for the location in the world where the player has pressed the input
-		FVector HitLocation = FVector::ZeroVector;
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-		HitLocation = Hit.Location;
+		FVector hitLocation = FVector::ZeroVector;
+		FHitResult hit;
+		GetHitResultUnderCursor(ECC_Visibility, true, hit);
+		hitLocation = hit.Location;
 
 		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, hitLocation);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, _fxCursor, hitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
 }
 
-void AScalarFieldPlayerController::OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	bIsTouch = true;
-	OnSetDestinationPressed();
+void AScalarFieldPlayerController::_onTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location) {
+	_bIsTouch = true;
+	_onSetDestinationPressed();
 }
 
-void AScalarFieldPlayerController::OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location)
-{
-	bIsTouch = false;
-	OnSetDestinationReleased();
+void AScalarFieldPlayerController::_onTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location) {
+	_bIsTouch = false;
+	_onSetDestinationReleased();
+}
+
+void AScalarFieldPlayerController::_onSkill1Cast() {
+	if (const auto sfCharacter = Cast<AScalarFieldCharacter>(GetPawn())) {
+		sfCharacter->CastSkillAtIndex(1);
+	}
 }

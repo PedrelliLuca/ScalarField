@@ -16,8 +16,7 @@
 #include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
 
-AScalarFieldCharacter::AScalarFieldCharacter()
-{
+AScalarFieldCharacter::AScalarFieldCharacter() {
 	// This is what makes the scalar field character interact with the environment grid
 	GetCapsuleComponent()->SetCollisionProfileName("GridInteractingPawn");
 
@@ -57,9 +56,12 @@ AScalarFieldCharacter::AScalarFieldCharacter()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AScalarFieldCharacter::Tick(float DeltaSeconds)
-{
+void AScalarFieldCharacter::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
+}
+
+void AScalarFieldCharacter::CastSkillAtIndex(uint32 index) {
+	UE_LOG(LogTemp, Warning, TEXT("AScalarFieldCharacter::CastSkillAtIndex(%i)"), index);
 }
 
 void AScalarFieldCharacter::BeginPlay() {
