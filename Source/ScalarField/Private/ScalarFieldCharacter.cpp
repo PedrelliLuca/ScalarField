@@ -60,13 +60,36 @@ void AScalarFieldCharacter::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
 }
 
-void AScalarFieldCharacter::CastSkillAtIndex(uint32 index) {
+void AScalarFieldCharacter::CastSkillAtIndex(const uint32 index) {
 	UE_LOG(LogTemp, Warning, TEXT("AScalarFieldCharacter::CastSkillAtIndex(%i)"), index);
+	
+	// [1, 2, ..., 9, 0] => [0, 1, ..., 8, 9]
+	check(index < 10);
+	const uint32 arrayIndex = index != 0 ? index - 1 : 10;
+
+	const bool bIsValidIndex = _skills.IsValidIndex(arrayIndex);
+	const bool bIsSkillValid = _skills[arrayIndex] != nullptr;
+	if (!bIsValidIndex || !bIsSkillValid) {
+		UE_LOG(LogTemp, Error, TEXT("An invalid skill has been selected!"));
+		return;
+	}
+
+	_skills[arrayIndex]->Cast();
 }
 
 void AScalarFieldCharacter::BeginPlay() {
 	Super::BeginPlay();
 
+	_dmiSetup();
+	_setOverlappingCells();
+
+	// Instancing the skills of this character
+	for (const auto skillClass : _skillClasses) {
+		_skills.Emplace(NewObject<UBaseSkill>(this, skillClass));
+	}
+}
+
+void AScalarFieldCharacter::_dmiSetup(){
 	// Setting up the DMI that changes the mesh color based on temperature
 	auto thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
 	_materialInstance = GetMesh()->CreateDynamicMaterialInstance(0, GetMesh()->GetMaterial(0), TEXT("Thermodynamics Material"));
@@ -75,7 +98,9 @@ void AScalarFieldCharacter::BeginPlay() {
 		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
 		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_updateMaterialBasedOnTemperature);
 	}
+}
 
+void AScalarFieldCharacter::_setOverlappingCells() {
 	// Retrieve all environment cells being overlapped at startup
 	TSet<AActor*> overlappingActors;
 	GetCapsuleComponent()->GetOverlappingActors(overlappingActors, AEnvironmentCell::StaticClass());
