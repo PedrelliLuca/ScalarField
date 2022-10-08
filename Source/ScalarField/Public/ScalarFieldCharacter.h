@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Skills/BaseSkill.h"
 #include "Skills/Skill.h"
 #include "ThermodynamicComponent.h"
 

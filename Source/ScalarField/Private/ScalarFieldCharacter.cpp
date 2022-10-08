@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Skills/IceWallSkill.h"
 #include "Materials/Material.h"
 #include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
@@ -68,9 +69,14 @@ void AScalarFieldCharacter::CastSkillAtIndex(const uint32 index) {
 	const uint32 arrayIndex = index != 0 ? index - 1 : 10;
 
 	const bool bIsValidIndex = _skills.IsValidIndex(arrayIndex);
+	if (!bIsValidIndex) {
+		UE_LOG(LogTemp, Error, TEXT("There is no skill at index %i"), index);
+		return;
+	}
+
 	const bool bIsSkillValid = _skills[arrayIndex] != nullptr;
-	if (!bIsValidIndex || !bIsSkillValid) {
-		UE_LOG(LogTemp, Error, TEXT("An invalid skill has been selected!"));
+	if (!bIsSkillValid) {
+		UE_LOG(LogTemp, Error, TEXT("Index %i hosts an invalid skill"), index);
 		return;
 	}
 
@@ -85,7 +91,9 @@ void AScalarFieldCharacter::BeginPlay() {
 
 	// Instancing the skills of this character
 	for (const auto skillClass : _skillClasses) {
-		_skills.Emplace(NewObject<UBaseSkill>(this, skillClass));
+		if (skillClass->IsChildOf(UIceWallSkill::StaticClass())) {
+			_skills.Emplace(NewObject<UIceWallSkill>(this, skillClass));
+		}
 	}
 }
 

@@ -19,10 +19,10 @@ public:
 
 private:
 	// TODO: in the future, the spawn location might work with a targeting system
+
+	// Location in the spawning character's reference frame
 	UPROPERTY(EditAnywhere, Category = "Skill Properties")
 	FVector _spawnLocation = FVector::ZeroVector;
-	UPROPERTY(EditAnywhere, Category = "Skill Properties")
-	FRotator _spawnRotator = FRotator::ZeroRotator;
 	UPROPERTY(EditAnywhere, Category = "Skill Properties")
 	TSubclassOf<AActor> _actorClass = nullptr;
 };
