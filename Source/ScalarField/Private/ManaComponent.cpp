@@ -28,6 +28,11 @@ void UManaComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyChang
 }
 #endif
 
+void UManaComponent::SetMana(const double mana) {
+	check(mana >= 0.);
+	_mana = mana;
+}
+
 void UManaComponent::SetMaxMana(double maxMana, const bool bUpdateMana /*= true*/) {
 	maxMana = FMath::Clamp(maxMana, 0., TNumericLimits<double>::Max());
 
@@ -35,9 +40,4 @@ void UManaComponent::SetMaxMana(double maxMana, const bool bUpdateMana /*= true*
 	if (bUpdateMana) {
 		SetMana(_maxMana);
 	}
-}
-
-void UManaComponent::SetMana(const double mana) {
-	check(mana >= 0.);
-	_mana = mana;
 }

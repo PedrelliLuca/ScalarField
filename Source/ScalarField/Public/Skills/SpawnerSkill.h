@@ -25,6 +25,4 @@ private:
 	FTransform _spawnTransform = FTransform::Identity;
 	UPROPERTY(EditAnywhere, Category = "Skill Properties")
 	TSubclassOf<AActor> _spawnClass = nullptr;
-
-	TSet<TWeakObjectPtr<AActor>> _spawnedActors;
 };

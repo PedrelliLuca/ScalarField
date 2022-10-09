@@ -17,13 +17,13 @@ public:
 
 	void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
-	void SetMaxMana(double maxMana, bool bUpdateMana = true);
-	void SetMana(double mana);
-	double GetMana() const { return _mana; }
-
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
+
+	double GetMana() const { return _mana; }
+	void SetMana(double mana);
+	void SetMaxMana(double maxMana, bool bUpdateMana = true);
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Mana", meta = (ClampMin = "0"))
