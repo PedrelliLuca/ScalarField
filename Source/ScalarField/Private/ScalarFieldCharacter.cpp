@@ -52,6 +52,9 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 	_thermodynamicC->SetupAttachment(RootComponent);
 
+	// Create a mana component...
+	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -62,24 +65,29 @@ void AScalarFieldCharacter::Tick(float DeltaSeconds) {
 }
 
 void AScalarFieldCharacter::CastSkillAtIndex(const uint32 index) {
-	UE_LOG(LogTemp, Warning, TEXT("AScalarFieldCharacter::CastSkillAtIndex(%i)"), index);
-	
 	// [1, 2, ..., 9, 0] => [0, 1, ..., 8, 9]
-	check(index < 10);
-	const uint32 arrayIndex = index != 0 ? index - 1 : 9;
+	check(index < ASSIGNABLE_SKILLS);
+	const uint32 arrayIndex = index != 0 ? index - 1 : ASSIGNABLE_SKILLS - 1;
 
 	const bool bIsValidIndex = _skills.IsValidIndex(arrayIndex);
 	if (!bIsValidIndex) {
-		UE_LOG(LogTemp, Error, TEXT("There is no skill at index %i"), index);
+		UE_LOG(LogTemp, Error, TEXT("There is no skill bounded with key %i"), index);
 		return;
 	}
 
-	const bool bIsSkillValid = _skills[arrayIndex] != nullptr;
-	if (!bIsSkillValid) {
-		UE_LOG(LogTemp, Error, TEXT("Index %i hosts an invalid skill"), index);
+	const auto skill = _skills[arrayIndex];
+
+	// Index %i hosts an invalid skill
+	check(skill != nullptr);
+
+	const double charMana = _manaC->GetMana();
+	const double manaCost = skill->GetManaCost();
+	if (charMana < manaCost) {
+		UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 		return;
 	}
 
+	_manaC->SetMana(charMana - manaCost);
 	_skills[arrayIndex]->Cast();
 }
 

@@ -4,6 +4,4 @@
 
 void UIceWallSkill::Cast() {
 	Super::Cast();
-
-	UE_LOG(LogTemp, Warning, TEXT("UIceWallSkill::Cast()"));
 }

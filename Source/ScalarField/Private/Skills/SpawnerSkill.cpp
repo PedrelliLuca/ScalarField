@@ -4,7 +4,6 @@
 #include "Skills/SpawnerSkill.h"
 
 void USpawnerSkill::Cast() {
-	UE_LOG(LogTemp, Warning, TEXT("USpawnerSkill::Cast()"));
 	const FTransform& casterToWorld = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTransform();
 
 	TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(_spawnClass, _spawnTransform * casterToWorld);

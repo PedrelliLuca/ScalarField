@@ -46,11 +46,11 @@ void UThermodynamicComponent::SetTemperature(double temperature, const bool upda
 	temperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
 
 	if (updateInitialTemp) {
-		_initialTemperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
+		_initialTemperature = temperature;
 	}
 
-	_currentTemperature = _initialTemperature;
-	_nextTemperature = _initialTemperature;
+	_currentTemperature = temperature;
+	_nextTemperature = temperature;
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "ManaComponent.h"
 #include "Skills/BaseSkill.h"
 #include "ThermodynamicComponent.h"
 
@@ -46,6 +47,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Thermodynamics, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
 
+	UPROPERTY(VisibleAnywhere, Category = Mana, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UManaComponent> _manaC;
+
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 
@@ -55,5 +59,6 @@ private:
 	UPROPERTY()
 	TArray<TScriptInterface<ISkill>> _skills;
 
+	static constexpr uint32 ASSIGNABLE_SKILLS = 10;
 };
 

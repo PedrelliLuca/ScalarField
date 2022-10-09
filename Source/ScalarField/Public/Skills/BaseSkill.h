@@ -39,6 +39,7 @@ class SCALARFIELD_API UBaseSkill : public UObject, public ISkill {
 public:
 	const FSkillParameters& GetParameters() const { return _parameters; }
 	void SetParameters(const FSkillParameters& parameters) { _parameters = parameters; }
+	double GetManaCost() const override { return _parameters.ManaCost; }
 
 private:
 	FSkillParameters _parameters;
