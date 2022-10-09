@@ -61,6 +61,8 @@ void AThermodynamicLevelScript::_generateAir(const double cellSide) {
 	const auto environmentGridSubsys = GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>();
 
 	const double moleculeSide = cellSide / _moleculesPerCellSide;
+	const double moleculeRadius = (moleculeSide + 2) * 0.5;
+	const double moleculeHalfHeight = moleculeSide * 4;
 
 	// For each cell...
 	for (const auto& coordCellPair : environmentGridSubsys->GetGrid()) {
@@ -75,7 +77,7 @@ void AThermodynamicLevelScript::_generateAir(const double cellSide) {
 				const TObjectPtr<AThermodynamicActor> molecule = GetWorld()->SpawnActor<AThermodynamicActor>(_moleculeClass, moleculeTransform);
 				molecule->SetTemperature(_airTemperature);
 				molecule->SetHeatCapacity(_airHeatCapacity);
-				molecule->SetThermicCapsuleDimensions((moleculeSide + 2) * 0.5, (moleculeSide + 2) * 0.5);
+				molecule->SetThermicCapsuleDimensions(moleculeRadius, moleculeHalfHeight);
 			}
 		}
 	}

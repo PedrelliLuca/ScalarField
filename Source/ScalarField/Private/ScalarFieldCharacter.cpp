@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "FireGlobeSkill.h"
 #include "IceWallSkill.h"
 #include "Materials/Material.h"
 #include "ThermodynamicsSettings.h"
@@ -87,7 +88,7 @@ void AScalarFieldCharacter::CastSkillAtIndex(const uint32 index) {
 		return;
 	}
 
-	if (_skills[arrayIndex]->Cast()) {
+	if (_skills[arrayIndex]->Cast(this)) {
 		_manaC->SetMana(charMana - manaCost);
 	}
 }
@@ -99,11 +100,16 @@ void AScalarFieldCharacter::BeginPlay() {
 	_setOverlappingCells();
 
 	// Instancing the skills of this character
-	for (const auto skillParameters : _skillsParameters) {
+	for (const auto& skillParameters : _skillsParameters) {
 		if (skillParameters.Class->IsChildOf(UIceWallSkill::StaticClass())) {
 			const auto iceWallSkill = NewObject<UIceWallSkill>(this, skillParameters.Class);
 			iceWallSkill->SetParameters(skillParameters);
 			_skills.Emplace(iceWallSkill);
+		}
+		if (skillParameters.Class->IsChildOf(UFireGlobeSkill::StaticClass())) {
+			const auto fireGlobeSkill = NewObject<UFireGlobeSkill>(this, skillParameters.Class);
+			fireGlobeSkill->SetParameters(skillParameters);
+			_skills.Emplace(fireGlobeSkill);
 		}
 	}
 }

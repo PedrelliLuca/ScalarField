@@ -8,5 +8,5 @@ void UAbstractSkill::StartCooldown() {
 
 	_bIsOnCooldown = true;
 	FTimerHandle timerHandle{};
-	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UAbstractSkill::_terminateCooldown, _parameters.CoolDown);
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UAbstractSkill::_endCooldown, _parameters.CoolDown);
 }
