@@ -8,6 +8,27 @@
 
 #include "BaseSkill.generated.h"
 
+USTRUCT(BlueprintType)
+struct SCALARFIELD_API FSkillParameters {
+	GENERATED_BODY();
+
+public:
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
+	double ManaCost = 0.;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
+	double CoolDown = 0.;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
+	double CastTime = 0.;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
+	double Duration = 0.;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
+	double BaseDamage = 0.;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
+	TSubclassOf<UBaseSkill> Class;
+
+	// TODO: add icon property
+};
+
 /**
  * 
  */
@@ -16,17 +37,9 @@ class SCALARFIELD_API UBaseSkill : public UObject, public ISkill {
 	GENERATED_BODY()
 
 public:
+	const FSkillParameters& GetParameters() const { return _parameters; }
+	void SetParameters(const FSkillParameters& parameters) { _parameters = parameters; }
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Skill Properties")
-	double _manaCost = 0.;
-	UPROPERTY(EditAnywhere, Category = "Skill Properties", meta = (ClampMin = "0"))
-	double _coolDown = 0.;
-	UPROPERTY(EditAnywhere, Category = "Skill Properties", meta = (ClampMin = "0"))
-	double _castTime = 0.;
-	UPROPERTY(EditAnywhere, Category = "Skill Properties", meta = (ClampMin = "-1"))
-	double _duration = 0.;
-	UPROPERTY(EditAnywhere, Category = "Skill Properties", meta = (ClampMin = "0"))
-	double _baseDamage = 0.;
-	// TODO: add icon property
+	FSkillParameters _parameters;
 };

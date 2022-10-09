@@ -66,7 +66,7 @@ void AScalarFieldCharacter::CastSkillAtIndex(const uint32 index) {
 	
 	// [1, 2, ..., 9, 0] => [0, 1, ..., 8, 9]
 	check(index < 10);
-	const uint32 arrayIndex = index != 0 ? index - 1 : 10;
+	const uint32 arrayIndex = index != 0 ? index - 1 : 9;
 
 	const bool bIsValidIndex = _skills.IsValidIndex(arrayIndex);
 	if (!bIsValidIndex) {
@@ -90,9 +90,11 @@ void AScalarFieldCharacter::BeginPlay() {
 	_setOverlappingCells();
 
 	// Instancing the skills of this character
-	for (const auto skillClass : _skillClasses) {
-		if (skillClass->IsChildOf(UIceWallSkill::StaticClass())) {
-			_skills.Emplace(NewObject<UIceWallSkill>(this, skillClass));
+	for (const auto skillParameters : _skillsParameters) {
+		if (skillParameters.Class->IsChildOf(UIceWallSkill::StaticClass())) {
+			const auto iceWallSkill = NewObject<UIceWallSkill>(this, skillParameters.Class);
+			iceWallSkill->SetParameters(skillParameters);
+			_skills.Emplace(iceWallSkill);
 		}
 	}
 }

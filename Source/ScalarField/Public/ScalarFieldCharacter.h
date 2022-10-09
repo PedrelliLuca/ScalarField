@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Skills/Skill.h"
+#include "Skills/BaseSkill.h"
 #include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
@@ -49,8 +49,8 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 
-	UPROPERTY(EditAnywhere, Category = "Skills", meta = (MustImplement = "Skill"))
-	TArray<TSubclassOf<UObject>> _skillClasses;
+	UPROPERTY(EditAnywhere, Category = "Skills")
+	TArray<FSkillParameters> _skillsParameters;
 
 	UPROPERTY()
 	TArray<TScriptInterface<ISkill>> _skills;

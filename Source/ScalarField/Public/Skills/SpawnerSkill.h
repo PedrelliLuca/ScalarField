@@ -20,9 +20,9 @@ public:
 private:
 	// TODO: in the future, the spawn location might work with a targeting system
 
-	// Location in the spawning character's reference frame
+	// Transform of the object to spawn in the caster's reference frame
 	UPROPERTY(EditAnywhere, Category = "Skill Properties")
-	FVector _spawnLocation = FVector::ZeroVector;
+	FTransform _spawnTransform = FTransform::Identity;
 	UPROPERTY(EditAnywhere, Category = "Skill Properties")
-	TSubclassOf<AActor> _actorClass = nullptr;
+	TSubclassOf<AActor> _spawnClass = nullptr;
 };
