@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "ManaComponent.h"
+#include "AbstractSkill.h"
 #include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
@@ -24,10 +26,14 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return _topDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return _cameraBoom; }
 
+	void CastSkillAtIndex(uint32 index);
+
 protected:
 	void BeginPlay() override;
 
 private:
+	void _dmiSetup();
+	void _setOverlappingCells();
 	void _updateMaterialBasedOnTemperature(double temperature);
 
 	/** Top down camera */
@@ -41,7 +47,18 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Thermodynamics, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
 
+	UPROPERTY(VisibleAnywhere, Category = Mana, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UManaComponent> _manaC;
+
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
+
+	UPROPERTY(EditAnywhere, Category = "Skills")
+	TArray<FSkillParameters> _skillsParameters;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UAbstractSkill>> _skills;
+
+	static constexpr uint32 ASSIGNABLE_SKILLS = 10;
 };
 

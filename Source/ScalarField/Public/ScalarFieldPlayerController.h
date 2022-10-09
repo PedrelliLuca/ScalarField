@@ -21,15 +21,15 @@ public:
 
 	/** Time Threshold to know if it was a short press */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	float ShortPressThreshold;
+	float _shortPressThreshold;
 
 	/** FX Class that we will spawn when clicking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-	UNiagaraSystem* FXCursor;
+	UNiagaraSystem* _fxCursor;
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
-	uint32 bMoveToMouseCursor : 1;
+	uint32 _bMoveToMouseCursor : 1;
 
 	// Begin PlayerController interface
 	virtual void PlayerTick(float DeltaTime) override;
@@ -37,15 +37,17 @@ protected:
 	// End PlayerController interface
 
 	/** Input handlers for SetDestination action. */
-	void OnSetDestinationPressed();
-	void OnSetDestinationReleased();
-	void OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location);
-	void OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location);
+	void _onSetDestinationPressed();
+	void _onSetDestinationReleased();
+	void _onTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location);
+	void _onTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location);
 
 private:
-	bool bInputPressed; // Input is bring pressed
-	bool bIsTouch; // Is it a touch device
-	float FollowTime; // For how long it has been pressed
+	void _onSkill1Cast();
+
+	bool _bInputPressed; // Input is bring pressed
+	bool _bIsTouch; // Is it a touch device
+	float _followTime; // For how long it has been pressed
 };
 
 

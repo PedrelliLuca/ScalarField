@@ -12,12 +12,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "IceWallSkill.h"
 #include "Materials/Material.h"
 #include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
 
-AScalarFieldCharacter::AScalarFieldCharacter()
-{
+AScalarFieldCharacter::AScalarFieldCharacter() {
 	// This is what makes the scalar field character interact with the environment grid
 	GetCapsuleComponent()->SetCollisionProfileName("GridInteractingPawn");
 
@@ -52,19 +52,63 @@ AScalarFieldCharacter::AScalarFieldCharacter()
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 	_thermodynamicC->SetupAttachment(RootComponent);
 
+	// Create a mana component...
+	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AScalarFieldCharacter::Tick(float DeltaSeconds)
-{
+void AScalarFieldCharacter::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
+}
+
+void AScalarFieldCharacter::CastSkillAtIndex(const uint32 index) {
+	// [1, 2, ..., 9, 0] => [0, 1, ..., 8, 9]
+	check(index < ASSIGNABLE_SKILLS);
+	const uint32 arrayIndex = index != 0 ? index - 1 : ASSIGNABLE_SKILLS - 1;
+
+	const bool bIsValidIndex = _skills.IsValidIndex(arrayIndex);
+	if (!bIsValidIndex) {
+		UE_LOG(LogTemp, Error, TEXT("There is no skill bounded with key %i"), index);
+		return;
+	}
+
+	const auto skill = _skills[arrayIndex];
+
+	// Index %i hosts an invalid skill
+	check(skill != nullptr);
+
+	const double charMana = _manaC->GetMana();
+	const double manaCost = skill->GetManaCost();
+	if (charMana < manaCost) {
+		UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
+		return;
+	}
+
+	if (_skills[arrayIndex]->Cast()) {
+		_manaC->SetMana(charMana - manaCost);
+	}
 }
 
 void AScalarFieldCharacter::BeginPlay() {
 	Super::BeginPlay();
 
+	_dmiSetup();
+	_setOverlappingCells();
+
+	// Instancing the skills of this character
+	for (const auto skillParameters : _skillsParameters) {
+		if (skillParameters.Class->IsChildOf(UIceWallSkill::StaticClass())) {
+			const auto iceWallSkill = NewObject<UIceWallSkill>(this, skillParameters.Class);
+			iceWallSkill->SetParameters(skillParameters);
+			_skills.Emplace(iceWallSkill);
+		}
+	}
+}
+
+void AScalarFieldCharacter::_dmiSetup(){
 	// Setting up the DMI that changes the mesh color based on temperature
 	auto thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
 	_materialInstance = GetMesh()->CreateDynamicMaterialInstance(0, GetMesh()->GetMaterial(0), TEXT("Thermodynamics Material"));
@@ -73,7 +117,9 @@ void AScalarFieldCharacter::BeginPlay() {
 		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
 		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_updateMaterialBasedOnTemperature);
 	}
+}
 
+void AScalarFieldCharacter::_setOverlappingCells() {
 	// Retrieve all environment cells being overlapped at startup
 	TSet<AActor*> overlappingActors;
 	GetCapsuleComponent()->GetOverlappingActors(overlappingActors, AEnvironmentCell::StaticClass());
