@@ -8,15 +8,16 @@ bool UFireGlobeSkill::Cast(const TObjectPtr<APawn> caster) {
 		return false;
 	}
 
-	// TODO: do not retrieve this, have it has Cast() argument
 	const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
 	spawnSpringArm->SetupAttachment(caster->GetRootComponent());
-
 	spawnSpringArm->SetRelativeLocation(FVector::ZeroVector);
+
 	// The point where we have to spawn the globe relative to the caster, it's also the point where the 2nd end of the arm lies
-	const FVector endLocation = GetSpawnTransform().GetLocation();
-	spawnSpringArm->SetRelativeRotation(endLocation.Rotation());
-	spawnSpringArm->TargetArmLength = endLocation.Length();
+	const FVector globeLocation = GetSpawnTransform().GetLocation();
+
+	// The spring sits on the vector that goes from the caster's root to the globeLocation
+	spawnSpringArm->SetRelativeRotation(globeLocation.Rotation());
+	spawnSpringArm->TargetArmLength = globeLocation.Length();
 
 	spawnSpringArm->RegisterComponent();
 

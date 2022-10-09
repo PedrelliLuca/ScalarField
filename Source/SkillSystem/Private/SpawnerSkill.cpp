@@ -9,7 +9,6 @@ bool USpawnerSkill::Cast(const TObjectPtr<APawn> caster) {
 		return false;
 	}
 
-	// TODO: do not retrieve the caster, have it has Cast() argument
 	const FTransform& casterToWorld = caster->GetTransform();
 	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(_spawnClass, _spawnTransform * casterToWorld);
 
