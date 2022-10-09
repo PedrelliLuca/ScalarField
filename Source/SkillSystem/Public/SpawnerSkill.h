@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Skills/AbstractSkill.h"
+#include "AbstractSkill.h"
 #include "SpawnerSkill.generated.h"
 
 /**
  *
  */
 UCLASS(Blueprintable)
-class SCALARFIELD_API USpawnerSkill : public UAbstractSkill
+class SKILLSYSTEM_API USpawnerSkill : public UAbstractSkill
 {
 	GENERATED_BODY()
 

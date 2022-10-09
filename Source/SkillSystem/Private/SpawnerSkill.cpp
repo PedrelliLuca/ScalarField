@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Skills/SpawnerSkill.h"
+#include "SpawnerSkill.h"
 
 bool USpawnerSkill::Cast() {
 	if (IsOnCooldown()) {

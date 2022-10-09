@@ -12,7 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Skills/IceWallSkill.h"
+#include "IceWallSkill.h"
 #include "Materials/Material.h"
 #include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"

@@ -17,7 +17,8 @@ public class ScalarField : ModuleRules
 			"NavigationSystem", 
 			"AIModule", 
 			"Niagara",
-			"EnvironmentGrid"
+			"EnvironmentGrid",
+			"SkillSystem"
 		});
     }
 }

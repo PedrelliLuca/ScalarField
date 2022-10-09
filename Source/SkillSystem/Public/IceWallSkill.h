@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Skills/SpawnerSkill.h"
+#include "SpawnerSkill.h"
 #include "IceWallSkill.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable)
-class SCALARFIELD_API UIceWallSkill : public USpawnerSkill {
+class SKILLSYSTEM_API UIceWallSkill : public USpawnerSkill {
 	GENERATED_BODY()
 	
 public:

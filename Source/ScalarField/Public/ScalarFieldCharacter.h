@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ManaComponent.h"
-#include "Skills/AbstractSkill.h"
+#include "AbstractSkill.h"
 #include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"

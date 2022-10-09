@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Skills/AbstractSkill.h"
+#include "AbstractSkill.h"
 
 void UAbstractSkill::StartCooldown() {
 	check(!_bIsOnCooldown);

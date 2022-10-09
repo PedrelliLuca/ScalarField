@@ -8,7 +8,7 @@
 #include "AbstractSkill.generated.h"
 
 USTRUCT(BlueprintType)
-struct SCALARFIELD_API FSkillParameters {
+struct SKILLSYSTEM_API FSkillParameters {
 	GENERATED_BODY();
 
 public:
@@ -32,7 +32,7 @@ public:
  * 
  */
 UCLASS(NotBlueprintable, Abstract)
-class SCALARFIELD_API UAbstractSkill : public UObject {
+class SKILLSYSTEM_API UAbstractSkill : public UObject {
 	GENERATED_BODY()
 
 public:
