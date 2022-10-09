@@ -15,7 +15,7 @@ class SCALARFIELD_API USpawnerSkill : public UBaseSkill
 	GENERATED_BODY()
 
 public:
-	void Cast() override;
+	bool Cast() override;
 
 private:
 	// TODO: in the future, the spawn location might work with a targeting system

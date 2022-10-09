@@ -40,7 +40,12 @@ public:
 	const FSkillParameters& GetParameters() const { return _parameters; }
 	void SetParameters(const FSkillParameters& parameters) { _parameters = parameters; }
 	double GetManaCost() const override { return _parameters.ManaCost; }
+	bool IsOnCooldown() const { return _bIsOnCooldown; }
+	void StartCooldown();
 
 private:
-	FSkillParameters _parameters;
+	void _terminateCooldown() { _bIsOnCooldown = false; }
+
+	FSkillParameters _parameters{};
+	bool _bIsOnCooldown = false;
 };

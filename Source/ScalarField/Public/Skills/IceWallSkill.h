@@ -14,6 +14,6 @@ class SCALARFIELD_API UIceWallSkill : public USpawnerSkill {
 	GENERATED_BODY()
 	
 public:
-	void Cast() override;
+	bool Cast() override;
 
 };

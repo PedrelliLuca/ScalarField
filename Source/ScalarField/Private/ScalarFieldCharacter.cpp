@@ -87,8 +87,9 @@ void AScalarFieldCharacter::CastSkillAtIndex(const uint32 index) {
 		return;
 	}
 
-	_manaC->SetMana(charMana - manaCost);
-	_skills[arrayIndex]->Cast();
+	if (_skills[arrayIndex]->Cast()) {
+		_manaC->SetMana(charMana - manaCost);
+	}
 }
 
 void AScalarFieldCharacter::BeginPlay() {

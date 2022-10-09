@@ -2,6 +2,6 @@
 
 #include "Skills/IceWallSkill.h"
 
-void UIceWallSkill::Cast() {
-	Super::Cast();
+bool UIceWallSkill::Cast() {
+	return Super::Cast();
 }

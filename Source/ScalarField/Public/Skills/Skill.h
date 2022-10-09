@@ -18,6 +18,6 @@ class SCALARFIELD_API ISkill {
 	GENERATED_BODY()
 
 public:
-	virtual void Cast() PURE_VIRTUAL(ISkill::Cast, );
+	virtual bool Cast() PURE_VIRTUAL(ISkill::Cast, return false;);
 	virtual double GetManaCost() const PURE_VIRTUAL(ISkill::GetManaCost, return 0.;);
 };
