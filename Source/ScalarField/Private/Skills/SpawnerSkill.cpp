@@ -5,7 +5,7 @@
 
 void USpawnerSkill::Cast() {
 	UE_LOG(LogTemp, Warning, TEXT("USpawnerSkill::Cast()"));
-	const FTransform& charToWorld = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTransform();
+	const FTransform& casterToWorld = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTransform();
 
-	GetWorld()->SpawnActor<AActor>(_spawnClass, _spawnTransform * charToWorld);
+	GetWorld()->SpawnActor<AActor>(_spawnClass, _spawnTransform * casterToWorld);
 }
