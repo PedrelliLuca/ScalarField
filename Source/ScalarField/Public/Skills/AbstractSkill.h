@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Skill.h"
 #include "UObject/NoExportTypes.h"
 
-#include "BaseSkill.generated.h"
+#include "AbstractSkill.generated.h"
 
 USTRUCT(BlueprintType)
 struct SCALARFIELD_API FSkillParameters {
@@ -24,7 +23,7 @@ public:
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
 	double BaseDamage = 0.;
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
-	TSubclassOf<UBaseSkill> Class;
+	TSubclassOf<UAbstractSkill> Class;
 
 	// TODO: add icon property
 };
@@ -33,13 +32,14 @@ public:
  * 
  */
 UCLASS(NotBlueprintable, Abstract)
-class SCALARFIELD_API UBaseSkill : public UObject, public ISkill {
+class SCALARFIELD_API UAbstractSkill : public UObject {
 	GENERATED_BODY()
 
 public:
+	virtual bool Cast() PURE_VIRTUAL(UAbstractSkill::Cast, return false;);
 	const FSkillParameters& GetParameters() const { return _parameters; }
 	void SetParameters(const FSkillParameters& parameters) { _parameters = parameters; }
-	double GetManaCost() const override { return _parameters.ManaCost; }
+	double GetManaCost() const { return _parameters.ManaCost; }
 	bool IsOnCooldown() const { return _bIsOnCooldown; }
 	void StartCooldown();
 

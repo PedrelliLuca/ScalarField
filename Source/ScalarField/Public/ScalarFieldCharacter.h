@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ManaComponent.h"
-#include "Skills/BaseSkill.h"
+#include "Skills/AbstractSkill.h"
 #include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
@@ -57,7 +57,7 @@ private:
 	TArray<FSkillParameters> _skillsParameters;
 
 	UPROPERTY()
-	TArray<TScriptInterface<ISkill>> _skills;
+	TArray<TObjectPtr<UAbstractSkill>> _skills;
 
 	static constexpr uint32 ASSIGNABLE_SKILLS = 10;
 };
