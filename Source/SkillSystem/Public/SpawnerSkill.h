@@ -15,7 +15,10 @@ class SKILLSYSTEM_API USpawnerSkill : public UAbstractSkill
 	GENERATED_BODY()
 
 public:
-	bool Cast() override;
+	bool Cast(TObjectPtr<APawn> caster) override;
+
+	const FTransform& GetSpawnTransform() const { return _spawnTransform; }
+	const TSubclassOf<AActor>& GetSpawnClass() const { return _spawnClass; }
 
 private:
 	// TODO: in the future, the spawn location might work with a targeting system

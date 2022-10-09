@@ -44,6 +44,7 @@ protected:
 
 private:
 	void _onSkill1Cast();
+	void _onSkill2Cast();
 
 	bool _bInputPressed; // Input is bring pressed
 	bool _bIsTouch; // Is it a touch device

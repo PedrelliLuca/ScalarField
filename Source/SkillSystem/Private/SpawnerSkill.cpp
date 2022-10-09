@@ -3,14 +3,15 @@
 
 #include "SpawnerSkill.h"
 
-bool USpawnerSkill::Cast() {
+bool USpawnerSkill::Cast(const TObjectPtr<APawn> caster) {
 	if (IsOnCooldown()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
 		return false;
 	}
 
-	const FTransform& casterToWorld = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTransform();
-	TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(_spawnClass, _spawnTransform * casterToWorld);
+	// TODO: do not retrieve the caster, have it has Cast() argument
+	const FTransform& casterToWorld = caster->GetTransform();
+	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(_spawnClass, _spawnTransform * casterToWorld);
 
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager().SetTimer(

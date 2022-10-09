@@ -36,7 +36,7 @@ class SKILLSYSTEM_API UAbstractSkill : public UObject {
 	GENERATED_BODY()
 
 public:
-	virtual bool Cast() PURE_VIRTUAL(UAbstractSkill::Cast, return false;);
+	virtual bool Cast(TObjectPtr<APawn> caster) PURE_VIRTUAL(UAbstractSkill::Cast, return false;);
 	const FSkillParameters& GetParameters() const { return _parameters; }
 	void SetParameters(const FSkillParameters& parameters) { _parameters = parameters; }
 	double GetManaCost() const { return _parameters.ManaCost; }
@@ -44,7 +44,7 @@ public:
 	void StartCooldown();
 
 private:
-	void _terminateCooldown() { _bIsOnCooldown = false; }
+	void _endCooldown() { _bIsOnCooldown = false; }
 
 	FSkillParameters _parameters{};
 	bool _bIsOnCooldown = false;
