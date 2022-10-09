@@ -9,12 +9,13 @@
 #include "Engine/World.h"
 #include "EnvironmentCell.h"
 #include "EnvironmentGridWorldSubsystem.h"
+#include "FireGlobeSkill.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "FireGlobeSkill.h"
 #include "IceWallSkill.h"
 #include "Materials/Material.h"
+#include "ThermalPush.h"
 #include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -110,6 +111,11 @@ void AScalarFieldCharacter::BeginPlay() {
 			const auto fireGlobeSkill = NewObject<UFireGlobeSkill>(this, skillParameters.Class);
 			fireGlobeSkill->SetParameters(skillParameters);
 			_skills.Emplace(fireGlobeSkill);
+		}
+		if (skillParameters.Class->IsChildOf(UThermalPush::StaticClass())) {
+			const auto thermalPushSkill = NewObject<UThermalPush>(this, skillParameters.Class);
+			thermalPushSkill->SetParameters(skillParameters);
+			_skills.Emplace(thermalPushSkill);
 		}
 	}
 }

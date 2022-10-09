@@ -52,6 +52,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("Skill1Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill1Cast);
 	InputComponent->BindAction("Skill2Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill2Cast);
+	InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &AScalarFieldPlayerController::_onTouchPressed);
@@ -100,9 +101,14 @@ void AScalarFieldPlayerController::_onSkill1Cast() {
 	}
 }
 
-void AScalarFieldPlayerController::_onSkill2Cast()
-{
+void AScalarFieldPlayerController::_onSkill2Cast() {
 	if (const auto sfCharacter = Cast<AScalarFieldCharacter>(GetPawn())) {
 		sfCharacter->CastSkillAtIndex(2);
+	}
+}
+
+void AScalarFieldPlayerController::_onSkill3Cast() {
+	if (const auto sfCharacter = Cast<AScalarFieldCharacter>(GetPawn())) {
+		sfCharacter->CastSkillAtIndex(3);
 	}
 }
