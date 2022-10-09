@@ -7,13 +7,13 @@
 #include "SpawnerSkill.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Blueprintable)
 class SCALARFIELD_API USpawnerSkill : public UBaseSkill
 {
 	GENERATED_BODY()
-	
+
 public:
 	void Cast() override;
 
@@ -25,4 +25,6 @@ private:
 	FTransform _spawnTransform = FTransform::Identity;
 	UPROPERTY(EditAnywhere, Category = "Skill Properties")
 	TSubclassOf<AActor> _spawnClass = nullptr;
+
+	TSet<TWeakObjectPtr<AActor>> _spawnedActors;
 };

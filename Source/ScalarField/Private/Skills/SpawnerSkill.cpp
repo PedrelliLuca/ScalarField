@@ -7,5 +7,17 @@ void USpawnerSkill::Cast() {
 	UE_LOG(LogTemp, Warning, TEXT("USpawnerSkill::Cast()"));
 	const FTransform& casterToWorld = GetWorld()->GetFirstPlayerController()->GetPawn()->GetTransform();
 
-	GetWorld()->SpawnActor<AActor>(_spawnClass, _spawnTransform * casterToWorld);
+	TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(_spawnClass, _spawnTransform * casterToWorld);
+
+	FTimerHandle timerHandle;
+	GetWorld()->GetTimerManager().SetTimer(
+		timerHandle,
+		[spawnActor]() {
+			if (spawnActor.IsValid()) {
+				spawnActor->Destroy();
+			}
+		},
+		GetParameters().Duration,
+		false
+	);
 }
