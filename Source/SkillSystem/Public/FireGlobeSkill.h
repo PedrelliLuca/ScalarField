@@ -16,5 +16,5 @@ class SKILLSYSTEM_API UFireGlobeSkill : public USpawnerSkill {
 	GENERATED_BODY()
 	
 public:
-	bool Cast(TObjectPtr<APawn> caster) override;
+	bool CastSkill(TObjectPtr<APawn> caster) override;
 };

@@ -2,6 +2,6 @@
 
 #include "IceWallSkill.h"
 
-bool UIceWallSkill::Cast(const TObjectPtr<APawn> caster) {
-	return Super::Cast(caster);
+bool UIceWallSkill::CastSkill(const TObjectPtr<APawn> caster) {
+	return Super::CastSkill(caster);
 }

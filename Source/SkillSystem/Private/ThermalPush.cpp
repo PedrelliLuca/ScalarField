@@ -4,7 +4,7 @@
 
 #include "ThermodynamicComponent.h"
 
-bool UThermalPush::Cast(const TObjectPtr<APawn> caster) {
+bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
 	if (IsOnCooldown()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
 		return false;
@@ -33,7 +33,7 @@ bool UThermalPush::Cast(const TObjectPtr<APawn> caster) {
 			false
 			);
 
-	if (const auto thermoC = ::Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
+	if (const auto thermoC = Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
 		if (thermoC->GetTemperature() > _hotThreshold) {
 			UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
 		}

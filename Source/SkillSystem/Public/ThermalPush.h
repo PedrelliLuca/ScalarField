@@ -17,7 +17,7 @@ class SKILLSYSTEM_API UThermalPush : public USpawnerSkill, public FTickableGameO
 	GENERATED_BODY()
 	
 public:
-	bool Cast(TObjectPtr<APawn> caster) override;
+	bool CastSkill(TObjectPtr<APawn> caster) override;
 	void Tick(float DeltaTime) override;
 	TStatId GetStatId() const override;
 	bool IsAllowedToTick() const override { return _spawnCapsule.IsValid(); }

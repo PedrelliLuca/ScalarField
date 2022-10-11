@@ -3,7 +3,7 @@
 
 #include "SpawnerSkill.h"
 
-bool USpawnerSkill::Cast(const TObjectPtr<APawn> caster) {
+bool USpawnerSkill::CastSkill(const TObjectPtr<APawn> caster) {
 	if (IsOnCooldown()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
 		return false;
