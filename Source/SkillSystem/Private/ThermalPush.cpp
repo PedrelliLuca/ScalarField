@@ -2,6 +2,8 @@
 
 #include "ThermalPush.h"
 
+#include "ThermodynamicComponent.h"
+
 bool UThermalPush::Cast(const TObjectPtr<APawn> caster) {
 	if (IsOnCooldown()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
@@ -30,6 +32,15 @@ bool UThermalPush::Cast(const TObjectPtr<APawn> caster) {
 		GetParameters().Duration,
 			false
 			);
+
+	if (const auto thermoC = ::Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
+		if (thermoC->GetTemperature() > _hotThreshold) {
+			UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
+		}
+		else if (thermoC->GetTemperature() < _coldThreshold) {
+			UE_LOG(LogTemp, Warning, TEXT("FREEZE!!!"));
+		}
+	}
 
 	_timeFromCast = 0.;
 	StartCooldown();
