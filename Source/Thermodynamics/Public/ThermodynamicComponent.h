@@ -12,7 +12,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnTemperatureChanged, double);
  *
  */
 UCLASS(ClassGroup=(Thermodynamics), meta = (BlueprintSpawnableComponent))
-class SCALARFIELD_API UThermodynamicComponent : public UCapsuleComponent
+class THERMODYNAMICS_API UThermodynamicComponent : public UCapsuleComponent
 {
 	GENERATED_BODY()
 

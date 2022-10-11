@@ -18,7 +18,8 @@ public class ScalarField : ModuleRules
 			"AIModule", 
 			"Niagara",
 			"EnvironmentGrid",
-			"SkillSystem"
+			"SkillSystem",
+			"Thermodynamics"
 		});
     }
 }
