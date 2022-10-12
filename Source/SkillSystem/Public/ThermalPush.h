@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/CapsuleComponent.h"
-#include "Particles/ParticleSystemComponent.h"
+#include "Particles/ParticleSystem.h"
 #include "SpawnerSkill.h"
 
 #include "ThermalPush.generated.h"
@@ -42,9 +42,9 @@ private:
 	double _maxCapsuleRadius = 100.;
 
 	UPROPERTY(EditAnywhere, Category = "Particles")
-	TSubclassOf<UParticleSystemComponent> _hotParticleSystem = nullptr;
+	TObjectPtr<UParticleSystem> _hotTemplate;
 	UPROPERTY(EditAnywhere, Category = "Particles")
-	TSubclassOf<UParticleSystemComponent> _coldParticleSystem = nullptr;
+	TObjectPtr<UParticleSystem> _coldTemplate;
 
 	double _timeFromCast = 0.;
 };

@@ -2,6 +2,7 @@
 
 #include "ThermalPush.h"
 
+#include "Particles/ParticleSystemComponent.h"
 #include "ThermodynamicComponent.h"
 
 bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
@@ -21,26 +22,44 @@ bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
 
 	_spawnCapsule->RegisterComponent();
 
+	TWeakObjectPtr<UParticleSystemComponent> activeParticleSystem = nullptr;
+	TWeakObjectPtr<UParticleSystem> activeParticleTemplate = nullptr;
+
+	if (const auto thermoC = Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
+		if (thermoC->GetTemperature() > _hotThreshold) {
+			UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
+			activeParticleTemplate = _hotTemplate;
+		}
+		else if (thermoC->GetTemperature() < _coldThreshold) {
+			UE_LOG(LogTemp, Warning, TEXT("FREEZE!!!"));
+			activeParticleTemplate = _coldTemplate;
+		}
+	}
+
+	if (activeParticleTemplate.IsValid()) {
+		activeParticleSystem = NewObject<UParticleSystemComponent>(caster, TEXT("Push Particle System"));
+		activeParticleSystem->SetupAttachment(_spawnCapsule.Get());
+		activeParticleSystem->SetTemplate(activeParticleTemplate.Get());
+
+		activeParticleSystem->RegisterComponent();
+		activeParticleSystem->Activate(true);
+	}
+
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		timerHandle,
-		[spawnCapsule = TWeakObjectPtr<UCapsuleComponent>{ _spawnCapsule }]() {
+		[spawnCapsule = TWeakObjectPtr<UCapsuleComponent>{ _spawnCapsule }, activeParticleSystem]() {
+			if (activeParticleSystem.IsValid()) {
+				activeParticleSystem->DestroyComponent();
+			}
+
 			if (spawnCapsule.IsValid()) {
 				spawnCapsule->DestroyComponent();
 			}
 		},
 		GetParameters().Duration,
-			false
-			);
-
-	if (const auto thermoC = Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
-		if (thermoC->GetTemperature() > _hotThreshold) {
-			UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
-		}
-		else if (thermoC->GetTemperature() < _coldThreshold) {
-			UE_LOG(LogTemp, Warning, TEXT("FREEZE!!!"));
-		}
-	}
+		false
+	);
 
 	_timeFromCast = 0.;
 	StartCooldown();
