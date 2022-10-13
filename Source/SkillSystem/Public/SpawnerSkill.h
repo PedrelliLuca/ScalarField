@@ -15,7 +15,7 @@ class SKILLSYSTEM_API USpawnerSkill : public UAbstractSkill
 	GENERATED_BODY()
 
 public:
-	bool Cast(TObjectPtr<APawn> caster) override;
+	bool CastSkill(TObjectPtr<APawn> caster) override;
 
 	const FTransform& GetSpawnTransform() const { return _spawnTransform; }
 	const TSubclassOf<AActor>& GetSpawnClass() const { return _spawnClass; }

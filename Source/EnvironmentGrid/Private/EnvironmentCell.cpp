@@ -40,7 +40,7 @@ void AEnvironmentCell::FreezeTime() {
 	_freezingTime = FDateTime::Now();
 	
 	_isFrozen = true;
-	SetActorTickEnabled(_isFrozen);
+	SetActorTickEnabled(!_isFrozen);
 	_materialInstance->SetVectorParameterValue(TEXT("ActivationColor"), GetDefault<UEnvironmentCellSettings>()->GetCellFrozenColor());
 }
 
@@ -53,7 +53,7 @@ void AEnvironmentCell::UnfreezeTime() {
 	FTimespan freezeTimeSpan = FDateTime::Now() - _freezingTime;
 
 	_isFrozen = false;
-	SetActorTickEnabled(_isFrozen);
+	SetActorTickEnabled(!_isFrozen);
 	_materialInstance->SetVectorParameterValue(TEXT("ActivationColor"), GetDefault<UEnvironmentCellSettings>()->GetCellUnfrozenColor());
 }
 

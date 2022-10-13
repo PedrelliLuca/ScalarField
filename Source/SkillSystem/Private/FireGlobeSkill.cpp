@@ -2,7 +2,7 @@
 
 #include "FireGlobeSkill.h"
 
-bool UFireGlobeSkill::Cast(const TObjectPtr<APawn> caster) {
+bool UFireGlobeSkill::CastSkill(const TObjectPtr<APawn> caster) {
 	if (IsOnCooldown()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
 		return false;

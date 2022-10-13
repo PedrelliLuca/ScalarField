@@ -2,19 +2,18 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class SkillSystem : ModuleRules
+	public class Thermodynamics : ModuleRules
 	{
-		public SkillSystem(ReadOnlyTargetRules Target) : base(Target)
+		public Thermodynamics(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
 			PublicDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"Core",
+                    "Core",
                     "CoreUObject",
                     "Engine",
-					"Thermodynamics"
                 }
 				);
 
