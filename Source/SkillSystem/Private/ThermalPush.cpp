@@ -5,6 +5,11 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "ThermodynamicComponent.h"
 
+UThermalPush::UThermalPush() {
+	_hotTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Hot Particle System"));
+	_coldTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Cold Particle System"));
+}
+
 bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
 	if (IsOnCooldown()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
@@ -66,10 +71,10 @@ bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
 	return true;
 }
 
-void UThermalPush::Tick(float DeltaTime) {
+void UThermalPush::Tick(float deltaTime) {
 	FlushPersistentDebugLines(GetWorld());
 
-	_timeFromCast = FMath::Clamp(_timeFromCast + DeltaTime, 0., GetParameters().Duration);
+	_timeFromCast = FMath::Clamp(_timeFromCast + deltaTime, 0., GetParameters().Duration);
 	const double alpha = _timeFromCast / GetParameters().Duration;
 	const double halfHeight = FMath::Lerp(_minCapsuleHalfHeight, _maxCapsuleHalfHeight, alpha);
 	const double radius = FMath::Lerp(_minCapsuleRadius, _maxCapsuleRadius, alpha);
