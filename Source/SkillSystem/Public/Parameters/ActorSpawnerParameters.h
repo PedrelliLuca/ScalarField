@@ -10,7 +10,7 @@ struct FActorSpawnerParameters {
 
 public:
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> ClassOfActor = nullptr;
+	TSubclassOf<AActor> ActorClass = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	FTransform Transform = FTransform::Identity;
