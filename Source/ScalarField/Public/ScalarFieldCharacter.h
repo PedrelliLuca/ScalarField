@@ -2,10 +2,11 @@
 
 #pragma once
 
+#include "AbstractSkill.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ManaComponent.h"
-#include "AbstractSkill.h"
+#include "SkillsContainerComponent.h"
 #include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
@@ -58,6 +59,9 @@ private:
 
 	UPROPERTY()
 	TArray<TObjectPtr<UAbstractSkill>> _skills;
+
+	UPROPERTY(VisibleAnywhere, Category = Skills, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkillsContainerComponent> _skillsContainer;
 
 	static constexpr uint32 ASSIGNABLE_SKILLS = 10;
 };

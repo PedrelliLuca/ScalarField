@@ -57,6 +57,9 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	// Create a mana component...
 	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));
 
+	// Create a skills container component...
+	_skillsContainer = CreateDefaultSubobject<USkillsContainerComponent>(TEXT("Skills Container"));
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
