@@ -5,6 +5,7 @@
 #include "ActorSpawnerParameters.h"
 #include "CapsuleSpawnerParameters.h"
 #include "CoreMinimal.h"
+#include "FollowerActorSpawnerParameters.h"
 
 #include "NewSkillParameters.generated.h"
 
@@ -34,4 +35,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Actor Spawner Components")
 	TArray<FActorSpawnerParameters> ActorSpawnerParameters;
+
+	UPROPERTY(EditAnywhere, Category = "Follower Actor Spawner Components")
+	TArray<FFollowerActorSpawnerParameters> FollowerActorSpawnerParameters;
 };

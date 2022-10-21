@@ -9,9 +9,9 @@ struct FActorSpawnerParameters {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Actor")
 	TSubclassOf<AActor> ActorClass = nullptr;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Actor")
 	FTransform Transform = FTransform::Identity;
 };

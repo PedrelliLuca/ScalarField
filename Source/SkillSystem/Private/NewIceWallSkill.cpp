@@ -3,10 +3,10 @@
 #include "NewIceWallSkill.h"
 
 void UNewIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
-	const auto& actorSpawner = _getActorSpawners()[0];
+	const auto& iceWallSpawner = _getActorSpawners()[0];
 
 	const FTransform& casterToWorld = caster->GetTransform();
-	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(actorSpawner.ActorClass, actorSpawner.Transform * casterToWorld);
+	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(iceWallSpawner.ActorClass, iceWallSpawner.Transform * casterToWorld);
 
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
@@ -25,7 +25,6 @@ void UNewIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
 
 #if DO_CHECK
 void UNewIceWallSkill::CheckParametersSanity() const {
-	const auto& actorSpawners = _getActorSpawners();
-	check(actorSpawners.Num() == 1);
+	check(_getActorSpawners().Num() == 1);
 }
 #endif

@@ -29,6 +29,7 @@ public:
 protected:
 	double _getDuration() const { return _parameters.Duration; }
 	const TArray<FActorSpawnerParameters>& _getActorSpawners() const { return _parameters.ActorSpawnerParameters; }
+	const TArray<FFollowerActorSpawnerParameters>& _getFollowerActorSpawners() const { return _parameters.FollowerActorSpawnerParameters; }
 
 	void _startCooldown();
 	void _endCooldown();
