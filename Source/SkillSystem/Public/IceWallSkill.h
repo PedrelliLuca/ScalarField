@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "AbstractSkill.h"
 
-#include "NewIceWallSkill.generated.h"
+#include "IceWallSkill.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UNewIceWallSkill : public UAbstractSkill {
+class SKILLSYSTEM_API UIceWallSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:

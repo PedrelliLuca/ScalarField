@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "NewIceWallSkill.h"
+#include "IceWallSkill.h"
 
-void UNewIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
+void UIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
 	const auto& iceWallSpawner = _getActorSpawners()[0];
 
 	const FTransform& casterToWorld = caster->GetTransform();
@@ -24,7 +24,7 @@ void UNewIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
 }
 
 #if DO_CHECK
-void UNewIceWallSkill::CheckParametersSanity() const {
+void UIceWallSkill::CheckParametersSanity() const {
 	check(_getActorSpawners().Num() == 1);
 }
 #endif
