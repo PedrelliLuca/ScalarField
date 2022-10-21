@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include "AbstractSkill.h"
 #include "Components/CapsuleComponent.h"
 #include "CoreMinimal.h"
-#include "NewAbstractSkill.h"
 #include "Particles/ParticleSystem.h"
 
 #include "NewThermalPushSkill.generated.h"
@@ -13,7 +13,7 @@
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UNewThermalPushSkill : public UNewAbstractSkill, public FTickableGameObject {
+class SKILLSYSTEM_API UNewThermalPushSkill : public UAbstractSkill, public FTickableGameObject {
 	GENERATED_BODY()
 	
 public:

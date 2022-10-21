@@ -2,9 +2,9 @@
 
 #pragma once
 
+#include "AbstractSkill.h"
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "NewAbstractSkill.h"
 
 #include "SkillsContainerComponent.generated.h"
 
@@ -25,8 +25,8 @@ protected:
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Skills")
-	TArray<TSubclassOf<UNewAbstractSkill>> _skillsClasses;
+	TArray<TSubclassOf<UAbstractSkill>> _skillsClasses;
 
 	UPROPERTY()
-	TArray<TObjectPtr<UNewAbstractSkill>> _skills;
+	TArray<TObjectPtr<UAbstractSkill>> _skills;
 };

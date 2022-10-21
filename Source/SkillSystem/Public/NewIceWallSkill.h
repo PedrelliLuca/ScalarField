@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 #include "NewIceWallSkill.generated.h"
 
@@ -11,7 +11,7 @@
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UNewIceWallSkill : public UNewAbstractSkill {
+class SKILLSYSTEM_API UNewIceWallSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:

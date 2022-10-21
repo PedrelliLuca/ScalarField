@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "Parameters/NewSkillParameters.h"
 
-#include "NewAbstractSkill.generated.h"
+#include "AbstractSkill.generated.h"
 
 
 /**
  * 
  */
 UCLASS(NotBlueprintable, Abstract)
-class SKILLSYSTEM_API UNewAbstractSkill : public UObject {
+class SKILLSYSTEM_API UAbstractSkill : public UObject {
 	GENERATED_BODY()
 
 public:
 	/** TODO: add description */
-	virtual void Execute(TObjectPtr<AActor> caster) PURE_VIRTUAL(UNewAbstractSkill::Execute, return;);
+	virtual void Execute(TObjectPtr<AActor> caster) PURE_VIRTUAL(UAbstractSkill::Execute, return;);
 
 #if DO_CHECK
 	virtual void CheckParametersSanity() const {}

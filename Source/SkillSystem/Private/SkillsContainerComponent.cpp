@@ -47,7 +47,7 @@ void USkillsContainerComponent::BeginPlay() {
 	Super::BeginPlay();
 
 	for (const auto skillClass : _skillsClasses) {
-		const auto skill = NewObject<UNewAbstractSkill>(GetOwner(), skillClass);
+		const auto skill = NewObject<UAbstractSkill>(GetOwner(), skillClass);
 
 #if DO_CHECK
 		skill->CheckParametersSanity();

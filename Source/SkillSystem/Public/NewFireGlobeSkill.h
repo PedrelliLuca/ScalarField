@@ -2,8 +2,8 @@
 
 #pragma once
 
+#include "AbstractSkill.h"
 #include "CoreMinimal.h"
-#include "NewAbstractSkill.h"
 
 #include "NewFireGlobeSkill.generated.h"
 
@@ -11,7 +11,7 @@
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UNewFireGlobeSkill : public UNewAbstractSkill {
+class SKILLSYSTEM_API UNewFireGlobeSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:
