@@ -20,7 +20,7 @@ public:
 	virtual void Execute(TObjectPtr<AActor> caster) PURE_VIRTUAL(UNewAbstractSkill::Execute, return;);
 
 #if DO_CHECK
-	virtual void CheckParametersSanity() const PURE_VIRTUAL(UNewAbstractSkill::CheckParametersSanity, return;);
+	virtual void CheckParametersSanity() const {}
 #endif
 
 	double GetManaCost() const { return _parameters.ManaCost; }
