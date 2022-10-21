@@ -4,7 +4,6 @@
 #include "SkillsContainerComponent.h"
 
 #include "ManaComponent.h"
-#include "NewIceWallSkill.h"
 
 USkillsContainerComponent::USkillsContainerComponent() {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -47,26 +46,13 @@ bool USkillsContainerComponent::ExecuteSkillAtIndex(const uint32 index) {
 void USkillsContainerComponent::BeginPlay() {
 	Super::BeginPlay();
 
-	for (const auto skillParametersClass : _skillsParametersClasses) {
-		_skills.Emplace(_createSkill(skillParametersClass));
+	for (const auto skillClass : _skillsClasses) {
+		const auto skill = NewObject<UNewAbstractSkill>(GetOwner(), skillClass);
+
+#if DO_CHECK
+		skill->CheckParametersSanity();
+#endif
+
+		_skills.Emplace(skill);
 	}
-}
-
-TObjectPtr<UNewAbstractSkill> USkillsContainerComponent::_createSkill(const TSubclassOf<UNewSkillParameters> skillParametersClass) const {
-	const auto parameters = NewObject<UNewSkillParameters>(GetOwner(), skillParametersClass);
-	
-	TObjectPtr<UClass> skillClass;
-
-	switch (parameters->Skill) {
-	case EConcreteSkill::CS_IceWall:
-		skillClass = UNewIceWallSkill::StaticClass();
-		break;
-	default:
-		checkNoEntry();
-	};
-
-	const auto skill = NewObject<UNewAbstractSkill>(GetOwner(), skillClass);
-	skill->Initialize(parameters);
-
-	return skill;
 }

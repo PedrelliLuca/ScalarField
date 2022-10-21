@@ -18,25 +18,24 @@ class SKILLSYSTEM_API UNewAbstractSkill : public UObject {
 public:
 	/** TODO: add description */
 	virtual void Execute(TObjectPtr<AActor> caster) PURE_VIRTUAL(UNewAbstractSkill::Execute, return;);
-	/** TODO: add description */
-	virtual void Initialize(TWeakObjectPtr<UNewSkillParameters> skillParameters);
 
-	double GetManaCost() const { return _manaCost; }
-	double GetDuration() const { return _duration; }
+#if DO_CHECK
+	virtual void CheckParametersSanity() const PURE_VIRTUAL(UNewAbstractSkill::CheckParametersSanity, return;);
+#endif
+
+	double GetManaCost() const { return _parameters.ManaCost; }
 	bool IsOnCooldown() const { return _bIsOnCooldown; }
 
 protected:
+	double _getDuration() const { return _parameters.Duration; }
+	const TArray<FActorSpawnerParameters>& _getActorSpawners() const { return _parameters.ActorSpawnerParameters; }
+
 	void _startCooldown();
 	void _endCooldown();
-	bool _isOnCooldown() { return _bIsOnCooldown; }
 
 private:
-	double _manaCost = 0.;
-	double _cooldown = 0.;
-	double _castTime = 0.;
-	double _channelingTime = 0.;
-	double _duration = 0.;
-
 	bool _bIsOnCooldown = false;
-	
+
+	UPROPERTY(EditAnywhere)
+	FNewSkillParameters _parameters;
 };

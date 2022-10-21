@@ -7,11 +7,6 @@
 
 #include "NewIceWallSkill.generated.h"
 
-struct FActorSpawnerSkillComponent {
-	TSubclassOf<AActor> ActorClass = nullptr;
-	FTransform Transform = FTransform::Identity;
-};
-
 /**
  * 
  */
@@ -21,8 +16,8 @@ class SKILLSYSTEM_API UNewIceWallSkill : public UNewAbstractSkill {
 	
 public:
 	void Execute(TObjectPtr<AActor> caster) override;
-	void Initialize(TWeakObjectPtr<UNewSkillParameters> skillParameters) override;
 
-private:
-	FActorSpawnerSkillComponent _actorSpawnerC;
+#if DO_CHECK
+	void CheckParametersSanity() const override;
+#endif
 };

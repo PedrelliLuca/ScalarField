@@ -8,26 +8,14 @@
 
 #include "NewSkillParameters.generated.h"
 
-UENUM()
-enum class EConcreteSkill : uint32 {
-	CS_Invalid = 0     UMETA(DisplayName = "Invalid"),
-	CS_IceWall = 1     UMETA(DisplayName = "Ice Wall"),
-	CS_FireGlobe = 2   UMETA(DisplayName = "Fire Globe"),
-	CS_ThermalPush = 3 UMETA(DisplayName = "Thermal Push"),
-};
-
 /**
  * 
  */
-UCLASS(Blueprintable)
-class SKILLSYSTEM_API UNewSkillParameters : public UObject
-{
+USTRUCT(Blueprintable)
+struct SKILLSYSTEM_API FNewSkillParameters {
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, Category = "Associated Skill")
-	EConcreteSkill Skill = EConcreteSkill::CS_Invalid;
-
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double ManaCost = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))

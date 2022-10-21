@@ -3,8 +3,10 @@
 #include "NewIceWallSkill.h"
 
 void UNewIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
+	const auto& actorSpawner = _getActorSpawners()[0];
+
 	const FTransform& casterToWorld = caster->GetTransform();
-	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(_actorSpawnerC.ActorClass, _actorSpawnerC.Transform * casterToWorld);
+	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(actorSpawner.ActorClass, actorSpawner.Transform * casterToWorld);
 
 	FTimerHandle timerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
@@ -14,21 +16,16 @@ void UNewIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
 				spawnActor->Destroy();
 			}
 		},
-		GetDuration(),
+		_getDuration(),
 		false
 	);
 
 	_startCooldown();
 }
 
-void UNewIceWallSkill::Initialize(const TWeakObjectPtr<UNewSkillParameters> skillParameters) {
-	Super::Initialize(skillParameters);
-
-	const auto skillParams = skillParameters.Get();
-	check(skillParams->Skill == EConcreteSkill::CS_IceWall);
-	check(skillParams->ActorSpawnerParameters.Num() == 1);
-
-	const auto actorSpawnerParams = skillParameters->ActorSpawnerParameters[0];
-	_actorSpawnerC.ActorClass = actorSpawnerParams.ActorClass;
-	_actorSpawnerC.Transform = actorSpawnerParams.Transform;
+#if DO_CHECK
+void UNewIceWallSkill::CheckParametersSanity() const {
+	const auto& actorSpawners = _getActorSpawners();
+	check(actorSpawners.Num() == 1);
 }
+#endif
