@@ -9,13 +9,10 @@
 #include "Engine/World.h"
 #include "EnvironmentCell.h"
 #include "EnvironmentGridWorldSubsystem.h"
-#include "FireGlobeSkill.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "IceWallSkill.h"
 #include "Materials/Material.h"
-#include "ThermalPush.h"
 #include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
 

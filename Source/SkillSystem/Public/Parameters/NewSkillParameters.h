@@ -3,7 +3,6 @@
 #pragma once
 
 #include "ActorSpawnerParameters.h"
-#include "CapsuleSpawnerParameters.h"
 #include "CoreMinimal.h"
 #include "FollowerActorSpawnerParameters.h"
 
@@ -30,9 +29,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double BaseDamage = 0.;
 	
-	UPROPERTY(EditAnywhere, Category = "Capsule Components")
-	TArray<FCapsuleSpawnerParameters> CapsuleSpawnerParameters;
-
 	UPROPERTY(EditAnywhere, Category = "Actor Spawner Components")
 	TArray<FActorSpawnerParameters> ActorSpawnerParameters;
 

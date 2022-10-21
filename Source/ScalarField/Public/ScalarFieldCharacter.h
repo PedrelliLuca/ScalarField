@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "AbstractSkill.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ManaComponent.h"
