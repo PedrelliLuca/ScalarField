@@ -27,7 +27,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return _topDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return _cameraBoom; }
 
-	void CastSkillAtIndex(uint32 index);
+	void ExecuteSkillAtKey(uint32 key);
 
 protected:
 	void BeginPlay() override;
@@ -54,15 +54,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 
-	UPROPERTY(EditAnywhere, Category = "Skills")
-	TArray<FSkillParameters> _skillsParameters;
-
-	UPROPERTY()
-	TArray<TObjectPtr<UAbstractSkill>> _skills;
-
 	UPROPERTY(VisibleAnywhere, Category = Skills, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkillsContainerComponent> _skillsContainer;
 
-	static constexpr uint32 ASSIGNABLE_SKILLS = 10;
+	static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
 };
 

@@ -97,18 +97,18 @@ void AScalarFieldPlayerController::_onTouchReleased(const ETouchIndex::Type Fing
 
 void AScalarFieldPlayerController::_onSkill1Cast() {
 	if (const auto sfCharacter = Cast<AScalarFieldCharacter>(GetPawn())) {
-		sfCharacter->CastSkillAtIndex(1);
+		sfCharacter->ExecuteSkillAtKey(1);
 	}
 }
 
 void AScalarFieldPlayerController::_onSkill2Cast() {
 	if (const auto sfCharacter = Cast<AScalarFieldCharacter>(GetPawn())) {
-		sfCharacter->CastSkillAtIndex(2);
+		sfCharacter->ExecuteSkillAtKey(2);
 	}
 }
 
 void AScalarFieldPlayerController::_onSkill3Cast() {
 	if (const auto sfCharacter = Cast<AScalarFieldCharacter>(GetPawn())) {
-		sfCharacter->CastSkillAtIndex(3);
+		sfCharacter->ExecuteSkillAtKey(3);
 	}
 }

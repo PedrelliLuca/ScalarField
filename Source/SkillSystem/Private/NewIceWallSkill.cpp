@@ -2,12 +2,7 @@
 
 #include "NewIceWallSkill.h"
 
-bool UNewIceWallSkill::CastSkill(const TObjectPtr<APawn> caster) {
-	if (_isOnCooldown()) {
-		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
-		return false;
-	}
-
+void UNewIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
 	const FTransform& casterToWorld = caster->GetTransform();
 	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(_actorSpawnerC.ActorClass, _actorSpawnerC.Transform * casterToWorld);
 
@@ -24,11 +19,10 @@ bool UNewIceWallSkill::CastSkill(const TObjectPtr<APawn> caster) {
 	);
 
 	_startCooldown();
-	return true;
 }
 
-void UNewIceWallSkill::InitializeSkill(const TWeakObjectPtr<UNewSkillParameters> skillParameters) {
-	Super::InitializeSkill(skillParameters);
+void UNewIceWallSkill::Initialize(const TWeakObjectPtr<UNewSkillParameters> skillParameters) {
+	Super::Initialize(skillParameters);
 
 	const auto skillParams = skillParameters.Get();
 	check(skillParams->Skill == EConcreteSkill::CS_IceWall);

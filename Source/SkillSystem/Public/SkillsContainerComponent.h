@@ -19,6 +19,8 @@ public:
 	// Sets default values for this component's properties
 	USkillsContainerComponent();
 
+	bool ExecuteSkillAtIndex(uint32 index);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

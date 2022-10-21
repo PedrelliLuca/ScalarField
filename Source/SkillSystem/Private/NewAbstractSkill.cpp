@@ -3,7 +3,7 @@
 
 #include "NewAbstractSkill.h"
 
-void UNewAbstractSkill::InitializeSkill(const TWeakObjectPtr<UNewSkillParameters> skillParameters) {
+void UNewAbstractSkill::Initialize(const TWeakObjectPtr<UNewSkillParameters> skillParameters) {
 	check(skillParameters.IsValid());
 	
 	const TObjectPtr<UNewSkillParameters> skillParams = skillParameters.Get();

@@ -20,8 +20,8 @@ class SKILLSYSTEM_API UNewIceWallSkill : public UNewAbstractSkill {
 	GENERATED_BODY()
 	
 public:
-	bool CastSkill(TObjectPtr<APawn> caster) override;
-	void InitializeSkill(TWeakObjectPtr<UNewSkillParameters> skillParameters) override;
+	void Execute(TObjectPtr<AActor> caster) override;
+	void Initialize(TWeakObjectPtr<UNewSkillParameters> skillParameters) override;
 
 private:
 	FActorSpawnerSkillComponent _actorSpawnerC;

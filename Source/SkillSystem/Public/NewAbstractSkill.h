@@ -17,11 +17,13 @@ class SKILLSYSTEM_API UNewAbstractSkill : public UObject {
 
 public:
 	/** TODO: add description */
-	virtual bool CastSkill(TObjectPtr<APawn> caster) PURE_VIRTUAL(UNewAbstractSkill::CastSkill, return false;);
+	virtual void Execute(TObjectPtr<AActor> caster) PURE_VIRTUAL(UNewAbstractSkill::Execute, return;);
 	/** TODO: add description */
-	virtual void InitializeSkill(TWeakObjectPtr<UNewSkillParameters> skillParameters);
+	virtual void Initialize(TWeakObjectPtr<UNewSkillParameters> skillParameters);
 
+	double GetManaCost() const { return _manaCost; }
 	double GetDuration() const { return _duration; }
+	bool IsOnCooldown() const { return _bIsOnCooldown; }
 
 protected:
 	void _startCooldown();

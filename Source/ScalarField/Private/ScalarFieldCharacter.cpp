@@ -69,32 +69,13 @@ void AScalarFieldCharacter::Tick(float DeltaSeconds) {
 	Super::Tick(DeltaSeconds);
 }
 
-void AScalarFieldCharacter::CastSkillAtIndex(const uint32 index) {
-	// [1, 2, ..., 9, 0] => [0, 1, ..., 8, 9]
-	check(index < ASSIGNABLE_SKILLS);
-	const uint32 arrayIndex = index != 0 ? index - 1 : ASSIGNABLE_SKILLS - 1;
+void AScalarFieldCharacter::ExecuteSkillAtKey(const uint32 key) {
+	check(key < KEY_ASSIGNABLE_SKILLS);
+	check(_skillsContainer != nullptr);
 
-	const bool bIsValidIndex = _skills.IsValidIndex(arrayIndex);
-	if (!bIsValidIndex) {
-		UE_LOG(LogTemp, Error, TEXT("There is no skill bounded with key %i"), index);
-		return;
-	}
-
-	const auto skill = _skills[arrayIndex];
-
-	// Index %i hosts an invalid skill
-	check(skill != nullptr);
-
-	const double charMana = _manaC->GetMana();
-	const double manaCost = skill->GetManaCost();
-	if (charMana < manaCost) {
-		UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
-		return;
-	}
-
-	if (_skills[arrayIndex]->CastSkill(this)) {
-		_manaC->SetMana(charMana - manaCost);
-	}
+	// keys [1, 2, ..., 9, 0] => index [0, 1, ..., 8, 9]
+	const uint32 index = key != 0 ? key - 1 : KEY_ASSIGNABLE_SKILLS - 1;
+	_skillsContainer->ExecuteSkillAtIndex(index);
 }
 
 void AScalarFieldCharacter::BeginPlay() {
@@ -102,25 +83,6 @@ void AScalarFieldCharacter::BeginPlay() {
 
 	_dmiSetup();
 	_setOverlappingCells();
-
-	// Instancing the skills of this character
-	for (const auto& skillParameters : _skillsParameters) {
-		if (skillParameters.Class->IsChildOf(UIceWallSkill::StaticClass())) {
-			const auto iceWallSkill = NewObject<UIceWallSkill>(this, skillParameters.Class);
-			iceWallSkill->SetParameters(skillParameters);
-			_skills.Emplace(iceWallSkill);
-		}
-		if (skillParameters.Class->IsChildOf(UFireGlobeSkill::StaticClass())) {
-			const auto fireGlobeSkill = NewObject<UFireGlobeSkill>(this, skillParameters.Class);
-			fireGlobeSkill->SetParameters(skillParameters);
-			_skills.Emplace(fireGlobeSkill);
-		}
-		if (skillParameters.Class->IsChildOf(UThermalPush::StaticClass())) {
-			const auto thermalPushSkill = NewObject<UThermalPush>(this, skillParameters.Class);
-			thermalPushSkill->SetParameters(skillParameters);
-			_skills.Emplace(thermalPushSkill);
-		}
-	}
 }
 
 void AScalarFieldCharacter::_dmiSetup(){
