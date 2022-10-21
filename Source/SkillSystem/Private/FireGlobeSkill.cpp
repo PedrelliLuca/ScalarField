@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "NewFireGlobeSkill.h"
+#include "FireGlobeSkill.h"
 
 #include "GameFramework/SpringArmComponent.h"
 
-void UNewFireGlobeSkill::Execute(TObjectPtr<AActor> caster) {
+void UFireGlobeSkill::Execute(TObjectPtr<AActor> caster) {
 	const auto& fireGlobeSpawner = _getFollowerActorSpawners()[0];
 
 	const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
@@ -43,7 +43,7 @@ void UNewFireGlobeSkill::Execute(TObjectPtr<AActor> caster) {
 }
 
 #if DO_CHECK
-void UNewFireGlobeSkill::CheckParametersSanity() const {
+void UFireGlobeSkill::CheckParametersSanity() const {
 	check(_getFollowerActorSpawners().Num() == 1);
 }
 #endif

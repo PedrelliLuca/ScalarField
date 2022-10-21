@@ -5,13 +5,13 @@
 #include "AbstractSkill.h"
 #include "CoreMinimal.h"
 
-#include "NewFireGlobeSkill.generated.h"
+#include "FireGlobeSkill.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UNewFireGlobeSkill : public UAbstractSkill {
+class SKILLSYSTEM_API UFireGlobeSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:
