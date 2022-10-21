@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Parameters/NewSkillParameters.h"
+#include "Parameters/SkillParameters.h"
 
 #include "AbstractSkill.generated.h"
 
@@ -38,5 +38,5 @@ private:
 	bool _bIsOnCooldown = false;
 
 	UPROPERTY(EditAnywhere)
-	FNewSkillParameters _parameters;
+	FSkillParameters _parameters;
 };

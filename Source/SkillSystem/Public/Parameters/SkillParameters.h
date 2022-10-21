@@ -6,13 +6,13 @@
 #include "CoreMinimal.h"
 #include "FollowerActorSpawnerParameters.h"
 
-#include "NewSkillParameters.generated.h"
+#include "SkillParameters.generated.h"
 
 /**
  * 
  */
 USTRUCT(Blueprintable)
-struct SKILLSYSTEM_API FNewSkillParameters {
+struct SKILLSYSTEM_API FSkillParameters {
 	GENERATED_BODY()
 	
 public:
