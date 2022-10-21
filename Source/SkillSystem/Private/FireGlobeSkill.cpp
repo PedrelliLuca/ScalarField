@@ -2,18 +2,17 @@
 
 #include "FireGlobeSkill.h"
 
-bool UFireGlobeSkill::CastSkill(const TObjectPtr<APawn> caster) {
-	if (IsOnCooldown()) {
-		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
-		return false;
-	}
+#include "GameFramework/SpringArmComponent.h"
+
+void UFireGlobeSkill::Execute(TObjectPtr<AActor> caster) {
+	const auto& fireGlobeSpawner = _getFollowerActorSpawners()[0];
 
 	const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
 	spawnSpringArm->SetupAttachment(caster->GetRootComponent());
 	spawnSpringArm->SetRelativeLocation(FVector::ZeroVector);
 
 	// The point where we have to spawn the globe relative to the caster, it's also the point where the 2nd end of the arm lies
-	const FVector globeLocation = GetSpawnTransform().GetLocation();
+	const FVector globeLocation = fireGlobeSpawner.Transform.GetLocation();
 
 	// The spring sits on the vector that goes from the caster's root to the globeLocation
 	spawnSpringArm->SetRelativeRotation(globeLocation.Rotation());
@@ -21,7 +20,7 @@ bool UFireGlobeSkill::CastSkill(const TObjectPtr<APawn> caster) {
 
 	spawnSpringArm->RegisterComponent();
 
-	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(GetSpawnClass(), GetSpawnTransform() * caster->GetTransform());
+	const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(fireGlobeSpawner.ActorClass, fireGlobeSpawner.Transform * caster->GetTransform());
 	spawnActor->AttachToComponent(spawnSpringArm, FAttachmentTransformRules::KeepWorldTransform, spawnSpringArm->SocketName);
 
 	FTimerHandle timerHandle;
@@ -36,10 +35,15 @@ bool UFireGlobeSkill::CastSkill(const TObjectPtr<APawn> caster) {
 				spawnSpringArm->DestroyComponent();
 			}
 		},
-		GetParameters().Duration,
+		_getDuration(),
 		false
 	);
 
-	StartCooldown();
-	return true;
+	_startCooldown();
 }
+
+#if DO_CHECK
+void UFireGlobeSkill::CheckParametersSanity() const {
+	check(_getFollowerActorSpawners().Num() == 1);
+}
+#endif

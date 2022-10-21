@@ -3,30 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+#include "Parameters/SkillParameters.h"
 
 #include "AbstractSkill.generated.h"
 
-USTRUCT(BlueprintType)
-struct SKILLSYSTEM_API FSkillParameters {
-	GENERATED_BODY();
-
-public:
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
-	double ManaCost = 0.;
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
-	double CoolDown = 0.;
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
-	double CastTime = 0.;
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
-	double Duration = 0.;
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
-	double BaseDamage = 0.;
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
-	TSubclassOf<UAbstractSkill> Class;
-
-	// TODO: add icon property
-};
 
 /**
  * 
@@ -36,16 +16,27 @@ class SKILLSYSTEM_API UAbstractSkill : public UObject {
 	GENERATED_BODY()
 
 public:
-	virtual bool CastSkill(TObjectPtr<APawn> caster) PURE_VIRTUAL(UAbstractSkill::Cast, return false;);
-	const FSkillParameters& GetParameters() const { return _parameters; }
-	void SetParameters(const FSkillParameters& parameters) { _parameters = parameters; }
+	/** TODO: add description */
+	virtual void Execute(TObjectPtr<AActor> caster) PURE_VIRTUAL(UAbstractSkill::Execute, return;);
+
+#if DO_CHECK
+	virtual void CheckParametersSanity() const {}
+#endif
+
 	double GetManaCost() const { return _parameters.ManaCost; }
 	bool IsOnCooldown() const { return _bIsOnCooldown; }
-	void StartCooldown();
+
+protected:
+	double _getDuration() const { return _parameters.Duration; }
+	const TArray<FActorSpawnerParameters>& _getActorSpawners() const { return _parameters.ActorSpawnerParameters; }
+	const TArray<FFollowerActorSpawnerParameters>& _getFollowerActorSpawners() const { return _parameters.FollowerActorSpawnerParameters; }
+
+	void _startCooldown();
+	void _endCooldown();
 
 private:
-	void _endCooldown() { _bIsOnCooldown = false; }
-
-	FSkillParameters _parameters{};
 	bool _bIsOnCooldown = false;
+
+	UPROPERTY(EditAnywhere)
+	FSkillParameters _parameters;
 };

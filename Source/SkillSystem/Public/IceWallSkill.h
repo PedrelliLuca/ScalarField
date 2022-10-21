@@ -3,17 +3,21 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SpawnerSkill.h"
+#include "AbstractSkill.h"
+
 #include "IceWallSkill.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UIceWallSkill : public USpawnerSkill {
+class SKILLSYSTEM_API UIceWallSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:
-	bool CastSkill(TObjectPtr<APawn> caster) override;
+	void Execute(TObjectPtr<AActor> caster) override;
 
+#if DO_CHECK
+	void CheckParametersSanity() const override;
+#endif
 };

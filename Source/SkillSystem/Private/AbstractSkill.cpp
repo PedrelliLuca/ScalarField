@@ -3,10 +3,14 @@
 
 #include "AbstractSkill.h"
 
-void UAbstractSkill::StartCooldown() {
+void UAbstractSkill::_startCooldown() {
 	check(!_bIsOnCooldown);
 
 	_bIsOnCooldown = true;
 	FTimerHandle timerHandle{};
-	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UAbstractSkill::_endCooldown, _parameters.CoolDown);
+	GetWorld()->GetTimerManager().SetTimer(timerHandle, this, &UAbstractSkill::_endCooldown, _parameters.Cooldown);
+}
+
+void UAbstractSkill::_endCooldown() {
+	_bIsOnCooldown = false;
 }

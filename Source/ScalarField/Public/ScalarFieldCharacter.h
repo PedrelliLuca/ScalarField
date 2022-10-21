@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "ManaComponent.h"
-#include "AbstractSkill.h"
+#include "SkillsContainerComponent.h"
 #include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
@@ -26,7 +26,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return _topDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return _cameraBoom; }
 
-	void CastSkillAtIndex(uint32 index);
+	void ExecuteSkillAtKey(uint32 key);
 
 protected:
 	void BeginPlay() override;
@@ -53,12 +53,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 
-	UPROPERTY(EditAnywhere, Category = "Skills")
-	TArray<FSkillParameters> _skillsParameters;
+	UPROPERTY(VisibleAnywhere, Category = Skills, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkillsContainerComponent> _skillsContainer;
 
-	UPROPERTY()
-	TArray<TObjectPtr<UAbstractSkill>> _skills;
-
-	static constexpr uint32 ASSIGNABLE_SKILLS = 10;
+	static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
 };
 

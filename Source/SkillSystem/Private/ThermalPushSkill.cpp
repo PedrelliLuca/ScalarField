@@ -1,16 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ThermalPush.h"
+#include "ThermalPushSkill.h"
 
 #include "Particles/ParticleSystemComponent.h"
 #include "ThermodynamicComponent.h"
 
-bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
-	if (IsOnCooldown()) {
-		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
-		return false;
-	}
+UThermalPushSkill::UThermalPushSkill() {
+	_hotTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Hot Particle System"));
+	_coldTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Cold Particle System"));
+}
 
+void UThermalPushSkill::Execute(TObjectPtr<AActor> caster) {
 	_spawnCapsule = NewObject<UCapsuleComponent>(caster, TEXT("Thermal Push Capsule"));
 	_spawnCapsule->SetupAttachment(caster->GetRootComponent());
 	_spawnCapsule->SetRelativeLocation(FVector::ForwardVector * _minCapsuleHalfHeight);
@@ -22,9 +22,7 @@ bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
 
 	_spawnCapsule->RegisterComponent();
 
-	TWeakObjectPtr<UParticleSystemComponent> activeParticleSystem = nullptr;
 	TWeakObjectPtr<UParticleSystem> activeParticleTemplate = nullptr;
-
 	if (const auto thermoC = Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
 		if (thermoC->GetTemperature() > _hotThreshold) {
 			UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
@@ -36,6 +34,7 @@ bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
 		}
 	}
 
+	TWeakObjectPtr<UParticleSystemComponent> activeParticleSystem = nullptr;
 	if (activeParticleTemplate.IsValid()) {
 		activeParticleSystem = NewObject<UParticleSystemComponent>(caster, TEXT("Push Particle System"));
 		activeParticleSystem->SetupAttachment(_spawnCapsule.Get());
@@ -57,20 +56,19 @@ bool UThermalPush::CastSkill(const TObjectPtr<APawn> caster) {
 				spawnCapsule->DestroyComponent();
 			}
 		},
-		GetParameters().Duration,
+		_getDuration(),
 		false
 	);
 
 	_timeFromCast = 0.;
-	StartCooldown();
-	return true;
+	_startCooldown();
 }
 
-void UThermalPush::Tick(float DeltaTime) {
+void UThermalPushSkill::Tick(const float deltaTime) {
 	FlushPersistentDebugLines(GetWorld());
 
-	_timeFromCast = FMath::Clamp(_timeFromCast + DeltaTime, 0., GetParameters().Duration);
-	const double alpha = _timeFromCast / GetParameters().Duration;
+	_timeFromCast = FMath::Clamp(_timeFromCast + deltaTime, 0., _getDuration());
+	const double alpha = _timeFromCast / _getDuration();
 	const double halfHeight = FMath::Lerp(_minCapsuleHalfHeight, _maxCapsuleHalfHeight, alpha);
 	const double radius = FMath::Lerp(_minCapsuleRadius, _maxCapsuleRadius, alpha);
 
@@ -81,10 +79,10 @@ void UThermalPush::Tick(float DeltaTime) {
 	_spawnCapsule->SetCapsuleRadius(radius);
 	_spawnCapsule->SetRelativeLocation(FVector::ForwardVector * halfHeight);
 
-	DrawDebugCapsule(GetWorld(), _spawnCapsule->GetComponentLocation(), _spawnCapsule->GetUnscaledCapsuleHalfHeight(), _spawnCapsule->GetUnscaledCapsuleRadius(), _spawnCapsule->GetComponentRotation().Quaternion(), FColor::Green, false, GetParameters().Duration);
-
+	DrawDebugCapsule(GetWorld(), _spawnCapsule->GetComponentLocation(), _spawnCapsule->GetUnscaledCapsuleHalfHeight(), _spawnCapsule->GetUnscaledCapsuleRadius(),
+		_spawnCapsule->GetComponentRotation().Quaternion(), FColor::Green, false, _getDuration());
 }
 
-TStatId UThermalPush::GetStatId() const {
-	return TStatId();
+TStatId UThermalPushSkill::GetStatId() const {
+	return TStatId{};
 }

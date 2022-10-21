@@ -2,9 +2,8 @@
 
 #pragma once
 
+#include "AbstractSkill.h"
 #include "CoreMinimal.h"
-#include "SpawnerSkill.h"
-#include "GameFramework/SpringArmComponent.h"
 
 #include "FireGlobeSkill.generated.h"
 
@@ -12,9 +11,13 @@
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UFireGlobeSkill : public USpawnerSkill {
+class SKILLSYSTEM_API UFireGlobeSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:
-	bool CastSkill(TObjectPtr<APawn> caster) override;
+	void Execute(TObjectPtr<AActor> caster) override;
+
+#if DO_CHECK
+	void CheckParametersSanity() const override;
+#endif
 };

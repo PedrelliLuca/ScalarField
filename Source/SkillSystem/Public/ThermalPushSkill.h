@@ -2,23 +2,26 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "AbstractSkill.h"
 #include "Components/CapsuleComponent.h"
+#include "CoreMinimal.h"
 #include "Particles/ParticleSystem.h"
-#include "SpawnerSkill.h"
 
-#include "ThermalPush.generated.h"
+#include "ThermalPushSkill.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UThermalPush : public USpawnerSkill, public FTickableGameObject {
+class SKILLSYSTEM_API UThermalPushSkill : public UAbstractSkill, public FTickableGameObject {
 	GENERATED_BODY()
 	
 public:
-	bool CastSkill(TObjectPtr<APawn> caster) override;
-	void Tick(float DeltaTime) override;
+	UThermalPushSkill();
+
+	void Execute(TObjectPtr<AActor> caster) override;
+
+	void Tick(float deltaTime) override;
 	TStatId GetStatId() const override;
 	bool IsAllowedToTick() const override { return _spawnCapsule.IsValid(); }
 
@@ -26,24 +29,24 @@ private:
 	TWeakObjectPtr<UCapsuleComponent> _spawnCapsule;
 
 	// When the skill is casted with the caster having a temperature above this threshold, hit ignitable objects are set on fire
-	UPROPERTY(EditAnywhere, Category = "Thresholds")
+	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Thresholds")
 	double _hotThreshold = 300.;
 	// When the skill is casted with the caster having a temperature below this threshold, hit freezable objects are frozen
-	UPROPERTY(EditAnywhere, Category = "Thresholds")
+	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Thresholds")
 	double _coldThreshold = 270.;
 
-	UPROPERTY(EditAnywhere, Category = "Collision")
+	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Collision")
 	double _minCapsuleHalfHeight = 10.;
-	UPROPERTY(EditAnywhere, Category = "Collision")
+	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Collision")
 	double _maxCapsuleHalfHeight = 200.;
-	UPROPERTY(EditAnywhere, Category = "Collision")
+	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Collision")
 	double _minCapsuleRadius = 5.;
-	UPROPERTY(EditAnywhere, Category = "Collision")
+	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Collision")
 	double _maxCapsuleRadius = 100.;
 
-	UPROPERTY(EditAnywhere, Category = "Particles")
+	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Particles")
 	TObjectPtr<UParticleSystem> _hotTemplate;
-	UPROPERTY(EditAnywhere, Category = "Particles")
+	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Particles")
 	TObjectPtr<UParticleSystem> _coldTemplate;
 
 	double _timeFromCast = 0.;
