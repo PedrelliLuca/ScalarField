@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "NewAbstractSkill.h"
 #include "Parameters/NewSkillParameters.h"
 
 #include "SkillsContainerComponent.generated.h"
@@ -23,8 +24,11 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	TObjectPtr<UNewAbstractSkill> _createSkill(TSubclassOf<UNewSkillParameters> skillParametersClass) const;
+
 	UPROPERTY(EditAnywhere, Category = "Skills")
 	TArray<TSubclassOf<UNewSkillParameters>> _skillsParametersClasses;
 		
-	// TArray<TObjectPtr<UAbstractSkill>> _skills;
+	UPROPERTY()
+	TArray<TObjectPtr<UNewAbstractSkill>> _skills;
 };
