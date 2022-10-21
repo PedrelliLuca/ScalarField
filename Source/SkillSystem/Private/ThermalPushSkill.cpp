@@ -1,16 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "NewThermalPushSkill.h"
+#include "ThermalPushSkill.h"
 
 #include "Particles/ParticleSystemComponent.h"
 #include "ThermodynamicComponent.h"
 
-UNewThermalPushSkill::UNewThermalPushSkill() {
+UThermalPushSkill::UThermalPushSkill() {
 	_hotTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Hot Particle System"));
 	_coldTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Cold Particle System"));
 }
 
-void UNewThermalPushSkill::Execute(TObjectPtr<AActor> caster) {
+void UThermalPushSkill::Execute(TObjectPtr<AActor> caster) {
 	_spawnCapsule = NewObject<UCapsuleComponent>(caster, TEXT("Thermal Push Capsule"));
 	_spawnCapsule->SetupAttachment(caster->GetRootComponent());
 	_spawnCapsule->SetRelativeLocation(FVector::ForwardVector * _minCapsuleHalfHeight);
@@ -64,7 +64,7 @@ void UNewThermalPushSkill::Execute(TObjectPtr<AActor> caster) {
 	_startCooldown();
 }
 
-void UNewThermalPushSkill::Tick(const float deltaTime) {
+void UThermalPushSkill::Tick(const float deltaTime) {
 	FlushPersistentDebugLines(GetWorld());
 
 	_timeFromCast = FMath::Clamp(_timeFromCast + deltaTime, 0., _getDuration());
@@ -83,6 +83,6 @@ void UNewThermalPushSkill::Tick(const float deltaTime) {
 		_spawnCapsule->GetComponentRotation().Quaternion(), FColor::Green, false, _getDuration());
 }
 
-TStatId UNewThermalPushSkill::GetStatId() const {
+TStatId UThermalPushSkill::GetStatId() const {
 	return TStatId{};
 }

@@ -7,17 +7,17 @@
 #include "CoreMinimal.h"
 #include "Particles/ParticleSystem.h"
 
-#include "NewThermalPushSkill.generated.h"
+#include "ThermalPushSkill.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UNewThermalPushSkill : public UAbstractSkill, public FTickableGameObject {
+class SKILLSYSTEM_API UThermalPushSkill : public UAbstractSkill, public FTickableGameObject {
 	GENERATED_BODY()
 	
 public:
-	UNewThermalPushSkill();
+	UThermalPushSkill();
 
 	void Execute(TObjectPtr<AActor> caster) override;
 
