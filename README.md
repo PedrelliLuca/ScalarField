@@ -1,5 +1,5 @@
 # ScalarField
-A "DA: Origins" - like game, where magic works by interacting with the environment. You can find a playlist of videos showing my progress over time on [my YouTube channel](https://www.youtube.com/watch?v=8diMF7YYtPs&list=PLerNkl_bon8TyPWhDtxs6CzJtjON4_Fit&ab_channel=LucaPedrelli).
+A "DA: Origins" - like game, where magic works by interacting with the environment. You can find a playlist of videos showing my progress over time on [my YouTube channel](https://www.youtube.com/playlist?list=PLerNkl_bon8TyPWhDtxs6CzJtjON4_Fit).
 
 ## Coding Style
 I follow ZURU Tech's coding style, which is just https://github.com/Allar/ue4-style-guide#table-of-contents but with some exceptions.  
