@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "SkillUserState.h"
 #include "Templates/SubclassOf.h"
 
 #include "ScalarFieldPlayerController.generated.h"
@@ -50,6 +51,9 @@ private:
 	bool _bInputPressed; // Input is bring pressed
 	bool _bIsTouch; // Is it a touch device
 	float _followTime; // For how long it has been pressed
+
+	UPROPERTY()
+	TObjectPtr<USkillUserState> _skillUserState;
 };
 
 

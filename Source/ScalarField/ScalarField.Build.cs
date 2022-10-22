@@ -19,7 +19,8 @@ public class ScalarField : ModuleRules
 			"Niagara",
 			"EnvironmentGrid",
 			"SkillSystem",
-			"Thermodynamics"
+			"Thermodynamics",
+			"SkillUserFSM",
 		});
     }
 }

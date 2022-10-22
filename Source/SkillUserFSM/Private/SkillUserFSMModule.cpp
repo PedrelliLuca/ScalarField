@@ -5,7 +5,7 @@
 
 DEFINE_LOG_CATEGORY(LogSkillUserFSM);
 
-IMPLEMENT_MODULE(FSkillUserFSM Module, SkillUserFSM);
+IMPLEMENT_MODULE(FSkillUserFSMModule, SkillUserFSM);
 
 void FSkillUserFSMModule::StartupModule()
 {
