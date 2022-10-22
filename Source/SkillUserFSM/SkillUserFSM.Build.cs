@@ -14,7 +14,8 @@ namespace UnrealBuildTool.Rules
                     "Core",
                     "CoreUObject",
                     "Engine",
-					// ... add other public dependencies that you statically link with here ...
+                    "Niagara",
+                    "AIModule",
 				}
 				);
 

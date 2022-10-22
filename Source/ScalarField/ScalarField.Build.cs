@@ -15,8 +15,6 @@ public class ScalarField : ModuleRules
 			"InputCore", 
 			"HeadMountedDisplay", 
 			"NavigationSystem", 
-			"AIModule", 
-			"Niagara",
 			"EnvironmentGrid",
 			"SkillSystem",
 			"Thermodynamics",

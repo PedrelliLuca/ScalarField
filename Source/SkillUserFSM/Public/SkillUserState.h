@@ -16,10 +16,10 @@ class SKILLUSERFSM_API USkillUserState : public UObject {
 
 public:
 	virtual TObjectPtr<USkillUserState> OnLMBPress(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnLMBPress, return nullptr;);
-	virtual TObjectPtr<USkillUserState> OnLMBRelease(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnLMBRelease, return nullptr;);
+	virtual TObjectPtr<USkillUserState> OnLMBRelease(TObjectPtr<APlayerController> controller) PURE_VIRTUAL(USkillUserState::OnLMBRelease, return nullptr;);
 	virtual TObjectPtr<USkillUserState> OnKey1Press(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnKey1Press, return nullptr;);
 
-	virtual void Tick(float deltaTime, TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::Tick, return;);
+	virtual void Tick(float deltaTime, TObjectPtr<APlayerController> controller) PURE_VIRTUAL(USkillUserState::Tick, return;);
 	virtual void OnEnter(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnEnter, return;);
 	virtual void OnLeave(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnLeave, return;);
 	
