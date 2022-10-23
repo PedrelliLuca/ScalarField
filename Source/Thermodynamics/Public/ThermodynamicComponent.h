@@ -25,7 +25,7 @@ public:
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-	void SetTemperature(double temperature, const bool updateInitialTemp = true);
+	void SetTemperature(double temperature, const bool updateInitialTemp = false);
 	double GetTemperature() const { return _currentTemperature; }
 
 	void SetHeatCapacity(double heatCapacity) { _heatCapacity = heatCapacity; }

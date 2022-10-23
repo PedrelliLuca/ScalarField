@@ -30,7 +30,7 @@ public:
 
 	uint32 NumberOfTargets() const { return _parameters.ActorTargetParameters.Num(); }
 	bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const;
-	double GetMaxDistanceForTarget(int32 targetIndex);
+	double GetMaxDistanceForTarget(int32 targetIndex) const;
 	void SetTarget(int32 targetIndex, TWeakObjectPtr<AActor> target);
 	void RemoveAllTargets();
 
@@ -40,6 +40,7 @@ protected:
 	double _getDuration() const { return _parameters.Duration; }
 	const TArray<FActorSpawnerParameters>& _getActorSpawners() const { return _parameters.ActorSpawnerParameters; }
 	const TArray<FFollowerActorSpawnerParameters>& _getFollowerActorSpawners() const { return _parameters.FollowerActorSpawnerParameters; }
+	const TArray<FActorTargetParameters>& _getActorTargets() const { return _parameters.ActorTargetParameters; }
 
 	void _startCooldown();
 	void _endCooldown();

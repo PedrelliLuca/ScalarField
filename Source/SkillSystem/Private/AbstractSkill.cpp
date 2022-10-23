@@ -28,7 +28,7 @@ bool UAbstractSkill::IsValidTarget(const int32 index, const TObjectPtr<AActor> t
 	return true;
 }
 
-double UAbstractSkill::GetMaxDistanceForTarget(int32 targetIndex) {
+double UAbstractSkill::GetMaxDistanceForTarget(int32 targetIndex) const {
 	check(_parameters.ActorTargetParameters.IsValidIndex(targetIndex));
 	return _parameters.ActorTargetParameters[targetIndex].MaxDistance;
 }

@@ -75,7 +75,7 @@ void AThermodynamicLevelScript::_generateAir(const double cellSide) {
 				const FTransform moleculeTransform{ moleculeLocation };
 
 				const TObjectPtr<AThermodynamicActor> molecule = GetWorld()->SpawnActor<AThermodynamicActor>(_moleculeClass, moleculeTransform);
-				molecule->SetTemperature(_airTemperature);
+				molecule->SetTemperature(_airTemperature, true);
 				molecule->SetHeatCapacity(_airHeatCapacity);
 				molecule->SetThermicCapsuleDimensions(moleculeRadius, moleculeHalfHeight);
 			}

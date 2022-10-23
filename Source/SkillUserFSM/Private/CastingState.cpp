@@ -80,6 +80,7 @@ TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(TObjectPtr<AC
 }
 
 void UCastingState::OnEnter(TObjectPtr<AController> controller) {
+	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
 	if (DisablesMovement()) {
 		controller->StopMovement();
 	}
@@ -92,7 +93,6 @@ void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 		_endCasting();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
 	GetWorld()->GetTimerManager().SetTimer(_countdownToCast, this, &UCastingState::_endCasting, skill->GetCastTime());
 }
 

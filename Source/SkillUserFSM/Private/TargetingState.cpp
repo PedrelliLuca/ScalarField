@@ -24,6 +24,7 @@ TObjectPtr<USkillUserState> UTargetingState::OnTargeting(TObjectPtr<AActor> targ
 	}
 
 	skill->SetTarget(_targetBeingSearched, target);
+	UE_LOG(LogTemp, Warning, TEXT("Target set!"));
 
 	++_targetBeingSearched;
 	if (_targetBeingSearched == skill->NumberOfTargets()) {
@@ -99,6 +100,7 @@ TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<
 
 void UTargetingState::OnEnter(TObjectPtr<AController> controller) {
 	check(GetSkillInExecution()->NumberOfTargets() > 0);
+	UE_LOG(LogTemp, Warning, TEXT("Targeting..."));
 }
 
 void UTargetingState::OnLeave(TObjectPtr<AController> controller) {
