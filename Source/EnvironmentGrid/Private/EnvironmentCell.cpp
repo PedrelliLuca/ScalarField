@@ -59,12 +59,12 @@ void AEnvironmentCell::UnfreezeTime() {
 
 void AEnvironmentCell::_onCellBeginningOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	// Because of how collisions have been set up, OtherComp has object channel GridInteractingPawn
-	UE_LOG(LogTemp, Warning, TEXT("Cell %s _onCellBeginningOverlap"), *_coordinates.ToString());
+	// UE_LOG(LogTemp, Warning, TEXT("Cell %s _onCellBeginningOverlap"), *_coordinates.ToString());
 	OnCellBeginningOverlap.Broadcast(_coordinates);
 }
 
 void AEnvironmentCell::_onCellEndingOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	// Because of how collisions have been set up, OtherComp has object channel GridInteractingPawn
-	UE_LOG(LogTemp, Warning, TEXT("Cell %s _onCellEndingOverlap"), *_coordinates.ToString());
+	// UE_LOG(LogTemp, Warning, TEXT("Cell %s _onCellEndingOverlap"), *_coordinates.ToString());
 	OnCellEndingOverlap.Broadcast(_coordinates);
 }

@@ -9,38 +9,12 @@ USkillsContainerComponent::USkillsContainerComponent() {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-bool USkillsContainerComponent::ExecuteSkillAtIndex(const uint32 index) {
-	const auto owner = GetOwner();
-
-	if (!_skills.IsValidIndex(index)) {
-		UE_LOG(LogTemp, Error, TEXT("There is no skill at index %i"), index);
-		return false;
+TObjectPtr<UAbstractSkill> USkillsContainerComponent::GetSkillAtIndex(const uint32 index) const {
+	if (_skills.IsValidIndex(index)) {
+		check(IsValid(_skills[index]));
+		return _skills[index];
 	}
-
-	const auto skill = _skills[index];
-	check(skill != nullptr);
-
-	if (skill->IsOnCooldown()) {
-		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
-		return false;
-	}
-
-	if (const auto manaC = owner->FindComponentByClass<UManaComponent>()) {
-		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetManaCost();
-		if (charMana < manaCost) {
-			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
-			return false;
-		}
-
-		manaC->SetMana(charMana - manaCost);
-	}
-
-	// The owner isn't forced to have a mana component. If it doesn't have one, it means that it can cast its skills for free.
-	// Elements in the environment, like turrets that spit fire or clouds that spawn lightning bolts, are examples of this.
-	skill->Execute(owner);
-
-	return true;
+	return nullptr;
 }
 
 void USkillsContainerComponent::BeginPlay() {

@@ -15,13 +15,15 @@ class SKILLUSERFSM_API USkillUserState : public UObject {
 	GENERATED_BODY()
 
 public:
-	virtual TObjectPtr<USkillUserState> OnLMBPress(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnLMBPress, return nullptr;);
-	virtual TObjectPtr<USkillUserState> OnLMBRelease(TObjectPtr<APlayerController> controller) PURE_VIRTUAL(USkillUserState::OnLMBRelease, return nullptr;);
-	virtual TObjectPtr<USkillUserState> OnKey1Press(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnKey1Press, return nullptr;);
+	virtual TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnTargeting, return nullptr;);
+	virtual TObjectPtr<USkillUserState> OnBeginSkillExecution(int32 skillKey, TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnBeginSkillExecution, return nullptr;);
+	virtual TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::Tick, return nullptr;);
+	virtual TObjectPtr<USkillUserState> OnSkillExecutionAborted(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnSkillExecutionAborted, return nullptr;);
 
-	virtual void Tick(float deltaTime, TObjectPtr<APlayerController> controller) PURE_VIRTUAL(USkillUserState::Tick, return;);
 	virtual void OnEnter(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnEnter, return;);
 	virtual void OnLeave(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnLeave, return;);
+
+	virtual bool DisablesMovement() const PURE_VIRTUAL(USkillUserState::OnLMBPress, return false;);
 	
 protected:
 	TObjectPtr<USkillUserState> _keepCurrentState() { 
@@ -29,4 +31,6 @@ protected:
 		// rather signals that the user must not change its state.
 		return nullptr;  
 	}
+
+	static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
 };

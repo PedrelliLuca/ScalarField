@@ -24,7 +24,10 @@ public:
 #endif
 
 	double GetManaCost() const { return _parameters.ManaCost; }
+	double GetCastTime() const { return _parameters.CastTime; }
 	bool IsOnCooldown() const { return _bIsOnCooldown; }
+	bool RequiresTarget() const { return _parameters.Range > 0.; }
+	bool DisablesMovementDuringCast() const { return _parameters.DisablesMovementDuringCast; }
 
 protected:
 	double _getDuration() const { return _parameters.Duration; }
