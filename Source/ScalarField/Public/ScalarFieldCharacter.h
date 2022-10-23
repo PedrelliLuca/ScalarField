@@ -21,12 +21,8 @@ class AScalarFieldCharacter : public ACharacter
 public:
 	AScalarFieldCharacter();
 
-	void Tick(float DeltaSeconds) override;
-
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return _topDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return _cameraBoom; }
-
-	void ExecuteSkillAtKey(uint32 key);
 
 protected:
 	void BeginPlay() override;

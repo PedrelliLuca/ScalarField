@@ -10,15 +10,14 @@
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SKILLSYSTEM_API USkillsContainerComponent : public UActorComponent
-{
+class SKILLSYSTEM_API USkillsContainerComponent : public UActorComponent {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
 	USkillsContainerComponent();
 
-	bool ExecuteSkillAtIndex(uint32 index);
+	TObjectPtr<UAbstractSkill> GetSkillAtIndex(uint32 index) const;
 
 protected:
 	virtual void BeginPlay() override;

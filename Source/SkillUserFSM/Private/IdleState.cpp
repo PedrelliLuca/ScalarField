@@ -3,62 +3,55 @@
 
 #include "IdleState.h"
 
-#include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "NiagaraFunctionLibrary.h"
+#include "CastingState.h"
+#include "ManaComponent.h"
+#include "SkillsContainerComponent.h"
 
-TObjectPtr<USkillUserState> UIdleState::OnLMBPress(TObjectPtr<AController> controller) {
-	// We flag that the input is being pressed
-	_bInputPressed = true;
-	// Just in case the character was moving because of a previous short press we stop it
-	controller->StopMovement();
-
+TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<APlayerController> controller) {
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UIdleState::OnLMBRelease(TObjectPtr<APlayerController> controller) {
-	// Player is no longer pressing the input
-	_bInputPressed = false;
+TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
+	check(skillKey < KEY_ASSIGNABLE_SKILLS);
+	const auto pawn = controller->GetPawn();
+	const auto skillsContainer = pawn->FindComponentByClass<USkillsContainerComponent>();
+	check(IsValid(skillsContainer));
 
-	// If it was a short press
-	if (_followTime <= _shortPressThreshold) {
-		// We look for the location in the world where the player has pressed the input
-		FVector hitLocation = FVector::ZeroVector;
-		FHitResult hit;
-		controller->GetHitResultUnderCursor(ECC_Visibility, true, hit);
-		hitLocation = hit.Location;
+	// keys [1, 2, ..., 9, 0] => index [0, 1, ..., 8, 9]
+	const uint32 index = skillKey != 0 ? skillKey - 1 : KEY_ASSIGNABLE_SKILLS - 1;
+	const auto skill = skillsContainer->GetSkillAtIndex(index);
 
-		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(controller, hitLocation);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(controller, _fxCursor, hitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+	if (!IsValid(skill)) {
+		UE_LOG(LogTemp, Warning, TEXT("Skill bound with key &i isn't valid!"), skillKey);
+		return _keepCurrentState();
 	}
 
-	return _keepCurrentState();
-}
+	if (skill->IsOnCooldown()) {
+		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
+		return _keepCurrentState();
+	}
 
-TObjectPtr<USkillUserState> UIdleState::OnKey1Press(TObjectPtr<AController> controller) {
-	return TObjectPtr<USkillUserState>();
-}
-
-void UIdleState::Tick(float deltaTime, TObjectPtr<APlayerController> controller) {
-	if (_bInputPressed) {
-		_followTime += deltaTime;
-
-		// Look for the touch location
-		FVector hitLocation = FVector::ZeroVector;
-		FHitResult hit;
-		controller->GetHitResultUnderCursor(ECC_Visibility, true, hit);
-		hitLocation = hit.Location;
-
-		// Direct the Pawn towards that location
-		APawn* const myPawn = controller->GetPawn();
-		if (myPawn) {
-			FVector worldDirection = (hitLocation - myPawn->GetActorLocation()).GetSafeNormal();
-			myPawn->AddMovementInput(worldDirection, 1.f, false);
+	// The owner isn't forced to have a mana component. If it doesn't have one, it means that it can cast its skills for free.
+	// Elements in the environment, like turrets that spit fire or clouds that spawn lightning bolts, are examples of this
+	if (const auto manaC = pawn->FindComponentByClass<UManaComponent>()) {
+		const double charMana = manaC->GetMana();
+		const double manaCost = skill->GetManaCost();
+		if (charMana < manaCost) {
+			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
+			return _keepCurrentState();
 		}
+
+		manaC->SetMana(charMana - manaCost);
 	}
-	else {
-		_followTime = 0.f;
-	}
+
+	// TODO: if skill requires target return a targeting state, else return a casting state
+	const auto castingState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
+	castingState->SetSkillInExecution(skill);
+	return castingState;
+}
+
+TObjectPtr<USkillUserState> UIdleState::OnTick(float deltaTime, TObjectPtr<APlayerController> controller) {
+	return _keepCurrentState();
 }
 
 void UIdleState::OnEnter(TObjectPtr<AController> controller) {

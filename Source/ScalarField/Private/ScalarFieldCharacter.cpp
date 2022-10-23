@@ -62,19 +62,6 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AScalarFieldCharacter::Tick(float DeltaSeconds) {
-	Super::Tick(DeltaSeconds);
-}
-
-void AScalarFieldCharacter::ExecuteSkillAtKey(const uint32 key) {
-	check(key < KEY_ASSIGNABLE_SKILLS);
-	check(_skillsContainer != nullptr);
-
-	// keys [1, 2, ..., 9, 0] => index [0, 1, ..., 8, 9]
-	const uint32 index = key != 0 ? key - 1 : KEY_ASSIGNABLE_SKILLS - 1;
-	_skillsContainer->ExecuteSkillAtIndex(index);
-}
-
 void AScalarFieldCharacter::BeginPlay() {
 	Super::BeginPlay();
 
