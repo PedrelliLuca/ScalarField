@@ -29,4 +29,5 @@ public:
 	bool DisablesMovement() const override { return false; }
 
 private:
+	int32 _targetBeingSearched = 0;
 };

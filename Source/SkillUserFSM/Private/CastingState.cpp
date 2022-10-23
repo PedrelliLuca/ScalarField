@@ -52,7 +52,7 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 	}
 	
 	TObjectPtr<UExecutionState> newState = nullptr;
-	if (skill->RequiresTarget()) {
+	if (skill->NumberOfTargets() > 0) {
 		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
 	} else {
 		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());

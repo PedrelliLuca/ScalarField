@@ -25,10 +25,15 @@ public:
 
 	double GetManaCost() const { return _parameters.ManaCost; }
 	double GetCastTime() const { return _parameters.CastTime; }
-	double GetRange() const { return _parameters.Range; }
 
 	bool IsOnCooldown() const { return _bIsOnCooldown; }
-	bool RequiresTarget() const { return _parameters.Range > 0.; }
+
+	uint32 NumberOfTargets() const { return _parameters.ActorTargetParameters.Num(); }
+	bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const;
+	double GetMaxDistanceForTarget(int32 targetIndex);
+	void SetTarget(int32 targetIndex, TWeakObjectPtr<AActor> target);
+	void RemoveAllTargets();
+
 	bool DisablesMovementDuringCast() const { return _parameters.DisablesMovementDuringCast; }
 
 protected:

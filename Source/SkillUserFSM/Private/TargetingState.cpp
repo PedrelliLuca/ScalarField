@@ -11,15 +11,26 @@
 TObjectPtr<USkillUserState> UTargetingState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
 	const auto skill = GetSkillInExecution();
 
+	if (!skill->IsValidTarget(_targetBeingSearched, target)) {
+		UE_LOG(LogTemp, Warning, TEXT("Invalid target!"));
+		return _keepCurrentState();
+	}
+
 	FVector casterLocation = controller->GetPawn()->GetActorLocation();
 	FVector targetLocation = target->GetActorLocation();
-	if (FVector::Distance(casterLocation, targetLocation) > skill->GetRange()) {
+	if (FVector::Distance(casterLocation, targetLocation) > skill->GetMaxDistanceForTarget(_targetBeingSearched)) {
 		UE_LOG(LogTemp, Warning, TEXT("Out of range!"));
 		return _keepCurrentState();
 	}
 
-	// Set target in skill
-	// If all targets have been set, move to casting state. Otherwise, keep current state.
+	skill->SetTarget(_targetBeingSearched, target);
+
+	++_targetBeingSearched;
+	if (_targetBeingSearched == skill->NumberOfTargets()) {
+		const auto castingState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
+		castingState->SetSkillInExecution(skill);
+		return castingState;
+	}
 
 	return _keepCurrentState();
 }
@@ -62,8 +73,9 @@ TObjectPtr<USkillUserState> UTargetingState::OnBeginSkillExecution(const int32 s
 		manaC->SetMana(charMana - manaCost);
 	}
 	
+	GetSkillInExecution()->RemoveAllTargets();
 	TObjectPtr<UExecutionState> newState = nullptr;
-	if (skill->RequiresTarget()) {
+	if (skill->NumberOfTargets() > 0) {
 		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
 	} else {
 		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
@@ -79,11 +91,14 @@ TObjectPtr<USkillUserState> UTargetingState::OnTick(float deltaTime, TObjectPtr<
 
 TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill targeting aborted!"));
+
+	GetSkillInExecution()->RemoveAllTargets();
 	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
 	return idleState;
 }
 
 void UTargetingState::OnEnter(TObjectPtr<AController> controller) {
+	check(GetSkillInExecution()->NumberOfTargets() > 0);
 }
 
 void UTargetingState::OnLeave(TObjectPtr<AController> controller) {
