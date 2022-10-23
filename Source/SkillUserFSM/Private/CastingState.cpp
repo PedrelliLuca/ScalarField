@@ -66,6 +66,13 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(float deltaTime, TObjectPtr<AC
 	return _keepCurrentState();
 }
 
+TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
+	// TODO?: maybe in the future I'll make the character re-gain mana if the skill is aborted
+	UE_LOG(LogTemp, Error, TEXT("Skill cast aborted!"));
+	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
+	return idleState;
+}
+
 void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 	if (DisablesMovement()) {
 		controller->StopMovement();
@@ -79,6 +86,7 @@ void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 		_endCasting();
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
 	GetWorld()->GetTimerManager().SetTimer(_countdownToCast, this, &UCastingState::_endCasting, skill->GetCastTime());
 }
 
@@ -91,6 +99,7 @@ void UCastingState::OnLeave(TObjectPtr<AController> controller) {
 void UCastingState::_endCasting() {
 	check(_caster.IsValid());
 
+	UE_LOG(LogTemp, Warning, TEXT("Skill cast is over!"));
 	GetSkillInExecution()->Execute(_caster.Get());
 	_bIsCastingOver = true;
 }

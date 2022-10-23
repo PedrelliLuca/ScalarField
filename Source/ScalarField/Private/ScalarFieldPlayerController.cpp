@@ -56,7 +56,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Skill1Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill1Cast);
 	InputComponent->BindAction("Skill2Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill2Cast);
 	InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
-
+	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
 }
 
 void AScalarFieldPlayerController::BeginPlay() {
@@ -114,6 +114,11 @@ void AScalarFieldPlayerController::_onSkill2Cast() {
 
 void AScalarFieldPlayerController::_onSkill3Cast() {
 	const auto newState = _state->OnBeginSkillExecution(3, this);
+	_changingStateRoutine(newState);
+}
+
+void AScalarFieldPlayerController::_onCastAborted() {
+	const auto newState = _state->OnSkillExecutionAborted(this);
 	_changingStateRoutine(newState);
 }
 

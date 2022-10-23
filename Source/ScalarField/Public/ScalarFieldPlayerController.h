@@ -50,6 +50,7 @@ private:
 	void _onSkill1Cast();
 	void _onSkill2Cast();
 	void _onSkill3Cast();
+	void _onCastAborted();
 
 	void _changingStateRoutine(TObjectPtr<USkillUserState> newState);
 

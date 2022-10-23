@@ -20,8 +20,9 @@ class SKILLUSERFSM_API UCastingState : public UExecutionState {
 public:
 	virtual TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnBeginSkillExecution(int32 skillKey, TObjectPtr<AController> controller) override;
-
 	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
+	TObjectPtr<USkillUserState> OnSkillExecutionAborted(TObjectPtr<AController> controller) override;
+
 	void OnEnter(TObjectPtr<AController> controller) override;
 	void OnLeave(TObjectPtr<AController> controller) override;
 

@@ -54,6 +54,10 @@ TObjectPtr<USkillUserState> UIdleState::OnTick(float deltaTime, TObjectPtr<ACont
 	return _keepCurrentState();
 }
 
+TObjectPtr<USkillUserState> UIdleState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
+	return _keepCurrentState();
+}
+
 void UIdleState::OnEnter(TObjectPtr<AController> controller) {
 }
 
