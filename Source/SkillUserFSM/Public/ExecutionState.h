@@ -18,7 +18,10 @@ class SKILLUSERFSM_API UExecutionState : public USkillUserState {
 
 public:
 	void SetSkillInExecution(TWeakObjectPtr<UAbstractSkill> skillInExecution) { _skillInExecution = skillInExecution; }
-	TWeakObjectPtr<UAbstractSkill> GetSkillInExecution() const { return _skillInExecution; }
+	TObjectPtr<UAbstractSkill> GetSkillInExecution() const { 
+		check(_skillInExecution.IsValid());
+		return _skillInExecution.Get(); 
+	}
 
 private:
 	TWeakObjectPtr<UAbstractSkill> _skillInExecution = nullptr;

@@ -18,16 +18,15 @@ class SKILLUSERFSM_API UCastingState : public UExecutionState {
 	GENERATED_BODY()
 
 public:
-	virtual TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<APlayerController> controller) override;
+	virtual TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnBeginSkillExecution(int32 skillKey, TObjectPtr<AController> controller) override;
 
-	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<APlayerController> controller) override;
+	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
 	void OnEnter(TObjectPtr<AController> controller) override;
 	void OnLeave(TObjectPtr<AController> controller) override;
 
 	bool DisablesMovement() const override {
-		check(GetSkillInExecution().IsValid());
-		return GetSkillInExecution().Get()->DisablesMovementDuringCast();
+		return GetSkillInExecution()->DisablesMovementDuringCast();
 	}
 
 private:

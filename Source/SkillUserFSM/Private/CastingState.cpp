@@ -8,7 +8,7 @@
 #include "SkillsContainerComponent.h"
 
 
-TObjectPtr<USkillUserState> UCastingState::OnTargeting(TObjectPtr<APlayerController> controller) {
+TObjectPtr<USkillUserState> UCastingState::OnTargeting(TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
@@ -27,7 +27,7 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 		return _keepCurrentState();
 	}
 
-	if (skill == GetSkillInExecution().Get()) {
+	if (skill == GetSkillInExecution()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is already being casted!"));
 		return _keepCurrentState();
 	}
@@ -56,7 +56,7 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 	return castingState;
 }
 
-TObjectPtr<USkillUserState> UCastingState::OnTick(float deltaTime, TObjectPtr<APlayerController> controller) {
+TObjectPtr<USkillUserState> UCastingState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
 	if (_bIsCastingOver) {
 		// TODO: if skill requires channeling return a channeling state, else return an idle state
 		const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
@@ -67,15 +67,13 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(float deltaTime, TObjectPtr<AP
 }
 
 void UCastingState::OnEnter(TObjectPtr<AController> controller) {
-	check(GetSkillInExecution().IsValid());
-
 	if (DisablesMovement()) {
 		controller->StopMovement();
 	}
 
 	_caster = controller->GetPawn();
 
-	const auto skill = GetSkillInExecution().Get();
+	const auto skill = GetSkillInExecution();
 
 	if (FMath::IsNearlyZero(skill->GetCastTime())) {
 		_endCasting();
@@ -93,6 +91,6 @@ void UCastingState::OnLeave(TObjectPtr<AController> controller) {
 void UCastingState::_endCasting() {
 	check(_caster.IsValid());
 
-	GetSkillInExecution().Get()->Execute(_caster.Get());
+	GetSkillInExecution()->Execute(_caster.Get());
 	_bIsCastingOver = true;
 }

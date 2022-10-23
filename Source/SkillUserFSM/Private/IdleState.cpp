@@ -7,7 +7,7 @@
 #include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
 
-TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<APlayerController> controller) {
+TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
@@ -50,7 +50,7 @@ TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillK
 	return castingState;
 }
 
-TObjectPtr<USkillUserState> UIdleState::OnTick(float deltaTime, TObjectPtr<APlayerController> controller) {
+TObjectPtr<USkillUserState> UIdleState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
