@@ -47,12 +47,10 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 			return _keepCurrentState();
 		}
-
-		manaC->SetMana(charMana - manaCost);
 	}
 	
 	TObjectPtr<UExecutionState> newState = nullptr;
-	if (skill->NumberOfTargets() > 0) {
+	if (skill->RequiresTarget()) {
 		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
 	} else {
 		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
@@ -88,6 +86,20 @@ void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 	_caster = controller->GetPawn();
 
 	const auto skill = GetSkillInExecution();
+
+	// Even though a similar check is already present before targeting state, we need to perform it again in case something
+	// is lowering the caster's mana over time while he's targeting.
+	if (const auto manaC = _caster->FindComponentByClass<UManaComponent>()) {
+		const double charMana = manaC->GetMana();
+		const double manaCost = skill->GetManaCost();
+		if (charMana < manaCost) {
+			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill"));
+			_bIsCastingOver = true;
+			return;
+		}
+		manaC->SetMana(charMana - manaCost);
+	}
+
 
 	if (FMath::IsNearlyZero(skill->GetCastTime())) {
 		_endCasting();

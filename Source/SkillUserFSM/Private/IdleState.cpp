@@ -41,12 +41,10 @@ TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillK
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 			return _keepCurrentState();
 		}
-
-		manaC->SetMana(charMana - manaCost);
 	}
 
 	TObjectPtr<UExecutionState> newState = nullptr;
-	if (skill->NumberOfTargets() > 0) {
+	if (skill->RequiresTarget()) {
 		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
 	} else {
 		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());

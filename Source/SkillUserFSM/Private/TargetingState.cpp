@@ -70,13 +70,11 @@ TObjectPtr<USkillUserState> UTargetingState::OnBeginSkillExecution(const int32 s
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 			return _keepCurrentState();
 		}
-
-		manaC->SetMana(charMana - manaCost);
 	}
 	
 	GetSkillInExecution()->RemoveAllTargets();
 	TObjectPtr<UExecutionState> newState = nullptr;
-	if (skill->NumberOfTargets() > 0) {
+	if (skill->RequiresTarget()) {
 		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
 	} else {
 		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
@@ -99,7 +97,7 @@ TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<
 }
 
 void UTargetingState::OnEnter(TObjectPtr<AController> controller) {
-	check(GetSkillInExecution()->NumberOfTargets() > 0);
+	check(GetSkillInExecution()->RequiresTarget());
 	UE_LOG(LogTemp, Warning, TEXT("Targeting..."));
 }
 
