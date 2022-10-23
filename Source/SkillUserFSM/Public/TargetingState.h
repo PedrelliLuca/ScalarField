@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "ExecutionState.h"
 
-#include "CastingState.generated.h"
+#include "TargetingState.generated.h"
 
 
 /**
@@ -14,7 +14,7 @@
  * Once casting is over, we transition to the channeling state if the skill requires it, otherwise we go to idle state.
  */
 UCLASS(Blueprintable)
-class SKILLUSERFSM_API UCastingState : public UExecutionState {
+class SKILLUSERFSM_API UTargetingState : public UExecutionState {
 	GENERATED_BODY()
 
 public:
@@ -26,12 +26,7 @@ public:
 	void OnEnter(TObjectPtr<AController> controller) override;
 	void OnLeave(TObjectPtr<AController> controller) override;
 
-	bool DisablesMovement() const override { return GetSkillInExecution()->DisablesMovementDuringCast(); }
+	bool DisablesMovement() const override { return false; }
 
 private:
-	void _endCasting();
-
-	bool _bIsCastingOver = false;
-	FTimerHandle _countdownToCast{};
-	TWeakObjectPtr<AActor> _caster = nullptr;
 };

@@ -1,19 +1,30 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CastingState.h"
+#include "TargetingState.h"
 
+#include "CastingState.h"
 #include "IdleState.h"
 #include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
-#include "TargetingState.h"
 
+TObjectPtr<USkillUserState> UTargetingState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
+	const auto skill = GetSkillInExecution();
 
-TObjectPtr<USkillUserState> UCastingState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
+	FVector casterLocation = controller->GetPawn()->GetActorLocation();
+	FVector targetLocation = target->GetActorLocation();
+	if (FVector::Distance(casterLocation, targetLocation) > skill->GetRange()) {
+		UE_LOG(LogTemp, Warning, TEXT("Out of range!"));
+		return _keepCurrentState();
+	}
+
+	// Set target in skill
+	// If all targets have been set, move to casting state. Otherwise, keep current state.
+
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UTargetingState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
 	check(skillKey < KEY_ASSIGNABLE_SKILLS);
 	const auto pawn = controller->GetPawn();
 	const auto skillsContainer = pawn->FindComponentByClass<USkillsContainerComponent>();
@@ -62,50 +73,18 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 	return newState;
 }
 
-TObjectPtr<USkillUserState> UCastingState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
-	if (_bIsCastingOver) {
-		// TODO: if skill requires channeling return a channeling state, else return an idle state
-		const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
-		return idleState;
-	}
-
+TObjectPtr<USkillUserState> UTargetingState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
-	// TODO?: maybe in the future I'll make the character re-gain mana if the skill is aborted
-	UE_LOG(LogTemp, Error, TEXT("Skill cast aborted!"));
+TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
+	UE_LOG(LogTemp, Error, TEXT("Skill targeting aborted!"));
 	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
 	return idleState;
 }
 
-void UCastingState::OnEnter(TObjectPtr<AController> controller) {
-	if (DisablesMovement()) {
-		controller->StopMovement();
-	}
-
-	_caster = controller->GetPawn();
-
-	const auto skill = GetSkillInExecution();
-
-	if (FMath::IsNearlyZero(skill->GetCastTime())) {
-		_endCasting();
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
-	GetWorld()->GetTimerManager().SetTimer(_countdownToCast, this, &UCastingState::_endCasting, skill->GetCastTime());
+void UTargetingState::OnEnter(TObjectPtr<AController> controller) {
 }
 
-void UCastingState::OnLeave(TObjectPtr<AController> controller) {
-	if (GetWorld()->GetTimerManager().GetTimerRemaining(_countdownToCast) > 0.) {
-		GetWorld()->GetTimerManager().ClearTimer(_countdownToCast);
-	}
-}
-
-void UCastingState::_endCasting() {
-	check(_caster.IsValid());
-
-	UE_LOG(LogTemp, Warning, TEXT("Skill cast is over!"));
-	GetSkillInExecution()->Execute(_caster.Get());
-	_bIsCastingOver = true;
+void UTargetingState::OnLeave(TObjectPtr<AController> controller) {
 }

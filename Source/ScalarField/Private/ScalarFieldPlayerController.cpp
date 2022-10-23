@@ -98,7 +98,9 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
 }
 
 void AScalarFieldPlayerController::_onSetTargetPressed() {
-	const auto newState = _state->OnTargeting(this);
+	FHitResult hit;
+	GetHitResultUnderCursor(ECC_Visibility, true, hit);
+	const auto newState = _state->OnTargeting(hit.GetActor(), this);
 	_changingStateRoutine(newState);
 }
 

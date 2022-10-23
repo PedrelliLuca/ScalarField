@@ -16,7 +16,7 @@ class SKILLUSERFSM_API UIdleState : public USkillUserState {
 	GENERATED_BODY()
 
 public:
-	TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AController> controller) override;
+	TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnBeginSkillExecution(int32 skillKey, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnSkillExecutionAborted(TObjectPtr<AController> controller) override;
