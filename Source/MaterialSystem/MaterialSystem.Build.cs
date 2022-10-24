@@ -2,21 +2,20 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class SkillSystem : ModuleRules
+	public class MaterialSystem : ModuleRules
 	{
-		public SkillSystem(ReadOnlyTargetRules Target) : base(Target)
+		public MaterialSystem(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
 			PublicDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"Core",
+                    "Core",
                     "CoreUObject",
                     "Engine",
-					"Thermodynamics",
-					"MaterialSystem",
-                }
+					// ... add other public dependencies that you statically link with here ...
+				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(

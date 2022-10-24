@@ -18,7 +18,7 @@ class SCALARFIELD_API AThermodynamicActor : public AActor {
 public:
 	AThermodynamicActor();
 
-	void SetTemperature(double temperature, bool updateInitialTemperature = true) { _thermodynamicC->SetTemperature(temperature, updateInitialTemperature); }
+	void SetTemperature(double temperature, bool updateInitialTemperature = false) { _thermodynamicC->SetTemperature(temperature, updateInitialTemperature); }
 	void SetHeatCapacity(double heatCapacity) { _thermodynamicC->SetHeatCapacity(heatCapacity); }
 	void SetThermicCapsuleDimensions(double radius, double halfHeight);
 

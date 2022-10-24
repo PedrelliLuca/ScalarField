@@ -56,6 +56,8 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Skill1Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill1Cast);
 	InputComponent->BindAction("Skill2Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill2Cast);
 	InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
+	InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
+
 	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
 }
 
@@ -98,7 +100,9 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
 }
 
 void AScalarFieldPlayerController::_onSetTargetPressed() {
-	const auto newState = _state->OnTargeting(this);
+	FHitResult hit;
+	GetHitResultUnderCursor(ECC_Visibility, true, hit);
+	const auto newState = _state->OnTargeting(hit.GetActor(), this);
 	_changingStateRoutine(newState);
 }
 
@@ -114,6 +118,11 @@ void AScalarFieldPlayerController::_onSkill2Cast() {
 
 void AScalarFieldPlayerController::_onSkill3Cast() {
 	const auto newState = _state->OnBeginSkillExecution(3, this);
+	_changingStateRoutine(newState);
+}
+
+void AScalarFieldPlayerController::_onSkill4Cast() {
+	const auto newState = _state->OnBeginSkillExecution(4, this);
 	_changingStateRoutine(newState);
 }
 

@@ -33,7 +33,7 @@ void UThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& prop
 	FName propertyName = property != nullptr ? property->GetFName() : NAME_None;
 	if (propertyName == GET_MEMBER_NAME_CHECKED(UThermodynamicComponent, _initialTemperature)) {
 		if (const auto initTempProperty = CastFieldChecked<FDoubleProperty>(property)) {
-			SetTemperature(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)));
+			SetTemperature(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)), true);
 		}
 	}
 
@@ -41,7 +41,7 @@ void UThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& prop
 }
 #endif
 
-void UThermodynamicComponent::SetTemperature(double temperature, const bool updateInitialTemp /*= true*/) {
+void UThermodynamicComponent::SetTemperature(double temperature, const bool updateInitialTemp /*= false*/) {
 	// Updating _initialTemperature just to give a visual feedback in the editor, this value doesn't matter during play
 	temperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
 

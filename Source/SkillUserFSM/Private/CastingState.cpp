@@ -6,9 +6,10 @@
 #include "IdleState.h"
 #include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
+#include "TargetingState.h"
 
 
-TObjectPtr<USkillUserState> UCastingState::OnTargeting(TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UCastingState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
@@ -46,14 +47,17 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 			return _keepCurrentState();
 		}
-
-		manaC->SetMana(charMana - manaCost);
 	}
 	
-	// TODO: if skill requires target return a targeting state, else return a casting state
-	const auto castingState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
-	castingState->SetSkillInExecution(skill);
-	return castingState;
+	TObjectPtr<UExecutionState> newState = nullptr;
+	if (skill->RequiresTarget()) {
+		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
+	} else {
+		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
+	}
+
+	newState->SetSkillInExecution(skill);
+	return newState;
 }
 
 TObjectPtr<USkillUserState> UCastingState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
@@ -74,6 +78,7 @@ TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(TObjectPtr<AC
 }
 
 void UCastingState::OnEnter(TObjectPtr<AController> controller) {
+	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
 	if (DisablesMovement()) {
 		controller->StopMovement();
 	}
@@ -82,11 +87,24 @@ void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 
 	const auto skill = GetSkillInExecution();
 
+	// Even though a similar check is already present before targeting state, we need to perform it again in case something
+	// is lowering the caster's mana over time while he's targeting.
+	if (const auto manaC = _caster->FindComponentByClass<UManaComponent>()) {
+		const double charMana = manaC->GetMana();
+		const double manaCost = skill->GetManaCost();
+		if (charMana < manaCost) {
+			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill"));
+			_bIsCastingOver = true;
+			return;
+		}
+		manaC->SetMana(charMana - manaCost);
+	}
+
+
 	if (FMath::IsNearlyZero(skill->GetCastTime())) {
 		_endCasting();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
 	GetWorld()->GetTimerManager().SetTimer(_countdownToCast, this, &UCastingState::_endCasting, skill->GetCastTime());
 }
 

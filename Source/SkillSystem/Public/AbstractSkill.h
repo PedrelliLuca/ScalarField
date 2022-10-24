@@ -25,14 +25,23 @@ public:
 
 	double GetManaCost() const { return _parameters.ManaCost; }
 	double GetCastTime() const { return _parameters.CastTime; }
+
 	bool IsOnCooldown() const { return _bIsOnCooldown; }
-	bool RequiresTarget() const { return _parameters.Range > 0.; }
+
+	uint32 NumberOfTargets() const { return _parameters.ActorTargetParameters.Num(); }
+	bool RequiresTarget() const { return NumberOfTargets() > 0; }
+	virtual bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const;
+	double GetMaxDistanceForTarget(int32 targetIndex) const;
+	void SetTarget(int32 targetIndex, TWeakObjectPtr<AActor> target);
+	void RemoveAllTargets();
+
 	bool DisablesMovementDuringCast() const { return _parameters.DisablesMovementDuringCast; }
 
 protected:
 	double _getDuration() const { return _parameters.Duration; }
 	const TArray<FActorSpawnerParameters>& _getActorSpawners() const { return _parameters.ActorSpawnerParameters; }
 	const TArray<FFollowerActorSpawnerParameters>& _getFollowerActorSpawners() const { return _parameters.FollowerActorSpawnerParameters; }
+	const TArray<FActorTargetParameters>& _getActorTargets() const { return _parameters.ActorTargetParameters; }
 
 	void _startCooldown();
 	void _endCooldown();

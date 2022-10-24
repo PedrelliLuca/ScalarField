@@ -2,20 +2,12 @@
 
 #pragma once
 
+#include "ActorTargetParameters.h"
 #include "ActorSpawnerParameters.h"
 #include "CoreMinimal.h"
 #include "FollowerActorSpawnerParameters.h"
 
 #include "SkillParameters.generated.h"
-
-USTRUCT(Blueprintable)
-struct SKILLSYSTEM_API FTargetingParameters {
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere)
-	double Range = 0.;
-};
 
 /**
  * 
@@ -40,13 +32,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
 	bool DisablesMovementDuringCast = false;
 
-	// TODO: Find another way besides negative Range values to determine whether a skill requires a targeting phase or not
-	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "-1"))
-	double Range = -1.;
-	
 	UPROPERTY(EditAnywhere, Category = "Actor Spawner Components")
 	TArray<FActorSpawnerParameters> ActorSpawnerParameters;
 
 	UPROPERTY(EditAnywhere, Category = "Follower Actor Spawner Components")
 	TArray<FFollowerActorSpawnerParameters> FollowerActorSpawnerParameters;
+
+	UPROPERTY(EditAnywhere, Category = "Actor Target Components")
+	TArray<FActorTargetParameters> ActorTargetParameters;
 };

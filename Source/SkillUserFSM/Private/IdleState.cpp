@@ -6,8 +6,9 @@
 #include "CastingState.h"
 #include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
+#include "TargetingState.h"
 
-TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
@@ -40,14 +41,17 @@ TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillK
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 			return _keepCurrentState();
 		}
-
-		manaC->SetMana(charMana - manaCost);
 	}
 
-	// TODO: if skill requires target return a targeting state, else return a casting state
-	const auto castingState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
-	castingState->SetSkillInExecution(skill);
-	return castingState;
+	TObjectPtr<UExecutionState> newState = nullptr;
+	if (skill->RequiresTarget()) {
+		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
+	} else {
+		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
+	}
+
+	newState->SetSkillInExecution(skill);
+	return newState;
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
