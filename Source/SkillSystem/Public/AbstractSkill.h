@@ -30,7 +30,7 @@ public:
 
 	uint32 NumberOfTargets() const { return _parameters.ActorTargetParameters.Num(); }
 	bool RequiresTarget() const { return NumberOfTargets() > 0; }
-	bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const;
+	virtual bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const;
 	double GetMaxDistanceForTarget(int32 targetIndex) const;
 	void SetTarget(int32 targetIndex, TWeakObjectPtr<AActor> target);
 	void RemoveAllTargets();

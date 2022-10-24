@@ -17,6 +17,8 @@ class SKILLSYSTEM_API UCarbonizeSkill : public UAbstractSkill {
 public:
 	void Execute(TObjectPtr<AActor> caster) override;
 
+	bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const override;
+
 #if DO_CHECK
 	void CheckParametersSanity() const override;
 #endif
