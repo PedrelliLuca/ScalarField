@@ -1,9 +1,8 @@
 # ScalarField
-A "DA: Origins" - like game, where magic works by interacting with the environment. You can find a playlist of videos showing my progress over time on [my YouTube channel](https://www.youtube.com/playlist?list=PLerNkl_bon8TyPWhDtxs6CzJtjON4_Fit).
+A "Dragon Age: Origins" - like game, where magic works by interacting with the environment. You can find a playlist of videos showing my progress over time on [my YouTube channel](https://www.youtube.com/playlist?list=PLerNkl_bon8TyPWhDtxs6CzJtjON4_Fit).
 
 ## Coding Style
-I follow ZURU Tech's coding style, which is just [Allar's](https://github.com/Allar/ue4-style-guide#table-of-contents) with some exceptions.  
-Example:
+I follow ZURU Tech's coding style, which is just [Allar's](https://github.com/Allar/ue4-style-guide#table-of-contents) with some exceptions. Example:
 ```cpp
 class MyClass {
 
