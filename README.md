@@ -2,7 +2,7 @@
 A "DA: Origins" - like game, where magic works by interacting with the environment. You can find a playlist of videos showing my progress over time on [my YouTube channel](https://www.youtube.com/playlist?list=PLerNkl_bon8TyPWhDtxs6CzJtjON4_Fit).
 
 ## Coding Style
-I follow ZURU Tech's coding style, which is just https://github.com/Allar/ue4-style-guide#table-of-contents but with some exceptions.  
+I follow ZURU Tech's coding style, which is just [Allar's](https://github.com/Allar/ue4-style-guide#table-of-contents) with some exceptions.  
 Example:
 ```cpp
 class MyClass {
