@@ -36,7 +36,7 @@ TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillK
 	// Elements in the environment, like turrets that spit fire or clouds that spawn lightning bolts, are examples of this
 	if (const auto manaC = pawn->FindComponentByClass<UManaComponent>()) {
 		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetManaCost();
+		const double manaCost = skill->GetCastManaCost();
 		if (charMana < manaCost) {
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 			return _keepCurrentState();

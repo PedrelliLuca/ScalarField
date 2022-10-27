@@ -18,19 +18,23 @@ struct SKILLSYSTEM_API FSkillParameters {
 	
 public:
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
-	double ManaCost = 0.;
+	double CastManaCost = 0.;
+	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
+	double ChannelingManaCost = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double Cooldown = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double CastTime = 0.;
-	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
-	double ChannelingTime = 0.;
+	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0.5"))
+	double ChannelingTime = 0.5;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double Duration = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double BaseDamage = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
 	bool DisablesMovementDuringCast = false;
+	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
+	bool RequiresChanneling = false;
 
 	UPROPERTY(EditAnywhere, Category = "Actor Spawner Components")
 	TArray<FActorSpawnerParameters> ActorSpawnerParameters;

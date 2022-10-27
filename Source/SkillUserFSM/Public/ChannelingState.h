@@ -19,7 +19,7 @@ class SKILLUSERFSM_API UChannelingState : public UExecutionState {
 	GENERATED_BODY()
 
 public:
-	virtual TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) override;
+	TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnBeginSkillExecution(int32 skillKey, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnSkillExecutionAborted(TObjectPtr<AController> controller) override;
@@ -28,4 +28,11 @@ public:
 	void OnLeave(TObjectPtr<AController> controller) override;
 
 	bool DisablesMovement() const override { return true; }
+
+private:
+	void _endChanneling();
+
+	bool _bEndChanneling = false;
+	FTimerHandle _channelingTimer{};
+	TWeakObjectPtr<AActor> _caster = nullptr;
 };

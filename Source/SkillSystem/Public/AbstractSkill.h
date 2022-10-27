@@ -23,10 +23,11 @@ public:
 	virtual void CheckParametersSanity() const {}
 #endif
 
-	double GetManaCost() const { return _parameters.ManaCost; }
-	double GetCastTime() const { return _parameters.CastTime; }
-
 	bool IsOnCooldown() const { return _bIsOnCooldown; }
+
+	double GetCastManaCost() const { return _parameters.CastManaCost; }
+	double GetCastTime() const { return _parameters.CastTime; }
+	bool DisablesMovementDuringCast() const { return _parameters.DisablesMovementDuringCast; }
 
 	uint32 NumberOfTargets() const { return _parameters.ActorTargetParameters.Num(); }
 	bool RequiresTarget() const { return NumberOfTargets() > 0; }
@@ -35,7 +36,9 @@ public:
 	void SetTarget(int32 targetIndex, TWeakObjectPtr<AActor> target);
 	void RemoveAllTargets();
 
-	bool DisablesMovementDuringCast() const { return _parameters.DisablesMovementDuringCast; }
+	bool RequiresChanneling() const { return _parameters.RequiresChanneling; }
+	double GetChannelingManaCost() const { return _parameters.ChannelingManaCost; }
+	double GetChannelingTime() const { return _parameters.ChannelingTime; }
 
 protected:
 	double _getDuration() const { return _parameters.Duration; }
