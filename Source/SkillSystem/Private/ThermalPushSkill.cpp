@@ -66,7 +66,7 @@ void UThermalPushSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<
 	_pushCapsule->SetRelativeLocation(FVector::ForwardVector * halfHeight);
 
 	DrawDebugCapsule(GetWorld(), _pushCapsule->GetComponentLocation(), _pushCapsule->GetUnscaledCapsuleHalfHeight(), _pushCapsule->GetUnscaledCapsuleRadius(),
-		_pushCapsule->GetComponentRotation().Quaternion(), FColor::Green, false, channelingTime);
+		_pushCapsule->GetComponentRotation().Quaternion(), FColor::Green, false);
 }
 
 void UThermalPushSkill::AbortChanneling() {

@@ -16,12 +16,21 @@ class SKILLSYSTEM_API UConeOfColdSkill : public UAbstractSkill {
 	
 public:
 	void ExecuteCast(TObjectPtr<AActor> caster) override;
+	void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) override;
+	void AbortChanneling() override;
 
 #if DO_CHECK
 	void CheckParametersSanity() const override;
 #endif
 
 private:
-	UPROPERTY(EditAnywhere, Category = "CarbonizeParameters")
-	double _carbonizationTemperature = 900.;
+	TWeakObjectPtr<UCapsuleComponent> _cone;
+	TWeakObjectPtr<AController> _casterController;
+
+	UPROPERTY(EditAnywhere, Category = "ConeOfColdParameters")
+	double _coneTemperature = 0.;
+	UPROPERTY(EditAnywhere, Category = "ConeOfColdParameters")
+	double _height = 300.;
+	UPROPERTY(EditAnywhere, Category = "ConeOfColdParameters")
+	double _radius = 50.;
 };
