@@ -19,7 +19,7 @@ class SKILLSYSTEM_API UThermalPushSkill : public UAbstractSkill, public FTickabl
 public:
 	UThermalPushSkill();
 
-	void Execute(TObjectPtr<AActor> caster) override;
+	void ExecuteCast(TObjectPtr<AActor> caster) override;
 
 	void Tick(float deltaTime) override;
 	TStatId GetStatId() const override;

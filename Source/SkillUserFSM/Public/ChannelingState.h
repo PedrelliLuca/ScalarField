@@ -30,9 +30,8 @@ public:
 	bool DisablesMovement() const override { return true; }
 
 private:
-	void _endChanneling();
-
-	bool _bEndChanneling = false;
 	FTimerHandle _channelingTimer{};
+	double _elapsedChannelingTime = 0.;
+
 	TWeakObjectPtr<AActor> _caster = nullptr;
 };

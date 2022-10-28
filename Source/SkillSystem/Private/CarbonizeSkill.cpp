@@ -5,7 +5,7 @@
 #include "MaterialsContainerComponent.h"
 #include "ThermodynamicComponent.h"
 
-void UCarbonizeSkill::Execute(const TObjectPtr<AActor> caster) {
+void UCarbonizeSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	const auto target = _getActorTargets()[0].Target;
 
 	const auto materialsC = target->FindComponentByClass<UMaterialsContainerComponent>();

@@ -8,16 +8,43 @@
 
 
 
-TObjectPtr<USkillUserState> UChannelingState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UChannelingState::OnTargeting(TObjectPtr<AActor> target, const TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UChannelingState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UChannelingState::OnBeginSkillExecution(const int32 skillKey, const TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
-	if (_bEndChanneling) {
+TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, const TObjectPtr<AController> controller) {
+	_elapsedChannelingTime += deltaTime;
+	const auto skill = GetSkillInExecution();
+	const double channelingDuration = GetSkillInExecution()->GetChannelingTime();
+	if (_elapsedChannelingTime >= channelingDuration) {
+		// Apply one last mana payment with reduced deltaTime
+		deltaTime = _elapsedChannelingTime - channelingDuration;
+	}
+
+	// No mana component? Channeling is free for _caster!
+	if (const auto manaC = _caster->FindComponentByClass<UManaComponent>()) {
+		const double charMana = manaC->GetMana();
+
+		const double manaCost = skill->GetChannelingManaCost();
+		const double manaCostThisFrame = (deltaTime / channelingDuration) * manaCost;
+
+		if (charMana < manaCostThisFrame) {
+			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill"));
+			const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
+			return idleState;
+		}
+
+		manaC->SetMana(charMana - manaCostThisFrame);
+	}
+
+	// Functionality of this particular skill requiring channeling
+	skill->ExecuteChannelingTick(deltaTime, _caster.Get());
+
+	if (_elapsedChannelingTime >= channelingDuration) {
 		const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
 		return idleState;
 	}
@@ -25,11 +52,15 @@ TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, TObjectPtr
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UChannelingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
-	return _keepCurrentState();
+TObjectPtr<USkillUserState> UChannelingState::OnSkillExecutionAborted(const TObjectPtr<AController> controller) {
+	UE_LOG(LogTemp, Error, TEXT("Skill channeling aborted!"));
+
+	GetSkillInExecution()->RemoveAllTargets();
+	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
+	return idleState;
 }
 
-void UChannelingState::OnEnter(TObjectPtr<AController> controller) {
+void UChannelingState::OnEnter(const TObjectPtr<AController> controller) {
 	const auto skill = GetSkillInExecution();
 
 	check(IsValid(skill) && skill->RequiresChanneling() && skill->GetChannelingManaCost() > 0.);
@@ -40,15 +71,7 @@ void UChannelingState::OnEnter(TObjectPtr<AController> controller) {
 	}
 
 	_caster = controller->GetPawn();
-
-	GetWorld()->GetTimerManager().SetTimer(_channelingTimer, this, &UChannelingState::_endChanneling, skill->GetChannelingTime());
 }
 
-void UChannelingState::OnLeave(TObjectPtr<AController> controller) {
-}
-
-void UChannelingState::_endChanneling() {
-	check(_caster.IsValid());
-	UE_LOG(LogTemp, Warning, TEXT("Skill cast is over!"));
-	_bEndChanneling = true;
+void UChannelingState::OnLeave(const TObjectPtr<AController> controller) {
 }

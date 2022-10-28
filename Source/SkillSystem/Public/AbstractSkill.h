@@ -17,7 +17,10 @@ class SKILLSYSTEM_API UAbstractSkill : public UObject {
 
 public:
 	/** TODO: add description */
-	virtual void Execute(TObjectPtr<AActor> caster) PURE_VIRTUAL(UAbstractSkill::Execute, return;);
+	virtual void ExecuteCast(TObjectPtr<AActor> caster) PURE_VIRTUAL(UAbstractSkill::Execute, return;);
+
+
+	virtual void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {}
 
 #if DO_CHECK
 	virtual void CheckParametersSanity() const {}

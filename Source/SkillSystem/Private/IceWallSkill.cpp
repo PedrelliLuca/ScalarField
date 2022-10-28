@@ -2,7 +2,7 @@
 
 #include "IceWallSkill.h"
 
-void UIceWallSkill::Execute(const TObjectPtr<AActor> caster) {
+void UIceWallSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	const auto& iceWallSpawner = _getActorSpawners()[0];
 
 	const FTransform& casterToWorld = caster->GetTransform();

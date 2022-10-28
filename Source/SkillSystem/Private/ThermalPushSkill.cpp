@@ -10,7 +10,7 @@ UThermalPushSkill::UThermalPushSkill() {
 	_coldTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Cold Particle System"));
 }
 
-void UThermalPushSkill::Execute(TObjectPtr<AActor> caster) {
+void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
 	_spawnCapsule = NewObject<UCapsuleComponent>(caster, TEXT("Thermal Push Capsule"));
 	_spawnCapsule->SetupAttachment(caster->GetRootComponent());
 	_spawnCapsule->SetRelativeLocation(FVector::ForwardVector * _minCapsuleHalfHeight);

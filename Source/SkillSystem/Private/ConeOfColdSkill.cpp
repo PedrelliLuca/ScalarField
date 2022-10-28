@@ -5,7 +5,7 @@
 #include "MaterialsContainerComponent.h"
 #include "ThermodynamicComponent.h"
 
-void UConeOfColdSkill::Execute(const TObjectPtr<AActor> caster) {
+void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 
 }
 

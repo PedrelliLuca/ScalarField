@@ -4,7 +4,7 @@
 
 #include "GameFramework/SpringArmComponent.h"
 
-void UFireGlobeSkill::Execute(TObjectPtr<AActor> caster) {
+void UFireGlobeSkill::ExecuteCast(TObjectPtr<AActor> caster) {
 	const auto& fireGlobeSpawner = _getFollowerActorSpawners()[0];
 
 	const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
