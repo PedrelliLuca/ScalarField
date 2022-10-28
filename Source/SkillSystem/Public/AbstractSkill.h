@@ -19,8 +19,9 @@ public:
 	/** TODO: add description */
 	virtual void ExecuteCast(TObjectPtr<AActor> caster) PURE_VIRTUAL(UAbstractSkill::Execute, return;);
 
-
 	virtual void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {}
+
+	virtual void AbortChanneling() {}
 
 #if DO_CHECK
 	virtual void CheckParametersSanity() const {}
@@ -42,6 +43,7 @@ public:
 	bool RequiresChanneling() const { return _parameters.RequiresChanneling; }
 	double GetChannelingManaCost() const { return _parameters.ChannelingManaCost; }
 	double GetChannelingTime() const { return _parameters.ChannelingTime; }
+	bool DisablesMovementDuringChanneling() const { return _parameters.DisablesMovementDuringChanneling; }
 
 protected:
 	double _getDuration() const { return _parameters.Duration; }

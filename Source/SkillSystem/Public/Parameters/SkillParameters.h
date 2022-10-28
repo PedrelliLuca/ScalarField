@@ -25,8 +25,8 @@ public:
 	double Cooldown = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double CastTime = 0.;
-	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0.5"))
-	double ChannelingTime = 0.5;
+	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
+	double ChannelingTime = 0;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double Duration = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
@@ -35,6 +35,8 @@ public:
 	bool DisablesMovementDuringCast = false;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
 	bool RequiresChanneling = false;
+	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
+	bool DisablesMovementDuringChanneling = false;
 
 	UPROPERTY(EditAnywhere, Category = "Actor Spawner Components")
 	TArray<FActorSpawnerParameters> ActorSpawnerParameters;
