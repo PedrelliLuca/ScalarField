@@ -26,11 +26,10 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	if (_bInputPressed) {
 		_followTime += deltaTime;
 
-		// Look for the touch location
-		FVector hitLocation = FVector::ZeroVector;
+		// We look for the location in the world where the player has pressed the input
 		FHitResult hit;
 		GetHitResultUnderCursor(ECC_Visibility, true, hit);
-		hitLocation = hit.Location;
+		const FVector hitLocation = hit.Location;
 
 		// Direct the Pawn towards that location
 		APawn* const myPawn = GetPawn();
@@ -88,10 +87,9 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
 	// If it was a short press
 	if (_followTime <= _shortPressThreshold) {
 		// We look for the location in the world where the player has pressed the input
-		FVector hitLocation = FVector::ZeroVector;
 		FHitResult hit;
 		GetHitResultUnderCursor(ECC_Visibility, true, hit);
-		hitLocation = hit.Location;
+		const FVector hitLocation = hit.Location;
 
 		// We move there and spawn some particles
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, hitLocation);

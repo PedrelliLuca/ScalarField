@@ -33,7 +33,6 @@ protected:
 
 	void BeginPlay() override;
 
-protected:
 	/** FX Class that we will spawn when clicking */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UNiagaraSystem* _fxCursor;
