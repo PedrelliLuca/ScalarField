@@ -10,5 +10,9 @@ void UPlayerRotationOnlyMovement::OnMovementTick(const TObjectPtr<APlayerControl
 	const auto pawn = playerController->GetPawn();
 	const FVector pawnCursorLoc = pawn->GetTransform().InverseTransformPosition(worldCursorLoc);
 
-	pawn->AddActorLocalRotation(pawnCursorLoc.Rotation());
+	// The plane with normal (0, 0, 1) containing the pawn's location, which is just (0, 0, 0) in its reference frame
+	const FPlane pawnPlane{0., 0., 1., 0.};
+	const auto projectedPawnCursorLoc = FPlane::PointPlaneProject(pawnCursorLoc, pawnPlane);
+
+	pawn->AddActorLocalRotation(projectedPawnCursorLoc.Rotation());
 }
