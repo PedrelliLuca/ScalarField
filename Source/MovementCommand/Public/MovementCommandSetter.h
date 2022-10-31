@@ -23,4 +23,5 @@ class MOVEMENTCOMMAND_API IMovementCommandSetter {
 public:
 	virtual bool IsInMovementMode(EMovementCommandMode mode) const = 0;
 	virtual void SetMovementMode(EMovementCommandMode mode) = 0;
+	virtual void SetDefaultMovementMode() = 0;
 };

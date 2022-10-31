@@ -17,6 +17,7 @@ class MOVEMENTCOMMAND_API UAIMovementCommandComponent : public UActorComponent, 
 public:	
 	bool IsInMovementMode(EMovementCommandMode mode) const override { return _activeMovementMode == mode; }
 	void SetMovementMode(EMovementCommandMode mode) override;
+	void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
 	TObjectPtr<UAIMovementCommand> GetMovementCommand() {
 		// Did you set the movement mode before calling this?
@@ -27,6 +28,9 @@ public:
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
 	TMap<EMovementCommandMode, TSubclassOf<UAIMovementCommand>> _modesToCommandClasses;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
+	EMovementCommandMode _defaultMovementMode;
 	
 	EMovementCommandMode _activeMovementMode;
 
