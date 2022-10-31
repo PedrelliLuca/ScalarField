@@ -29,10 +29,11 @@ public:
 
 	bool IsOnCooldown() const { return _bIsOnCooldown; }
 
+	EMovementCommandMode GetCastMovementMode() const { return _parameters.CastMovementMode; }
 	double GetCastManaCost() const { return _parameters.CastManaCost; }
 	double GetCastTime() const { return _parameters.CastTime; }
-	bool DisablesMovementDuringCast() const { return _parameters.DisablesMovementDuringCast; }
 
+	EMovementCommandMode GetTargetingMovementMode() const { return _parameters.TargetingMovementMode; }
 	uint32 NumberOfTargets() const { return _parameters.ActorTargetParameters.Num(); }
 	bool RequiresTarget() const { return NumberOfTargets() > 0; }
 	virtual bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const;
@@ -40,10 +41,10 @@ public:
 	void SetTarget(int32 targetIndex, TWeakObjectPtr<AActor> target);
 	void RemoveAllTargets();
 
+	EMovementCommandMode GetChannelingMovementMode() const { return _parameters.ChannelingMovementMode; }
 	bool RequiresChanneling() const { return _parameters.RequiresChanneling; }
 	double GetChannelingManaCost() const { return _parameters.ChannelingManaCost; }
 	double GetChannelingTime() const { return _parameters.ChannelingTime; }
-	bool DisablesMovementDuringChanneling() const { return _parameters.DisablesMovementDuringChanneling; }
 
 protected:
 	double _getDuration() const { return _parameters.Duration; }

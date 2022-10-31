@@ -6,6 +6,7 @@
 #include "ActorSpawnerParameters.h"
 #include "CoreMinimal.h"
 #include "FollowerActorSpawnerParameters.h"
+#include "MovementCommandMode.h"
 
 #include "SkillParameters.generated.h"
 
@@ -32,11 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double BaseDamage = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
-	bool DisablesMovementDuringCast = false;
-	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
 	bool RequiresChanneling = false;
-	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
-	bool DisablesMovementDuringChanneling = false;
 
 	UPROPERTY(EditAnywhere, Category = "Actor Spawner Components")
 	TArray<FActorSpawnerParameters> ActorSpawnerParameters;
@@ -46,4 +43,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Actor Target Components")
 	TArray<FActorTargetParameters> ActorTargetParameters;
+
+	UPROPERTY(EditAnywhere, Category = "Movement Command Modes")
+	EMovementCommandMode TargetingMovementMode;
+	UPROPERTY(EditAnywhere, Category = "Movement Command Modes")
+	EMovementCommandMode CastMovementMode;
+	UPROPERTY(EditAnywhere, Category = "Movement Command Modes")
+	EMovementCommandMode ChannelingMovementMode;
+	
 };
