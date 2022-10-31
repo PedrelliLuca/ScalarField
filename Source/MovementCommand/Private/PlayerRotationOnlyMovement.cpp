@@ -3,6 +3,10 @@
 #include "PlayerRotationOnlyMovement.h"
 
 void UPlayerRotationOnlyMovement::OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) {
+	if (playerController->IsFollowingAPath()) {
+		playerController->StopMovement();
+	}
+	
 	FHitResult hit;
 	playerController->GetHitResultUnderCursor(ECC_Visibility, true, hit);
 	const FVector worldCursorLoc = hit.Location;

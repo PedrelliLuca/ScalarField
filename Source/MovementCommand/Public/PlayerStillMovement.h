@@ -14,5 +14,9 @@ class MOVEMENTCOMMAND_API UPlayerStillMovement : public UPlayerMovementCommand {
 public:
 	void OnSetDestination(const TObjectPtr<APlayerController>& playerController) final {}
 	void OnStopMovement(const TObjectPtr<APlayerController>& playerController) final {}
-	void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) final { playerController->StopMovement(); }
+	void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) final {
+		if (playerController->IsFollowingAPath()) {
+			playerController->StopMovement();
+		}
+	}
 };
