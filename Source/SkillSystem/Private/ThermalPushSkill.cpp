@@ -70,13 +70,9 @@ void UThermalPushSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<
 }
 
 void UThermalPushSkill::AbortChanneling() {
-	_removeBuiltComponents();
-}
-
-void UThermalPushSkill::_removeBuiltComponents() {
 	if (_activeParticleSystem.IsValid()) {
-			_activeParticleSystem->DestroyComponent();
-		}
+		_activeParticleSystem->DestroyComponent();
+	}
 
 	// Are you calling this function on a casted thermal push?
 	check(_pushCapsule.IsValid());

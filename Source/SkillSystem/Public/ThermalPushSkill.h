@@ -24,8 +24,6 @@ public:
 	void AbortChanneling() override;
 
 private:
-	void _removeBuiltComponents();
-
 	// When the skill is casted with the caster having a temperature above this threshold, hit ignitable objects are set on fire
 	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Thresholds")
 	double _hotThreshold = 300.;
