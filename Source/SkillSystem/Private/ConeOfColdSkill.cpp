@@ -2,11 +2,8 @@
 
 #include "ConeOfColdSkill.h"
 
-#include "MaterialsContainerComponent.h"
-#include "ThermodynamicComponent.h"
-
 void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
-	// Capsule component's setup
+	// Capsule component setup
 	_cone = NewObject<UThermodynamicComponent>(caster, TEXT("Cone Of Cold ThermodynamicC"));
 	_cone->SetupAttachment(caster->GetRootComponent());
 	_cone->SetRelativeLocation(FVector::ForwardVector * _height);
@@ -15,26 +12,26 @@ void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	_cone->SetCapsuleRadius(_radius);
 	_cone->bMultiBodyOverlap = true;
 
+	// Thermodynamic component setup
+	_cone->SetTemperature(_coneTemperature, true);
+
 	_cone->RegisterComponent();
-
-	if (const auto pawn = Cast<APawn>(caster)) {
-		_casterController = pawn->GetController();
-		if (_casterController->IsA)
-	}
-
+	
 	_startCooldown();
 }
 
 void UConeOfColdSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {
+	FlushPersistentDebugLines(GetWorld());
 	
-
-
 	DrawDebugCapsule(GetWorld(), _cone->GetComponentLocation(), _cone->GetUnscaledCapsuleHalfHeight(), _cone->GetUnscaledCapsuleRadius(),
 		_cone->GetComponentRotation().Quaternion(), FColor::Cyan, false);
 }
 
 void UConeOfColdSkill::AbortChanneling() {
+	// Are you calling this function on a casted cone of cold?
+	check(_cone.IsValid());
 
+	_cone->DestroyComponent();
 }
 
 #if DO_CHECK

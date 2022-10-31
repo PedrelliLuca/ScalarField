@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbstractSkill.h"
+#include "ThermodynamicComponent.h"
 
 #include "ConeOfColdSkill.generated.h"
 
@@ -24,8 +25,7 @@ public:
 #endif
 
 private:
-	TWeakObjectPtr<UCapsuleComponent> _cone;
-	TWeakObjectPtr<AController> _casterController;
+	TWeakObjectPtr<UThermodynamicComponent> _cone;
 
 	UPROPERTY(EditAnywhere, Category = "ConeOfColdParameters")
 	double _coneTemperature = 0.;
