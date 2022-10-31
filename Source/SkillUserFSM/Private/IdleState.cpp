@@ -5,6 +5,7 @@
 
 #include "CastingState.h"
 #include "ManaComponent.h"
+#include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
 
@@ -63,6 +64,12 @@ TObjectPtr<USkillUserState> UIdleState::OnSkillExecutionAborted(TObjectPtr<ACont
 }
 
 void UIdleState::OnEnter(TObjectPtr<AController> controller) {
+	// Movement command update
+	const auto movementSetters = controller->GetComponentsByInterface(UMovementCommandSetter::StaticClass());
+	check(movementSetters.Num() == 1);
+	const auto movementSetter = Cast<IMovementCommandSetter>(movementSetters[0]);
+	check(movementSetter != nullptr);
+	movementSetter->SetDefaultMovementMode();
 }
 
 void UIdleState::OnLeave(TObjectPtr<AController> controller) {

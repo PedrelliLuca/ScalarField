@@ -6,6 +6,7 @@
 #include "ChannelingState.h"
 #include "IdleState.h"
 #include "ManaComponent.h"
+#include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
 
@@ -89,9 +90,13 @@ TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(TObjectPtr<AC
 
 void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
-	if (DisablesMovement()) {
-		controller->StopMovement();
-	}
+
+	// Movement command update
+	const auto movementSetters = controller->GetComponentsByInterface(UMovementCommandSetter::StaticClass());
+	check(movementSetters.Num() == 1);
+	const auto movementSetter = Cast<IMovementCommandSetter>(movementSetters[0]);
+	check(movementSetter != nullptr);
+	movementSetter->SetMovementMode(GetSkillInExecution()->GetCastMovementMode());
 
 	_caster = controller->GetPawn();
 

@@ -6,6 +6,7 @@
 #include "CastingState.h"
 #include "IdleState.h"
 #include "ManaComponent.h"
+#include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 
 TObjectPtr<USkillUserState> UTargetingState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
@@ -99,6 +100,13 @@ TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<
 void UTargetingState::OnEnter(TObjectPtr<AController> controller) {
 	check(GetSkillInExecution()->RequiresTarget());
 	UE_LOG(LogTemp, Warning, TEXT("Targeting..."));
+
+	// Movement command update
+	const auto movementSetters = controller->GetComponentsByInterface(UMovementCommandSetter::StaticClass());
+	check(movementSetters.Num() == 1);
+	const auto movementSetter = Cast<IMovementCommandSetter>(movementSetters[0]);
+	check(movementSetter != nullptr);
+	movementSetter->SetMovementMode(GetSkillInExecution()->GetTargetingMovementMode());
 }
 
 void UTargetingState::OnLeave(TObjectPtr<AController> controller) {

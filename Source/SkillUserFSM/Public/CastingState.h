@@ -27,8 +27,6 @@ public:
 	void OnEnter(TObjectPtr<AController> controller) override;
 	void OnLeave(TObjectPtr<AController> controller) override;
 
-	bool DisablesMovement() const override { return GetSkillInExecution()->DisablesMovementDuringCast(); }
-
 private:
 	void _endCasting();
 

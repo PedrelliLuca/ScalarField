@@ -27,8 +27,6 @@ public:
 	void OnEnter(TObjectPtr<AController> controller) override;
 	void OnLeave(TObjectPtr<AController> controller) override;
 
-	bool DisablesMovement() const override { return GetSkillInExecution()->DisablesMovementDuringChanneling(); }
-
 private:
 	template <typename S>
 	TObjectPtr<S> _leaveChannelingForState(TObjectPtr<AController> controller) {

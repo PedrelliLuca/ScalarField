@@ -22,8 +22,6 @@ public:
 
 	virtual void OnEnter(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnEnter, return;);
 	virtual void OnLeave(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnLeave, return;);
-
-	virtual bool DisablesMovement() const PURE_VIRTUAL(USkillUserState::OnLMBPress, return false;);
 	
 protected:
 	TObjectPtr<USkillUserState> _keepCurrentState() { 

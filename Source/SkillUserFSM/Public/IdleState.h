@@ -23,6 +23,4 @@ public:
 
 	void OnEnter(TObjectPtr<AController> controller) override;
 	void OnLeave(TObjectPtr<AController> controller) override;
-
-	bool DisablesMovement() const override { return false; }
 };
