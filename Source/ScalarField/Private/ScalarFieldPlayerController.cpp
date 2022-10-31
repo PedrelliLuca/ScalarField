@@ -18,10 +18,6 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	const auto newState = _state->OnTick(deltaTime, this);
 	_changingStateRoutine(newState);
 
-	if (_state->DisablesMovement()) {
-		return;
-	}
-
 	_movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
 }
 
@@ -49,18 +45,10 @@ void AScalarFieldPlayerController::BeginPlay() {
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
-	if (_state->DisablesMovement()) {
-		return;
-	}
-
 	_movementCommandC->GetMovementCommand()->OnStopMovement(this);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationReleased() {
-	if (_state->DisablesMovement()) {
-		return;
-	}
-
 	_movementCommandC->GetMovementCommand()->OnSetDestination(this);
 }
 
