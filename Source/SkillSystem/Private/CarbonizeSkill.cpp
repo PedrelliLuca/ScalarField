@@ -19,8 +19,7 @@ void UCarbonizeSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	_startCooldown();
 }
 
-bool UCarbonizeSkill::IsValidTarget(const int32 targetIndex, const TObjectPtr<AActor> target) const
-{
+bool UCarbonizeSkill::IsValidTarget(const int32 targetIndex, const TObjectPtr<AActor> target) const {
 	if (!Super::IsValidTarget(targetIndex, target)) {
 		return false;
 	}
