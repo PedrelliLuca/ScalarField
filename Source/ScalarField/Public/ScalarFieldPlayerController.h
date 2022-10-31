@@ -37,6 +37,7 @@ private:
 	void _onSkill2Cast();
 	void _onSkill3Cast();
 	void _onSkill4Cast();
+	void _onSkill5Cast();
 
 	void _onCastAborted();
 
