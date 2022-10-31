@@ -13,6 +13,7 @@ void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	_cone->bMultiBodyOverlap = true;
 
 	// Thermodynamic component setup
+	_cone->SetHeatCapacity(_coneHeatCapacity);
 	_cone->SetTemperature(_coneTemperature, true);
 
 	_cone->RegisterComponent();
