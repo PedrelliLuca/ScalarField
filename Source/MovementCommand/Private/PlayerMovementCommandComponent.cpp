@@ -3,7 +3,7 @@
 #include "PlayerMovementCommandComponent.h"
 
 void UPlayerMovementCommandComponent::SetMovementMode(EMovementCommandMode mode) {
-	// Did you forget to set this up?
+	// Did you forget to set this up from the editor?
 	check(_modesToCommandClasses.Contains(mode));
 	_activeMovementMode = mode;
 

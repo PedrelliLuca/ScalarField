@@ -14,6 +14,8 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
+					"Niagara",
+					"AIModule",
 				}
 				);
 

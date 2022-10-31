@@ -18,6 +18,12 @@ public:
 	bool IsInMovementMode(EMovementCommandMode mode) const override { return _activeMovementMode == mode; }
 	void SetMovementMode(EMovementCommandMode mode) override;
 
+	TObjectPtr<UAIMovementCommand> GetMovementCommand() {
+		// Did you set the movement mode before calling this?
+		check(IsValid(_activeMovementCommand));
+		return _activeMovementCommand;
+	}
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
 	TMap<EMovementCommandMode, TSubclassOf<UAIMovementCommand>> _modesToCommandClasses;

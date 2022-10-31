@@ -2,10 +2,7 @@
 
 #include "ScalarFieldPlayerController.h"
 
-#include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "GameFramework/Pawn.h"
 #include "IdleState.h"
-#include "NiagaraFunctionLibrary.h"
 #include "ScalarFieldCharacter.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
@@ -25,24 +22,7 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 		return;
 	}
 
-	if (_bInputPressed) {
-		_followTime += deltaTime;
-
-		// We look for the location in the world where the player has pressed the input
-		FHitResult hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, hit);
-		const FVector hitLocation = hit.Location;
-
-		// Direct the Pawn towards that location
-		APawn* const myPawn = GetPawn();
-		if (myPawn) {
-			FVector worldDirection = (hitLocation - myPawn->GetActorLocation()).GetSafeNormal();
-			myPawn->AddMovementInput(worldDirection, 1.f, false);
-		}
-	}
-	else {
-		_followTime = 0.f;
-	}
+	_movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
 }
 
 void AScalarFieldPlayerController::SetupInputComponent() {
@@ -65,6 +45,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 void AScalarFieldPlayerController::BeginPlay() {
 	Super::BeginPlay();
 	_state = NewObject<UIdleState>(this, UIdleState::StaticClass());
+	_movementCommandC->SetMovementMode(EMovementCommandMode::MCM_RotoTranslation);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
@@ -72,10 +53,7 @@ void AScalarFieldPlayerController::_onSetDestinationPressed() {
 		return;
 	}
 
-	// We flag that the input is being pressed
-	_bInputPressed = true;
-	// Just in case the character was moving because of a previous short press we stop it
-	StopMovement();
+	_movementCommandC->GetMovementCommand()->OnStopMovement(this);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationReleased() {
@@ -83,20 +61,7 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
 		return;
 	}
 
-	// Player is no longer pressing the input
-	_bInputPressed = false;
-
-	// If it was a short press
-	if (_followTime <= _shortPressThreshold) {
-		// We look for the location in the world where the player has pressed the input
-		FHitResult hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, hit);
-		const FVector hitLocation = hit.Location;
-
-		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, hitLocation);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, _fxCursor, hitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
-	}
+	_movementCommandC->GetMovementCommand()->OnSetDestination(this);
 }
 
 void AScalarFieldPlayerController::_onSetTargetPressed() {

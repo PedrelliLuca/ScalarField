@@ -13,5 +13,5 @@ class UPlayerMovementCommand : public UObject {
 public:
 	virtual void OnSetDestination(const TObjectPtr<APlayerController>& playerController) PURE_VIRTUAL(UPlayerMovementCommand::OnSetDestination, return;);
 	virtual void OnStopMovement(const TObjectPtr<APlayerController>& playerController) PURE_VIRTUAL(UPlayerMovementCommand::OnStopMovement, return;);
-	virtual void OnMovementTick(const TObjectPtr<APlayerController>& playerController) PURE_VIRTUAL(UPlayerMovementCommand::OnMovementTick, return;);
+	virtual void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) PURE_VIRTUAL(UPlayerMovementCommand::OnMovementTick, return;);
 };

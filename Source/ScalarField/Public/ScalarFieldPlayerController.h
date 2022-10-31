@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "NiagaraSystem.h"
 #include "PlayerMovementCommandComponent.h"
 #include "SkillUserState.h"
 
@@ -21,22 +20,12 @@ public:
 	AScalarFieldPlayerController();
 
 protected:
-	/** True if the controlled character should navigate to the mouse cursor. */
-	uint32 _bMoveToMouseCursor : 1;
-
 	// Begin PlayerController interface
 	void PlayerTick(float deltaTime) override;
 	void SetupInputComponent() override;
 	// End PlayerController interface
 
 	void BeginPlay() override;
-
-	/** FX Class that we will spawn when clicking */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UNiagaraSystem* _fxCursor;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	double _shortPressThreshold = 1.;
 
 private:
 	/** Input handlers for SetDestination action. */
@@ -52,9 +41,6 @@ private:
 	void _onCastAborted();
 
 	void _changingStateRoutine(TObjectPtr<USkillUserState> newState);
-
-	bool _bInputPressed; // Input is being pressed
-	double _followTime; // For how long it has been pressed
 
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;
