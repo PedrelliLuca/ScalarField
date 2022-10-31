@@ -19,6 +19,7 @@ public class ScalarField : ModuleRules
             "SkillSystem",
             "Thermodynamics",
             "SkillUserFSM",
+            "MovementCommand",
             "Niagara",
             "AIModule",
         });

@@ -3,14 +3,16 @@
 #include "ScalarFieldPlayerController.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "Engine/World.h"
 #include "GameFramework/Pawn.h"
+#include "IdleState.h"
 #include "NiagaraFunctionLibrary.h"
 #include "ScalarFieldCharacter.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
+
+	_movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
 }
 
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {

@@ -4,10 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "IdleState.h"
 #include "NiagaraSystem.h"
+#include "PlayerMovementCommandComponent.h"
 #include "SkillUserState.h"
-#include "Templates/SubclassOf.h"
 
 #include "ScalarFieldPlayerController.generated.h"
 
@@ -15,8 +14,7 @@
 class UNiagaraSystem;
 
 UCLASS()
-class AScalarFieldPlayerController : public APlayerController
-{
+class AScalarFieldPlayerController : public APlayerController {
 	GENERATED_BODY()
 
 public:
@@ -60,6 +58,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;
+
+	UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
+	TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
 };
 
 
