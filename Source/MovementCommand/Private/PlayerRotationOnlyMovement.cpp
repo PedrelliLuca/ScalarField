@@ -6,17 +6,19 @@ void UPlayerRotationOnlyMovement::OnMovementTick(const TObjectPtr<APlayerControl
 	if (playerController->IsFollowingAPath()) {
 		playerController->StopMovement();
 	}
-	
-	FHitResult hit;
-	playerController->GetHitResultUnderCursor(ECC_Visibility, true, hit);
-	const FVector worldCursorLoc = hit.Location;
 
+	FVector cursorLoc{};
+	FVector cursorDir{};
+	playerController->DeprojectMousePositionToWorld(cursorLoc, cursorDir);
+
+	// Computing the plane with normal (0, 0, 1) containing the pawn's location in world coordinates
 	const auto pawn = playerController->GetPawn();
-	const FVector pawnCursorLoc = pawn->GetTransform().InverseTransformPosition(worldCursorLoc);
+	const auto pawnZ = pawn->GetActorLocation().Z;
+	const FPlane pawnPlane{0., 0., 1., pawnZ};
 
-	// The plane with normal (0, 0, 1) containing the pawn's location, which is just (0, 0, 0) in its reference frame
-	const FPlane pawnPlane{0., 0., 1., 0.};
-	const auto projectedPawnCursorLoc = FPlane::PointPlaneProject(pawnCursorLoc, pawnPlane);
-
-	pawn->AddActorLocalRotation(projectedPawnCursorLoc.Rotation());
+	// We project the cursor location on the aforementioned plane, then express it in the pawn's reference frame to
+	// extract the yaw rotation we need for the pawn to look at the cursor.
+	const auto wrCursorLocOnPawnPlane = FMath::LinePlaneIntersection(cursorLoc, cursorLoc + cursorDir * LINE_LENGTH, pawnPlane);
+	const auto prCursorLocOnPawnPlane = pawn->GetTransform().InverseTransformPosition(wrCursorLocOnPawnPlane);
+	pawn->AddActorLocalRotation(prCursorLocOnPawnPlane.Rotation());
 }

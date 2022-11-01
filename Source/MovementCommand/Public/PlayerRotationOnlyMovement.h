@@ -17,6 +17,5 @@ public:
 	void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) override;
 
 private:
-	UPROPERTY(EditDefaultsOnly)
-	double _angularVelocity = 10.;
+	static constexpr int32 LINE_LENGTH = 10000;
 };
