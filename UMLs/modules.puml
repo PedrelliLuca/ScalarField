@@ -1,0 +1,41 @@
+@startuml
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam sequenceParticipant underline
+skinparam linetype ortho
+
+package EnvironmentGrid <<Rectangle>> {
+}
+
+package MaterialSystem <<Rectangle>> {
+}
+
+package MovementCommand <<Rectangle>> {
+}
+
+package ScalarField <<Rectangle>> {
+}
+
+package SkillSystem <<Rectangle>> {
+}
+
+package SkillUserFSM <<Rectangle>> {
+}
+
+package Thermodynamics <<Rectangle>> {
+}
+
+SkillSystem +-- Thermodynamics
+SkillSystem +-- MaterialSystem
+SkillSystem +-- MovementCommand
+
+SkillUserFSM +-- SkillSystem
+SkillUserFSM +-- MovementCommand
+
+ScalarField +-- EnvironmentGrid
+ScalarField +-- Thermodynamics
+ScalarField +-- SkillSystem
+ScalarField +-- SkillUserFSM
+ScalarField +-- MovementCommand
+
+@enduml

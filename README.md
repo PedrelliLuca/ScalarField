@@ -1,6 +1,19 @@
 # ScalarField
 A "Dragon Age: Origins" - like game, where magic works by interacting with the environment. You can find a playlist of videos showing my progress over time on [my YouTube channel](https://www.youtube.com/playlist?list=PLerNkl_bon8TyPWhDtxs6CzJtjON4_Fit).
 
+## Modules
+Here is a brief explanation of each module and an image explaining how they're related to each other
+
+![modules](UMLs/modules.png)
+
+- **ScalarField**: The game's main module, contains very specific classes that cannot be moved to a dedicated module and need functionalities from many different modules.
+- **Thermodynamics**: Module that defines the laws for heat exchanges in the game. Heat transmission is the basis for every thermodynamic (fire and ice) spell in the game.
+- **EnvironmentGrid**: Since thermodynamics is computationally heavy, this module that defines a grid whose purpose is to (de)activate heat exchanges based on the player's location. This is a work in progress: the grid has been created, but it currently does nothing, see [#6](https://github.com/PedrelliLuca/ScalarField/issues/6).
+- **SkillUserFSM**: The Finite State Machine (FSM) describing the various phases of skill execution and how to transition between them. Since both the Player and AI can fire skills, this works with all kinds of controllers. Its implementation follows the [State Pattern](https://gameprogrammingpatterns.com/state.html).
+- **SkillSystem**: Contains all the skills of the game. The module also defines the skills' parameters, which have been made to be easily-tunable by game designers. The implementation is a mixture of [Subclass Sandbox](https://gameprogrammingpatterns.com/subclass-sandbox.html) and [Type Object](https://gameprogrammingpatterns.com/type-object.html) design patterns.
+- **MovementCommand**: [Command Pattern](https://gameprogrammingpatterns.com/command.html) for movement callbacks. Every controller kind has a specific command object associated to each movement mode and simply executes the currently-selected command. Skills make controllers transition between different movement modes during their execution.
+- **MaterialsSystem**: This module is a work in progress. In the future, it will define every material kind in the game. It will be possible to gather materials and spend them to fire specific skill. Moreover, only targets made of certain materials will be targetable by certain skills.
+
 ## Coding Style
 I follow ZURU Tech's coding style, which is just [Allar's](https://github.com/Allar/ue4-style-guide#table-of-contents) with some exceptions. Example:
 ```cpp
