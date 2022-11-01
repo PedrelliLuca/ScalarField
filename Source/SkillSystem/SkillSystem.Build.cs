@@ -16,6 +16,7 @@ namespace UnrealBuildTool.Rules
                     "Engine",
 					"Thermodynamics",
 					"MaterialSystem",
+					"MovementCommand",
                 }
 				);
 

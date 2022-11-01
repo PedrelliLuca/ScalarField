@@ -15,7 +15,7 @@ class SKILLSYSTEM_API UFireGlobeSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:
-	void Execute(TObjectPtr<AActor> caster) override;
+	void ExecuteCast(TObjectPtr<AActor> caster) override;
 
 #if DO_CHECK
 	void CheckParametersSanity() const override;

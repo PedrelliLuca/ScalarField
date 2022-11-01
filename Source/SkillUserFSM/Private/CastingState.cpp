@@ -3,8 +3,10 @@
 
 #include "CastingState.h"
 
+#include "ChannelingState.h"
 #include "IdleState.h"
 #include "ManaComponent.h"
+#include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
 
@@ -42,17 +44,18 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 	// Elements in the environment, like turrets that spit fire or clouds that spawn lightning bolts, are examples of this.
 	if (const auto manaC = pawn->FindComponentByClass<UManaComponent>()) {
 		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetManaCost();
+		const double manaCost = skill->GetCastManaCost();
 		if (charMana < manaCost) {
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 			return _keepCurrentState();
 		}
 	}
-	
+
 	TObjectPtr<UExecutionState> newState = nullptr;
 	if (skill->RequiresTarget()) {
 		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
-	} else {
+	}
+	else {
 		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
 	}
 
@@ -61,27 +64,39 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 }
 
 TObjectPtr<USkillUserState> UCastingState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
-	if (_bIsCastingOver) {
-		// TODO: if skill requires channeling return a channeling state, else return an idle state
-		const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
-		return idleState;
+	if (!_bEndCasting) {
+		return _keepCurrentState();
+
 	}
 
-	return _keepCurrentState();
+	if (GetSkillInExecution()->RequiresChanneling()) {
+		const auto channelingState = NewObject<UChannelingState>(controller, UChannelingState::StaticClass());
+		channelingState->SetSkillInExecution(GetSkillInExecution());
+		return channelingState;
+	}
+
+	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
+	return idleState;
 }
 
 TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
 	// TODO?: maybe in the future I'll make the character re-gain mana if the skill is aborted
 	UE_LOG(LogTemp, Error, TEXT("Skill cast aborted!"));
+
+	GetSkillInExecution()->RemoveAllTargets();
 	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
 	return idleState;
 }
 
 void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
-	if (DisablesMovement()) {
-		controller->StopMovement();
-	}
+
+	// Movement command update
+	const auto movementSetters = controller->GetComponentsByInterface(UMovementCommandSetter::StaticClass());
+	check(movementSetters.Num() == 1);
+	const auto movementSetter = Cast<IMovementCommandSetter>(movementSetters[0]);
+	check(movementSetter != nullptr);
+	movementSetter->SetMovementMode(GetSkillInExecution()->GetCastMovementMode());
 
 	_caster = controller->GetPawn();
 
@@ -91,10 +106,10 @@ void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 	// is lowering the caster's mana over time while he's targeting.
 	if (const auto manaC = _caster->FindComponentByClass<UManaComponent>()) {
 		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetManaCost();
+		const double manaCost = skill->GetCastManaCost();
 		if (charMana < manaCost) {
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill"));
-			_bIsCastingOver = true;
+			_bEndCasting = true;
 			return;
 		}
 		manaC->SetMana(charMana - manaCost);
@@ -118,6 +133,6 @@ void UCastingState::_endCasting() {
 	check(_caster.IsValid());
 
 	UE_LOG(LogTemp, Warning, TEXT("Skill cast is over!"));
-	GetSkillInExecution()->Execute(_caster.Get());
-	_bIsCastingOver = true;
+	GetSkillInExecution()->ExecuteCast(_caster.Get());
+	_bEndCasting = true;
 }

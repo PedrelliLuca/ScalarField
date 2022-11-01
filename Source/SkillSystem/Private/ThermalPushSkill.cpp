@@ -10,18 +10,20 @@ UThermalPushSkill::UThermalPushSkill() {
 	_coldTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Cold Particle System"));
 }
 
-void UThermalPushSkill::Execute(TObjectPtr<AActor> caster) {
-	_spawnCapsule = NewObject<UCapsuleComponent>(caster, TEXT("Thermal Push Capsule"));
-	_spawnCapsule->SetupAttachment(caster->GetRootComponent());
-	_spawnCapsule->SetRelativeLocation(FVector::ForwardVector * _minCapsuleHalfHeight);
-	_spawnCapsule->SetRelativeRotation(FRotator{ 90., 0., 0. });
-	_spawnCapsule->SetCollisionProfileName("BlockAllDynamic");
-	_spawnCapsule->SetCapsuleHalfHeight(_minCapsuleHalfHeight);
-	_spawnCapsule->SetCapsuleRadius(_minCapsuleRadius);
-	_spawnCapsule->bMultiBodyOverlap = true;
+void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
+	// Capsule component's setup
+	_pushCapsule = NewObject<UCapsuleComponent>(caster, TEXT("Thermal Push Capsule"));
+	_pushCapsule->SetupAttachment(caster->GetRootComponent());
+	_pushCapsule->SetRelativeLocation(FVector::ForwardVector * _minCapsuleHalfHeight);
+	_pushCapsule->SetRelativeRotation(FRotator{ 90., 0., 0. });
+	_pushCapsule->SetCollisionProfileName("BlockAllDynamic");
+	_pushCapsule->SetCapsuleHalfHeight(_minCapsuleHalfHeight);
+	_pushCapsule->SetCapsuleRadius(_minCapsuleRadius);
+	_pushCapsule->bMultiBodyOverlap = true;
 
-	_spawnCapsule->RegisterComponent();
+	_pushCapsule->RegisterComponent();
 
+	// Particle system's setup
 	TWeakObjectPtr<UParticleSystem> activeParticleTemplate = nullptr;
 	if (const auto thermoC = Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
 		if (thermoC->GetTemperature() > _hotThreshold) {
@@ -34,55 +36,46 @@ void UThermalPushSkill::Execute(TObjectPtr<AActor> caster) {
 		}
 	}
 
-	TWeakObjectPtr<UParticleSystemComponent> activeParticleSystem = nullptr;
 	if (activeParticleTemplate.IsValid()) {
-		activeParticleSystem = NewObject<UParticleSystemComponent>(caster, TEXT("Push Particle System"));
-		activeParticleSystem->SetupAttachment(_spawnCapsule.Get());
-		activeParticleSystem->SetTemplate(activeParticleTemplate.Get());
+		_activeParticleSystem = NewObject<UParticleSystemComponent>(caster, TEXT("Push Particle System"));
+		_activeParticleSystem->SetupAttachment(_pushCapsule.Get());
+		_activeParticleSystem->SetTemplate(activeParticleTemplate.Get());
 
-		activeParticleSystem->RegisterComponent();
-		activeParticleSystem->Activate(true);
+		_activeParticleSystem->RegisterComponent();
+		_activeParticleSystem->Activate(true);
 	}
-
-	FTimerHandle timerHandle;
-	GetWorld()->GetTimerManager().SetTimer(
-		timerHandle,
-		[spawnCapsule = TWeakObjectPtr<UCapsuleComponent>{ _spawnCapsule }, activeParticleSystem]() {
-			if (activeParticleSystem.IsValid()) {
-				activeParticleSystem->DestroyComponent();
-			}
-
-			if (spawnCapsule.IsValid()) {
-				spawnCapsule->DestroyComponent();
-			}
-		},
-		_getDuration(),
-		false
-	);
 
 	_timeFromCast = 0.;
 	_startCooldown();
 }
 
-void UThermalPushSkill::Tick(const float deltaTime) {
+void UThermalPushSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {
 	FlushPersistentDebugLines(GetWorld());
 
-	_timeFromCast = FMath::Clamp(_timeFromCast + deltaTime, 0., _getDuration());
-	const double alpha = _timeFromCast / _getDuration();
+	const double channelingTime = GetChannelingTime();
+	_timeFromCast = FMath::Clamp(_timeFromCast + deltaTime, 0., channelingTime);
+	const double alpha = _timeFromCast / channelingTime;
 	const double halfHeight = FMath::Lerp(_minCapsuleHalfHeight, _maxCapsuleHalfHeight, alpha);
 	const double radius = FMath::Lerp(_minCapsuleRadius, _maxCapsuleRadius, alpha);
 
-	// This should be ensured by IsAllowedToTick() override
-	check(_spawnCapsule.IsValid());
+	// ExecuteCast() must be called before ExecuteChannelingTick()
+	check(_pushCapsule.IsValid());
 
-	_spawnCapsule->SetCapsuleHalfHeight(halfHeight);
-	_spawnCapsule->SetCapsuleRadius(radius);
-	_spawnCapsule->SetRelativeLocation(FVector::ForwardVector * halfHeight);
+	_pushCapsule->SetCapsuleHalfHeight(halfHeight);
+	_pushCapsule->SetCapsuleRadius(radius);
+	_pushCapsule->SetRelativeLocation(FVector::ForwardVector * halfHeight);
 
-	DrawDebugCapsule(GetWorld(), _spawnCapsule->GetComponentLocation(), _spawnCapsule->GetUnscaledCapsuleHalfHeight(), _spawnCapsule->GetUnscaledCapsuleRadius(),
-		_spawnCapsule->GetComponentRotation().Quaternion(), FColor::Green, false, _getDuration());
+	DrawDebugCapsule(GetWorld(), _pushCapsule->GetComponentLocation(), _pushCapsule->GetUnscaledCapsuleHalfHeight(), _pushCapsule->GetUnscaledCapsuleRadius(),
+		_pushCapsule->GetComponentRotation().Quaternion(), FColor::Green, false);
 }
 
-TStatId UThermalPushSkill::GetStatId() const {
-	return TStatId{};
+void UThermalPushSkill::AbortChanneling() {
+	if (_activeParticleSystem.IsValid()) {
+		_activeParticleSystem->DestroyComponent();
+	}
+
+	// Are you calling this function on a casted thermal push?
+	check(_pushCapsule.IsValid());
+
+	_pushCapsule->DestroyComponent();
 }

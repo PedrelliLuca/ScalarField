@@ -6,6 +6,7 @@
 #include "CastingState.h"
 #include "IdleState.h"
 #include "ManaComponent.h"
+#include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 
 TObjectPtr<USkillUserState> UTargetingState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
@@ -65,7 +66,7 @@ TObjectPtr<USkillUserState> UTargetingState::OnBeginSkillExecution(const int32 s
 	// Elements in the environment, like turrets that spit fire or clouds that spawn lightning bolts, are examples of this.
 	if (const auto manaC = pawn->FindComponentByClass<UManaComponent>()) {
 		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetManaCost();
+		const double manaCost = skill->GetCastManaCost();
 		if (charMana < manaCost) {
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
 			return _keepCurrentState();
@@ -99,6 +100,13 @@ TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<
 void UTargetingState::OnEnter(TObjectPtr<AController> controller) {
 	check(GetSkillInExecution()->RequiresTarget());
 	UE_LOG(LogTemp, Warning, TEXT("Targeting..."));
+
+	// Movement command update
+	const auto movementSetters = controller->GetComponentsByInterface(UMovementCommandSetter::StaticClass());
+	check(movementSetters.Num() == 1);
+	const auto movementSetter = Cast<IMovementCommandSetter>(movementSetters[0]);
+	check(movementSetter != nullptr);
+	movementSetter->SetMovementMode(GetSkillInExecution()->GetTargetingMovementMode());
 }
 
 void UTargetingState::OnLeave(TObjectPtr<AController> controller) {

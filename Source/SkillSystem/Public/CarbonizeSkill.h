@@ -15,7 +15,7 @@ class SKILLSYSTEM_API UCarbonizeSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:
-	void Execute(TObjectPtr<AActor> caster) override;
+	void ExecuteCast(TObjectPtr<AActor> caster) override;
 
 	bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const override;
 

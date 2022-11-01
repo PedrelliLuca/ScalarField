@@ -13,21 +13,17 @@
  * 
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UThermalPushSkill : public UAbstractSkill, public FTickableGameObject {
+class SKILLSYSTEM_API UThermalPushSkill : public UAbstractSkill {
 	GENERATED_BODY()
 	
 public:
 	UThermalPushSkill();
 
-	void Execute(TObjectPtr<AActor> caster) override;
-
-	void Tick(float deltaTime) override;
-	TStatId GetStatId() const override;
-	bool IsAllowedToTick() const override { return _spawnCapsule.IsValid(); }
+	void ExecuteCast(TObjectPtr<AActor> caster) override;
+	void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) override;
+	void AbortChanneling() override;
 
 private:
-	TWeakObjectPtr<UCapsuleComponent> _spawnCapsule;
-
 	// When the skill is casted with the caster having a temperature above this threshold, hit ignitable objects are set on fire
 	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Thresholds")
 	double _hotThreshold = 300.;
@@ -48,6 +44,9 @@ private:
 	TObjectPtr<UParticleSystem> _hotTemplate;
 	UPROPERTY(EditAnywhere, Category = "ThermalPushParameters | Particles")
 	TObjectPtr<UParticleSystem> _coldTemplate;
+
+	TWeakObjectPtr<UParticleSystemComponent> _activeParticleSystem = nullptr;
+	TWeakObjectPtr<UCapsuleComponent> _pushCapsule;
 
 	double _timeFromCast = 0.;
 };

@@ -6,6 +6,7 @@
 #include "ActorSpawnerParameters.h"
 #include "CoreMinimal.h"
 #include "FollowerActorSpawnerParameters.h"
+#include "MovementCommandMode.h"
 
 #include "SkillParameters.generated.h"
 
@@ -18,19 +19,19 @@ struct SKILLSYSTEM_API FSkillParameters {
 	
 public:
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
-	double ManaCost = 0.;
+	double CastManaCost = 0.;
+	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
+	double ChannelingManaCost = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double Cooldown = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double CastTime = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
-	double ChannelingTime = 0.;
-	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
-	double Duration = 0.;
+	double ChannelingTime = 0;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes", meta = (ClampMin = "0"))
 	double BaseDamage = 0.;
 	UPROPERTY(EditAnywhere, Category = "Basic Attributes")
-	bool DisablesMovementDuringCast = false;
+	bool RequiresChanneling = false;
 
 	UPROPERTY(EditAnywhere, Category = "Actor Spawner Components")
 	TArray<FActorSpawnerParameters> ActorSpawnerParameters;
@@ -40,4 +41,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Actor Target Components")
 	TArray<FActorTargetParameters> ActorTargetParameters;
+
+	UPROPERTY(EditAnywhere, Category = "Movement Command Modes")
+	EMovementCommandMode TargetingMovementMode;
+	UPROPERTY(EditAnywhere, Category = "Movement Command Modes")
+	EMovementCommandMode CastMovementMode;
+	UPROPERTY(EditAnywhere, Category = "Movement Command Modes")
+	EMovementCommandMode ChannelingMovementMode;
+	
 };

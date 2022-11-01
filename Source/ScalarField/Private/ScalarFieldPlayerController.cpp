@@ -2,15 +2,14 @@
 
 #include "ScalarFieldPlayerController.h"
 
-#include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "Engine/World.h"
-#include "GameFramework/Pawn.h"
-#include "NiagaraFunctionLibrary.h"
+#include "IdleState.h"
 #include "ScalarFieldCharacter.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
+
+	_movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
 }
 
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
@@ -19,29 +18,7 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	const auto newState = _state->OnTick(deltaTime, this);
 	_changingStateRoutine(newState);
 
-	if (_state->DisablesMovement()) {
-		return;
-	}
-
-	if (_bInputPressed) {
-		_followTime += deltaTime;
-
-		// Look for the touch location
-		FVector hitLocation = FVector::ZeroVector;
-		FHitResult hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, hit);
-		hitLocation = hit.Location;
-
-		// Direct the Pawn towards that location
-		APawn* const myPawn = GetPawn();
-		if (myPawn) {
-			FVector worldDirection = (hitLocation - myPawn->GetActorLocation()).GetSafeNormal();
-			myPawn->AddMovementInput(worldDirection, 1.f, false);
-		}
-	}
-	else {
-		_followTime = 0.f;
-	}
+	_movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
 }
 
 void AScalarFieldPlayerController::SetupInputComponent() {
@@ -57,6 +34,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Skill2Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill2Cast);
 	InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
 	InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
+	InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
 
 	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
 }
@@ -64,39 +42,15 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 void AScalarFieldPlayerController::BeginPlay() {
 	Super::BeginPlay();
 	_state = NewObject<UIdleState>(this, UIdleState::StaticClass());
+	_movementCommandC->SetMovementMode(EMovementCommandMode::MCM_RotoTranslation);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
-	if (_state->DisablesMovement()) {
-		return;
-	}
-
-	// We flag that the input is being pressed
-	_bInputPressed = true;
-	// Just in case the character was moving because of a previous short press we stop it
-	StopMovement();
+	_movementCommandC->GetMovementCommand()->OnStopMovement(this);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationReleased() {
-	if (_state->DisablesMovement()) {
-		return;
-	}
-
-	// Player is no longer pressing the input
-	_bInputPressed = false;
-
-	// If it was a short press
-	if (_followTime <= _shortPressThreshold) {
-		// We look for the location in the world where the player has pressed the input
-		FVector hitLocation = FVector::ZeroVector;
-		FHitResult hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, hit);
-		hitLocation = hit.Location;
-
-		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, hitLocation);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, _fxCursor, hitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
-	}
+	_movementCommandC->GetMovementCommand()->OnSetDestination(this);
 }
 
 void AScalarFieldPlayerController::_onSetTargetPressed() {
@@ -123,6 +77,11 @@ void AScalarFieldPlayerController::_onSkill3Cast() {
 
 void AScalarFieldPlayerController::_onSkill4Cast() {
 	const auto newState = _state->OnBeginSkillExecution(4, this);
+	_changingStateRoutine(newState);
+}
+
+void AScalarFieldPlayerController::_onSkill5Cast() {
+	const auto newState = _state->OnBeginSkillExecution(5, this);
 	_changingStateRoutine(newState);
 }
 

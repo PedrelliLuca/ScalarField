@@ -5,7 +5,7 @@
 #include "MaterialsContainerComponent.h"
 #include "ThermodynamicComponent.h"
 
-void UCarbonizeSkill::Execute(const TObjectPtr<AActor> caster) {
+void UCarbonizeSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	const auto target = _getActorTargets()[0].Target;
 
 	const auto materialsC = target->FindComponentByClass<UMaterialsContainerComponent>();
@@ -19,8 +19,7 @@ void UCarbonizeSkill::Execute(const TObjectPtr<AActor> caster) {
 	_startCooldown();
 }
 
-bool UCarbonizeSkill::IsValidTarget(const int32 targetIndex, const TObjectPtr<AActor> target) const
-{
+bool UCarbonizeSkill::IsValidTarget(const int32 targetIndex, const TObjectPtr<AActor> target) const {
 	if (!Super::IsValidTarget(targetIndex, target)) {
 		return false;
 	}
