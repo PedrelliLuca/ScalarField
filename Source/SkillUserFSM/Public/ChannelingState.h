@@ -40,7 +40,6 @@ private:
 		return NewObject<S>(controller);
 	}
 
-	FTimerHandle _channelingTimer{};
 	double _elapsedChannelingTime = 0.;
 
 	TWeakObjectPtr<AActor> _caster = nullptr;
