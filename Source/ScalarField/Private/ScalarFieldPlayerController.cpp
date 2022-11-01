@@ -4,6 +4,7 @@
 
 #include "IdleState.h"
 #include "ScalarFieldCharacter.h"
+#include "TacticalPauseWorldSubsystem.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	bShowMouseCursor = true;
@@ -37,6 +38,8 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
 
 	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
+
+	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
 
 void AScalarFieldPlayerController::BeginPlay() {
@@ -88,6 +91,10 @@ void AScalarFieldPlayerController::_onSkill5Cast() {
 void AScalarFieldPlayerController::_onCastAborted() {
 	const auto newState = _state->OnSkillExecutionAborted(this);
 	_changingStateRoutine(newState);
+}
+
+void AScalarFieldPlayerController::_onTacticalPauseToggled() {
+	GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->ToggleWorldTacticalPauseStatus();
 }
 
 void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserState> newState) {

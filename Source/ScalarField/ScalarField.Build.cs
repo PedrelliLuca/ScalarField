@@ -20,6 +20,7 @@ public class ScalarField : ModuleRules
             "Thermodynamics",
             "SkillUserFSM",
             "MovementCommand",
+            "TacticalPauseSystem",
         });
     }
 }

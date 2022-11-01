@@ -41,6 +41,8 @@ private:
 
 	void _onCastAborted();
 
+	void _onTacticalPauseToggled();
+
 	void _changingStateRoutine(TObjectPtr<USkillUserState> newState);
 
 	UPROPERTY()
@@ -48,6 +50,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
 	TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
+
+	bool _bTacticalPauseActive = false;
 };
 
 
