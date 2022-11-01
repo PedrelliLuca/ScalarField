@@ -35,7 +35,7 @@ void UFireGlobeSkill::ExecuteCast(TObjectPtr<AActor> caster) {
 				spawnSpringArm->DestroyComponent();
 			}
 		},
-		_getDuration(),
+		fireGlobeSpawner.SpawnDuration,
 		false
 	);
 

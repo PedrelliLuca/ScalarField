@@ -16,7 +16,7 @@ void UIceWallSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 				spawnActor->Destroy();
 			}
 		},
-		_getDuration(),
+		iceWallSpawner.SpawnDuration,
 		false
 	);
 

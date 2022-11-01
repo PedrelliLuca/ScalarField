@@ -47,7 +47,6 @@ public:
 	double GetChannelingTime() const { return _parameters.ChannelingTime; }
 
 protected:
-	double _getDuration() const { return _parameters.Duration; }
 	const TArray<FActorSpawnerParameters>& _getActorSpawners() const { return _parameters.ActorSpawnerParameters; }
 	const TArray<FFollowerActorSpawnerParameters>& _getFollowerActorSpawners() const { return _parameters.FollowerActorSpawnerParameters; }
 	const TArray<FActorTargetParameters>& _getActorTargets() const { return _parameters.ActorTargetParameters; }
