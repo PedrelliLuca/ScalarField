@@ -16,6 +16,7 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	Super::PlayerTick(deltaTime);
 
+	// We handled the input with the Super:: call. If the tacticalPause is on, we skip the FSM's and movement cmd tick
 	if (_bIsTacticalPauseOn) {
 		return;
 	}
