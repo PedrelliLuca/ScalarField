@@ -16,6 +16,10 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	Super::PlayerTick(deltaTime);
 
+	if (_bIsTacticalPauseOn) {
+		return;
+	}
+
 	const auto newState = _state->OnTick(deltaTime, this);
 	_changingStateRoutine(newState);
 
@@ -104,6 +108,8 @@ void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTact
 	 * The PlayerController must never, ever, have its time dilation different from 1, since
 	 * that would cause the player to not be able to send any kind of input. */
 	CustomTimeDilation = 1. / currentWorldTimeDilation;
+
+	_bIsTacticalPauseOn = bIsTacticalPauseOn;
 }
 
 void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserState> newState) {

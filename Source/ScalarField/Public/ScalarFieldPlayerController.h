@@ -52,7 +52,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
 	TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
 
-	bool _bTacticalPauseActive = false;
+	bool _bIsTacticalPauseOn = false;
 };
 
 
