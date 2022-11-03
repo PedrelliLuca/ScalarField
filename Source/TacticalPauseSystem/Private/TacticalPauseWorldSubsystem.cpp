@@ -4,16 +4,24 @@
 
 #include "Kismet/GameplayStatics.h"
 
+void UTacticalPauseWorldSubsystem::OnWorldBeginPlay(UWorld& InWorld) {
+	Super::OnWorldBeginPlay(InWorld);
+	_tacticalPauseTimeDilation = SMALL_NUMBER;
+}
+
 void UTacticalPauseWorldSubsystem::ToggleWorldTacticalPauseStatus() {
+	double currentWorldTimeDilation;
 	if (!_bIsTacticalPauseOn) {
 		UE_LOG(LogTemp, Warning, TEXT("Tactical Pause: ON"));
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.);
+		currentWorldTimeDilation = _tacticalPauseTimeDilation;
 		_bIsTacticalPauseOn = true;
 	} else {
 		UE_LOG(LogTemp, Warning, TEXT("Tactical Pause: OFF"));
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.);
+		currentWorldTimeDilation = 1.;
 		_bIsTacticalPauseOn = false;
 	}
 
-	_onTacticalPauseToggle.Broadcast(_bIsTacticalPauseOn);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), currentWorldTimeDilation);
+
+	_onTacticalPauseToggle.Broadcast(_bIsTacticalPauseOn, currentWorldTimeDilation);
 }

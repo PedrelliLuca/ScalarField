@@ -45,7 +45,9 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 void AScalarFieldPlayerController::BeginPlay() {
 	Super::BeginPlay();
 	_state = NewObject<UIdleState>(this, UIdleState::StaticClass());
-	_movementCommandC->SetMovementMode(EMovementCommandMode::MCM_RotoTranslation);
+	_movementCommandC->SetDefaultMovementMode();
+
+	GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
@@ -95,6 +97,13 @@ void AScalarFieldPlayerController::_onCastAborted() {
 
 void AScalarFieldPlayerController::_onTacticalPauseToggled() {
 	GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->ToggleWorldTacticalPauseStatus();
+}
+
+void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTacticalPauseOn, const double currentWorldTimeDilation) {
+	/* Here we're literally overriding whatever the UTacticalPauseWorldSubsystem just did. 
+	 * The PlayerController must never, ever, have its time dilation different from 1, since
+	 * that would cause the player to not be able to send any kind of input. */
+	CustomTimeDilation = 1. / currentWorldTimeDilation;
 }
 
 void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserState> newState) {
