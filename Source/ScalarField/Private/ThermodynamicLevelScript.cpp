@@ -10,6 +10,8 @@
 void AThermodynamicLevelScript::BeginPlay() {
 	Super::BeginPlay();
 
+	GetWorldSettings()->MinGlobalTimeDilation = 0.;
+
 	// Search for the special trigger box actor that determines how the environment grid and the air are spawned
 	TObjectPtr<ATriggerBox> gridTrigger = nullptr;
 	for (TActorIterator<ATriggerBox> actorIt(GetWorld()); actorIt; ++actorIt) {

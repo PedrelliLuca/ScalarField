@@ -18,7 +18,7 @@ class SKILLSYSTEM_API UConeOfColdSkill : public UAbstractSkill {
 public:
 	void ExecuteCast(TObjectPtr<AActor> caster) override;
 	void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) override;
-	void AbortChanneling() override;
+	void Abort() override;
 
 #if DO_CHECK
 	void CheckParametersSanity() const override;

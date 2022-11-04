@@ -38,7 +38,7 @@ void UAbstractSkill::SetTarget(int32 index, TWeakObjectPtr<AActor> target) {
 	_parameters.ActorTargetParameters[index].Target = target;
 }
 
-void UAbstractSkill::RemoveAllTargets() {
+void UAbstractSkill::_removeAllTargets() {
 	for (auto targetParams : _parameters.ActorTargetParameters) {
 		targetParams.Target = nullptr;
 	}

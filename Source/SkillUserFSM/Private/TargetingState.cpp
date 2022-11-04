@@ -61,24 +61,12 @@ TObjectPtr<USkillUserState> UTargetingState::OnBeginSkillExecution(const int32 s
 		UE_LOG(LogTemp, Warning, TEXT("Skill is on cooldown!"));
 		return _keepCurrentState();
 	}
-
-	// The owner isn't forced to have a mana component. If it doesn't have one, it means that it can cast its skills for free.
-	// Elements in the environment, like turrets that spit fire or clouds that spawn lightning bolts, are examples of this.
-	if (const auto manaC = pawn->FindComponentByClass<UManaComponent>()) {
-		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetCastManaCost();
-		if (charMana < manaCost) {
-			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
-			return _keepCurrentState();
-		}
-	}
 	
-	GetSkillInExecution()->RemoveAllTargets();
 	TObjectPtr<UExecutionState> newState = nullptr;
 	if (skill->RequiresTarget()) {
-		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
+		newState = _abortExecutionForState<UTargetingState>(controller);
 	} else {
-		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
+		newState = _abortExecutionForState<UCastingState>(controller);
 	}
 
 	newState->SetSkillInExecution(skill);
@@ -91,10 +79,7 @@ TObjectPtr<USkillUserState> UTargetingState::OnTick(float deltaTime, TObjectPtr<
 
 TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill targeting aborted!"));
-
-	GetSkillInExecution()->RemoveAllTargets();
-	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
-	return idleState;
+	return _abortExecutionForState<UIdleState>(controller);
 }
 
 void UTargetingState::OnEnter(TObjectPtr<AController> controller) {

@@ -4,6 +4,7 @@
 
 #include "IdleState.h"
 #include "ScalarFieldCharacter.h"
+#include "TacticalPauseWorldSubsystem.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	bShowMouseCursor = true;
@@ -14,6 +15,11 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	Super::PlayerTick(deltaTime);
+
+	// We handled the input with the Super:: call. If the tacticalPause is on, we skip the FSM's and movement cmd tick
+	if (_bIsTacticalPauseOn) {
+		return;
+	}
 
 	const auto newState = _state->OnTick(deltaTime, this);
 	_changingStateRoutine(newState);
@@ -37,12 +43,16 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
 
 	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
+
+	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
 
 void AScalarFieldPlayerController::BeginPlay() {
 	Super::BeginPlay();
 	_state = NewObject<UIdleState>(this, UIdleState::StaticClass());
-	_movementCommandC->SetMovementMode(EMovementCommandMode::MCM_RotoTranslation);
+	_movementCommandC->SetDefaultMovementMode();
+
+	GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
@@ -88,6 +98,19 @@ void AScalarFieldPlayerController::_onSkill5Cast() {
 void AScalarFieldPlayerController::_onCastAborted() {
 	const auto newState = _state->OnSkillExecutionAborted(this);
 	_changingStateRoutine(newState);
+}
+
+void AScalarFieldPlayerController::_onTacticalPauseToggled() {
+	GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->ToggleWorldTacticalPauseStatus();
+}
+
+void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTacticalPauseOn, const double currentWorldTimeDilation) {
+	/* Here we're literally overriding whatever the UTacticalPauseWorldSubsystem just did. 
+	 * The PlayerController must never, ever, have its time dilation different from 1, since
+	 * that would cause the player to not be able to send any kind of input. */
+	CustomTimeDilation = 1. / currentWorldTimeDilation;
+
+	_bIsTacticalPauseOn = bIsTacticalPauseOn;
 }
 
 void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserState> newState) {
