@@ -69,7 +69,9 @@ void UThermalPushSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<
 		_pushCapsule->GetComponentRotation().Quaternion(), FColor::Green, false);
 }
 
-void UThermalPushSkill::AbortChanneling() {
+void UThermalPushSkill::Abort() {
+	Super::Abort();
+
 	if (_activeParticleSystem.IsValid()) {
 		_activeParticleSystem->DestroyComponent();
 	}

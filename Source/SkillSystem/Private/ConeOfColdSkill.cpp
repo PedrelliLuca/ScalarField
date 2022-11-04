@@ -28,7 +28,9 @@ void UConeOfColdSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<A
 		_cone->GetComponentRotation().Quaternion(), FColor::Cyan, false);
 }
 
-void UConeOfColdSkill::AbortChanneling() {
+void UConeOfColdSkill::Abort() {
+	Super::Abort();
+
 	// Are you calling this function on a casted cone of cold?
 	check(_cone.IsValid());
 

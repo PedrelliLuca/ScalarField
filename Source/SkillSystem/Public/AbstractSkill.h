@@ -21,7 +21,7 @@ public:
 
 	virtual void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {}
 
-	virtual void AbortChanneling() {}
+	virtual void Abort() { _removeAllTargets(); }
 
 #if DO_CHECK
 	virtual void CheckParametersSanity() const {}
@@ -39,7 +39,6 @@ public:
 	virtual bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const;
 	double GetMaxDistanceForTarget(int32 targetIndex) const;
 	void SetTarget(int32 targetIndex, TWeakObjectPtr<AActor> target);
-	void RemoveAllTargets();
 
 	EMovementCommandMode GetChannelingMovementMode() const { return _parameters.ChannelingMovementMode; }
 	bool RequiresChanneling() const { return _parameters.RequiresChanneling; }
@@ -50,6 +49,7 @@ protected:
 	const TArray<FActorSpawnerParameters>& _getActorSpawners() const { return _parameters.ActorSpawnerParameters; }
 	const TArray<FFollowerActorSpawnerParameters>& _getFollowerActorSpawners() const { return _parameters.FollowerActorSpawnerParameters; }
 	const TArray<FActorTargetParameters>& _getActorTargets() const { return _parameters.ActorTargetParameters; }
+	void _removeAllTargets();
 
 	void _startCooldown();
 	void _endCooldown();

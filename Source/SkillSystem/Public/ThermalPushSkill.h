@@ -21,7 +21,7 @@ public:
 
 	void ExecuteCast(TObjectPtr<AActor> caster) override;
 	void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) override;
-	void AbortChanneling() override;
+	void Abort() override;
 
 private:
 	// When the skill is casted with the caster having a temperature above this threshold, hit ignitable objects are set on fire

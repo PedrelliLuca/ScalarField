@@ -18,9 +18,20 @@ class SKILLUSERFSM_API UExecutionState : public USkillUserState {
 
 public:
 	void SetSkillInExecution(TWeakObjectPtr<UAbstractSkill> skillInExecution) { _skillInExecution = skillInExecution; }
-	TObjectPtr<UAbstractSkill> GetSkillInExecution() const { 
+	TObjectPtr<UAbstractSkill> GetSkillInExecution() const {
 		check(_skillInExecution.IsValid());
-		return _skillInExecution.Get(); 
+		return _skillInExecution.Get();
+	}
+
+protected:
+	template <typename S> TObjectPtr<S> _abortExecutionForState(TObjectPtr<AController> controller) {
+		static_assert(TIsDerivedFrom<S, USkillUserState>::Value, "S must derived from USkillUserState abstract class");
+		static_assert(!TIsSame<S, USkillUserState>::Value, "S must not be of type USkillUserState");
+		static_assert(!TIsSame<S, UExecutionState>::Value, "S must not be of type UExecutionState");
+
+		check(_skillInExecution.IsValid());
+		_skillInExecution->Abort();
+		return NewObject<S>(controller);
 	}
 
 private:

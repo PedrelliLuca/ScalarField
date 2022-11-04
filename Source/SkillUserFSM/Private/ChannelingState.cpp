@@ -40,10 +40,10 @@ TObjectPtr<USkillUserState> UChannelingState::OnBeginSkillExecution(const int32 
 
 	TObjectPtr<UExecutionState> newState = nullptr;
 	if (skill->RequiresTarget()) {
-		newState = _leaveChannelingForState<UTargetingState>(controller);
+		newState = _abortExecutionForState<UTargetingState>(controller);
 	}
 	else {
-		newState = _leaveChannelingForState<UCastingState>(controller);
+		newState = _abortExecutionForState<UCastingState>(controller);
 	}
 
 	newState->SetSkillInExecution(skill);
@@ -67,7 +67,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, const TObj
 
 		if (charMana < manaCostThisFrame) {
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to keep channeling skill"));
-			return _leaveChannelingForState<UIdleState>(controller);
+			return _abortExecutionForState<UIdleState>(controller);
 		}
 
 		_casterManaC->SetMana(charMana - manaCostThisFrame);
@@ -78,7 +78,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, const TObj
 	_elapsedChannelingTime += deltaTime;
 
 	if (FMath::IsNearlyEqual(_elapsedChannelingTime, channelingDuration)) {
-		return _leaveChannelingForState<UIdleState>(controller);
+		return _abortExecutionForState<UIdleState>(controller);
 	}
 
 	return _keepCurrentState();
@@ -86,7 +86,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, const TObj
 
 TObjectPtr<USkillUserState> UChannelingState::OnSkillExecutionAborted(const TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill channeling aborted!"));
-	return _leaveChannelingForState<UIdleState>(controller);
+	return _abortExecutionForState<UIdleState>(controller);
 }
 
 void UChannelingState::OnEnter(const TObjectPtr<AController> controller) {

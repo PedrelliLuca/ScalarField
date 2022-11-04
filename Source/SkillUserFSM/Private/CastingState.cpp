@@ -41,10 +41,10 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 
 	TObjectPtr<UExecutionState> newState = nullptr;
 	if (skill->RequiresTarget()) {
-		newState = NewObject<UTargetingState>(controller);
+		newState = _abortExecutionForState<UTargetingState>(controller);
 	}
 	else {
-		newState = NewObject<UCastingState>(controller);
+		newState = _abortExecutionForState<UCastingState>(controller);
 	}
 
 	newState->SetSkillInExecution(skill);
@@ -61,7 +61,7 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 
 			if (currentMana < _manaLeftToPay) {
 				UE_LOG(LogTemp, Error, TEXT("Not enough mana to keep casting skill"));
-				return NewObject<UIdleState>(controller);
+				return _abortExecutionForState<UIdleState>(controller);
 			}
 			_casterManaC->SetMana(currentMana - _manaLeftToPay);
 		}
@@ -78,7 +78,7 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 
 		if (currentMana < manaCostThisFrame) {
 			UE_LOG(LogTemp, Error, TEXT("Not enough mana to keep casting skill"));
-			return NewObject<UIdleState>(controller);
+			return _abortExecutionForState<UIdleState>(controller);
 		}
 
 		_casterManaC->SetMana(currentMana - manaCostThisFrame);
@@ -91,9 +91,7 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 
 TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(const TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill cast aborted!"));
-
-	GetSkillInExecution()->RemoveAllTargets();
-	return NewObject<UIdleState>(controller);
+	return _abortExecutionForState<UIdleState>(controller);
 }
 
 void UCastingState::OnEnter(const TObjectPtr<AController> controller) {
@@ -120,7 +118,7 @@ TObjectPtr<USkillUserState> UCastingState::_determineStateBasedOnSkillChanneling
 {
 	if (GetSkillInExecution()->RequiresChanneling()) {
 		const auto channelingState = NewObject<UChannelingState>(controller, UChannelingState::StaticClass());
-		channelingState->SetSkillInExecution(GetSkillInExecution());
+		channelingState->SetSkillInExecution(skill);
 		return channelingState;
 	}
 

@@ -62,12 +62,11 @@ TObjectPtr<USkillUserState> UTargetingState::OnBeginSkillExecution(const int32 s
 		return _keepCurrentState();
 	}
 	
-	GetSkillInExecution()->RemoveAllTargets();
 	TObjectPtr<UExecutionState> newState = nullptr;
 	if (skill->RequiresTarget()) {
-		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
+		newState = _abortExecutionForState<UTargetingState>(controller);
 	} else {
-		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
+		newState = _abortExecutionForState<UCastingState>(controller);
 	}
 
 	newState->SetSkillInExecution(skill);
@@ -80,10 +79,7 @@ TObjectPtr<USkillUserState> UTargetingState::OnTick(float deltaTime, TObjectPtr<
 
 TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill targeting aborted!"));
-
-	GetSkillInExecution()->RemoveAllTargets();
-	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
-	return idleState;
+	return _abortExecutionForState<UIdleState>(controller);
 }
 
 void UTargetingState::OnEnter(TObjectPtr<AController> controller) {

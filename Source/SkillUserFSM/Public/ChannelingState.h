@@ -29,18 +29,6 @@ public:
 	void OnLeave(TObjectPtr<AController> controller) override;
 
 private:
-	template <typename S>
-	TObjectPtr<S> _leaveChannelingForState(TObjectPtr<AController> controller) {
-		static_assert(TIsDerivedFrom<S, USkillUserState>::Value, "S must derived from USkillUserState abstract class");
-        static_assert(!TIsSame<S, USkillUserState>::Value, "S must not be of type USkillUserState");
-		static_assert(!TIsSame<S, UExecutionState>::Value, "S must not be of type UExecutionState");
-
-		const auto skill = GetSkillInExecution();
-		skill->AbortChanneling();
-		skill->RemoveAllTargets();
-		return NewObject<S>(controller);
-	}
-
 	double _elapsedChannelingTime = 0.;
 
 	TWeakObjectPtr<AActor> _caster = nullptr;
