@@ -39,23 +39,12 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 		return _keepCurrentState();
 	}
 
-	// The owner isn't forced to have a mana component. If it doesn't have one, it means that it can cast its skills for free.
-	// Elements in the environment, like turrets that spit fire or clouds that spawn lightning bolts, are examples of this.
-	if (const auto manaC = pawn->FindComponentByClass<UManaComponent>()) {
-		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetCastManaCost();
-		if (charMana < manaCost) {
-			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
-			return _keepCurrentState();
-		}
-	}
-
 	TObjectPtr<UExecutionState> newState = nullptr;
 	if (skill->RequiresTarget()) {
-		newState = NewObject<UTargetingState>(controller, UTargetingState::StaticClass());
+		newState = NewObject<UTargetingState>(controller);
 	}
 	else {
-		newState = NewObject<UCastingState>(controller, UCastingState::StaticClass());
+		newState = NewObject<UCastingState>(controller);
 	}
 
 	newState->SetSkillInExecution(skill);
@@ -69,6 +58,11 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 	if (_elapsedCastTime + deltaTime >= castDuration) {
 		if (_casterManaC.IsValid()) { // No mana component == free skill
 			const auto currentMana = _casterManaC->GetMana();
+
+			if (currentMana < _manaLeftToPay) {
+				UE_LOG(LogTemp, Error, TEXT("Not enough mana to keep casting skill"));
+				return NewObject<UIdleState>(controller);
+			}
 			_casterManaC->SetMana(currentMana - _manaLeftToPay);
 		}
 
@@ -81,6 +75,12 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 
 		const double manaCost = skill->GetCastManaCost();
 		const double manaCostThisFrame = (deltaTime / castDuration) * manaCost;
+
+		if (currentMana < manaCostThisFrame) {
+			UE_LOG(LogTemp, Error, TEXT("Not enough mana to keep casting skill"));
+			return NewObject<UIdleState>(controller);
+		}
+
 		_casterManaC->SetMana(currentMana - manaCostThisFrame);
 		_manaLeftToPay -= manaCostThisFrame;
 	}
@@ -93,8 +93,7 @@ TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(const TObject
 	UE_LOG(LogTemp, Error, TEXT("Skill cast aborted!"));
 
 	GetSkillInExecution()->RemoveAllTargets();
-	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
-	return idleState;
+	return NewObject<UIdleState>(controller);
 }
 
 void UCastingState::OnEnter(const TObjectPtr<AController> controller) {
@@ -125,6 +124,5 @@ TObjectPtr<USkillUserState> UCastingState::_determineStateBasedOnSkillChanneling
 		return channelingState;
 	}
 
-	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
-	return idleState;
+	return NewObject<UIdleState>(controller);
 }

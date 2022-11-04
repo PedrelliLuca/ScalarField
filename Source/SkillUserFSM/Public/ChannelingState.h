@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ExecutionState.h"
+#include "ManaComponent.h"
 
 #include "ChannelingState.generated.h"
 
@@ -43,4 +44,5 @@ private:
 	double _elapsedChannelingTime = 0.;
 
 	TWeakObjectPtr<AActor> _caster = nullptr;
+	TWeakObjectPtr<UManaComponent> _casterManaC = nullptr;
 };

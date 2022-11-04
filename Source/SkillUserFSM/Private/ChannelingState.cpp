@@ -5,7 +5,6 @@
 
 #include "CastingState.h"
 #include "IdleState.h"
-#include "ManaComponent.h"
 #include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
@@ -39,17 +38,6 @@ TObjectPtr<USkillUserState> UChannelingState::OnBeginSkillExecution(const int32 
 		return _keepCurrentState();
 	}
 
-	// The owner isn't forced to have a mana component. If it doesn't have one, it means that it can cast its skills for free.
-	// Elements in the environment, like turrets that spit fire or clouds that spawn lightning bolts, are examples of this.
-	if (const auto manaC = pawn->FindComponentByClass<UManaComponent>()) {
-		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetCastManaCost();
-		if (charMana < manaCost) {
-			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill at index %i"), index);
-			return _keepCurrentState();
-		}
-	}
-
 	TObjectPtr<UExecutionState> newState = nullptr;
 	if (skill->RequiresTarget()) {
 		newState = _leaveChannelingForState<UTargetingState>(controller);
@@ -69,25 +57,25 @@ TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, const TObj
 		// Apply one last mana payment with reduced deltaTime
 		deltaTime = channelingDuration - _elapsedChannelingTime;
 	}
-	_elapsedChannelingTime += deltaTime;
 
-	// No mana component? Channeling is free for _caster!
-	if (const auto manaC = _caster->FindComponentByClass<UManaComponent>()) {
-		const double charMana = manaC->GetMana();
+	// No mana component == free skill
+	if (_casterManaC.IsValid()) {
+		const double charMana = _casterManaC->GetMana();
 
 		const double manaCost = skill->GetChannelingManaCost();
 		const double manaCostThisFrame = (deltaTime / channelingDuration) * manaCost;
 
 		if (charMana < manaCostThisFrame) {
-			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill"));
+			UE_LOG(LogTemp, Error, TEXT("Not enough mana to keep channeling skill"));
 			return _leaveChannelingForState<UIdleState>(controller);
 		}
 
-		manaC->SetMana(charMana - manaCostThisFrame);
+		_casterManaC->SetMana(charMana - manaCostThisFrame);
 	}
 
 	// Execution of skill's channel logic
 	skill->ExecuteChannelingTick(deltaTime, _caster.Get());
+	_elapsedChannelingTime += deltaTime;
 
 	if (FMath::IsNearlyEqual(_elapsedChannelingTime, channelingDuration)) {
 		return _leaveChannelingForState<UIdleState>(controller);
@@ -114,6 +102,7 @@ void UChannelingState::OnEnter(const TObjectPtr<AController> controller) {
 	movementSetter->SetMovementMode(GetSkillInExecution()->GetChannelingMovementMode());
 
 	_caster = controller->GetPawn();
+	_casterManaC = _caster->FindComponentByClass<UManaComponent>();
 }
 
 void UChannelingState::OnLeave(const TObjectPtr<AController> controller) {
