@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ExecutionState.h"
+#include "ManaComponent.h"
 
 #include "CastingState.generated.h"
 
@@ -28,9 +29,11 @@ public:
 	void OnLeave(TObjectPtr<AController> controller) override;
 
 private:
-	void _endCasting();
+	double _elapsedCastTime = 0.;
+	double _manaLeftToPay = 0.;
 
-	bool _bEndCasting = false;
-	FTimerHandle _countdownToCast{};
+	TObjectPtr<USkillUserState> _determineStateBasedOnSkillChanneling(TObjectPtr<UAbstractSkill> skill, TObjectPtr<AController> controller);
+	
 	TWeakObjectPtr<AActor> _caster = nullptr;
+	TWeakObjectPtr<UManaComponent> _casterManaC = nullptr;
 };

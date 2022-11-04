@@ -5,17 +5,16 @@
 
 #include "ChannelingState.h"
 #include "IdleState.h"
-#include "ManaComponent.h"
 #include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
 
 
-TObjectPtr<USkillUserState> UCastingState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UCastingState::OnTargeting(const TObjectPtr<AActor> target, const TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 skillKey, const TObjectPtr<AController> controller) {
 	check(skillKey < KEY_ASSIGNABLE_SKILLS);
 	const auto pawn = controller->GetPawn();
 	const auto skillsContainer = pawn->FindComponentByClass<USkillsContainerComponent>();
@@ -63,24 +62,34 @@ TObjectPtr<USkillUserState> UCastingState::OnBeginSkillExecution(const int32 ski
 	return newState;
 }
 
-TObjectPtr<USkillUserState> UCastingState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
-	if (!_bEndCasting) {
-		return _keepCurrentState();
+TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const TObjectPtr<AController> controller) {
+	const auto skill = GetSkillInExecution();
+	const double castDuration = GetSkillInExecution()->GetCastTime();
 
+	if (_elapsedCastTime + deltaTime >= castDuration) {
+		if (_casterManaC.IsValid()) { // No mana component == free skill
+			const auto currentMana = _casterManaC->GetMana();
+			_casterManaC->SetMana(currentMana - _manaLeftToPay);
+		}
+
+		skill->ExecuteCast(_caster.Get());
+		return _determineStateBasedOnSkillChanneling(skill, controller);
 	}
 
-	if (GetSkillInExecution()->RequiresChanneling()) {
-		const auto channelingState = NewObject<UChannelingState>(controller, UChannelingState::StaticClass());
-		channelingState->SetSkillInExecution(GetSkillInExecution());
-		return channelingState;
+	if (_casterManaC.IsValid()) { // No mana component == free skill
+		const auto currentMana = _casterManaC->GetMana();
+
+		const double manaCost = skill->GetCastManaCost();
+		const double manaCostThisFrame = (deltaTime / castDuration) * manaCost;
+		_casterManaC->SetMana(currentMana - manaCostThisFrame);
+		_manaLeftToPay -= manaCostThisFrame;
 	}
 
-	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
-	return idleState;
+	_elapsedCastTime += deltaTime;
+	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
-	// TODO?: maybe in the future I'll make the character re-gain mana if the skill is aborted
+TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(const TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill cast aborted!"));
 
 	GetSkillInExecution()->RemoveAllTargets();
@@ -88,7 +97,7 @@ TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(TObjectPtr<AC
 	return idleState;
 }
 
-void UCastingState::OnEnter(TObjectPtr<AController> controller) {
+void UCastingState::OnEnter(const TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Warning, TEXT("Skill cast begun!"));
 
 	// Movement command update
@@ -99,40 +108,23 @@ void UCastingState::OnEnter(TObjectPtr<AController> controller) {
 	movementSetter->SetMovementMode(GetSkillInExecution()->GetCastMovementMode());
 
 	_caster = controller->GetPawn();
+	_casterManaC = _caster->FindComponentByClass<UManaComponent>();
 
 	const auto skill = GetSkillInExecution();
-
-	// Even though a similar check is already present before targeting state, we need to perform it again in case something
-	// is lowering the caster's mana over time while he's targeting.
-	if (const auto manaC = _caster->FindComponentByClass<UManaComponent>()) {
-		const double charMana = manaC->GetMana();
-		const double manaCost = skill->GetCastManaCost();
-		if (charMana < manaCost) {
-			UE_LOG(LogTemp, Error, TEXT("Not enough mana to cast skill"));
-			_bEndCasting = true;
-			return;
-		}
-		manaC->SetMana(charMana - manaCost);
-	}
-
-
-	if (FMath::IsNearlyZero(skill->GetCastTime())) {
-		_endCasting();
-	}
-
-	GetWorld()->GetTimerManager().SetTimer(_countdownToCast, this, &UCastingState::_endCasting, skill->GetCastTime());
+	_manaLeftToPay = skill->GetCastManaCost();
 }
 
-void UCastingState::OnLeave(TObjectPtr<AController> controller) {
-	if (GetWorld()->GetTimerManager().GetTimerRemaining(_countdownToCast) > 0.) {
-		GetWorld()->GetTimerManager().ClearTimer(_countdownToCast);
-	}
+void UCastingState::OnLeave(const TObjectPtr<AController> controller) {
 }
 
-void UCastingState::_endCasting() {
-	check(_caster.IsValid());
+TObjectPtr<USkillUserState> UCastingState::_determineStateBasedOnSkillChanneling(const TObjectPtr<UAbstractSkill> skill, const TObjectPtr<AController> controller)
+{
+	if (GetSkillInExecution()->RequiresChanneling()) {
+		const auto channelingState = NewObject<UChannelingState>(controller, UChannelingState::StaticClass());
+		channelingState->SetSkillInExecution(GetSkillInExecution());
+		return channelingState;
+	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Skill cast is over!"));
-	GetSkillInExecution()->ExecuteCast(_caster.Get());
-	_bEndCasting = true;
+	const auto idleState = NewObject<UIdleState>(controller, UIdleState::StaticClass());
+	return idleState;
 }
