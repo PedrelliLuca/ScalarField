@@ -8,8 +8,7 @@
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class GAMEPLAYATTRIBUTES_API UHealthComponent : public UActorComponent
-{
+class GAMEPLAYATTRIBUTES_API UHealthComponent : public UActorComponent {
 	GENERATED_BODY()
 
 public:	

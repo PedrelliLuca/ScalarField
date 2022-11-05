@@ -22,6 +22,7 @@ public class ScalarField : ModuleRules
             "MovementCommand",
             "TacticalPauseSystem",
             "GameplayAttributes",
+            "DamageHandlers",
         });
     }
 }
