@@ -10,8 +10,8 @@ UManaComponent::UManaComponent() {
 void UManaComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
 	Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-	const double _manaRegenPerFrame = _manaRegenPerSecond * deltaTime;
-	_mana = FMath::Clamp(_mana + _manaRegenPerFrame, 0., _maxMana);
+	const double manaRegenPerFrame = _manaRegenPerSecond * deltaTime;
+	_mana = FMath::Clamp(_mana + manaRegenPerFrame, 0., _maxMana);
 }
 
 #if WITH_EDITOR

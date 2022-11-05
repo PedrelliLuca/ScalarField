@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "HealthComponent.h"
 #include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
 #include "ThermodynamicComponent.h"
@@ -45,6 +46,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Mana, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UManaComponent> _manaC;
+
+	UPROPERTY(VisibleAnywhere, Category = Health)
+	TObjectPtr<UHealthComponent> _healthC;
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;

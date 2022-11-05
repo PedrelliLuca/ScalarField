@@ -54,6 +54,9 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	// Create a mana component...
 	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));
 
+	// Create a health component...
+	_healthC = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+
 	// Create a skills container component...
 	_skillsContainer = CreateDefaultSubobject<USkillsContainerComponent>(TEXT("Skills Container"));
 
