@@ -21,6 +21,7 @@ public class ScalarField : ModuleRules
             "SkillUserFSM",
             "MovementCommand",
             "TacticalPauseSystem",
+            "GameplayAttributes",
         });
     }
 }

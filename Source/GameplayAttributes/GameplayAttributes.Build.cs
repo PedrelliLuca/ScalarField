@@ -2,9 +2,9 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class SkillUserFSM : ModuleRules
+	public class GameplayAttributes : ModuleRules
 	{
-		public SkillUserFSM(ReadOnlyTargetRules Target) : base(Target)
+		public GameplayAttributes(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
@@ -14,10 +14,7 @@ namespace UnrealBuildTool.Rules
                     "Core",
                     "CoreUObject",
                     "Engine",
-					"SkillSystem",
-					"MovementCommand",
-					"GameplayAttributes",
-				}
+                }
 				);
 
 			PrivateDependencyModuleNames.AddRange(

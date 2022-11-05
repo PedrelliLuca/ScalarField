@@ -3,8 +3,6 @@
 
 #include "SkillsContainerComponent.h"
 
-#include "ManaComponent.h"
-
 USkillsContainerComponent::USkillsContainerComponent() {
 	PrimaryComponentTick.bCanEverTick = false;
 }

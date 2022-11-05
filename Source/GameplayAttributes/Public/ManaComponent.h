@@ -8,7 +8,7 @@
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SKILLSYSTEM_API UManaComponent : public UActorComponent
+class GAMEPLAYATTRIBUTES_API UManaComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
