@@ -24,7 +24,11 @@ public:
 	void SetHealth(double health);
 	void SetMaxHealth(double maxHealth, bool bUpdateHealth = true);
 
-	void TakeDamage(double damage) { _health -= damage; }
+	void TakeDamage(double damage) { 
+		_health -= damage; 
+		UE_LOG(LogTemp, Warning, TEXT("Damage taken: %f, Health is now: %f"), damage, _health);
+	}
+
 	bool IsDead() const { return _health <= DBL_EPSILON; }
 
 private:

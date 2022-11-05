@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "ThermodynamicComponent.h"
 
 #include "TemperatureDamageHandlerComponent.generated.h"
 
@@ -16,13 +15,7 @@ class DAMAGEHANDLERS_API UTemperatureDamageHandlerComponent : public UActorCompo
 public:	
     UTemperatureDamageHandlerComponent();
 
-    void SetThermodynamicDamageDealer(TWeakObjectPtr<UThermodynamicComponent> thermodynamicC) { 
-        check(thermodynamicC.IsValid());
-        check(GetOwner() == thermodynamicC->GetOwner());
-        _thermodynamicC = MoveTemp(thermodynamicC);
-    }
-
-    void HandleDamage();
+    void HandleDamage(double temperature);
 
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
@@ -32,17 +25,14 @@ public:
     double GetMinComfortTemperature() const { return _minComfortTemperature; }
     double GetMaxComfortTemperature() const { return _maxComfortTemperature; }
 
-    bool IsTemperatureComfortable() const { 
-        check(_thermodynamicC.IsValid());
-        return _thermodynamicC->GetTemperature() >= _minComfortTemperature && _thermodynamicC->GetTemperature() <= _maxComfortTemperature;
-    }
+    bool IsTemperatureComfortable(const double temperature) const { return temperature >= _minComfortTemperature && temperature <= _maxComfortTemperature; }
 
 #if WITH_EDITOR
 	void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
 
 private:
-    // TODO: in the future this might become a strategy object so that designer can set the damage function they want!
+    // TODO: in the future this might become a strategy object so that designers can set the damage function they want!
     double _computeDamageFromTemperature(double temperature);
 
     UPROPERTY(EditAnywhere, Category = "Temperature Comfort Interval", meta = (ClampMin = "0"))
@@ -53,8 +43,6 @@ private:
 
     UPROPERTY(EditAnywhere, Category = "Temperature Damage Interval", meta = (ClampMin = "0"))
     double _damageInterval = 1.;
-
-    TWeakObjectPtr<UThermodynamicComponent> _thermodynamicC = nullptr;
 
     double _currentInteralTime = 0.;
 };

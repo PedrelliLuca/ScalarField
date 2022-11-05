@@ -13,6 +13,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
+#include "TemperatureDamageType.h"
 #include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -58,12 +59,43 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	_healthC = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
 	// Create a skills container component...
-	_skillsContainer = CreateDefaultSubobject<USkillsContainerComponent>(TEXT("Skills Container"));
+	_skillsContainer = CreateDefaultSubobject<USkillsContainerComponent>(TEXT("Skills Container Component"));
+
+	// Create the component that handles temperature damage...
+	_temperatureDmgHandlerC = CreateDefaultSubobject<UTemperatureDamageHandlerComponent>(TEXT("Temperature Damage Handler Component"));
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
+
+float AScalarFieldCharacter::TakeDamage(const float damageAmount, const FDamageEvent& damageEvent, AController* const eventInstigator, AActor* const damageCauser) {
+	float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
+
+	if (damageEvent.DamageTypeClass == UTemperatureDamageType::StaticClass()) {
+		check(IsValid(_healthC));
+
+		// TODO: apply damage resistances here
+
+		if (!_healthC->IsDead()) {
+			_healthC->TakeDamage(damageAmount);
+		}
+
+	}
+
+	/*if (_healthC->IsDead()) {
+		OnDeath();
+	}*/
+
+	return damage;
+}
+
+void AScalarFieldCharacter::Tick(float deltaTime) {
+	Super::Tick(deltaTime);
+
+	_temperatureDmgHandlerC->HandleDamage(_thermodynamicC->GetTemperature());
+}
+
 
 void AScalarFieldCharacter::BeginPlay() {
 	Super::BeginPlay();
@@ -72,7 +104,7 @@ void AScalarFieldCharacter::BeginPlay() {
 	_setOverlappingCells();
 }
 
-void AScalarFieldCharacter::_dmiSetup(){
+void AScalarFieldCharacter::_dmiSetup() {
 	// Setting up the DMI that changes the mesh color based on temperature
 	auto thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
 	_materialInstance = GetMesh()->CreateDynamicMaterialInstance(0, GetMesh()->GetMaterial(0), TEXT("Thermodynamics Material"));
@@ -93,7 +125,7 @@ void AScalarFieldCharacter::_setOverlappingCells() {
 		AEnvironmentCell* overlappingCell = Cast<AEnvironmentCell>(overlappingActor);
 		check(overlappingCell != nullptr);
 		return overlappingCell;
-	});
+		});
 
 	// Send the cells to the grid subsystem to unfreeze them
 	GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>()->ActivateOverlappedCells(overlappingCells);
@@ -101,5 +133,5 @@ void AScalarFieldCharacter::_setOverlappingCells() {
 
 void AScalarFieldCharacter::_updateMaterialBasedOnTemperature(double temperature) {
 	check(!_materialInstance.IsNull())
-	_materialInstance->SetVectorParameterValue(TEXT("Tint"), FColorizer::GenerateColorFromTemperature(temperature));
+		_materialInstance->SetVectorParameterValue(TEXT("Tint"), FColorizer::GenerateColorFromTemperature(temperature));
 }

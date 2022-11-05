@@ -2,22 +2,20 @@
 
 
 #include "TemperatureDamageHandlerComponent.h"
-
 #include "TemperatureDamageType.h"
 
 UTemperatureDamageHandlerComponent::UTemperatureDamageHandlerComponent() {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UTemperatureDamageHandlerComponent::HandleDamage() {
-    check(_thermodynamicC.IsValid());
+void UTemperatureDamageHandlerComponent::HandleDamage(const double temperature) {
 
 	if (IsComponentTickEnabled()) {
 		// Damage handler on cooldown
 		return;
 	}
 
-	if (IsTemperatureComfortable()) {
+	if (IsTemperatureComfortable(temperature)) {
 		// This temperature doesn't cause any damage to the owner
 		return;
 	}
@@ -25,13 +23,15 @@ void UTemperatureDamageHandlerComponent::HandleDamage() {
 	// The temperature harms the owner
 	const TSubclassOf<UDamageType> damageType = UTemperatureDamageType::StaticClass();
 	FDamageEvent damageEvent{ damageType };
-	GetOwner()->TakeDamage(_computeDamageFromTemperature(_thermodynamicC->GetTemperature()), damageEvent, nullptr, GetOwner());
+	GetOwner()->TakeDamage(_computeDamageFromTemperature(temperature), damageEvent, nullptr, GetOwner());
 
 	SetComponentTickEnabled(true);
 }
 
 void UTemperatureDamageHandlerComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
 	Super::TickComponent(deltaTime, tickType, thisTickFunction);
+
+	// TickComponent() manages the cooldown of the temperature damage deltaTime
 
 	_currentInteralTime += deltaTime;
 	if (_currentInteralTime > _damageInterval) {
@@ -68,5 +68,13 @@ void UTemperatureDamageHandlerComponent::PostEditChangeProperty(FPropertyChanged
 #endif
 
 double UTemperatureDamageHandlerComponent::_computeDamageFromTemperature(const double temperature) {
-	return temperature;
+	if (temperature < _minComfortTemperature) {
+		return _minComfortTemperature - temperature;
+	}
+	else if (temperature > _maxComfortTemperature) {
+		return temperature - _maxComfortTemperature;
+	}
+
+	checkNoEntry();
+	return 0.;
 }

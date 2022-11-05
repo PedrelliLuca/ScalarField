@@ -20,10 +20,8 @@ public:
 	AScalarFieldPlayerController();
 
 protected:
-	// Begin PlayerController interface
 	void PlayerTick(float deltaTime) override;
 	void SetupInputComponent() override;
-	// End PlayerController interface
 
 	void BeginPlay() override;
 
