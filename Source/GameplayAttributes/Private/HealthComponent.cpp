@@ -11,7 +11,7 @@ void UHealthComponent::TickComponent(const float deltaTime, const ELevelTick tic
 	Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
 	const double healthRegenPerFrame = _healthRegenPerSecond * deltaTime;
-	_currentHealth = FMath::Clamp(_currentHealth + healthRegenPerFrame, 0., _maxHealth);
+	SetCurrentHealth(_currentHealth + healthRegenPerFrame);
 }
 
 #if WITH_EDITOR
@@ -28,9 +28,9 @@ void UHealthComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyCha
 }
 #endif
 
-void UHealthComponent::SetCurrentHealth(const double mana) {
-	check(mana >= 0.);
-	_currentHealth = mana;
+void UHealthComponent::SetCurrentHealth(const double health) {
+	_currentHealth =  FMath::Clamp(health, 0., _maxHealth);
+	_onHealthChanged.Broadcast(health);
 }
 
 void UHealthComponent::SetMaxHealth(double maxHealth, const bool bUpdateHealth /*= true*/) {
@@ -40,4 +40,11 @@ void UHealthComponent::SetMaxHealth(double maxHealth, const bool bUpdateHealth /
 	if (bUpdateHealth) {
 		SetCurrentHealth(_maxHealth);
 	}
+
+	_onMaxHealthChanged.Broadcast(maxHealth);
+}
+
+void UHealthComponent::SetHealthRegen(double healthRegenPerSecond) {
+	_healthRegenPerSecond = healthRegenPerSecond;
+	_onHealthRegenChanged.Broadcast(healthRegenPerSecond);
 }

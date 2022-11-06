@@ -37,6 +37,10 @@ private:
 	void _setOverlappingCells();
 	void _updateMaterialBasedOnTemperature(double temperature);
 
+	void _healthChanged(double newHealth) const;
+	void _maxHealthChanged(double newMaxHealth) const;
+	void _healthRegenChanged(double newHealthRegen) const;
+
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* _topDownCameraComponent;

@@ -6,6 +6,10 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthRegenChanged, double);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GAMEPLAYATTRIBUTES_API UHealthComponent : public UActorComponent {
@@ -26,14 +30,18 @@ public:
 
 	void SetCurrentHealth(double health);
 	void SetMaxHealth(double maxHealth, bool bUpdateHealth = true);
-	void SetHealthRegen(double healthRegenPerSecond) { _healthRegenPerSecond = healthRegenPerSecond; }
+	void SetHealthRegen(double healthRegenPerSecond);
 
 	void TakeDamage(double damage) { 
-		_currentHealth -= damage; 
+		SetCurrentHealth(GetCurrentHealth() - damage);
 		UE_LOG(LogTemp, Warning, TEXT("Damage taken: %f, Health is now: %f"), damage, _currentHealth);
 	}
 
 	bool IsDead() const { return _currentHealth <= DBL_EPSILON; }
+
+	FOnHealthChanged& OnHealthChanged() { return _onHealthChanged; }
+	FOnMaxHealthChanged& OnMaxHealthChanged() { return _onMaxHealthChanged; }
+	FOnHealthRegenChanged& OnHealthRegenChanged() { return _onHealthRegenChanged; }
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (ClampMin = "0"))
@@ -45,4 +53,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Health")
 	double _currentHealth = 0.;
+
+	FOnHealthChanged _onHealthChanged;
+	FOnMaxHealthChanged _onMaxHealthChanged;
+	FOnHealthRegenChanged _onHealthRegenChanged;
 };

@@ -13,6 +13,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Materials/Material.h"
+#include "ScalarFieldPlayerController.h"
 #include "TemperatureDamageType.h"
 #include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
@@ -102,6 +103,10 @@ void AScalarFieldCharacter::BeginPlay() {
 
 	_dmiSetup();
 	_setOverlappingCells();
+
+	_healthC->OnHealthChanged().AddUObject(this, &AScalarFieldCharacter::_healthChanged);
+	_healthC->OnMaxHealthChanged().AddUObject(this, &AScalarFieldCharacter::_maxHealthChanged);
+	_healthC->OnHealthRegenChanged().AddUObject(this, &AScalarFieldCharacter::_healthRegenChanged);
 }
 
 void AScalarFieldCharacter::_dmiSetup() {
@@ -134,4 +139,25 @@ void AScalarFieldCharacter::_setOverlappingCells() {
 void AScalarFieldCharacter::_updateMaterialBasedOnTemperature(double temperature) {
 	check(!_materialInstance.IsNull())
 		_materialInstance->SetVectorParameterValue(TEXT("Tint"), FColorizer::GenerateColorFromTemperature(temperature));
+}
+
+void AScalarFieldCharacter::_healthChanged(const double newHealth) const {
+	// Am I player-controlled?
+	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
+		pc->GetGameplayHUD()->SetCurrentHealth(newHealth);
+	}
+}
+
+void AScalarFieldCharacter::_maxHealthChanged(double newMaxHealth) const {
+	// Am I player-controlled?
+	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
+		pc->GetGameplayHUD()->SetMaxHealth(newMaxHealth);
+	}
+}
+
+void AScalarFieldCharacter::_healthRegenChanged(double newHealthRegen) const {
+	// Am I player-controlled?
+	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
+		pc->GetGameplayHUD()->SetHealthRegen(newHealthRegen);
+	}
 }

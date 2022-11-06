@@ -20,6 +20,8 @@ class AScalarFieldPlayerController : public APlayerController {
 public:
 	AScalarFieldPlayerController();
 
+	TWeakObjectPtr<UHUDWidget> GetGameplayHUD() { return _hudWidget; }
+
 protected:
 	void PlayerTick(float deltaTime) override;
 	void SetupInputComponent() override;
