@@ -32,10 +32,7 @@ public:
 	void SetMaxHealth(double maxHealth, bool bUpdateHealth = true);
 	void SetHealthRegen(double healthRegenPerSecond);
 
-	void TakeDamage(double damage) { 
-		SetCurrentHealth(GetCurrentHealth() - damage);
-		UE_LOG(LogTemp, Warning, TEXT("Damage taken: %f, Health is now: %f"), damage, _currentHealth);
-	}
+	void TakeDamage(double damage) { SetCurrentHealth(GetCurrentHealth() - damage); }
 
 	bool IsDead() const { return _currentHealth <= DBL_EPSILON; }
 
