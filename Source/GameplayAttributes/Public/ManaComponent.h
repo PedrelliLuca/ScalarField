@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "ManaComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnManaChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxManaChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnManaRegenChanged, double);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GAMEPLAYATTRIBUTES_API UManaComponent : public UActorComponent
@@ -27,7 +30,14 @@ public:
 
 	void SetCurrentMana(double mana);
 	void SetMaxMana(double maxMana, bool bUpdateMana = true);
-	void SetManaRegen(double manaRegenPerSecond) { _manaRegenPerSecond = manaRegenPerSecond; }
+	void SetManaRegen(double manaRegenPerSecond);
+
+	FOnManaChanged& OnManaChanged() { return _onManaChanged; }
+	FOnMaxManaChanged& OnMaxManaChanged() { return _onMaxManaChanged; }
+	FOnManaRegenChanged& OnManaRegenChanged() { return _onManaRegenChanged; }
+
+protected:
+	void BeginPlay() override;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Mana", meta = (ClampMin = "0"))
@@ -39,4 +49,8 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Mana")
 	double _currentMana = 0.;
+
+	FOnManaChanged _onManaChanged;
+	FOnMaxManaChanged _onMaxManaChanged;
+	FOnManaRegenChanged _onManaRegenChanged;
 };

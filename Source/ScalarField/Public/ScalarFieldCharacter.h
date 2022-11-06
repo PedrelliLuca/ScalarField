@@ -41,6 +41,10 @@ private:
 	void _maxHealthChanged(double newMaxHealth) const;
 	void _healthRegenChanged(double newHealthRegen) const;
 
+	void _manaChanged(double newHealth) const;
+	void _maxManaChanged(double newMaxHealth) const;
+	void _manaRegenChanged(double newHealthRegen) const;
+
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* _topDownCameraComponent;

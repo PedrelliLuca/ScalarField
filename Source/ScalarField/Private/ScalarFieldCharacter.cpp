@@ -107,6 +107,10 @@ void AScalarFieldCharacter::BeginPlay() {
 	_healthC->OnHealthChanged().AddUObject(this, &AScalarFieldCharacter::_healthChanged);
 	_healthC->OnMaxHealthChanged().AddUObject(this, &AScalarFieldCharacter::_maxHealthChanged);
 	_healthC->OnHealthRegenChanged().AddUObject(this, &AScalarFieldCharacter::_healthRegenChanged);
+
+	_manaC->OnManaChanged().AddUObject(this, &AScalarFieldCharacter::_manaChanged);
+	_manaC->OnMaxManaChanged().AddUObject(this, &AScalarFieldCharacter::_maxManaChanged);
+	_manaC->OnManaRegenChanged().AddUObject(this, &AScalarFieldCharacter::_manaRegenChanged);
 }
 
 void AScalarFieldCharacter::_dmiSetup() {
@@ -161,3 +165,25 @@ void AScalarFieldCharacter::_healthRegenChanged(double newHealthRegen) const {
 		pc->GetGameplayHUD()->SetHealthRegen(newHealthRegen);
 	}
 }
+
+void AScalarFieldCharacter::_manaChanged(const double newMana) const {
+	// Am I player-controlled?
+	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
+		pc->GetGameplayHUD()->SetCurrentMana(newMana);
+	}
+}
+
+void AScalarFieldCharacter::_maxManaChanged(double newMaxMana) const {
+	// Am I player-controlled?
+	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
+		pc->GetGameplayHUD()->SetMaxMana(newMaxMana);
+	}
+}
+
+void AScalarFieldCharacter::_manaRegenChanged(double newManaRegen) const {
+	// Am I player-controlled?
+	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
+		pc->GetGameplayHUD()->SetManaRegen(newManaRegen);
+	}
+}
+

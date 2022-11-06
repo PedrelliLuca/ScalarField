@@ -30,7 +30,7 @@ void UHealthComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyCha
 
 void UHealthComponent::SetCurrentHealth(const double health) {
 	_currentHealth =  FMath::Clamp(health, 0., _maxHealth);
-	_onHealthChanged.Broadcast(health);
+	_onHealthChanged.Broadcast(_currentHealth);
 }
 
 void UHealthComponent::SetMaxHealth(double maxHealth, const bool bUpdateHealth /*= true*/) {
@@ -41,10 +41,15 @@ void UHealthComponent::SetMaxHealth(double maxHealth, const bool bUpdateHealth /
 		SetCurrentHealth(_maxHealth);
 	}
 
-	_onMaxHealthChanged.Broadcast(maxHealth);
+	_onMaxHealthChanged.Broadcast(_maxHealth);
 }
 
 void UHealthComponent::SetHealthRegen(double healthRegenPerSecond) {
 	_healthRegenPerSecond = healthRegenPerSecond;
-	_onHealthRegenChanged.Broadcast(healthRegenPerSecond);
+	_onHealthRegenChanged.Broadcast(_healthRegenPerSecond);
+}
+
+void UHealthComponent::BeginPlay() {
+	Super::BeginPlay();
+	_currentHealth = _maxHealth;
 }

@@ -43,6 +43,9 @@ public:
 	FOnMaxHealthChanged& OnMaxHealthChanged() { return _onMaxHealthChanged; }
 	FOnHealthRegenChanged& OnHealthRegenChanged() { return _onHealthRegenChanged; }
 
+protected:
+	void BeginPlay() override;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (ClampMin = "0"))
 	double _maxHealth = 0.;

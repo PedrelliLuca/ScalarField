@@ -11,7 +11,7 @@ void UManaComponent::TickComponent(const float deltaTime, const ELevelTick tickT
 	Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
 	const double manaRegenPerFrame = _manaRegenPerSecond * deltaTime;
-	_currentMana = FMath::Clamp(_currentMana + manaRegenPerFrame, 0., _maxMana);
+	SetCurrentMana(_currentMana + manaRegenPerFrame);
 }
 
 #if WITH_EDITOR
@@ -29,8 +29,8 @@ void UManaComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyChang
 #endif
 
 void UManaComponent::SetCurrentMana(const double mana) {
-	check(mana >= 0.);
-	_currentMana = mana;
+	_currentMana =  FMath::Clamp(mana, 0., _maxMana);
+	_onManaChanged.Broadcast(_currentMana);
 }
 
 void UManaComponent::SetMaxMana(double maxMana, const bool bUpdateMana /*= true*/) {
@@ -40,4 +40,16 @@ void UManaComponent::SetMaxMana(double maxMana, const bool bUpdateMana /*= true*
 	if (bUpdateMana) {
 		SetCurrentMana(_maxMana);
 	}
+
+	_onMaxManaChanged.Broadcast(_maxMana);
+}
+
+void UManaComponent::SetManaRegen(double manaRegenPerSecond) {
+	_manaRegenPerSecond = manaRegenPerSecond;
+	_onManaRegenChanged.Broadcast(_manaRegenPerSecond);
+}
+
+void UManaComponent::BeginPlay() {
+	Super::BeginPlay();
+	_currentMana = _maxMana;
 }
