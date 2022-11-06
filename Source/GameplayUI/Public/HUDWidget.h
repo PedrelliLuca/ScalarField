@@ -25,7 +25,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetHealthRegen(double newHealthRegen);
 
-
 	void SetMaxMana(double newMaxMana);
 	void SetCurrentMana(double newCurrentMana);
 
@@ -36,6 +35,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetTemperature(double temperature, FLinearColor temperatureColor);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetPauseStatus(bool bIsGamePaused);
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
