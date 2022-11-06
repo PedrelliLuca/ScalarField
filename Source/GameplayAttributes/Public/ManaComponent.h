@@ -21,9 +21,13 @@ public:
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-	double GetMana() const { return _mana; }
-	void SetMana(double mana);
+	double GetCurrentMana() const { return _currentMana; }
+	double GetMaxMana() const { return _maxMana; }
+	double GetManaRegen() const { return _manaRegenPerSecond; }
+
+	void SetCurrentMana(double mana);
 	void SetMaxMana(double maxMana, bool bUpdateMana = true);
+	void SetManaRegen(double manaRegenPerSecond) { _manaRegenPerSecond = manaRegenPerSecond; }
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Mana", meta = (ClampMin = "0"))
@@ -34,5 +38,5 @@ private:
 	double _manaRegenPerSecond = 0.;
 
 	UPROPERTY(VisibleAnywhere, Category = "Mana")
-	double _mana = 0.;
+	double _currentMana = 0.;
 };

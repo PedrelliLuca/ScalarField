@@ -20,16 +20,20 @@ public:
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-	double GetHealth() const { return _health; }
-	void SetHealth(double health);
+	double GetCurrentHealth() const { return _currentHealth; }
+	double GetMaxHealth() const { return _maxHealth; }
+	double GetHealthRegen() const { return _healthRegenPerSecond; }
+
+	void SetCurrentHealth(double health);
 	void SetMaxHealth(double maxHealth, bool bUpdateHealth = true);
+	void SetHealthRegen(double healthRegenPerSecond) { _healthRegenPerSecond = healthRegenPerSecond; }
 
 	void TakeDamage(double damage) { 
-		_health -= damage; 
-		UE_LOG(LogTemp, Warning, TEXT("Damage taken: %f, Health is now: %f"), damage, _health);
+		_currentHealth -= damage; 
+		UE_LOG(LogTemp, Warning, TEXT("Damage taken: %f, Health is now: %f"), damage, _currentHealth);
 	}
 
-	bool IsDead() const { return _health <= DBL_EPSILON; }
+	bool IsDead() const { return _currentHealth <= DBL_EPSILON; }
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Health", meta = (ClampMin = "0"))
@@ -40,5 +44,5 @@ private:
 	double _healthRegenPerSecond = 0.;
 
 	UPROPERTY(VisibleAnywhere, Category = "Health")
-	double _health = 0.;
+	double _currentHealth = 0.;
 };
