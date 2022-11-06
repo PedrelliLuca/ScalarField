@@ -19,6 +19,8 @@ class TACTICALPAUSESYSTEM_API UTacticalPauseWorldSubsystem : public UWorldSubsys
 public:
 	void OnWorldBeginPlay(UWorld& InWorld) override;
 
+	bool IsTacticalPauseOn() const { return _bIsTacticalPauseOn; }
+
 	void ToggleWorldTacticalPauseStatus();
 	FOnTacticalPauseToggle& OnTacticalPauseToggle() { return _onTacticalPauseToggle; }
 	

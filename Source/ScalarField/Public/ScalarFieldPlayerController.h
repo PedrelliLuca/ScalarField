@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "HUDWidget.h"
 #include "PlayerMovementCommandComponent.h"
 #include "SkillUserState.h"
 
@@ -19,11 +20,11 @@ class AScalarFieldPlayerController : public APlayerController {
 public:
 	AScalarFieldPlayerController();
 
+	TWeakObjectPtr<UHUDWidget> GetGameplayHUD() { return _hudWidget; }
+
 protected:
-	// Begin PlayerController interface
 	void PlayerTick(float deltaTime) override;
 	void SetupInputComponent() override;
-	// End PlayerController interface
 
 	void BeginPlay() override;
 
@@ -46,11 +47,19 @@ private:
 
 	void _changingStateRoutine(TObjectPtr<USkillUserState> newState);
 
+	void _createHUD();
+
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;
 
 	UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
 	TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
+
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UHUDWidget> _hudWidgetClass = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UHUDWidget> _hudWidget = nullptr;
 
 	bool _bIsTacticalPauseOn = false;
 };

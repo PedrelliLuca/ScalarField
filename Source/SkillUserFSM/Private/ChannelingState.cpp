@@ -60,7 +60,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, const TObj
 
 	// No mana component == free skill
 	if (_casterManaC.IsValid()) {
-		const double charMana = _casterManaC->GetMana();
+		const double charMana = _casterManaC->GetCurrentMana();
 
 		const double manaCost = skill->GetChannelingManaCost();
 		const double manaCostThisFrame = (deltaTime / channelingDuration) * manaCost;
@@ -70,7 +70,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, const TObj
 			return _abortExecutionForState<UIdleState>(controller);
 		}
 
-		_casterManaC->SetMana(charMana - manaCostThisFrame);
+		_casterManaC->SetCurrentMana(charMana - manaCostThisFrame);
 	}
 
 	// Execution of skill's channel logic

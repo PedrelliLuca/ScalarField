@@ -6,9 +6,12 @@
 #include "Components/ActorComponent.h"
 #include "ManaComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnManaChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxManaChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnManaRegenChanged, double);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SKILLSYSTEM_API UManaComponent : public UActorComponent
+class GAMEPLAYATTRIBUTES_API UManaComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -21,9 +24,20 @@ public:
 	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-	double GetMana() const { return _mana; }
-	void SetMana(double mana);
+	double GetCurrentMana() const { return _currentMana; }
+	double GetMaxMana() const { return _maxMana; }
+	double GetManaRegen() const { return _manaRegenPerSecond; }
+
+	void SetCurrentMana(double mana);
 	void SetMaxMana(double maxMana, bool bUpdateMana = true);
+	void SetManaRegen(double manaRegenPerSecond);
+
+	FOnManaChanged& OnManaChanged() { return _onManaChanged; }
+	FOnMaxManaChanged& OnMaxManaChanged() { return _onMaxManaChanged; }
+	FOnManaRegenChanged& OnManaRegenChanged() { return _onManaRegenChanged; }
+
+protected:
+	void BeginPlay() override;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Mana", meta = (ClampMin = "0"))
@@ -34,5 +48,9 @@ private:
 	double _manaRegenPerSecond = 0.;
 
 	UPROPERTY(VisibleAnywhere, Category = "Mana")
-	double _mana = 0.;
+	double _currentMana = 0.;
+
+	FOnManaChanged _onManaChanged;
+	FOnMaxManaChanged _onMaxManaChanged;
+	FOnManaRegenChanged _onManaRegenChanged;
 };

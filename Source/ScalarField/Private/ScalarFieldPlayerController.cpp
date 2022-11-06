@@ -52,7 +52,11 @@ void AScalarFieldPlayerController::BeginPlay() {
 	_state = NewObject<UIdleState>(this, UIdleState::StaticClass());
 	_movementCommandC->SetDefaultMovementMode();
 
-	GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
+	const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
+	pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
+	_bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
+
+	_createHUD();
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
@@ -111,6 +115,7 @@ void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTact
 	CustomTimeDilation = 1. / currentWorldTimeDilation;
 
 	_bIsTacticalPauseOn = bIsTacticalPauseOn;
+	_hudWidget->SetPauseStatus(_bIsTacticalPauseOn);
 }
 
 void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserState> newState) {
@@ -119,4 +124,35 @@ void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserSt
 		_state = newState;
 		_state->OnEnter(this);
 	}
+}
+
+void AScalarFieldPlayerController::_createHUD() {
+	// Create only once
+	check(!IsValid(_hudWidget));
+
+	if (!IsValid(_hudWidgetClass)) {
+		UE_LOG(LogTemp, Error, TEXT("%s() Missing UHUDWidget class. Please fill in on the Blueprint of the PlayerController."), *FString(__FUNCTION__));
+		return;
+	}
+
+	_hudWidget = CreateWidget<UHUDWidget>(this, _hudWidgetClass);
+    _hudWidget->AddToViewport();
+
+	const auto pawn = GetPawn();
+
+	const auto healthC = pawn->FindComponentByClass<const UHealthComponent>();
+	check(IsValid(healthC));
+
+	_hudWidget->SetCurrentHealth(healthC->GetCurrentHealth());
+	_hudWidget->SetMaxHealth(healthC->GetMaxHealth());
+	_hudWidget->SetHealthRegen(healthC->GetHealthRegen());
+
+	const auto manaC = pawn->FindComponentByClass<const UManaComponent>();
+	check(IsValid(manaC));
+
+	_hudWidget->SetCurrentMana(manaC->GetCurrentMana());
+	_hudWidget->SetMaxMana(manaC->GetMaxMana());
+	_hudWidget->SetManaRegen(manaC->GetManaRegen());
+
+	_hudWidget->SetPauseStatus(_bIsTacticalPauseOn);
 }

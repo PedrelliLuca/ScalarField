@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "HealthComponent.h"
 #include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
+#include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
@@ -24,13 +26,26 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return _topDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return _cameraBoom; }
 
+	float TakeDamage(float damageAmount, const FDamageEvent& damageEvent, AController* eventInstigator, AActor* damageCauser) override;
+	void Tick(float deltaTime) override;
+
 protected:
 	void BeginPlay() override;
 
 private:
 	void _dmiSetup();
 	void _setOverlappingCells();
-	void _updateMaterialBasedOnTemperature(double temperature);
+	void _updateMaterialTint(FLinearColor temperatureColor);
+
+	void _temperatureChanged(double newTemperature);
+
+	void _healthChanged(double newHealth) const;
+	void _maxHealthChanged(double newMaxHealth) const;
+	void _healthRegenChanged(double newHealthRegen) const;
+
+	void _manaChanged(double newHealth) const;
+	void _maxManaChanged(double newMaxHealth) const;
+	void _manaRegenChanged(double newHealthRegen) const;
 
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -46,11 +61,17 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = Mana, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UManaComponent> _manaC;
 
-	UPROPERTY()
-	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
+	UPROPERTY(VisibleAnywhere, Category = Health)
+	TObjectPtr<UHealthComponent> _healthC;
 
 	UPROPERTY(VisibleAnywhere, Category = Skills, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkillsContainerComponent> _skillsContainer;
+
+	UPROPERTY(VisibleAnywhere, Category = "Damage Handling", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UTemperatureDamageHandlerComponent> _temperatureDmgHandlerC;
+
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 
 	static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
 };

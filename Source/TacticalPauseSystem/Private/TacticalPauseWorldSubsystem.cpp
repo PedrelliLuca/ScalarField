@@ -12,11 +12,9 @@ void UTacticalPauseWorldSubsystem::OnWorldBeginPlay(UWorld& InWorld) {
 void UTacticalPauseWorldSubsystem::ToggleWorldTacticalPauseStatus() {
 	double currentWorldTimeDilation;
 	if (!_bIsTacticalPauseOn) {
-		UE_LOG(LogTemp, Warning, TEXT("Tactical Pause: ON"));
 		currentWorldTimeDilation = _tacticalPauseTimeDilation;
 		_bIsTacticalPauseOn = true;
 	} else {
-		UE_LOG(LogTemp, Warning, TEXT("Tactical Pause: OFF"));
 		currentWorldTimeDilation = 1.;
 		_bIsTacticalPauseOn = false;
 	}

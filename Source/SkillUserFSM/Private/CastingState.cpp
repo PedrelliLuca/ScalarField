@@ -57,13 +57,13 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 
 	if (_elapsedCastTime + deltaTime >= castDuration) {
 		if (_casterManaC.IsValid()) { // No mana component == free skill
-			const auto currentMana = _casterManaC->GetMana();
+			const auto currentMana = _casterManaC->GetCurrentMana();
 
 			if (currentMana < _manaLeftToPay) {
 				UE_LOG(LogTemp, Error, TEXT("Not enough mana to keep casting skill"));
 				return _abortExecutionForState<UIdleState>(controller);
 			}
-			_casterManaC->SetMana(currentMana - _manaLeftToPay);
+			_casterManaC->SetCurrentMana(currentMana - _manaLeftToPay);
 		}
 
 		skill->ExecuteCast(_caster.Get());
@@ -71,7 +71,7 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 	}
 
 	if (_casterManaC.IsValid()) { // No mana component == free skill
-		const auto currentMana = _casterManaC->GetMana();
+		const auto currentMana = _casterManaC->GetCurrentMana();
 
 		const double manaCost = skill->GetCastManaCost();
 		const double manaCostThisFrame = (deltaTime / castDuration) * manaCost;
@@ -81,7 +81,7 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 			return _abortExecutionForState<UIdleState>(controller);
 		}
 
-		_casterManaC->SetMana(currentMana - manaCostThisFrame);
+		_casterManaC->SetCurrentMana(currentMana - manaCostThisFrame);
 		_manaLeftToPay -= manaCostThisFrame;
 	}
 
