@@ -34,6 +34,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetManaRegen(double newManaRegen);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetTemperature(double temperature, FLinearColor temperatureColor);
+
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	double _currentHealth = 0.;

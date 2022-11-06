@@ -15,7 +15,6 @@
 #include "Materials/Material.h"
 #include "ScalarFieldPlayerController.h"
 #include "TemperatureDamageType.h"
-#include "ThermodynamicsSettings.h"
 #include "UObject/ConstructorHelpers.h"
 
 AScalarFieldCharacter::AScalarFieldCharacter() {
@@ -104,6 +103,8 @@ void AScalarFieldCharacter::BeginPlay() {
 	_dmiSetup();
 	_setOverlappingCells();
 
+	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_temperatureChanged);
+
 	_healthC->OnHealthChanged().AddUObject(this, &AScalarFieldCharacter::_healthChanged);
 	_healthC->OnMaxHealthChanged().AddUObject(this, &AScalarFieldCharacter::_maxHealthChanged);
 	_healthC->OnHealthRegenChanged().AddUObject(this, &AScalarFieldCharacter::_healthRegenChanged);
@@ -115,12 +116,11 @@ void AScalarFieldCharacter::BeginPlay() {
 
 void AScalarFieldCharacter::_dmiSetup() {
 	// Setting up the DMI that changes the mesh color based on temperature
-	auto thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
 	_materialInstance = GetMesh()->CreateDynamicMaterialInstance(0, GetMesh()->GetMaterial(0), TEXT("Thermodynamics Material"));
 
 	if (_materialInstance != nullptr) {
-		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
-		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_updateMaterialBasedOnTemperature);
+		const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
+		_updateMaterialTint(temperatureColor);
 	}
 }
 
@@ -140,9 +140,19 @@ void AScalarFieldCharacter::_setOverlappingCells() {
 	GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>()->ActivateOverlappedCells(overlappingCells);
 }
 
-void AScalarFieldCharacter::_updateMaterialBasedOnTemperature(double temperature) {
-	check(!_materialInstance.IsNull())
-		_materialInstance->SetVectorParameterValue(TEXT("Tint"), FColorizer::GenerateColorFromTemperature(temperature));
+void AScalarFieldCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {
+	check(!_materialInstance.IsNull());
+	_materialInstance->SetVectorParameterValue(TEXT("Tint"), temperatureColor);
+}
+
+void AScalarFieldCharacter::_temperatureChanged(double newTemperature) {
+	const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
+	_updateMaterialTint(temperatureColor);
+
+	// Am I player-controlled?
+	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
+		pc->GetGameplayHUD()->SetTemperature(newTemperature, temperatureColor);
+	}
 }
 
 void AScalarFieldCharacter::_healthChanged(const double newHealth) const {

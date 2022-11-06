@@ -35,7 +35,9 @@ protected:
 private:
 	void _dmiSetup();
 	void _setOverlappingCells();
-	void _updateMaterialBasedOnTemperature(double temperature);
+	void _updateMaterialTint(FLinearColor temperatureColor);
+
+	void _temperatureChanged(double newTemperature);
 
 	void _healthChanged(double newHealth) const;
 	void _maxHealthChanged(double newMaxHealth) const;
