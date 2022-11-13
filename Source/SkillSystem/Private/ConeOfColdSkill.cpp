@@ -3,42 +3,50 @@
 #include "ConeOfColdSkill.h"
 
 void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
-	// Capsule component setup
-	_cone = NewObject<UThermodynamicComponent>(caster, TEXT("Cone Of Cold ThermodynamicC"));
-	_cone->SetupAttachment(caster->GetRootComponent());
-	_cone->SetRelativeLocation(FVector::ForwardVector * _height);
-	_cone->SetRelativeRotation(FRotator{ 90., 0., 0. });
-	_cone->SetCapsuleHalfHeight(_height);
-	_cone->SetCapsuleRadius(_radius);
-	_cone->bMultiBodyOverlap = true;
+	const auto& coldConeSpawner = _getFollowerActorSpawners()[0];
 
-	// Thermodynamic component setup
-	_cone->SetHeatCapacity(_coneHeatCapacity);
-	_cone->SetTemperature(_coneTemperature, true);
+	_spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
+	_spawnSpringArm->SetupAttachment(caster->GetRootComponent());
+	_spawnSpringArm->SetRelativeLocation(FVector::ZeroVector);
 
-	_cone->RegisterComponent();
-	
+	// The point where we have to spawn the globe relative to the caster, it's also the point where the 2nd end of the arm lies
+	const FVector globeLocation = coldConeSpawner.Transform.GetLocation();
+
+	// The spring sits on the vector that goes from the caster's root to the globeLocation
+	_spawnSpringArm->SetRelativeRotation(globeLocation.Rotation());
+	_spawnSpringArm->TargetArmLength = globeLocation.Length();
+
+	_spawnSpringArm->RegisterComponent();
+
+	_spawnActor = GetWorld()->SpawnActor<AActor>(coldConeSpawner.ActorClass, coldConeSpawner.Transform * caster->GetTransform());
+	_spawnActor->AttachToComponent(_spawnSpringArm.Get(), FAttachmentTransformRules::KeepWorldTransform, _spawnSpringArm->SocketName);
+
+	check(FMath::IsNearlyEqual(coldConeSpawner.SpawnDuration, GetChannelingTime()));
+
+	_cone = _spawnActor->FindComponentByClass<UCapsuleComponent>();
+
 	_startCooldown();
 }
 
 void UConeOfColdSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {
 	FlushPersistentDebugLines(GetWorld());
-	
-	DrawDebugCapsule(GetWorld(), _cone->GetComponentLocation(), _cone->GetUnscaledCapsuleHalfHeight(), _cone->GetUnscaledCapsuleRadius(),
-		_cone->GetComponentRotation().Quaternion(), FColor::Cyan, false);
+
+	if (_cone.IsValid()) {
+		DrawDebugCapsule(GetWorld(), _cone->GetComponentLocation(), _cone->GetUnscaledCapsuleHalfHeight(), _cone->GetUnscaledCapsuleRadius(),
+			_cone->GetComponentRotation().Quaternion(), FColor::Cyan, false);
+	}
 }
 
 void UConeOfColdSkill::Abort() {
 	Super::Abort();
 
-	// Are you calling this function on a casted cone of cold?
-	check(_cone.IsValid());
-
-	_cone->DestroyComponent();
+	_spawnActor->Destroy();
+	_spawnSpringArm->DestroyComponent();
+	_cone = nullptr;
 }
 
 #if DO_CHECK
 void UConeOfColdSkill::CheckParametersSanity() const {
-
+	check(_getFollowerActorSpawners().Num() == 1);
 }
 #endif
