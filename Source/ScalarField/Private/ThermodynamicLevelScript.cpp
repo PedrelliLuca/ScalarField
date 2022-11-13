@@ -22,7 +22,7 @@ void AThermodynamicLevelScript::BeginPlay() {
 	}
 
 	if (gridTrigger == nullptr) {
-		UE_LOG(LogTemp, Warning, TEXT("AThermodynamicLevelScript::BeginPlay() couldn't find ATriggerBox labeled \"GridTriggerBox\", environment grid won't be spawned."));
+		UE_LOG(LogTemp, Warning, TEXT("%s() couldn't find ATriggerBox labeled \"GridTriggerBox\", environment grid won't be spawned."), *FString{__FUNCTION__});
 		return;
 	}
 
