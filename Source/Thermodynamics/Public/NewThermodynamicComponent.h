@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/CapsuleComponent.h"
 #include "NewThermodynamicComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnNewTemperatureChanged, double);
@@ -51,6 +50,8 @@ private:
 	double _getTemperatureDelta(float deltaTime);
 	void _increaseOccurredHeatExchangesCount();
 	void _setCurrentTempAsNext();
+
+	void _setInitialExchangers();
 
 	/**
 	 * The following two functions specifically mention "Thermodynamics" in their names since SetThermodynamicCollision(), the function that sets up the _thermodynamicCollisionC, requires the input component 
