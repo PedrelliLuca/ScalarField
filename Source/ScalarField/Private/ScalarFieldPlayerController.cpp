@@ -2,8 +2,9 @@
 
 #include "ScalarFieldPlayerController.h"
 
+#include "HealthComponent.h"
 #include "IdleState.h"
-#include "ScalarFieldCharacter.h"
+#include "ManaComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
