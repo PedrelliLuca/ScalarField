@@ -13,9 +13,14 @@ UNewThermodynamicComponent::UNewThermodynamicComponent(const FObjectInitializer&
 void UNewThermodynamicComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
 	Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
+	if (_bCollisionChangedSinceLastTick) {
+		// UPrimitiveComponent::OnComponentBeginOverlap does not fire before the first tick. We need this call to get the collisions we're already
+		// overlapping with.
+		_setInitialExchangers();
+		_bCollisionChangedSinceLastTick = false;
+	}
 
 	_heatExchangesToPerformThisFrame = _heatExchangers.Num();
-
 	_nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
 	if (_heatExchangesOccurredThisFrame == _heatExchangesToPerformThisFrame) {
@@ -52,13 +57,8 @@ void UNewThermodynamicComponent::SetTemperature(double temperature, const bool u
 void UNewThermodynamicComponent::SetThermodynamicCollision(TObjectPtr<UPrimitiveComponent> thermoCollision) {
 	check(IsValid(thermoCollision));
 
-	if (_thermodynamicCollisionC.IsValid()) {
-		_thermodynamicCollisionC->OnComponentBeginOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onThermodynamicOverlapBegin);
-		_thermodynamicCollisionC->OnComponentEndOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onThermodynamicOverlapEnd);
-	}
-
-	_heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
-	_heatExchangesOccurredThisFrame = 0;
+	// SetThermodynamicCollision() can be called just once
+	check(!_thermodynamicCollisionC.IsValid());
 
 	// Is the input collision an actual thermodynamic collider?
 	const auto profile = thermoCollision->GetCollisionProfileName();
@@ -68,16 +68,12 @@ void UNewThermodynamicComponent::SetThermodynamicCollision(TObjectPtr<UPrimitive
 	_thermodynamicCollisionC->OnComponentBeginOverlap.AddDynamic(this, &UNewThermodynamicComponent::_onThermodynamicOverlapBegin);
 	_thermodynamicCollisionC->OnComponentEndOverlap.AddDynamic(this, &UNewThermodynamicComponent::_onThermodynamicOverlapEnd);
 
-	// The heat exchangers that are already overlapping with the _thermodynamicCollision must be retrieved
-	_setInitialExchangers();
+	_bCollisionChangedSinceLastTick = true;
 }
 
 void UNewThermodynamicComponent::BeginPlay() {
 	Super::BeginPlay();
 	SetTemperature(_initialTemperature);
-
-	// The heat exchangers that are already overlapping with the _thermodynamicCollision must be retrieved
-	// _setInitialExchangers();
 }
 
 double UNewThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
@@ -122,9 +118,10 @@ void UNewThermodynamicComponent::_setInitialExchangers() {
 	TArray<TObjectPtr<UPrimitiveComponent>> overlappingComponents;
 	_thermodynamicCollisionC->GetOverlappingComponents(overlappingComponents);
 
-	for (const auto& overlappingC : overlappingComponents) {
-		const auto otherOwner = overlappingC->GetOwner();
-		// HeatExchangers can overlap only with other HeatExchangers, and there can be only one thermodynamic collider per actor
+	for (const auto& otherC : overlappingComponents) {
+		const auto otherOwner = otherC->GetOwner();
+		// HeatExchangers can overlap only with other HeatExchangers, and there can be only one thermodynamic collider per actor.
+		// This implies that it has to be is impossible for otherC to have the same component as this.
 		check(otherOwner != GetOwner());
 
 		const auto otherThermoC = otherOwner->FindComponentByClass<UNewThermodynamicComponent>();
@@ -141,14 +138,14 @@ void UNewThermodynamicComponent::_onThermodynamicOverlapBegin(UPrimitiveComponen
 	// NOTE: THIS WHOLE SYSTEM WORKS AS LONG AS YOU HAVE A SINGLE THERMODYNAMIC COMPONENT FOR EACH ACTOR. Only if this hypothesys holds you can be sure to retrieve the thermodynamic component associated
 	// with the overlappedComponent in input.
 	check(IsValid(otherThermoC));
-	check(otherThermoC->_thermodynamicCollisionC.Get() == overlappedComponent);
+	check(otherThermoC->_thermodynamicCollisionC.Get() == otherComp);
 
 	_heatExchangers.Emplace(otherThermoC);
 }
 
 void UNewThermodynamicComponent::_onThermodynamicOverlapEnd(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
-	const auto thermoCToRemove = Algo::FindByPredicate(_heatExchangers, [&overlappedComponent](const TWeakObjectPtr<UNewThermodynamicComponent>& thermoC) {
-		return thermoC->_thermodynamicCollisionC == overlappedComponent;
+	const auto thermoCToRemove = Algo::FindByPredicate(_heatExchangers, [&otherComp](const TWeakObjectPtr<UNewThermodynamicComponent>& thermoC) {
+		return thermoC->_thermodynamicCollisionC.Get() == otherComp;
 	});
 
 	check(thermoCToRemove != nullptr);

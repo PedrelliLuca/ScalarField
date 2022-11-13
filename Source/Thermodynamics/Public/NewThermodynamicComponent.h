@@ -71,10 +71,10 @@ private:
 	// This is the factor (k*A)/L in the heat exchange formulas (4) and (5)
 	static constexpr double ROD_CONSTANT = 1.;
 
-	TWeakObjectPtr<UPrimitiveComponent> _thermodynamicCollisionC = nullptr;
-
 	uint32 _heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
 	uint32 _heatExchangesOccurredThisFrame = 0;
 
+	TWeakObjectPtr<UPrimitiveComponent> _thermodynamicCollisionC = nullptr;
 	TSet<TWeakObjectPtr<UNewThermodynamicComponent>> _heatExchangers{};
+	bool _bCollisionChangedSinceLastTick = false;
 };
