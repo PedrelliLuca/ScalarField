@@ -2,9 +2,10 @@
 
 #pragma once
 
+#include "Components/CapsuleComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ThermodynamicComponent.h"
+#include "NewThermodynamicComponent.h"
 
 #include "ThermodynamicActor.generated.h"
 
@@ -28,11 +29,16 @@ protected:
 private:
 	void _updateMaterialBasedOnTemperature(double temperature);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> _staticMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Thermodynamics, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCapsuleComponent> _thermodynamicCapsuleC;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UNewThermodynamicComponent> _thermodynamicC;
+
+
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
