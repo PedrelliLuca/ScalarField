@@ -57,8 +57,13 @@ void UNewThermodynamicComponent::SetTemperature(double temperature, const bool u
 void UNewThermodynamicComponent::SetThermodynamicCollision(TObjectPtr<UPrimitiveComponent> thermoCollision) {
 	check(IsValid(thermoCollision));
 
-	// SetThermodynamicCollision() can be called just once
-	check(!_thermodynamicCollisionC.IsValid());
+	if (_thermodynamicCollisionC.IsValid()) {
+		_thermodynamicCollisionC->OnComponentBeginOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onThermodynamicOverlapBegin);
+		_thermodynamicCollisionC->OnComponentEndOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onThermodynamicOverlapEnd);
+
+		_heatExchangesOccurredThisFrame = 0;
+		_heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
+	}
 
 	// Is the input collision an actual thermodynamic collider?
 	const auto profile = thermoCollision->GetCollisionProfileName();
