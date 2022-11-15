@@ -10,11 +10,14 @@ void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	_spawnSpringArm->SetRelativeLocation(FVector::ZeroVector);
 
 	// The point where we have to spawn the globe relative to the caster, it's also the point where the 2nd end of the arm lies
-	const FVector globeLocation = coldConeSpawner.Transform.GetLocation();
+	const FVector coneLocation = coldConeSpawner.Transform.GetLocation();
 
-	// The spring sits on the vector that goes from the caster's root to the globeLocation
-	_spawnSpringArm->SetRelativeRotation(globeLocation.Rotation());
-	_spawnSpringArm->TargetArmLength = globeLocation.Length();
+	// The spring sits on the vector that goes from the caster's root to the globeLocation.
+	// About the minus sign:
+	// In the spring's reference frame, the spring elongates in the -x direction. Therefore, we need to make the spring point to
+	// the location that is the opposite of the want we want the second end to be in.
+	_spawnSpringArm->SetRelativeRotation((- coneLocation).Rotation());
+	_spawnSpringArm->TargetArmLength = coneLocation.Length();
 
 	_spawnSpringArm->RegisterComponent();
 
