@@ -2,7 +2,7 @@
 
 #include "ScalarFieldGameMode.h"
 #include "ScalarFieldPlayerController.h"
-#include "NewScalarFieldCharacter.h"
+#include "ScalarFieldCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 AScalarFieldGameMode::AScalarFieldGameMode()
@@ -11,7 +11,7 @@ AScalarFieldGameMode::AScalarFieldGameMode()
 	PlayerControllerClass = AScalarFieldPlayerController::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/BP_NewTopDownCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/TopDown/Blueprints/BP_TopDownCharacter"));
 	if (PlayerPawnBPClass.Class != nullptr)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
