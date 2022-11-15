@@ -16,7 +16,7 @@ AThermodynamicActor::AThermodynamicActor() {
 	_thermodynamicCapsuleC->SetupAttachment(RootComponent);
 	_thermodynamicCapsuleC->SetCollisionProfileName("HeatExchanger");
 
-	_thermodynamicC = CreateDefaultSubobject<UNewThermodynamicComponent>(TEXT("Thermodynamic Component"));
+	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 }
 
 void AThermodynamicActor::SetThermicCapsuleDimensions(const double radius, const double halfHeight) {

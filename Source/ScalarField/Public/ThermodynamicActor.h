@@ -5,7 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "NewThermodynamicComponent.h"
+#include "ThermodynamicComponent.h"
 
 #include "ThermodynamicActor.generated.h"
 
@@ -36,7 +36,7 @@ private:
 	TObjectPtr<UCapsuleComponent> _thermodynamicCapsuleC;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UNewThermodynamicComponent> _thermodynamicC;
+	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
 
 
 

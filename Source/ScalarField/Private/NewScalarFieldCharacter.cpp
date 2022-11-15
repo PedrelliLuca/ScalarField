@@ -53,7 +53,7 @@ ANewScalarFieldCharacter::ANewScalarFieldCharacter() {
 	_thermodynamicCapsuleC->SetupAttachment(RootComponent);
 	_thermodynamicCapsuleC->SetCollisionProfileName("HeatExchanger");
 
-	_thermodynamicC = CreateDefaultSubobject<UNewThermodynamicComponent>(TEXT("Thermodynamic Component"));
+	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 
 	// Create a mana component...
 	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));
