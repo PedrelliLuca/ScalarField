@@ -8,7 +8,6 @@ void UFireGlobeSkill::ExecuteCast(TObjectPtr<AActor> caster) {
 
 	const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
 	spawnSpringArm->SetupAttachment(caster->GetRootComponent());
-	spawnSpringArm->SetRelativeLocation(FVector::ZeroVector);
 
 	// The point where we have to spawn the globe relative to the caster, it's also the point where the 2nd end of the arm lies
 	const FVector globeLocation = fireGlobeSpawner.Transform.GetLocation();

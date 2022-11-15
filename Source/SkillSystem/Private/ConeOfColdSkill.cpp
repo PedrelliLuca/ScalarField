@@ -6,8 +6,8 @@ void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	const auto& coldConeSpawner = _getFollowerActorSpawners()[0];
 
 	_spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
+	_spawnSpringArm->bDoCollisionTest = false;
 	_spawnSpringArm->SetupAttachment(caster->GetRootComponent());
-	_spawnSpringArm->SetRelativeLocation(FVector::ZeroVector);
 
 	// The point where we have to spawn the globe relative to the caster, it's also the point where the 2nd end of the arm lies
 	const FVector coneLocation = coldConeSpawner.Transform.GetLocation();
