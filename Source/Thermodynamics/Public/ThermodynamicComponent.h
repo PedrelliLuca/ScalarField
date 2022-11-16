@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/CapsuleComponent.h"
 #include "ThermodynamicComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTemperatureChanged, double);
@@ -12,7 +11,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnTemperatureChanged, double);
  *
  */
 UCLASS(ClassGroup=(Thermodynamics), meta = (BlueprintSpawnableComponent))
-class THERMODYNAMICS_API UThermodynamicComponent : public UCapsuleComponent
+class THERMODYNAMICS_API UThermodynamicComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -22,7 +21,7 @@ public:
 	void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
 #if WITH_EDITOR
-	void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
 
 	void SetTemperature(double temperature, const bool updateInitialTemp = false);
@@ -30,13 +29,17 @@ public:
 
 	void SetHeatCapacity(double heatCapacity) { _heatCapacity = heatCapacity; }
 
+	void SetThermodynamicCollision(TObjectPtr<UPrimitiveComponent> thermoCollision);
+
 	FOnTemperatureChanged OnTemperatureChanged;
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Thermodynamics", meta = (ClampMin = "1"))
+	void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = "Thermodynamic Parameters", meta = (ClampMin = "1"))
 	double _heatCapacity = 4184.;
 
-	UPROPERTY(EditAnywhere, Category = "Thermodynamics")
+	UPROPERTY(EditAnywhere, Category = "Thermodynamic Parameters")
 	double _initialTemperature = 298.15;
 
 private:
@@ -44,11 +47,23 @@ private:
 		_heatCapacity = FMath::Clamp(heatCapacity, 1., TNumericLimits<double>::Max());
 	}
 
-	double _getTemperatureDelta(const TArray<TObjectPtr<UPrimitiveComponent>>& overlappingComponents, float deltaTime);
-	void _increaseInteractorsCount();
+	double _getTemperatureDelta(float deltaTime);
+	void _increaseOccurredHeatExchangesCount();
 	void _setCurrentTempAsNext();
 
-	UPROPERTY(VisibleAnywhere, Category = "Thermodynamics")
+	void _setInitialExchangers();
+
+	/**
+	 * The following two functions specifically mention "Thermodynamics" in their names since SetThermodynamicCollision(), the function that sets up the _thermodynamicCollisionC, requires the input component 
+	 * to be a "HeatExchanger". A "HeatExchanger" is a "Thermodynamics" object channel that can only overlap with object that are also "Thermodynamics", so we have the warranty here that overlappedComponent
+	 * is in the "Thermodynamics" channel.
+	 */
+	UFUNCTION()
+	void _onThermodynamicOverlapBegin(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult);
+	UFUNCTION()
+	void _onThermodynamicOverlapEnd(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
+
+	UPROPERTY(VisibleAnywhere, Category = "Thermodynamic Parameters")
 	double _currentTemperature;
 
 	double _nextTemperature;
@@ -56,6 +71,10 @@ private:
 	// This is the factor (k*A)/L in the heat exchange formulas (4) and (5)
 	static constexpr double ROD_CONSTANT = 1.;
 
-	uint32 _numOfInteractors = TNumericLimits<uint32>::Max();
-	uint32 _counterOfInteractors = 0;
+	uint32 _heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
+	uint32 _heatExchangesOccurredThisFrame = 0;
+
+	TWeakObjectPtr<UPrimitiveComponent> _thermodynamicCollisionC = nullptr;
+	TSet<TWeakObjectPtr<UThermodynamicComponent>> _heatExchangers{};
+	bool _bCollisionChangedSinceLastTick = false;
 };

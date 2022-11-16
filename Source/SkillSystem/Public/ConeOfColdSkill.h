@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AbstractSkill.h"
-#include "ThermodynamicComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 #include "ConeOfColdSkill.generated.h"
 
@@ -25,14 +26,7 @@ public:
 #endif
 
 private:
-	TWeakObjectPtr<UThermodynamicComponent> _cone;
-
-	UPROPERTY(EditAnywhere, Category = "ConeOfColdParameters")
-	double _coneTemperature = 0.;
-	UPROPERTY(EditAnywhere, Category = "ConeOfColdParameters")
-	double _coneHeatCapacity = 100000.;
-	UPROPERTY(EditAnywhere, Category = "ConeOfColdParameters")
-	double _height = 300.;
-	UPROPERTY(EditAnywhere, Category = "ConeOfColdParameters")
-	double _radius = 50.;
+	TWeakObjectPtr<USpringArmComponent> _spawnSpringArm = nullptr;
+	TWeakObjectPtr<AActor> _spawnActor = nullptr;
+	TWeakObjectPtr<UCapsuleComponent> _cone = nullptr;
 };

@@ -8,13 +8,15 @@ void UFireGlobeSkill::ExecuteCast(TObjectPtr<AActor> caster) {
 
 	const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
 	spawnSpringArm->SetupAttachment(caster->GetRootComponent());
-	spawnSpringArm->SetRelativeLocation(FVector::ZeroVector);
 
 	// The point where we have to spawn the globe relative to the caster, it's also the point where the 2nd end of the arm lies
 	const FVector globeLocation = fireGlobeSpawner.Transform.GetLocation();
 
-	// The spring sits on the vector that goes from the caster's root to the globeLocation
-	spawnSpringArm->SetRelativeRotation(globeLocation.Rotation());
+	// The spring sits on the vector that goes from the caster's root to the globeLocation.
+	// About the minus sign:
+	// In the spring's reference frame, the spring elongates in the -x direction. Therefore, we need to make the spring point to
+	// the location that is the opposite of the want we want the second end to be in.
+	spawnSpringArm->SetRelativeRotation((- globeLocation).Rotation());
 	spawnSpringArm->TargetArmLength = globeLocation.Length();
 
 	spawnSpringArm->RegisterComponent();

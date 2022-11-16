@@ -12,17 +12,21 @@ AThermodynamicActor::AThermodynamicActor() {
 	_staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	SetRootComponent(_staticMesh);
 
+	_thermodynamicCapsuleC = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Thermodynamic Capsule"));
+	_thermodynamicCapsuleC->SetupAttachment(RootComponent);
+	_thermodynamicCapsuleC->SetCollisionProfileName("HeatExchanger");
+
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
-	_thermodynamicC->SetupAttachment(RootComponent);
 }
 
 void AThermodynamicActor::SetThermicCapsuleDimensions(const double radius, const double halfHeight) {
-	_thermodynamicC->SetCapsuleRadius(radius);
-	_thermodynamicC->SetCapsuleHalfHeight(halfHeight);
+	_thermodynamicCapsuleC->SetCapsuleRadius(radius);
+	_thermodynamicCapsuleC->SetCapsuleHalfHeight(halfHeight);
 }
 
 void AThermodynamicActor::BeginPlay() {
 	Super::BeginPlay();
+	_thermodynamicC->SetThermodynamicCollision(_thermodynamicCapsuleC);
 
 	// Setting up the DMI that changes the mesh color based on temperature
 	const UThermodynamicsSettings* const thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();

@@ -48,9 +48,12 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	_topDownCameraComponent->SetupAttachment(_cameraBoom, USpringArmComponent::SocketName);
 	_topDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Create a thermodynamic component...
+	// Create the thermodynamic collision and the thermodynamic component...
+	_thermodynamicCapsuleC = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Thermodynamic Capsule"));
+	_thermodynamicCapsuleC->SetupAttachment(RootComponent);
+	_thermodynamicCapsuleC->SetCollisionProfileName("HeatExchanger");
+
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
-	_thermodynamicC->SetupAttachment(RootComponent);
 
 	// Create a mana component...
 	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));
@@ -96,14 +99,14 @@ void AScalarFieldCharacter::Tick(float deltaTime) {
 	_temperatureDmgHandlerC->HandleDamage(_thermodynamicC->GetTemperature());
 }
 
-
 void AScalarFieldCharacter::BeginPlay() {
 	Super::BeginPlay();
 
+	_thermodynamicC->SetThermodynamicCollision(_thermodynamicCapsuleC);
+	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_temperatureChanged);
+
 	_dmiSetup();
 	_setOverlappingCells();
-
-	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_temperatureChanged);
 
 	_healthC->OnHealthChanged().AddUObject(this, &AScalarFieldCharacter::_healthChanged);
 	_healthC->OnMaxHealthChanged().AddUObject(this, &AScalarFieldCharacter::_maxHealthChanged);
