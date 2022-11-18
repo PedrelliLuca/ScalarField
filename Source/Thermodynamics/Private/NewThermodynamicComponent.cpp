@@ -97,7 +97,7 @@ double UNewThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 	const auto thisCollision = _getMostComplexCollision();
 	for (const auto& otherThermoC : _possibleHeatExchangers) {
 		check(otherThermoC.IsValid());
-		const auto otherCollison = _getMostComplexCollision();
+		const auto otherCollison = otherThermoC->_getMostComplexCollision();
 
 		// If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC. 
 		if (thisCollision->IsOverlappingComponent(otherCollison.Get())) {
@@ -137,13 +137,16 @@ void UNewThermodynamicComponent::_setInitialExchangers() {
 
 	for (const auto& otherC : overlappingComponents) {
 		const auto otherOwner = otherC->GetOwner();
-		// HeatExchangers can overlap only with other HeatExchangers, and there can be only one thermodynamic collider per actor.
-		// This implies that it has to be is impossible for otherC to have the same component as this.
-		check(otherOwner != GetOwner());
 
 		const auto otherThermoC = otherOwner->FindComponentByClass<UNewThermodynamicComponent>();
 		// If I have a thermodynamic collision I must have a thermodynamic component
 		check(IsValid(otherThermoC));
+
+		// Filtering out every collision that's not simple VS simple
+		if (otherThermoC->_simpleCollisionC.Get() != otherC) {
+			check(otherThermoC->_complexCollisionC.Get() == otherC);
+			continue;
+		}
 
 		_possibleHeatExchangers.Emplace(otherThermoC);
 	}
