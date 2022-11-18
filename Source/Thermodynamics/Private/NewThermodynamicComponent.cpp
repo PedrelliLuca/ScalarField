@@ -54,8 +54,8 @@ void UNewThermodynamicComponent::SetTemperature(double temperature, const bool u
 	_nextTemperature = temperature;
 }
 
-void UNewThermodynamicComponent::SetThermodynamicCollision(TObjectPtr<UPrimitiveComponent> thermoCollision) {
-	check(IsValid(thermoCollision));
+void UNewThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> simpleCollision, TObjectPtr<UPrimitiveComponent> complexCollision /*= nullptr*/) {
+	check(IsValid(simpleCollision));
 
 	if (_simpleCollisionC.IsValid()) {
 		_simpleCollisionC->OnComponentBeginOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onSimpleBeginOverlap);
@@ -63,15 +63,22 @@ void UNewThermodynamicComponent::SetThermodynamicCollision(TObjectPtr<UPrimitive
 
 		_heatExchangesOccurredThisFrame = 0;
 		_heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
+		_possibleHeatExchangers.Empty();
 	}
 
 	// Is the input collision an actual thermodynamic collider?
-	const auto profile = thermoCollision->GetCollisionProfileName();
-	check(profile == TEXT("HeatExchanger"));
+	check(simpleCollision->GetCollisionProfileName() == TEXT("HeatExchanger"));
 
-	_simpleCollisionC = thermoCollision;
+	_simpleCollisionC = simpleCollision;
 	_simpleCollisionC->OnComponentBeginOverlap.AddDynamic(this, &UNewThermodynamicComponent::_onSimpleBeginOverlap);
 	_simpleCollisionC->OnComponentEndOverlap.AddDynamic(this, &UNewThermodynamicComponent::_onSimpleEndOverlap);
+
+	_complexCollisionC = nullptr;
+	if (IsValid(complexCollision)) {
+		// Is the input collision an actual thermodynamic collider?
+		check(complexCollision->GetCollisionProfileName() == TEXT("HeatExchanger"));
+		_complexCollisionC = complexCollision;
+	}
 
 	_bCollisionChangedSinceLastTick = true;
 }

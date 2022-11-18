@@ -29,7 +29,7 @@ public:
 
 	void SetHeatCapacity(double heatCapacity) { _heatCapacity = heatCapacity; }
 
-	void SetThermodynamicCollision(TObjectPtr<UPrimitiveComponent> thermoCollision);
+	void SetCollision(TObjectPtr<UPrimitiveComponent> thermoCollision, TObjectPtr<UPrimitiveComponent> complexCollision = nullptr);
 
 	FNewOnTemperatureChanged OnTemperatureChanged;
 
