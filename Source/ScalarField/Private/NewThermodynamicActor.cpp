@@ -12,28 +12,23 @@ ANewThermodynamicActor::ANewThermodynamicActor() {
 	_staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	SetRootComponent(_staticMesh);
 
-	_simpleThermodynamicCollision = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Thermodynamic Capsule"));
-	_simpleThermodynamicCollision->SetupAttachment(RootComponent);
-	_simpleThermodynamicCollision->SetCollisionProfileName("HeatExchanger");
-
 	_thermodynamicC = CreateDefaultSubobject<UNewThermodynamicComponent>(TEXT("Thermodynamic Component"));
-}
-
-void ANewThermodynamicActor::SetThermicCapsuleDimensions(const double radius, const double halfHeight) {
-	_simpleThermodynamicCollision->SetCapsuleRadius(radius);
-	_simpleThermodynamicCollision->SetCapsuleHalfHeight(halfHeight);
 }
 
 void ANewThermodynamicActor::BeginPlay() {
 	Super::BeginPlay();
 
+	const auto simpleThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "SimpleThermalCollision" });
+	check(simpleThermalCollisions.Num() == 1);
+	_simpleThermalCollision = Cast<UPrimitiveComponent>(simpleThermalCollisions[0]);
+
 	const auto complexThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "ComplexThermalCollision" });
 	check(complexThermalCollisions.Num() <= 1);
 
 	if (!complexThermalCollisions.IsEmpty()) {
-		_complexThermoCollision = Cast<UPrimitiveComponent>(complexThermalCollisions[0]);
+		_complexThermalCollision = Cast<UPrimitiveComponent>(complexThermalCollisions[0]);
 	}
-	_thermodynamicC->SetCollision(_simpleThermodynamicCollision, _complexThermoCollision);
+	_thermodynamicC->SetCollision(_simpleThermalCollision, _complexThermalCollision);
 
 	// Setting up the DMI that changes the mesh color based on temperature
 	const UThermodynamicsSettings* const thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
