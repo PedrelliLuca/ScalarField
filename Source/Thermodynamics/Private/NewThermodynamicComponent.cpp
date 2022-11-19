@@ -20,10 +20,12 @@ void UNewThermodynamicComponent::TickComponent(const float deltaTime, const ELev
 		_bCollisionChangedSinceLastTick = false;
 	}
 
-	_heatExchangesToPerformThisFrame = _possibleHeatExchangers.Num();
+	// We'll get checked for each potential heat exchanger.
+	_timesToBeCheckedThisFrame = _possibleHeatExchangers.Num();
+
 	_nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
-	if (_heatExchangesOccurredThisFrame == _heatExchangesToPerformThisFrame) {
+	if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
 		_setCurrentTempAsNext();
 	}
 }
@@ -61,8 +63,8 @@ void UNewThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> si
 		_simpleCollisionC->OnComponentBeginOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onSimpleBeginOverlap);
 		_simpleCollisionC->OnComponentEndOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onSimpleEndOverlap);
 
-		_heatExchangesOccurredThisFrame = 0;
-		_heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
+		_counterOfChecksThisFrame = 0;
+		_timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
 		_possibleHeatExchangers.Empty();
 	}
 
@@ -95,18 +97,21 @@ double UNewThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 	}
 
 	const auto thisCollision = _getMostComplexCollision();
+
+	// Here this component performs the heat-checks on the other components.
 	for (const auto& otherThermoC : _possibleHeatExchangers) {
 		check(otherThermoC.IsValid());
 		const auto otherCollison = otherThermoC->_getMostComplexCollision();
 
 		// If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC. 
 		if (thisCollision->IsOverlappingComponent(otherCollison.Get())) {
-			/* When this is hotter than other, the delta is negative since we emit heat
+			/* When this is hotter than other, the delta is negative since we emit heat.
 			 * When this is colder than other, the delta is positive since we absorb heat. */
 			deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
-
-			otherThermoC->_increaseOccurredHeatExchangesCount();
 		}
+
+		// We heat-checked otherThermoC, so it must increase its counter
+		otherThermoC->_updateCounterOfChecksThisFrame();
 	}
 
 	deltaTemperature /= _possibleHeatExchangers.Num();
@@ -114,9 +119,9 @@ double UNewThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 	return deltaTemperature;
 }
 
-void UNewThermodynamicComponent::_increaseOccurredHeatExchangesCount() {
-	++_heatExchangesOccurredThisFrame;
-	if (_heatExchangesOccurredThisFrame == _heatExchangesToPerformThisFrame) {
+void UNewThermodynamicComponent::_updateCounterOfChecksThisFrame() {
+	++_counterOfChecksThisFrame;
+	if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
 		_setCurrentTempAsNext();
 	}
 }
@@ -125,8 +130,8 @@ void UNewThermodynamicComponent::_setCurrentTempAsNext() {
 	_currentTemperature = _nextTemperature;
 	OnTemperatureChanged.Broadcast(_currentTemperature);
 
-	_heatExchangesOccurredThisFrame = 0;
-	_heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
+	_counterOfChecksThisFrame = 0;
+	_timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
 }
 
 void UNewThermodynamicComponent::_setInitialExchangers() {
