@@ -12,7 +12,7 @@ AThermodynamicActor::AThermodynamicActor() {
 	_staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	SetRootComponent(_staticMesh);
 
-	_thermodynamicC = CreateDefaultSubobject<UNewThermodynamicComponent>(TEXT("Thermodynamic Component"));
+	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 }
 
 void AThermodynamicActor::BeginPlay() {

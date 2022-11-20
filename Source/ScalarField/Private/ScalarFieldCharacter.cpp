@@ -48,7 +48,7 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	_topDownCameraComponent->SetupAttachment(_cameraBoom, USpringArmComponent::SocketName);
 	_topDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	_thermodynamicC = CreateDefaultSubobject<UNewThermodynamicComponent>(TEXT("Thermodynamic Component"));
+	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 
 	// Create a mana component...
 	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));

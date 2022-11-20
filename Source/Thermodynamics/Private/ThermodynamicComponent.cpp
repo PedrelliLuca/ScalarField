@@ -1,16 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NewThermodynamicComponent.h"
+#include "ThermodynamicComponent.h"
 
-UNewThermodynamicComponent::UNewThermodynamicComponent(const FObjectInitializer& ObjectInitializer) {
+UThermodynamicComponent::UThermodynamicComponent(const FObjectInitializer& ObjectInitializer) {
 	PrimaryComponentTick.bCanEverTick = true;
 
 	_currentTemperature = _initialTemperature;
 	_nextTemperature = _initialTemperature;
 }
 
-void UNewThermodynamicComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
+void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
 	Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
 	if (_bCollisionChangedSinceLastTick) {
@@ -31,10 +31,10 @@ void UNewThermodynamicComponent::TickComponent(const float deltaTime, const ELev
 }
 
 #if WITH_EDITOR
-void UNewThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) {
+void UThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) {
 	FProperty* const property = propertyChangedEvent.Property;
 	FName propertyName = property != nullptr ? property->GetFName() : NAME_None;
-	if (propertyName == GET_MEMBER_NAME_CHECKED(UNewThermodynamicComponent, _initialTemperature)) {
+	if (propertyName == GET_MEMBER_NAME_CHECKED(UThermodynamicComponent, _initialTemperature)) {
 		if (const auto initTempProperty = CastFieldChecked<FDoubleProperty>(property)) {
 			SetTemperature(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)), true);
 		}
@@ -44,7 +44,7 @@ void UNewThermodynamicComponent::PostEditChangeProperty(FPropertyChangedEvent& p
 }
 #endif
 
-void UNewThermodynamicComponent::SetTemperature(double temperature, const bool updateInitialTemp /*= false*/) {
+void UThermodynamicComponent::SetTemperature(double temperature, const bool updateInitialTemp /*= false*/) {
 	temperature = FMath::Clamp(temperature, 0., TNumericLimits<double>::Max());
 
 	if (updateInitialTemp) {
@@ -56,12 +56,12 @@ void UNewThermodynamicComponent::SetTemperature(double temperature, const bool u
 	_nextTemperature = temperature;
 }
 
-void UNewThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> simpleCollision, TObjectPtr<UPrimitiveComponent> complexCollision /*= nullptr*/) {
+void UThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> simpleCollision, TObjectPtr<UPrimitiveComponent> complexCollision /*= nullptr*/) {
 	check(IsValid(simpleCollision));
 
 	if (_simpleCollisionC.IsValid()) {
-		_simpleCollisionC->OnComponentBeginOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onSimpleBeginOverlap);
-		_simpleCollisionC->OnComponentEndOverlap.RemoveDynamic(this, &UNewThermodynamicComponent::_onSimpleEndOverlap);
+		_simpleCollisionC->OnComponentBeginOverlap.RemoveDynamic(this, &UThermodynamicComponent::_onSimpleBeginOverlap);
+		_simpleCollisionC->OnComponentEndOverlap.RemoveDynamic(this, &UThermodynamicComponent::_onSimpleEndOverlap);
 
 		_counterOfChecksThisFrame = 0;
 		_timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
@@ -72,8 +72,8 @@ void UNewThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> si
 	check(simpleCollision->GetCollisionProfileName() == TEXT("HeatExchanger"));
 
 	_simpleCollisionC = simpleCollision;
-	_simpleCollisionC->OnComponentBeginOverlap.AddDynamic(this, &UNewThermodynamicComponent::_onSimpleBeginOverlap);
-	_simpleCollisionC->OnComponentEndOverlap.AddDynamic(this, &UNewThermodynamicComponent::_onSimpleEndOverlap);
+	_simpleCollisionC->OnComponentBeginOverlap.AddDynamic(this, &UThermodynamicComponent::_onSimpleBeginOverlap);
+	_simpleCollisionC->OnComponentEndOverlap.AddDynamic(this, &UThermodynamicComponent::_onSimpleEndOverlap);
 
 	_complexCollisionC = nullptr;
 	if (IsValid(complexCollision)) {
@@ -85,12 +85,12 @@ void UNewThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> si
 	_bCollisionChangedSinceLastTick = true;
 }
 
-void UNewThermodynamicComponent::BeginPlay() {
+void UThermodynamicComponent::BeginPlay() {
 	Super::BeginPlay();
 	SetTemperature(_initialTemperature);
 }
 
-double UNewThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
+double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 	double deltaTemperature = 0.0;
 	if (_possibleHeatExchangers.Num() == 0) {
 		return deltaTemperature;
@@ -119,14 +119,14 @@ double UNewThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 	return deltaTemperature;
 }
 
-void UNewThermodynamicComponent::_updateCounterOfChecksThisFrame() {
+void UThermodynamicComponent::_updateCounterOfChecksThisFrame() {
 	++_counterOfChecksThisFrame;
 	if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
 		_setCurrentTempAsNext();
 	}
 }
 
-void UNewThermodynamicComponent::_setCurrentTempAsNext() {
+void UThermodynamicComponent::_setCurrentTempAsNext() {
 	_currentTemperature = _nextTemperature;
 	OnTemperatureChanged.Broadcast(_currentTemperature);
 
@@ -134,7 +134,7 @@ void UNewThermodynamicComponent::_setCurrentTempAsNext() {
 	_timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
 }
 
-void UNewThermodynamicComponent::_setInitialExchangers() {
+void UThermodynamicComponent::_setInitialExchangers() {
 	check(_simpleCollisionC.IsValid());
 
 	TArray<TObjectPtr<UPrimitiveComponent>> overlappingComponents;
@@ -143,7 +143,7 @@ void UNewThermodynamicComponent::_setInitialExchangers() {
 	for (const auto& otherC : overlappingComponents) {
 		const auto otherOwner = otherC->GetOwner();
 
-		const auto otherThermoC = otherOwner->FindComponentByClass<UNewThermodynamicComponent>();
+		const auto otherThermoC = otherOwner->FindComponentByClass<UThermodynamicComponent>();
 		// If I have a thermodynamic collision I must have a thermodynamic component
 		check(IsValid(otherThermoC));
 
@@ -157,8 +157,8 @@ void UNewThermodynamicComponent::_setInitialExchangers() {
 	}
 }
 
-void UNewThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
-	const auto otherThermoC = otherActor->FindComponentByClass<UNewThermodynamicComponent>();
+void UThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
+	const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicComponent>();
 	check(IsValid(otherThermoC));
 
 	// Filtering out every collision that's not simple VS simple
@@ -171,8 +171,8 @@ void UNewThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* over
 	_possibleHeatExchangers.Emplace(otherThermoC);
 }
 
-void UNewThermodynamicComponent::_onSimpleEndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
-	const auto thermoCToRemove = Algo::FindByPredicate(_possibleHeatExchangers, [&otherComp](const TWeakObjectPtr<UNewThermodynamicComponent>& thermoC) {
+void UThermodynamicComponent::_onSimpleEndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
+	const auto thermoCToRemove = Algo::FindByPredicate(_possibleHeatExchangers, [&otherComp](const TWeakObjectPtr<UThermodynamicComponent>& thermoC) {
 		return thermoC->_simpleCollisionC.Get() == otherComp;
 	});
 
@@ -182,7 +182,7 @@ void UNewThermodynamicComponent::_onSimpleEndOverlap(UPrimitiveComponent* overla
 	}
 }
 
-TWeakObjectPtr<UPrimitiveComponent> UNewThermodynamicComponent::_getMostComplexCollision() {
+TWeakObjectPtr<UPrimitiveComponent> UThermodynamicComponent::_getMostComplexCollision() {
 	if (_complexCollisionC.IsValid()) {
 		return _complexCollisionC;
 	}

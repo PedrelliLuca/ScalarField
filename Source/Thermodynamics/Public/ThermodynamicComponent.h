@@ -3,20 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NewThermodynamicComponent.generated.h"
+#include "ThermodynamicComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FNewOnTemperatureChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTemperatureChanged, double);
 
 /**
  *
  */
 UCLASS(ClassGroup=(Thermodynamics), meta = (BlueprintSpawnableComponent))
-class THERMODYNAMICS_API UNewThermodynamicComponent : public UActorComponent
+class THERMODYNAMICS_API UThermodynamicComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
-	UNewThermodynamicComponent(const FObjectInitializer& ObjectInitializer);
+	UThermodynamicComponent(const FObjectInitializer& ObjectInitializer);
 
 	void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
@@ -31,7 +31,7 @@ public:
 
 	void SetCollision(TObjectPtr<UPrimitiveComponent> thermoCollision, TObjectPtr<UPrimitiveComponent> complexCollision = nullptr);
 
-	FNewOnTemperatureChanged OnTemperatureChanged;
+	FOnTemperatureChanged OnTemperatureChanged;
 
 protected:
 	void BeginPlay() override;
@@ -86,7 +86,7 @@ private:
 	 * Thermodynamic components whose simple collision is colliding with this component's simple collision. We don't know for sure if we can exchange heat with them though, we need to check the relation
 	 * between their most complex collisions. That occurs at each tick.
 	 */
-	TSet<TWeakObjectPtr<UNewThermodynamicComponent>> _possibleHeatExchangers{};
+	TSet<TWeakObjectPtr<UThermodynamicComponent>> _possibleHeatExchangers{};
 
 	bool _bCollisionChangedSinceLastTick = false;
 };

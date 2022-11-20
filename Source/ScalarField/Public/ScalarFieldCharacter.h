@@ -8,7 +8,7 @@
 #include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
-#include "NewThermodynamicComponent.h"
+#include "ThermodynamicComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
 
@@ -63,7 +63,7 @@ private:
 	TObjectPtr<UPrimitiveComponent> _complexThermalCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UNewThermodynamicComponent> _thermodynamicC;
+	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
 
 	UPROPERTY(VisibleAnywhere, Category = Mana, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UManaComponent> _manaC;
