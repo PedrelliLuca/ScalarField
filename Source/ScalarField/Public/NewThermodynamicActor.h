@@ -26,6 +26,7 @@ protected:
 	void BeginPlay() override;
 
 private:
+	void _setupThermodynamicCollisions();
 	void _updateMaterialBasedOnTemperature(double temperature);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh", meta = (AllowPrivateAccess = "true"))

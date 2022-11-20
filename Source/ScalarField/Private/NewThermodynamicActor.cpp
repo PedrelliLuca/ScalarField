@@ -18,6 +18,19 @@ ANewThermodynamicActor::ANewThermodynamicActor() {
 void ANewThermodynamicActor::BeginPlay() {
 	Super::BeginPlay();
 
+	_setupThermodynamicCollisions();
+
+	// Setting up the DMI that changes the mesh color based on temperature
+	const UThermodynamicsSettings* const thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
+	_materialInstance = _staticMesh->CreateDynamicMaterialInstance(0, thermodynamicsSettings->GetThermodynamicsMaterial(), TEXT("Thermodynamics Material"));
+
+	if (_materialInstance != nullptr) {
+		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
+		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &ANewThermodynamicActor::_updateMaterialBasedOnTemperature);
+	}
+}
+
+void ANewThermodynamicActor::_setupThermodynamicCollisions() {
 	const auto simpleThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "SimpleThermalCollision" });
 	check(simpleThermalCollisions.Num() == 1);
 	_simpleThermalCollision = Cast<UPrimitiveComponent>(simpleThermalCollisions[0]);
@@ -29,15 +42,6 @@ void ANewThermodynamicActor::BeginPlay() {
 		_complexThermalCollision = Cast<UPrimitiveComponent>(complexThermalCollisions[0]);
 	}
 	_thermodynamicC->SetCollision(_simpleThermalCollision, _complexThermalCollision);
-
-	// Setting up the DMI that changes the mesh color based on temperature
-	const UThermodynamicsSettings* const thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
-	_materialInstance = _staticMesh->CreateDynamicMaterialInstance(0, thermodynamicsSettings->GetThermodynamicsMaterial(), TEXT("Thermodynamics Material"));
-
-	if (_materialInstance != nullptr) {
-		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
-		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &ANewThermodynamicActor::_updateMaterialBasedOnTemperature);
-	}
 }
 
 void ANewThermodynamicActor::_updateMaterialBasedOnTemperature(const double temperature) {
