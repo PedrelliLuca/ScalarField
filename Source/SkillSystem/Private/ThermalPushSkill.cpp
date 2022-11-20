@@ -3,7 +3,7 @@
 #include "ThermalPushSkill.h"
 
 #include "Particles/ParticleSystemComponent.h"
-#include "ThermodynamicComponent.h"
+#include "NewThermodynamicComponent.h"
 
 UThermalPushSkill::UThermalPushSkill() {
 	_hotTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Hot Particle System"));
@@ -25,7 +25,7 @@ void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
 
 	// Particle system's setup
 	TWeakObjectPtr<UParticleSystem> activeParticleTemplate = nullptr;
-	if (const auto thermoC = Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
+	if (const auto thermoC = Cast<UNewThermodynamicComponent>(caster->GetComponentByClass(UNewThermodynamicComponent::StaticClass()))) {
 		if (thermoC->GetTemperature() > _hotThreshold) {
 			UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
 			activeParticleTemplate = _hotTemplate;

@@ -3,7 +3,7 @@
 #include "CarbonizeSkill.h"
 
 #include "MaterialsContainerComponent.h"
-#include "ThermodynamicComponent.h"
+#include "NewThermodynamicComponent.h"
 
 void UCarbonizeSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	const auto target = _getActorTargets()[0].Target;
@@ -12,7 +12,7 @@ void UCarbonizeSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
 	/*const auto materialsC = target->FindComponentByClass<UMaterialsContainerComponent>();
 	check(IsValid(materialsC));*/
 
-	const auto thermoC = target->FindComponentByClass<UThermodynamicComponent>();
+	const auto thermoC = target->FindComponentByClass<UNewThermodynamicComponent>();
 	check(IsValid(thermoC));
 
 	thermoC->SetTemperature(_carbonizationTemperature);
@@ -25,8 +25,9 @@ bool UCarbonizeSkill::IsValidTarget(const int32 targetIndex, const TObjectPtr<AA
 		return false;
 	}
 
+	const auto thermoC = target->FindComponentByClass<UNewThermodynamicComponent>();
 	const auto materialsC = target->FindComponentByClass<UMaterialsContainerComponent>();
-	return materialsC->HasMaterial(EMaterial::M_Carbon);
+	return IsValid(thermoC) && IsValid(materialsC) && materialsC->HasMaterial(EMaterial::M_Carbon);
 }
 
 #if DO_CHECK
