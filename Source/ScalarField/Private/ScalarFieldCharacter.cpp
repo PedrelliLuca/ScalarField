@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "NewScalarFieldCharacter.h"
+#include "ScalarFieldCharacter.h"
 
 #include "Camera/CameraComponent.h"
 #include "Colorizer.h"
@@ -17,7 +17,7 @@
 #include "TemperatureDamageType.h"
 #include "UObject/ConstructorHelpers.h"
 
-ANewScalarFieldCharacter::ANewScalarFieldCharacter() {
+AScalarFieldCharacter::AScalarFieldCharacter() {
 	// This is what makes the scalar field character interact with the environment grid
 	GetCapsuleComponent()->SetCollisionProfileName("GridInteractingPawn");
 
@@ -67,7 +67,7 @@ ANewScalarFieldCharacter::ANewScalarFieldCharacter() {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-float ANewScalarFieldCharacter::TakeDamage(const float damageAmount, const FDamageEvent& damageEvent, AController* const eventInstigator, AActor* const damageCauser) {
+float AScalarFieldCharacter::TakeDamage(const float damageAmount, const FDamageEvent& damageEvent, AController* const eventInstigator, AActor* const damageCauser) {
 	float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
 
 	if (damageEvent.DamageTypeClass == UTemperatureDamageType::StaticClass()) {
@@ -88,31 +88,31 @@ float ANewScalarFieldCharacter::TakeDamage(const float damageAmount, const FDama
 	return damage;
 }
 
-void ANewScalarFieldCharacter::Tick(float deltaTime) {
+void AScalarFieldCharacter::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 
 	_temperatureDmgHandlerC->HandleDamage(_thermodynamicC->GetTemperature());
 }
 
-void ANewScalarFieldCharacter::BeginPlay() {
+void AScalarFieldCharacter::BeginPlay() {
 	Super::BeginPlay();
 
 	_setupThermodynamicCollisions();
-	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &ANewScalarFieldCharacter::_temperatureChanged);
+	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_temperatureChanged);
 
 	_dmiSetup();
 	_setOverlappingCells();
 
-	_healthC->OnHealthChanged().AddUObject(this, &ANewScalarFieldCharacter::_healthChanged);
-	_healthC->OnMaxHealthChanged().AddUObject(this, &ANewScalarFieldCharacter::_maxHealthChanged);
-	_healthC->OnHealthRegenChanged().AddUObject(this, &ANewScalarFieldCharacter::_healthRegenChanged);
+	_healthC->OnHealthChanged().AddUObject(this, &AScalarFieldCharacter::_healthChanged);
+	_healthC->OnMaxHealthChanged().AddUObject(this, &AScalarFieldCharacter::_maxHealthChanged);
+	_healthC->OnHealthRegenChanged().AddUObject(this, &AScalarFieldCharacter::_healthRegenChanged);
 
-	_manaC->OnManaChanged().AddUObject(this, &ANewScalarFieldCharacter::_manaChanged);
-	_manaC->OnMaxManaChanged().AddUObject(this, &ANewScalarFieldCharacter::_maxManaChanged);
-	_manaC->OnManaRegenChanged().AddUObject(this, &ANewScalarFieldCharacter::_manaRegenChanged);
+	_manaC->OnManaChanged().AddUObject(this, &AScalarFieldCharacter::_manaChanged);
+	_manaC->OnMaxManaChanged().AddUObject(this, &AScalarFieldCharacter::_maxManaChanged);
+	_manaC->OnManaRegenChanged().AddUObject(this, &AScalarFieldCharacter::_manaRegenChanged);
 }
 
-void ANewScalarFieldCharacter::_setupThermodynamicCollisions() {
+void AScalarFieldCharacter::_setupThermodynamicCollisions() {
 	const auto simpleThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "SimpleThermalCollision" });
 	check(simpleThermalCollisions.Num() == 1);
 	_simpleThermalCollision = Cast<UPrimitiveComponent>(simpleThermalCollisions[0]);
@@ -126,7 +126,7 @@ void ANewScalarFieldCharacter::_setupThermodynamicCollisions() {
 	_thermodynamicC->SetCollision(_simpleThermalCollision, _complexThermalCollision);
 }
 
-void ANewScalarFieldCharacter::_dmiSetup() {
+void AScalarFieldCharacter::_dmiSetup() {
 	// Setting up the DMI that changes the mesh color based on temperature
 	_materialInstance = GetMesh()->CreateDynamicMaterialInstance(0, GetMesh()->GetMaterial(0), TEXT("Thermodynamics Material"));
 
@@ -136,7 +136,7 @@ void ANewScalarFieldCharacter::_dmiSetup() {
 	}
 }
 
-void ANewScalarFieldCharacter::_setOverlappingCells() {
+void AScalarFieldCharacter::_setOverlappingCells() {
 	// Retrieve all environment cells being overlapped at startup
 	TSet<AActor*> overlappingActors;
 	GetCapsuleComponent()->GetOverlappingActors(overlappingActors, AEnvironmentCell::StaticClass());
@@ -152,12 +152,12 @@ void ANewScalarFieldCharacter::_setOverlappingCells() {
 	GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>()->ActivateOverlappedCells(overlappingCells);
 }
 
-void ANewScalarFieldCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {
+void AScalarFieldCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {
 	check(!_materialInstance.IsNull());
 	_materialInstance->SetVectorParameterValue(TEXT("Tint"), temperatureColor);
 }
 
-void ANewScalarFieldCharacter::_temperatureChanged(double newTemperature) {
+void AScalarFieldCharacter::_temperatureChanged(double newTemperature) {
 	const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
 	_updateMaterialTint(temperatureColor);
 
@@ -167,42 +167,42 @@ void ANewScalarFieldCharacter::_temperatureChanged(double newTemperature) {
 	}
 }
 
-void ANewScalarFieldCharacter::_healthChanged(const double newHealth) const {
+void AScalarFieldCharacter::_healthChanged(const double newHealth) const {
 	// Am I player-controlled?
 	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
 		pc->GetGameplayHUD()->SetCurrentHealth(newHealth);
 	}
 }
 
-void ANewScalarFieldCharacter::_maxHealthChanged(double newMaxHealth) const {
+void AScalarFieldCharacter::_maxHealthChanged(double newMaxHealth) const {
 	// Am I player-controlled?
 	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
 		pc->GetGameplayHUD()->SetMaxHealth(newMaxHealth);
 	}
 }
 
-void ANewScalarFieldCharacter::_healthRegenChanged(double newHealthRegen) const {
+void AScalarFieldCharacter::_healthRegenChanged(double newHealthRegen) const {
 	// Am I player-controlled?
 	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
 		pc->GetGameplayHUD()->SetHealthRegen(newHealthRegen);
 	}
 }
 
-void ANewScalarFieldCharacter::_manaChanged(const double newMana) const {
+void AScalarFieldCharacter::_manaChanged(const double newMana) const {
 	// Am I player-controlled?
 	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
 		pc->GetGameplayHUD()->SetCurrentMana(newMana);
 	}
 }
 
-void ANewScalarFieldCharacter::_maxManaChanged(double newMaxMana) const {
+void AScalarFieldCharacter::_maxManaChanged(double newMaxMana) const {
 	// Am I player-controlled?
 	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
 		pc->GetGameplayHUD()->SetMaxMana(newMaxMana);
 	}
 }
 
-void ANewScalarFieldCharacter::_manaRegenChanged(double newManaRegen) const {
+void AScalarFieldCharacter::_manaRegenChanged(double newManaRegen) const {
 	// Am I player-controlled?
 	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
 		pc->GetGameplayHUD()->SetManaRegen(newManaRegen);

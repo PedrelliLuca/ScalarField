@@ -10,18 +10,18 @@
 #include "TemperatureDamageHandlerComponent.h"
 #include "NewThermodynamicComponent.h"
 
-#include "NewScalarFieldCharacter.generated.h"
+#include "ScalarFieldCharacter.generated.h"
 
 /*!
 * \brief Character structured for a top-view game.
 */
 UCLASS(Blueprintable)
-class ANewScalarFieldCharacter : public ACharacter
+class AScalarFieldCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	ANewScalarFieldCharacter();
+	AScalarFieldCharacter();
 
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return _topDownCameraComponent; }
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return _cameraBoom; }
