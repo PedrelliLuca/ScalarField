@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NewThermodynamicActor.h"
+#include "ThermodynamicActor.h"
 
 #include "Colorizer.h"
 #include "ThermodynamicsSettings.h"
 
-ANewThermodynamicActor::ANewThermodynamicActor() {
+AThermodynamicActor::AThermodynamicActor() {
 	PrimaryActorTick.bCanEverTick = true;
 
 	_staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
@@ -15,7 +15,7 @@ ANewThermodynamicActor::ANewThermodynamicActor() {
 	_thermodynamicC = CreateDefaultSubobject<UNewThermodynamicComponent>(TEXT("Thermodynamic Component"));
 }
 
-void ANewThermodynamicActor::BeginPlay() {
+void AThermodynamicActor::BeginPlay() {
 	Super::BeginPlay();
 
 	_setupThermodynamicCollisions();
@@ -26,11 +26,11 @@ void ANewThermodynamicActor::BeginPlay() {
 
 	if (_materialInstance != nullptr) {
 		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
-		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &ANewThermodynamicActor::_updateMaterialBasedOnTemperature);
+		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AThermodynamicActor::_updateMaterialBasedOnTemperature);
 	}
 }
 
-void ANewThermodynamicActor::_setupThermodynamicCollisions() {
+void AThermodynamicActor::_setupThermodynamicCollisions() {
 	const auto simpleThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "SimpleThermalCollision" });
 	check(simpleThermalCollisions.Num() == 1);
 	_simpleThermalCollision = Cast<UPrimitiveComponent>(simpleThermalCollisions[0]);
@@ -44,7 +44,7 @@ void ANewThermodynamicActor::_setupThermodynamicCollisions() {
 	_thermodynamicC->SetCollision(_simpleThermalCollision, _complexThermalCollision);
 }
 
-void ANewThermodynamicActor::_updateMaterialBasedOnTemperature(const double temperature) {
+void AThermodynamicActor::_updateMaterialBasedOnTemperature(const double temperature) {
 	check(!_materialInstance.IsNull())
 	_materialInstance->SetVectorParameterValue(TEXT("temperature"), FColorizer::GenerateColorFromTemperature(temperature));
 }

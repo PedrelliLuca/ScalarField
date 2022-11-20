@@ -7,17 +7,17 @@
 #include "GameFramework/Actor.h"
 #include "NewThermodynamicComponent.h"
 
-#include "NewThermodynamicActor.generated.h"
+#include "ThermodynamicActor.generated.h"
 
 /**
  *
  */
 UCLASS(Blueprintable)
-class SCALARFIELD_API ANewThermodynamicActor : public AActor {
+class SCALARFIELD_API AThermodynamicActor : public AActor {
 	GENERATED_BODY()
 
 public:
-	ANewThermodynamicActor();
+	AThermodynamicActor();
 
 	void SetTemperature(double temperature, bool updateInitialTemperature = false) { _thermodynamicC->SetTemperature(temperature, updateInitialTemperature); }
 	void SetHeatCapacity(double heatCapacity) { _thermodynamicC->SetHeatCapacity(heatCapacity); }

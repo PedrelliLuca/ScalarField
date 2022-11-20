@@ -4,7 +4,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "CoreMinimal.h"
-#include "NewThermodynamicActor.h"
+#include "ThermodynamicActor.h"
 
 #include "AirMolecule.generated.h"
 
@@ -12,7 +12,7 @@
  *
  */
 UCLASS(Blueprintable)
-class SCALARFIELD_API AAirMolecule : public ANewThermodynamicActor {
+class SCALARFIELD_API AAirMolecule : public AThermodynamicActor {
 	GENERATED_BODY()
 
 public:
