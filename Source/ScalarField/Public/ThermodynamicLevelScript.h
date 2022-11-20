@@ -6,7 +6,7 @@
 #include "Engine/LevelScriptActor.h"
 #include "Engine/TriggerBox.h"
 #include "EnvironmentGridWorldSubsystem.h"
-#include "ThermodynamicActor.h"
+#include "AirMolecule.h"
 
 #include "ThermodynamicLevelScript.generated.h"
 
@@ -36,7 +36,7 @@ protected:
 	int32 _moleculesPerCellSide = 3;
 
 	UPROPERTY(EditAnywhere, NoClear, Category = "Air")
-	TSubclassOf<AThermodynamicActor> _moleculeClass;
+	TSubclassOf<AAirMolecule> _moleculeClass;
 
 private:
 	UEnvironmentGridWorldSubsystem::FGridSpawnAttributes _buildGridSpawnAttributes(TObjectPtr<ATriggerBox> gridTriggerBox);
