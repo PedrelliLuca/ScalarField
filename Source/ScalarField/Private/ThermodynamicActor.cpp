@@ -12,21 +12,13 @@ AThermodynamicActor::AThermodynamicActor() {
 	_staticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	SetRootComponent(_staticMesh);
 
-	_thermodynamicCapsuleC = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Thermodynamic Capsule"));
-	_thermodynamicCapsuleC->SetupAttachment(RootComponent);
-	_thermodynamicCapsuleC->SetCollisionProfileName("HeatExchanger");
-
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
-}
-
-void AThermodynamicActor::SetThermicCapsuleDimensions(const double radius, const double halfHeight) {
-	_thermodynamicCapsuleC->SetCapsuleRadius(radius);
-	_thermodynamicCapsuleC->SetCapsuleHalfHeight(halfHeight);
 }
 
 void AThermodynamicActor::BeginPlay() {
 	Super::BeginPlay();
-	_thermodynamicC->SetThermodynamicCollision(_thermodynamicCapsuleC);
+
+	_setupThermodynamicCollisions();
 
 	// Setting up the DMI that changes the mesh color based on temperature
 	const UThermodynamicsSettings* const thermodynamicsSettings = GetDefault<UThermodynamicsSettings>();
@@ -36,6 +28,20 @@ void AThermodynamicActor::BeginPlay() {
 		_updateMaterialBasedOnTemperature(_thermodynamicC->GetTemperature());
 		_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AThermodynamicActor::_updateMaterialBasedOnTemperature);
 	}
+}
+
+void AThermodynamicActor::_setupThermodynamicCollisions() {
+	const auto simpleThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "SimpleThermalCollision" });
+	check(simpleThermalCollisions.Num() == 1);
+	_simpleThermalCollision = Cast<UPrimitiveComponent>(simpleThermalCollisions[0]);
+
+	const auto complexThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "ComplexThermalCollision" });
+	check(complexThermalCollisions.Num() <= 1);
+
+	if (!complexThermalCollisions.IsEmpty()) {
+		_complexThermalCollision = Cast<UPrimitiveComponent>(complexThermalCollisions[0]);
+	}
+	_thermodynamicC->SetCollision(_simpleThermalCollision, _complexThermalCollision);
 }
 
 void AThermodynamicActor::_updateMaterialBasedOnTemperature(const double temperature) {

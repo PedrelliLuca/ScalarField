@@ -20,10 +20,12 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
 		_bCollisionChangedSinceLastTick = false;
 	}
 
-	_heatExchangesToPerformThisFrame = _heatExchangers.Num();
+	// We'll get checked for each potential heat exchanger.
+	_timesToBeCheckedThisFrame = _possibleHeatExchangers.Num();
+
 	_nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
-	if (_heatExchangesOccurredThisFrame == _heatExchangesToPerformThisFrame) {
+	if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
 		_setCurrentTempAsNext();
 	}
 }
@@ -54,24 +56,37 @@ void UThermodynamicComponent::SetTemperature(double temperature, const bool upda
 	_nextTemperature = temperature;
 }
 
-void UThermodynamicComponent::SetThermodynamicCollision(TObjectPtr<UPrimitiveComponent> thermoCollision) {
-	check(IsValid(thermoCollision));
+void UThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> simpleCollision, TObjectPtr<UPrimitiveComponent> complexCollision /*= nullptr*/) {
+	check(IsValid(simpleCollision));
 
-	if (_thermodynamicCollisionC.IsValid()) {
-		_thermodynamicCollisionC->OnComponentBeginOverlap.RemoveDynamic(this, &UThermodynamicComponent::_onThermodynamicOverlapBegin);
-		_thermodynamicCollisionC->OnComponentEndOverlap.RemoveDynamic(this, &UThermodynamicComponent::_onThermodynamicOverlapEnd);
+	if (_simpleCollisionC.IsValid()) {
+		_simpleCollisionC->OnComponentBeginOverlap.RemoveDynamic(this, &UThermodynamicComponent::_onSimpleBeginOverlap);
+		_simpleCollisionC->OnComponentEndOverlap.RemoveDynamic(this, &UThermodynamicComponent::_onSimpleEndOverlap);
 
-		_heatExchangesOccurredThisFrame = 0;
-		_heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
+		_counterOfChecksThisFrame = 0;
+		_timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
+		_possibleHeatExchangers.Empty();
 	}
 
 	// Is the input collision an actual thermodynamic collider?
-	const auto profile = thermoCollision->GetCollisionProfileName();
-	check(profile == TEXT("HeatExchanger"));
+	check(simpleCollision->GetCollisionProfileName() == TEXT("HeatExchanger"));
 
-	_thermodynamicCollisionC = thermoCollision;
-	_thermodynamicCollisionC->OnComponentBeginOverlap.AddDynamic(this, &UThermodynamicComponent::_onThermodynamicOverlapBegin);
-	_thermodynamicCollisionC->OnComponentEndOverlap.AddDynamic(this, &UThermodynamicComponent::_onThermodynamicOverlapEnd);
+	_simpleCollisionC = simpleCollision;
+	_simpleCollisionC->OnComponentBeginOverlap.AddDynamic(this, &UThermodynamicComponent::_onSimpleBeginOverlap);
+	_simpleCollisionC->OnComponentEndOverlap.AddDynamic(this, &UThermodynamicComponent::_onSimpleEndOverlap);
+
+	_complexCollisionC = nullptr;
+	if (IsValid(complexCollision)) {
+		// Is the input collision an actual thermodynamic collider?
+		if (complexCollision->GetCollisionProfileName() != TEXT("NoCollision")) {
+			UE_LOG(LogTemp, Warning, TEXT("%s(): Complex Collision profile name not set to \"No Collision\", it will be forced!"), *FString{__FUNCTION__});
+			complexCollision->SetCollisionProfileName(TEXT("NoCollision"));
+		}
+		_complexCollisionC = complexCollision;
+
+		// By default, the complex collision sleeps.
+		_complexCollisionC->SetComponentTickEnabled(false);
+	}
 
 	_bCollisionChangedSinceLastTick = true;
 }
@@ -83,28 +98,36 @@ void UThermodynamicComponent::BeginPlay() {
 
 double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 	double deltaTemperature = 0.0;
-	if (_heatExchangers.Num() == 0) {
+	if (_possibleHeatExchangers.Num() == 0) {
 		return deltaTemperature;
 	}
 
-	for (const auto& otherThermoC : _heatExchangers) {
+	const auto thisCollision = _getMostComplexCollision();
+
+	// Here this component performs the heat-checks on the other components.
+	for (const auto& otherThermoC : _possibleHeatExchangers) {
 		check(otherThermoC.IsValid());
+		const auto otherCollison = otherThermoC->_getMostComplexCollision();
 
-		/* When this is hotter than other, the delta is negative since we emit heat
-		 * When this is colder than other, the delta is positive since we absorb heat. */
-		deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
+		// If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC. 
+		if (thisCollision->IsOverlappingComponent(otherCollison.Get())) {
+			/* When this is hotter than other, the delta is negative since we emit heat.
+			 * When this is colder than other, the delta is positive since we absorb heat. */
+			deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
+		}
 
-		otherThermoC->_increaseOccurredHeatExchangesCount();
+		// We heat-checked otherThermoC, so it must increase its counter
+		otherThermoC->_updateCounterOfChecksThisFrame();
 	}
 
-	deltaTemperature /= _heatExchangers.Num();
+	deltaTemperature /= _possibleHeatExchangers.Num();
 	deltaTemperature *= ROD_CONSTANT * deltaTime / _heatCapacity;
 	return deltaTemperature;
 }
 
-void UThermodynamicComponent::_increaseOccurredHeatExchangesCount() {
-	++_heatExchangesOccurredThisFrame;
-	if (_heatExchangesOccurredThisFrame == _heatExchangesToPerformThisFrame) {
+void UThermodynamicComponent::_updateCounterOfChecksThisFrame() {
+	++_counterOfChecksThisFrame;
+	if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
 		_setCurrentTempAsNext();
 	}
 }
@@ -113,46 +136,80 @@ void UThermodynamicComponent::_setCurrentTempAsNext() {
 	_currentTemperature = _nextTemperature;
 	OnTemperatureChanged.Broadcast(_currentTemperature);
 
-	_heatExchangesOccurredThisFrame = 0;
-	_heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
+	_counterOfChecksThisFrame = 0;
+	_timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
 }
 
 void UThermodynamicComponent::_setInitialExchangers() {
-	check(_thermodynamicCollisionC.IsValid());
+	check(_simpleCollisionC.IsValid());
 
 	TArray<TObjectPtr<UPrimitiveComponent>> overlappingComponents;
-	_thermodynamicCollisionC->GetOverlappingComponents(overlappingComponents);
+	_simpleCollisionC->GetOverlappingComponents(overlappingComponents);
 
 	for (const auto& otherC : overlappingComponents) {
 		const auto otherOwner = otherC->GetOwner();
-		// HeatExchangers can overlap only with other HeatExchangers, and there can be only one thermodynamic collider per actor.
-		// This implies that it has to be is impossible for otherC to have the same component as this.
-		check(otherOwner != GetOwner());
 
 		const auto otherThermoC = otherOwner->FindComponentByClass<UThermodynamicComponent>();
 		// If I have a thermodynamic collision I must have a thermodynamic component
 		check(IsValid(otherThermoC));
 
-		_heatExchangers.Emplace(otherThermoC);
+		// Filtering out every collision that's not simple VS simple
+		if (otherThermoC->_simpleCollisionC.Get() != otherC) {
+			check(otherThermoC->_complexCollisionC.Get() == otherC);
+			continue;
+		}
+
+		_possibleHeatExchangers.Emplace(otherThermoC);
+	}
+
+	if (_complexCollisionC.IsValid() && _possibleHeatExchangers.Num() > 0) {
+		// We have at least one possible heat excvhanger, wake up the complex collision!
+		_complexCollisionC->SetCollisionProfileName(TEXT("HeatExchanger"));
+		_complexCollisionC->SetComponentTickEnabled(true);
 	}
 }
 
-void UThermodynamicComponent::_onThermodynamicOverlapBegin(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
+void UThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
 	const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicComponent>();
-
-	// NOTE: THIS WHOLE SYSTEM WORKS AS LONG AS YOU HAVE A SINGLE THERMODYNAMIC COMPONENT FOR EACH ACTOR. Only if this hypothesys holds you can be sure to retrieve the thermodynamic component associated
-	// with the overlappedComponent in input.
 	check(IsValid(otherThermoC));
-	check(otherThermoC->_thermodynamicCollisionC.Get() == otherComp);
 
-	_heatExchangers.Emplace(otherThermoC);
+	// Filtering out every collision that's not simple VS simple
+	if (otherThermoC->_simpleCollisionC.Get() != otherComp) {
+		// NOTE: THIS WHOLE SYSTEM WORKS AS LONG AS YOU HAVE A SINGLE THERMODYNAMIC COMPONENT FOR EACH ACTOR. Only if this hypothesys holds you can be sure otherComp is either the otherThermoC's simple or complex collision.
+		check(otherThermoC->_complexCollisionC.Get() == otherComp);
+		return;
+	}
+
+	_possibleHeatExchangers.Emplace(otherThermoC);
+
+	if (_complexCollisionC.IsValid() && !_complexCollisionC->IsComponentTickEnabled()) {
+		// We have at least one possible heat excvhanger, wake up the complex collision!
+		_complexCollisionC->SetCollisionProfileName(TEXT("HeatExchanger"));
+		_complexCollisionC->SetComponentTickEnabled(true);
+	}
 }
 
-void UThermodynamicComponent::_onThermodynamicOverlapEnd(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
-	const auto thermoCToRemove = Algo::FindByPredicate(_heatExchangers, [&otherComp](const TWeakObjectPtr<UThermodynamicComponent>& thermoC) {
-		return thermoC->_thermodynamicCollisionC.Get() == otherComp;
+void UThermodynamicComponent::_onSimpleEndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
+	const auto thermoCToRemove = Algo::FindByPredicate(_possibleHeatExchangers, [&otherComp](const TWeakObjectPtr<UThermodynamicComponent>& thermoC) {
+		return thermoC->_simpleCollisionC.Get() == otherComp;
 	});
 
-	check(thermoCToRemove != nullptr);
-	_heatExchangers.Remove(*thermoCToRemove);
+	// thermoCToRemove could be nullptr, meaning that otherComp is a complex collision
+	if (thermoCToRemove != nullptr) {
+		_possibleHeatExchangers.Remove(*thermoCToRemove);
+
+		if (_complexCollisionC.IsValid() && _possibleHeatExchangers.Num() == 0) {
+			// No more possible heat exchangers, put the complex collision to sleep.
+			_complexCollisionC->SetCollisionProfileName(TEXT("NoCollision"));
+			_complexCollisionC->SetComponentTickEnabled(false);
+		}
+	}
+}
+
+TWeakObjectPtr<UPrimitiveComponent> UThermodynamicComponent::_getMostComplexCollision() {
+	if (_complexCollisionC.IsValid()) {
+		return _complexCollisionC;
+	}
+
+	return _simpleCollisionC;
 }

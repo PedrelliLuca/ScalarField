@@ -48,11 +48,6 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	_topDownCameraComponent->SetupAttachment(_cameraBoom, USpringArmComponent::SocketName);
 	_topDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Create the thermodynamic collision and the thermodynamic component...
-	_thermodynamicCapsuleC = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Thermodynamic Capsule"));
-	_thermodynamicCapsuleC->SetupAttachment(RootComponent);
-	_thermodynamicCapsuleC->SetCollisionProfileName("HeatExchanger");
-
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 
 	// Create a mana component...
@@ -102,7 +97,7 @@ void AScalarFieldCharacter::Tick(float deltaTime) {
 void AScalarFieldCharacter::BeginPlay() {
 	Super::BeginPlay();
 
-	_thermodynamicC->SetThermodynamicCollision(_thermodynamicCapsuleC);
+	_setupThermodynamicCollisions();
 	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_temperatureChanged);
 
 	_dmiSetup();
@@ -115,6 +110,20 @@ void AScalarFieldCharacter::BeginPlay() {
 	_manaC->OnManaChanged().AddUObject(this, &AScalarFieldCharacter::_manaChanged);
 	_manaC->OnMaxManaChanged().AddUObject(this, &AScalarFieldCharacter::_maxManaChanged);
 	_manaC->OnManaRegenChanged().AddUObject(this, &AScalarFieldCharacter::_manaRegenChanged);
+}
+
+void AScalarFieldCharacter::_setupThermodynamicCollisions() {
+	const auto simpleThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "SimpleThermalCollision" });
+	check(simpleThermalCollisions.Num() == 1);
+	_simpleThermalCollision = Cast<UPrimitiveComponent>(simpleThermalCollisions[0]);
+
+	const auto complexThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "ComplexThermalCollision" });
+	check(complexThermalCollisions.Num() <= 1);
+
+	if (!complexThermalCollisions.IsEmpty()) {
+		_complexThermalCollision = Cast<UPrimitiveComponent>(complexThermalCollisions[0]);
+	}
+	_thermodynamicC->SetCollision(_simpleThermalCollision, _complexThermalCollision);
 }
 
 void AScalarFieldCharacter::_dmiSetup() {

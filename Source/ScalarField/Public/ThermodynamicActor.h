@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Components/CapsuleComponent.h"
+#include "Components/PrimitiveComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ThermodynamicComponent.h"
@@ -21,24 +21,25 @@ public:
 
 	void SetTemperature(double temperature, bool updateInitialTemperature = false) { _thermodynamicC->SetTemperature(temperature, updateInitialTemperature); }
 	void SetHeatCapacity(double heatCapacity) { _thermodynamicC->SetHeatCapacity(heatCapacity); }
-	void SetThermicCapsuleDimensions(double radius, double halfHeight);
 
 protected:
 	void BeginPlay() override;
 
 private:
+	void _setupThermodynamicCollisions();
 	void _updateMaterialBasedOnTemperature(double temperature);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UStaticMeshComponent> _staticMesh;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCapsuleComponent> _thermodynamicCapsuleC;
+	UPROPERTY()
+	TObjectPtr<UPrimitiveComponent> _simpleThermalCollision = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UPrimitiveComponent> _complexThermalCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
-
-
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;

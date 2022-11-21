@@ -29,7 +29,7 @@ public:
 
 	void SetHeatCapacity(double heatCapacity) { _heatCapacity = heatCapacity; }
 
-	void SetThermodynamicCollision(TObjectPtr<UPrimitiveComponent> thermoCollision);
+	void SetCollision(TObjectPtr<UPrimitiveComponent> thermoCollision, TObjectPtr<UPrimitiveComponent> complexCollision = nullptr);
 
 	FOnTemperatureChanged OnTemperatureChanged;
 
@@ -48,7 +48,7 @@ private:
 	}
 
 	double _getTemperatureDelta(float deltaTime);
-	void _increaseOccurredHeatExchangesCount();
+	void _updateCounterOfChecksThisFrame();
 	void _setCurrentTempAsNext();
 
 	void _setInitialExchangers();
@@ -59,9 +59,11 @@ private:
 	 * is in the "Thermodynamics" channel.
 	 */
 	UFUNCTION()
-	void _onThermodynamicOverlapBegin(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult);
+	void _onSimpleBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult);
 	UFUNCTION()
-	void _onThermodynamicOverlapEnd(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
+	void _onSimpleEndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
+
+	TWeakObjectPtr<UPrimitiveComponent> _getMostComplexCollision();
 
 	UPROPERTY(VisibleAnywhere, Category = "Thermodynamic Parameters")
 	double _currentTemperature;
@@ -71,10 +73,20 @@ private:
 	// This is the factor (k*A)/L in the heat exchange formulas (4) and (5)
 	static constexpr double ROD_CONSTANT = 1.;
 
-	uint32 _heatExchangesToPerformThisFrame = TNumericLimits<uint32>::Max();
-	uint32 _heatExchangesOccurredThisFrame = 0;
+	// The number of times this component will be checked this frame by other thermodynamic components
+	uint32 _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
+	// Count of how many times this component got checked by other thermodynamic component this frame. When the counter reaches _timesToBeCheckedThisFrame, we know for sure we won't be checked again,
+	// meaning that we can finally set _currentTemperature = _nextTemperature
+	uint32 _counterOfChecksThisFrame = 0;
 
-	TWeakObjectPtr<UPrimitiveComponent> _thermodynamicCollisionC = nullptr;
-	TSet<TWeakObjectPtr<UThermodynamicComponent>> _heatExchangers{};
+	TWeakObjectPtr<UPrimitiveComponent> _simpleCollisionC = nullptr;
+	TWeakObjectPtr<UPrimitiveComponent> _complexCollisionC = nullptr;
+
+	/** 
+	 * Thermodynamic components whose simple collision is colliding with this component's simple collision. We don't know for sure if we can exchange heat with them though, we need to check the relation
+	 * between their most complex collisions. That occurs at each tick.
+	 */
+	TSet<TWeakObjectPtr<UThermodynamicComponent>> _possibleHeatExchangers{};
+
 	bool _bCollisionChangedSinceLastTick = false;
 };

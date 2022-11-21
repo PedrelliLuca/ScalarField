@@ -33,6 +33,7 @@ protected:
 	void BeginPlay() override;
 
 private:
+	void _setupThermodynamicCollisions();
 	void _dmiSetup();
 	void _setOverlappingCells();
 	void _updateMaterialTint(FLinearColor temperatureColor);
@@ -55,8 +56,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* _cameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCapsuleComponent> _thermodynamicCapsuleC;
+	UPROPERTY()
+	TObjectPtr<UPrimitiveComponent> _simpleThermalCollision = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UPrimitiveComponent> _complexThermalCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UThermodynamicComponent> _thermodynamicC;

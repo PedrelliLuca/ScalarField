@@ -25,8 +25,9 @@ bool UCarbonizeSkill::IsValidTarget(const int32 targetIndex, const TObjectPtr<AA
 		return false;
 	}
 
+	const auto thermoC = target->FindComponentByClass<UThermodynamicComponent>();
 	const auto materialsC = target->FindComponentByClass<UMaterialsContainerComponent>();
-	return materialsC->HasMaterial(EMaterial::M_Carbon);
+	return IsValid(thermoC) && IsValid(materialsC) && materialsC->HasMaterial(EMaterial::M_Carbon);
 }
 
 #if DO_CHECK
