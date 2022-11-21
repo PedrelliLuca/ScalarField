@@ -80,6 +80,9 @@ void UThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> simpl
 		// Is the input collision an actual thermodynamic collider?
 		check(complexCollision->GetCollisionProfileName() == TEXT("HeatExchanger"));
 		_complexCollisionC = complexCollision;
+
+		// By default, the complex collision sleeps.
+		_complexCollisionC->SetComponentTickEnabled(false);
 	}
 
 	_bCollisionChangedSinceLastTick = true;
@@ -155,6 +158,11 @@ void UThermodynamicComponent::_setInitialExchangers() {
 
 		_possibleHeatExchangers.Emplace(otherThermoC);
 	}
+
+	if (_complexCollisionC.IsValid() && _possibleHeatExchangers.Num() > 0) {
+		// We have at least one possible heat excvhanger, wake up the complex collision!
+		_complexCollisionC->SetComponentTickEnabled(true);
+	}
 }
 
 void UThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
@@ -169,6 +177,11 @@ void UThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlap
 	}
 
 	_possibleHeatExchangers.Emplace(otherThermoC);
+
+	if (_complexCollisionC.IsValid() && !_complexCollisionC->IsComponentTickEnabled()) {
+		// We have at least one possible heat excvhanger, wake up the complex collision!
+		_complexCollisionC->SetComponentTickEnabled(true);
+	}
 }
 
 void UThermodynamicComponent::_onSimpleEndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
@@ -179,6 +192,11 @@ void UThermodynamicComponent::_onSimpleEndOverlap(UPrimitiveComponent* overlappe
 	// thermoCToRemove could be nullptr, meaning that otherComp is a complex collision
 	if (thermoCToRemove != nullptr) {
 		_possibleHeatExchangers.Remove(*thermoCToRemove);
+
+		if (_complexCollisionC.IsValid() && _possibleHeatExchangers.Num() == 0) {
+			// No more possible heat exchangers, put the complex collision to sleep.
+			_complexCollisionC->SetComponentTickEnabled(false);
+		}
 	}
 }
 
