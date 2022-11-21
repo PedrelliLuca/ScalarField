@@ -78,7 +78,10 @@ void UThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> simpl
 	_complexCollisionC = nullptr;
 	if (IsValid(complexCollision)) {
 		// Is the input collision an actual thermodynamic collider?
-		check(complexCollision->GetCollisionProfileName() == TEXT("HeatExchanger"));
+		if (complexCollision->GetCollisionProfileName() != TEXT("NoCollision")) {
+			UE_LOG(LogTemp, Warning, TEXT("%s(): Complex Collision profile name not set to \"No Collision\", it will be forced!"), *FString{__FUNCTION__});
+			complexCollision->SetCollisionProfileName(TEXT("NoCollision"));
+		}
 		_complexCollisionC = complexCollision;
 
 		// By default, the complex collision sleeps.
@@ -161,6 +164,7 @@ void UThermodynamicComponent::_setInitialExchangers() {
 
 	if (_complexCollisionC.IsValid() && _possibleHeatExchangers.Num() > 0) {
 		// We have at least one possible heat excvhanger, wake up the complex collision!
+		_complexCollisionC->SetCollisionProfileName(TEXT("HeatExchanger"));
 		_complexCollisionC->SetComponentTickEnabled(true);
 	}
 }
@@ -180,6 +184,7 @@ void UThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlap
 
 	if (_complexCollisionC.IsValid() && !_complexCollisionC->IsComponentTickEnabled()) {
 		// We have at least one possible heat excvhanger, wake up the complex collision!
+		_complexCollisionC->SetCollisionProfileName(TEXT("HeatExchanger"));
 		_complexCollisionC->SetComponentTickEnabled(true);
 	}
 }
@@ -195,6 +200,7 @@ void UThermodynamicComponent::_onSimpleEndOverlap(UPrimitiveComponent* overlappe
 
 		if (_complexCollisionC.IsValid() && _possibleHeatExchangers.Num() == 0) {
 			// No more possible heat exchangers, put the complex collision to sleep.
+			_complexCollisionC->SetCollisionProfileName(TEXT("NoCollision"));
 			_complexCollisionC->SetComponentTickEnabled(false);
 		}
 	}
