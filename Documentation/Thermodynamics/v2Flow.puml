@@ -1,0 +1,26 @@
+@startuml
+title UThermodynamicComponent::Tick()
+
+start
+: otherComponents = GetOverlappingComponents();
+: _numInteractorsThisFrame = otherComponents.Num();
+
+repeat :for otherC in otherComponents;
+  :read other's temperature;
+  :update this component's temperatureVariation;
+  :<color:red> update <b>other's</b> counter of interactors</color>;
+  if (other->_counterInteractorsThisFrame == other->_numInteractorsThisFrame) then (true)
+    :other->_setCurrentTemperatureAsNext();
+  endif
+repeat while
+
+: thisNextTemperature = thisCurrentTemperature + temperatureVariation;
+
+
+if (_counterInteractorsThisFrame == _numInteractorsThisFrame) then (true)
+    :_setCurrentTemperatureAsNext();
+endif
+
+stop
+
+@enduml

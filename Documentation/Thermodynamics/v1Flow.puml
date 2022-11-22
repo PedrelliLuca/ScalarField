@@ -1,0 +1,16 @@
+@startuml
+title UThermodynamicComponent::Tick()
+
+start
+: otherComponents = GetOverlappingComponents();
+
+repeat :for otherC in otherComponents;
+  :read other's temperature;
+  :update this component's temperatureVariation;
+repeat while
+
+: thisNewTemperature = thisOldTemperature + temperatureVariation;
+
+stop
+
+@enduml

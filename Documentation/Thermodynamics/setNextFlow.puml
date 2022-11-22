@@ -1,0 +1,10 @@
+@startuml
+title UThermodynamicComponent::_setCurrentTemperatureAsNext()
+
+start
+:_currentTemperature = _nextTemperature;
+:_counterInteractorsThisFrame = 0;
+:<color:red>_numInteractorsThisFrame = infinite</color>;
+stop
+
+@enduml

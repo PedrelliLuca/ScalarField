@@ -1,0 +1,15 @@
+@startuml
+title UThermodynamicComponent::Tick()
+
+start
+: otherComponents = GetOverlappingComponents();
+
+repeat :for otherC in otherComponents;
+  :read other's temperature;
+  :update this component's temperature;
+  :update other component's temperature;
+repeat while
+
+stop
+
+@enduml
