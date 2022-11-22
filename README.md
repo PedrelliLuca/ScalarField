@@ -4,7 +4,7 @@ A "Dragon Age: Origins" - like game, where magic works by interacting with the e
 ## Modules
 Here is a brief explanation of each module and an image explaining how they're related to each other
 
-![modules](UMLs/modules.png)
+![modules](Documentation/modules.png)
 
 - **ScalarField**: The game's main module, contains very specific classes that cannot be moved to a dedicated module and need functionalities from many different modules.
 - **Thermodynamics**: Module that defines the laws for heat exchanges in the game. Heat transmission is the basis for every thermodynamic (fire and ice) spell in the game.
