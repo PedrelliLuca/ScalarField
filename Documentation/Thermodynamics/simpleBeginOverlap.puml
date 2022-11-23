@@ -1,0 +1,14 @@
+@startuml
+title UThermodynamicComponent::_onSimpleBeginOverlap
+
+start
+if (other collision is tagged as simple) then (false)
+    stop
+else (true)
+: _possibleHeatExchangers.Emplace(otherThermoC);
+: this->_complexCollisionC's profile name set to "Heat Exchanger";
+: this->_complexCollisionC's Tick() is enabled;
+endif
+stop
+
+@enduml

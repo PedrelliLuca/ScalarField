@@ -1,0 +1,26 @@
+@startuml
+title UThermodynamicComponent::Tick()
+
+start
+: _timesToBeCheckedThisFrame = _possibleHeatExchangers.Num();
+
+repeat :for otherThermoC in _possibleHeatExchangers;
+    if (this->_complexCollisionC->IsOverlapping(otherThermoC->_complexCollisionC)) then (true)
+        :update this component's temperatureVariation;
+    endif
+    :update <color:red>other's</color> _counterOfChecksThisFrame;
+    if (otherThermoC->_counterOfChecksThisFrame == otherThermoC->_timesToBeCheckedThisFrame) then (true)
+        :otherThermoC->_setCurrentTemperatureAsNext();
+    endif
+repeat while
+
+: thisNextTemperature = thisCurrentTemperature + temperatureVariation;
+
+
+if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame ) then (true)
+    :_setCurrentTemperatureAsNext();
+endif
+
+stop
+
+@enduml

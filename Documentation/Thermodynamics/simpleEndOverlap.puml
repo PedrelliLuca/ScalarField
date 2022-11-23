@@ -1,0 +1,15 @@
+@startuml
+title UThermodynamicComponent::_onSimpleEndOverlap
+
+start
+if (other collision is tagged as simple) then (false)
+    stop
+else (true)
+: _possibleHeatExchangers.Remove(otherThermoC);
+if (_possibleHeatExchangers.IsEmpty()) then (true)
+    : this->_complexCollisionC's profile name set to "NoCollision";
+: this->_complexCollisionC's Tick() is disabled;
+endif
+stop
+
+@enduml
