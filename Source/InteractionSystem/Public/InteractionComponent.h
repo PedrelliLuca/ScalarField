@@ -14,6 +14,8 @@ class INTERACTIONSYSTEM_API UInteractionComponent : public UWidgetComponent {
 public:
      UInteractionComponent();
 
+     double GetInteractionDistance() const { return _interactionDistance; }
+
 protected:
      UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
      double _interactionTime;

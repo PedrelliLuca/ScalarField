@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "HUDWidget.h"
+#include "InteractionComponent.h"
 #include "PlayerMovementCommandComponent.h"
 #include "SkillUserState.h"
 
@@ -12,6 +13,18 @@
 
 /** Forward declaration to improve compiling times */
 class UNiagaraSystem;
+
+/**
+ * \brief Stores all the data related to what the player is currently interacting with.
+ */
+USTRUCT()
+struct FInteractionData {
+	GENERATED_BODY()
+
+	TWeakObjectPtr<UInteractionComponent> ComponentBeingInteracted = nullptr;
+	double TimestampOfLastInteraction = 0.0;
+	bool bIsInteractKeyHeld = false;
+};
 
 UCLASS()
 class AScalarFieldPlayerController : public APlayerController {
@@ -49,6 +62,10 @@ private:
 
 	void _createHUD();
 
+	void _performInteractionCheck();
+	void _newInteractableFound(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent);
+	void _newInteractableNotFound();
+
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;
 
@@ -60,6 +77,9 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UHUDWidget> _hudWidget = nullptr;
+
+	FInteractionData _interactionData{};
+	static constexpr double INTERACTION_TRACE_LENGTH = 10000.0;
 
 	bool _bIsTacticalPauseOn = false;
 };

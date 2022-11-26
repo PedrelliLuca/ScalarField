@@ -17,11 +17,13 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	Super::PlayerTick(deltaTime);
 
+	_performInteractionCheck();
+	
 	// We handled the input with the Super:: call. If the tacticalPause is on, we skip the FSM's and movement cmd tick
 	if (_bIsTacticalPauseOn) {
 		return;
 	}
-
+	
 	const auto newState = _state->OnTick(deltaTime, this);
 	_changingStateRoutine(newState);
 
@@ -156,4 +158,44 @@ void AScalarFieldPlayerController::_createHUD() {
 	_hudWidget->SetManaRegen(manaC->GetManaRegen());
 
 	_hudWidget->SetPauseStatus(_bIsTacticalPauseOn);
+}
+
+void AScalarFieldPlayerController::_performInteractionCheck() {
+	_interactionData.TimestampOfLastInteraction = GetWorld()->GetRealTimeSeconds();
+	
+	FVector cursorLoc{};
+	FVector cursorDir{};
+	DeprojectMousePositionToWorld(cursorLoc, cursorDir);
+
+	const auto& traceStart = cursorLoc;
+	const auto traceEnd = traceStart + cursorDir * INTERACTION_TRACE_LENGTH;
+	FHitResult traceHit{};
+
+	// Did we find an actor something blocking the visibility channel?
+	if (GetWorld()->LineTraceSingleByChannel(traceHit, traceStart, traceEnd, ECollisionChannel::ECC_Visibility) && traceHit.GetActor()) {
+		TWeakObjectPtr<UInteractionComponent> hitInteractionC = traceHit.GetActor()->FindComponentByClass<UInteractionComponent>();
+
+		// Does the blocking actor have an interaction component that is not the one we're already interacting with?
+		if (hitInteractionC.IsValid() && hitInteractionC != _interactionData.ComponentBeingInteracted) {
+
+			const auto pawn = GetPawn();
+			check(IsValid(pawn));
+
+			// Is the pawn close enough to interact with the component we found?
+			const double distance = (traceHit.ImpactPoint - pawn->GetActorLocation()).Size();
+			if (distance <= hitInteractionC->GetInteractionDistance()) {
+				_newInteractableFound(MoveTemp(hitInteractionC));
+				return;
+			}
+		}
+	}
+
+	_newInteractableNotFound();
+}
+
+void AScalarFieldPlayerController::_newInteractableFound(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent) {
+	UE_LOG(LogTemp, Warning, TEXT("Interactable found <3"));
+}
+
+void AScalarFieldPlayerController::_newInteractableNotFound() {
 }
