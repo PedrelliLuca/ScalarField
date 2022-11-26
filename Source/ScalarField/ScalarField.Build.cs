@@ -25,6 +25,7 @@ public class ScalarField : ModuleRules
             "DamageHandlers",
             "GameplayUI",
             "UMG",
+            "InteractionSystem",
         });
     }
 }
