@@ -162,40 +162,51 @@ void AScalarFieldPlayerController::_createHUD() {
 
 void AScalarFieldPlayerController::_performInteractionCheck() {
 	_interactionData.TimestampOfLastInteraction = GetWorld()->GetRealTimeSeconds();
-	
+
+	// Building the trace line
 	FVector cursorLoc{};
 	FVector cursorDir{};
 	DeprojectMousePositionToWorld(cursorLoc, cursorDir);
-
 	const auto& traceStart = cursorLoc;
 	const auto traceEnd = traceStart + cursorDir * INTERACTION_TRACE_LENGTH;
+
+	// Did we find an actor blocking the visibility channel?
 	FHitResult traceHit{};
-
-	// Did we find an actor something blocking the visibility channel?
 	if (GetWorld()->LineTraceSingleByChannel(traceHit, traceStart, traceEnd, ECollisionChannel::ECC_Visibility) && traceHit.GetActor()) {
-		TWeakObjectPtr<UInteractionComponent> hitInteractionC = traceHit.GetActor()->FindComponentByClass<UInteractionComponent>();
-
-		// Does the blocking actor have an interaction component that is not the one we're already interacting with?
-		if (hitInteractionC.IsValid() && hitInteractionC != _interactionData.ComponentBeingInteracted) {
-
+		// Does the actor we found have an interaction component?
+		if (TWeakObjectPtr<UInteractionComponent> hitInteractionC = traceHit.GetActor()->FindComponentByClass<UInteractionComponent>(); hitInteractionC.IsValid()) {
 			const auto pawn = GetPawn();
 			check(IsValid(pawn));
 
-			// Is the pawn close enough to interact with the component we found?
+			// Is the component within reach?
 			const double distance = (traceHit.ImpactPoint - pawn->GetActorLocation()).Size();
 			if (distance <= hitInteractionC->GetInteractionDistance()) {
-				_newInteractableFound(MoveTemp(hitInteractionC));
+
+				// Is the component the one we're already interacting with? If it isn't we update the interaction data,
+				// otherwise we don't do anything
+				if (hitInteractionC != _interactionData.ComponentBeingInteracted) {
+					_replaceComponentBeingInteracted(MoveTemp(hitInteractionC));
+				}
 				return;
 			}
 		}
 	}
 
-	_newInteractableNotFound();
+	_forgetInteractionComponent();
 }
 
-void AScalarFieldPlayerController::_newInteractableFound(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent) {
-	UE_LOG(LogTemp, Warning, TEXT("Interactable found <3"));
+void AScalarFieldPlayerController::_replaceComponentBeingInteracted(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent) {
+	check(newInteractionComponent.IsValid());
+
+	UE_LOG(LogTemp, Error, TEXT("Interaction has started"));
+	newInteractionComponent->SetHiddenInGame(false);
+	_interactionData.ComponentBeingInteracted = MoveTemp(newInteractionComponent);	
 }
 
-void AScalarFieldPlayerController::_newInteractableNotFound() {
+void AScalarFieldPlayerController::_forgetInteractionComponent() {
+	if (_interactionData.ComponentBeingInteracted.IsValid()) {
+		UE_LOG(LogTemp, Error, TEXT("Interaction is over"));
+		_interactionData.ComponentBeingInteracted->SetHiddenInGame(true);
+		_interactionData.ComponentBeingInteracted = nullptr;
+	}
 }

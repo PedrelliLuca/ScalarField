@@ -63,8 +63,8 @@ private:
 	void _createHUD();
 
 	void _performInteractionCheck();
-	void _newInteractableFound(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent);
-	void _newInteractableNotFound();
+	void _replaceComponentBeingInteracted(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent);
+	void _forgetInteractionComponent();
 
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;
