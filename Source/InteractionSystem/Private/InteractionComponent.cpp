@@ -13,7 +13,7 @@ UInteractionComponent::UInteractionComponent() {
 
 	// >>>>> UWidgetComponent setup
 	Space = EWidgetSpace::Screen;
-	DrawSize = FIntPoint(400, 100);
+	DrawSize = FIntPoint(600, 100);
 	bDrawAtDesiredSize = true;
 
 	SetActive(true);

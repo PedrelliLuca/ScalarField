@@ -79,7 +79,7 @@ private:
 	TObjectPtr<UHUDWidget> _hudWidget = nullptr;
 
 	FInteractionData _interactionData{};
-	static constexpr double INTERACTION_TRACE_LENGTH = 10000.0;
+	static constexpr double INTERACTION_TRACE_LENGTH = 100000.0;
 
 	bool _bIsTacticalPauseOn = false;
 };
