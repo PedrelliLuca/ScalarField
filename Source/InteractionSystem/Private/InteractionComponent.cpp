@@ -21,3 +21,27 @@ UInteractionComponent::UInteractionComponent() {
 	SetHiddenInGame(true);
 	// <<<<<
 }
+
+void UInteractionComponent::BeginInteraction(const TWeakObjectPtr<AController> interactingCharacter) {
+}
+
+void UInteractionComponent::Interact(TWeakObjectPtr<AController> interactingCharacter) {
+	_onInteraction.Broadcast(MoveTemp(interactingCharacter));
+}
+
+void UInteractionComponent::EndInteraction(const TWeakObjectPtr<AController> interactingCharacter) {
+}
+
+void UInteractionComponent::BeginPlay() {
+	Super::BeginPlay();
+
+	/* Enable the outline for each meshComponent that is visible. We want to show the player that the owner actor is
+	 * interactable. */
+	TInlineComponentArray<UMeshComponent*> meshComponents;
+	GetOwner()->GetComponents<UMeshComponent>(meshComponents);
+	for (const auto meshC : meshComponents) {
+		if (meshC->IsVisible()) {
+			meshC->SetRenderCustomDepth(true);
+		}
+	}
+}
