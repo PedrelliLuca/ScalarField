@@ -65,7 +65,11 @@ private:
 	void _performInteractionCheck();
 	void _replaceComponentBeingInteracted(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent);
 	void _forgetInteractionComponent();
+	void _interact();
 
+	void _onBeginInteraction();
+	void _onEndInteraction();
+	
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;
 
@@ -80,6 +84,7 @@ private:
 
 	FInteractionData _interactionData{};
 	static constexpr double INTERACTION_TRACE_LENGTH = 100000.0;
+	FTimerHandle _interactionTimerHandle{};
 
 	bool _bIsTacticalPauseOn = false;
 };

@@ -37,15 +37,16 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AScalarFieldPlayerController::_onSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AScalarFieldPlayerController::_onSetDestinationReleased);
 
-	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
-
 	InputComponent->BindAction("Skill1Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill1Cast);
 	InputComponent->BindAction("Skill2Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill2Cast);
 	InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
 	InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
 	InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
-
 	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
+	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
+
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_onBeginInteraction);
+	InputComponent->BindAction("Interact", IE_Released, this, &AScalarFieldPlayerController::_onEndInteraction);
 
 	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
@@ -163,7 +164,7 @@ void AScalarFieldPlayerController::_createHUD() {
 void AScalarFieldPlayerController::_performInteractionCheck() {
 	_interactionData.TimestampOfLastInteraction = GetWorld()->GetRealTimeSeconds();
 
-	// Building the trace line
+	// Building the cursor trace line
 	FVector cursorLoc{};
 	FVector cursorDir{};
 	DeprojectMousePositionToWorld(cursorLoc, cursorDir);
@@ -208,5 +209,36 @@ void AScalarFieldPlayerController::_forgetInteractionComponent() {
 		UE_LOG(LogTemp, Error, TEXT("Interaction is over"));
 		_interactionData.ComponentBeingInteracted->SetHiddenInGame(true);
 		_interactionData.ComponentBeingInteracted = nullptr;
+	}
+}
+
+void AScalarFieldPlayerController::_interact() {
+	GetWorldTimerManager().ClearTimer(_interactionTimerHandle);
+	if (const auto& interactable = _interactionData.ComponentBeingInteracted; interactable.IsValid()) {
+		interactable->Interact(this);
+	}
+}
+
+void AScalarFieldPlayerController::_onBeginInteraction() {
+	_interactionData.bIsInteractKeyHeld = true;
+
+	// Are we pressing the interaction key while hovering on an interactable actor?
+	if (const auto& interactable = _interactionData.ComponentBeingInteracted; interactable.IsValid()) {
+		interactable->BeginInteraction(this);
+
+		if (FMath::IsNearlyZero(interactable->GetInteractionTime())) {
+			_interact();
+		} else {
+			GetWorldTimerManager().SetTimer(_interactionTimerHandle, this, &AScalarFieldPlayerController::_interact, interactable->GetInteractionTime()); 
+		}
+	}
+}
+
+void AScalarFieldPlayerController::_onEndInteraction() {
+	_interactionData.bIsInteractKeyHeld = false;
+	GetWorldTimerManager().ClearTimer(_interactionTimerHandle);
+	
+	if (const auto& interactable = _interactionData.ComponentBeingInteracted; interactable.IsValid()) {
+		interactable->EndInteraction(this);		
 	}
 }
