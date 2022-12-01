@@ -21,7 +21,7 @@ USTRUCT()
 struct FInteractionData {
 	GENERATED_BODY()
 
-	TWeakObjectPtr<UInteractionComponent> ComponentBeingInteracted = nullptr;
+	TWeakObjectPtr<UInteractionComponent> InteractableBeingFocused = nullptr;
 	double TimestampOfLastInteraction = 0.0;
 	bool bIsInteractKeyHeld = false;
 };
@@ -62,13 +62,15 @@ private:
 
 	void _createHUD();
 
-	void _performInteractionCheck();
-	void _replaceComponentBeingInteracted(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent);
-	void _forgetInteractionComponent();
-	void _interact();
+	// Focus functions
+	void _checkIfSomeInteractableIsFocused();
+	void _setInteractableBeingFocused(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent);
+	void _couldntFindInteractableToFocus();
 
-	void _onBeginInteraction();
-	void _onEndInteraction();
+	// Interaction functions
+	void _beginInteraction();
+	void _interact();
+	void _endInteraction();
 	
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;

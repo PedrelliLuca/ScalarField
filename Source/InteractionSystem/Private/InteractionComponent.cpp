@@ -17,19 +17,31 @@ UInteractionComponent::UInteractionComponent() {
 	bDrawAtDesiredSize = true;
 
 	SetActive(true);
-	// Don't show me the UI by default, I want it to appear only when the player has met specific conditions.
+	// Don't show me the UI by default, I want it to appear only when the player is focusing the owner actor
 	SetHiddenInGame(true);
 	// <<<<<
 }
 
-void UInteractionComponent::BeginInteraction(const TWeakObjectPtr<AController> interactingCharacter) {
+void UInteractionComponent::BeginFocus(TWeakObjectPtr<AController> interactingController) {
+	SetHiddenInGame(false);
+	_onBeginFocus.Broadcast(MoveTemp(interactingController));
+}
+
+void UInteractionComponent::EndFocus(TWeakObjectPtr<AController> interactingController) {
+	SetHiddenInGame(true);
+	_onEndFocus.Broadcast(MoveTemp(interactingController));
+}
+
+void UInteractionComponent::BeginInteraction(TWeakObjectPtr<AController> interactingCharacter) {
+	_onBeginInteraction.Broadcast(MoveTemp(interactingCharacter));
 }
 
 void UInteractionComponent::Interact(TWeakObjectPtr<AController> interactingCharacter) {
 	_onInteraction.Broadcast(MoveTemp(interactingCharacter));
 }
 
-void UInteractionComponent::EndInteraction(const TWeakObjectPtr<AController> interactingCharacter) {
+void UInteractionComponent::EndInteraction(TWeakObjectPtr<AController> interactingCharacter) {
+	_onEndInteraction.Broadcast(MoveTemp(interactingCharacter));
 }
 
 void UInteractionComponent::BeginPlay() {
