@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "HUDWidget.h"
 #include "InteractionComponent.h"
+#include "InteractorInterface.h"
 #include "PlayerMovementCommandComponent.h"
 #include "SkillUserState.h"
 
@@ -27,7 +28,7 @@ struct FInteractionData {
 };
 
 UCLASS()
-class AScalarFieldPlayerController : public APlayerController {
+class AScalarFieldPlayerController : public APlayerController, public IInteractorInterface {
 	GENERATED_BODY()
 
 public:
@@ -63,14 +64,14 @@ private:
 	void _createHUD();
 
 	// Focus functions
-	void _checkIfSomeInteractableIsFocused();
-	void _setInteractableBeingFocused(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent);
-	void _couldntFindInteractableToFocus();
+	void _performFocusCheck() override;
+	void _setInteractableBeingFocused(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent) override;
+	void _couldntFindInteractableToFocus() override;
 
 	// Interaction functions
-	void _beginInteraction();
-	void _interact();
-	void _endInteraction();
+	void _beginInteraction() override;
+	void _interact() override;
+	void _endInteraction() override;
 	
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;

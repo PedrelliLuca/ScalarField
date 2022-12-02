@@ -17,7 +17,7 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	Super::PlayerTick(deltaTime);
 
-	_checkIfSomeInteractableIsFocused();
+	_performFocusCheck();
 	
 	// We handled the input with the Super:: call. If the tacticalPause is on, we skip the FSM's and movement cmd tick
 	if (_bIsTacticalPauseOn) {
@@ -161,7 +161,7 @@ void AScalarFieldPlayerController::_createHUD() {
 	_hudWidget->SetPauseStatus(_bIsTacticalPauseOn);
 }
 
-void AScalarFieldPlayerController::_checkIfSomeInteractableIsFocused() {
+void AScalarFieldPlayerController::_performFocusCheck() {
 	_interactionData.TimestampOfLastInteraction = GetWorld()->GetRealTimeSeconds();
 
 	// Building the cursor trace line
