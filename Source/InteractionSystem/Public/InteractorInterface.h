@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "InteractionComponent.h"
 #include "InteractorInterface.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
@@ -16,8 +15,7 @@ class IInteractorInterface {
 private:
 	// Focus functions
 	virtual void _performFocusCheck() = 0;
-	virtual void _setInteractableBeingFocused(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent) = 0;
-	virtual void _couldntFindInteractableToFocus() = 0;
+	virtual void _endCurrentFocus() = 0;
 
 	// Interaction functions
 	virtual void _beginInteraction() = 0;

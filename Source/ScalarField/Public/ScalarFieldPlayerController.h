@@ -65,8 +65,7 @@ private:
 
 	// Focus functions
 	void _performFocusCheck() override;
-	void _setInteractableBeingFocused(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent) override;
-	void _couldntFindInteractableToFocus() override;
+	void _endCurrentFocus() override;
 
 	// Interaction functions
 	void _beginInteraction() override;

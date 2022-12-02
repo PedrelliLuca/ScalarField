@@ -22,26 +22,26 @@ UInteractionComponent::UInteractionComponent() {
 	// <<<<<
 }
 
-void UInteractionComponent::BeginFocus(TWeakObjectPtr<AController> interactingController) {
+void UInteractionComponent::BeginFocus(TScriptInterface<IInteractorInterface> interactor) {
 	SetHiddenInGame(false);
-	_onBeginFocus.Broadcast(MoveTemp(interactingController));
+	_onBeginFocus.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::EndFocus(TWeakObjectPtr<AController> interactingController) {
+void UInteractionComponent::EndFocus(TScriptInterface<IInteractorInterface> interactor) {
 	SetHiddenInGame(true);
-	_onEndFocus.Broadcast(MoveTemp(interactingController));
+	_onEndFocus.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::BeginInteraction(TWeakObjectPtr<AController> interactingCharacter) {
-	_onBeginInteraction.Broadcast(MoveTemp(interactingCharacter));
+void UInteractionComponent::BeginInteraction(TScriptInterface<IInteractorInterface> interactor) {
+	_onBeginInteraction.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::Interact(TWeakObjectPtr<AController> interactingCharacter) {
-	_onInteraction.Broadcast(MoveTemp(interactingCharacter));
+void UInteractionComponent::Interact(TScriptInterface<IInteractorInterface> interactor) {
+	_onInteraction.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::EndInteraction(TWeakObjectPtr<AController> interactingCharacter) {
-	_onEndInteraction.Broadcast(MoveTemp(interactingCharacter));
+void UInteractionComponent::EndInteraction(TScriptInterface<IInteractorInterface> interactor) {
+	_onEndInteraction.Broadcast(MoveTemp(interactor));
 }
 
 void UInteractionComponent::BeginPlay() {

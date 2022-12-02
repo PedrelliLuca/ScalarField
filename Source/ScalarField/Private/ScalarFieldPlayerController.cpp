@@ -186,35 +186,26 @@ void AScalarFieldPlayerController::_performFocusCheck() {
 				// Is the component the one we're already focusing? If it isn't we update the interaction data,
 				// otherwise we don't do anything
 				if (hitInteractionC != _interactionData.InteractableBeingFocused) {
-					_setInteractableBeingFocused(MoveTemp(hitInteractionC));
+					_endCurrentFocus();
+	
+					// Here the actual replacement occurs
+					_interactionData.InteractableBeingFocused = hitInteractionC;
+					hitInteractionC->BeginFocus(this);
 				}
+
+				// This is crucial: we don't call _endCurrentFocus() if we're still focusing the same interactable.
 				return;
 			}
 		}
 	}
 
-	_couldntFindInteractableToFocus();
+	_endCurrentFocus();
+
+	// Now there's nothing we're focusing, our data must reflect that.
+	_interactionData.InteractableBeingFocused = nullptr;
 }
 
-void AScalarFieldPlayerController::_setInteractableBeingFocused(TWeakObjectPtr<UInteractionComponent>&& newInteractionComponent) { 
-	// Were we focusing something? If so, we call EndFocus on it, as we're no longer focusing it.
-	if (const auto& oldInteractable = _interactionData.InteractableBeingFocused; oldInteractable.IsValid()) {
-		oldInteractable->EndFocus(this);
-
-		// No focus means that no interaction is possible. Now, if key isn't held we don't have to worry, it means that
-		// _onEndInteraction() has already been called by the release of the key
-		if (_interactionData.bIsInteractKeyHeld) {
-			_endInteraction();
-		}
-	}
-
-	// Here the actual replacement occurs
-	check(newInteractionComponent.IsValid());
-	_interactionData.InteractableBeingFocused = MoveTemp(newInteractionComponent);
-	newInteractionComponent->BeginFocus(this);
-}
-
-void AScalarFieldPlayerController::_couldntFindInteractableToFocus() {
+void AScalarFieldPlayerController::_endCurrentFocus() {
 	// Were we focusing something? If so, we call EndFocus on it, as we're no longer focusing it.
 	if (const auto oldInteractable = _interactionData.InteractableBeingFocused; oldInteractable.IsValid()) {
 		oldInteractable->EndFocus(this);
@@ -225,9 +216,6 @@ void AScalarFieldPlayerController::_couldntFindInteractableToFocus() {
 			_endInteraction();
 		}
 	}
-
-	// Now there's nothing we're focusing, our data must reflect that.
-	_interactionData.InteractableBeingFocused = nullptr;
 }
 
 void AScalarFieldPlayerController::_beginInteraction() {

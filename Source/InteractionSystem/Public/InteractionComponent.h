@@ -3,15 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InteractorInterface.h"
 #include "Components/WidgetComponent.h"
+#include "UObject/WeakInterfacePtr.h"
 
 #include "InteractionComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginFocus, TWeakObjectPtr<AController>, interactingController);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndFocus, TWeakObjectPtr<AController>, interactingController);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginInteraction, TWeakObjectPtr<AController>, interactingController);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndInteraction, TWeakObjectPtr<AController>, interactingController);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteraction, TWeakObjectPtr<AController>, interactingController);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginFocus, TScriptInterface<IInteractorInterface>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndFocus, TScriptInterface<IInteractorInterface>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginInteraction, TScriptInterface<IInteractorInterface>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndInteraction, TScriptInterface<IInteractorInterface>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteraction, TScriptInterface<IInteractorInterface>, interactor);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class INTERACTIONSYSTEM_API UInteractionComponent : public UWidgetComponent {
@@ -20,11 +22,11 @@ class INTERACTIONSYSTEM_API UInteractionComponent : public UWidgetComponent {
 public:
      UInteractionComponent();
 
-     void BeginFocus(TWeakObjectPtr<AController> interactingController);
-     void EndFocus(TWeakObjectPtr<AController> interactingController);
-     void BeginInteraction(TWeakObjectPtr<AController> interactingController);
-     void EndInteraction(TWeakObjectPtr<AController> interactingController);
-     void Interact(TWeakObjectPtr<AController> interactingController);
+     void BeginFocus(TScriptInterface<IInteractorInterface> interactor);
+     void EndFocus(TScriptInterface<IInteractorInterface> interactor);
+     void BeginInteraction(TScriptInterface<IInteractorInterface> interactor);
+     void EndInteraction(TScriptInterface<IInteractorInterface> interactor);
+     void Interact(TScriptInterface<IInteractorInterface> interactor);
 
      double GetInteractionTime() const { return _interactionTime; }
      double GetInteractionDistance() const { return _interactionDistance; }
