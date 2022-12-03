@@ -22,8 +22,8 @@ struct FPlayerInteractionData {
 	GENERATED_BODY()
 
 	TWeakObjectPtr<UInteractionComponent> InteractableBeingFocused = nullptr;
+	TWeakObjectPtr<UInteractionComponent> InteractableBeingInteracted = nullptr;
 	double TimestampOfLastFocusCheck = 0.0;
-	bool bIsInteractKeyHeld = false;
 };
 
 UCLASS()
@@ -43,6 +43,9 @@ protected:
 	void SetupInputComponent() override;
 
 	void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	void EndInteraction() override;
 
 private:
 	/** Input handlers for SetDestination action. */
@@ -67,12 +70,13 @@ private:
 
 	// Focus functions
 	void _performFocusCheck() override;
-	void _endCurrentFocus() override;
+	void _endFocus() override;
+	const TWeakObjectPtr<UInteractionComponent>& _getInteractableBeingFocused() const { return _interactionData.InteractableBeingFocused; }
 
 	// Interaction functions
 	void _beginInteraction() override;
 	void _interact() override;
-	void _endInteraction() override;
+	const TWeakObjectPtr<UInteractionComponent>& _getInteractableBeingInteracted() const { return _interactionData.InteractableBeingInteracted; }
 	
 	UPROPERTY()
 	TObjectPtr<USkillUserState> _state;

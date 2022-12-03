@@ -56,7 +56,6 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_beginInteraction);
-	InputComponent->BindAction("Interact", IE_Released, this, &AScalarFieldPlayerController::_endInteraction);
 
 	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
@@ -196,65 +195,69 @@ void AScalarFieldPlayerController::_performFocusCheck() {
 				// Is the component the one we're already focusing? If it isn't we update the interaction data,
 				// otherwise we don't do anything
 				if (hitInteractionC != _interactionData.InteractableBeingFocused) {
-					_endCurrentFocus();
+					_endFocus();
 	
 					// Here the actual replacement occurs
 					_interactionData.InteractableBeingFocused = hitInteractionC;
 					hitInteractionC->BeginFocus(this);
 				}
 
-				// This is crucial: we don't call _endCurrentFocus() if we're still focusing the same interactable.
+				// This is crucial: we don't call _endFocus() if we're still focusing the same interactable.
 				return;
 			}
 		}
 	}
 
-	_endCurrentFocus();
+	_endFocus();
+}
 
+void AScalarFieldPlayerController::_endFocus() {
+	// Were we focusing something? If so, we call EndFocus on it, as we're no longer focusing it.
+	if (_getInteractableBeingFocused().IsValid()) {
+		_getInteractableBeingFocused()->EndFocus(this);
+	}
+	
 	// Now there's nothing we're focusing, our data must reflect that.
 	_interactionData.InteractableBeingFocused = nullptr;
 }
 
-void AScalarFieldPlayerController::_endCurrentFocus() {
-	// Were we focusing something? If so, we call EndFocus on it, as we're no longer focusing it.
-	if (const auto oldInteractable = _interactionData.InteractableBeingFocused; oldInteractable.IsValid()) {
-		oldInteractable->EndFocus(this);
-		
-		// No focus means that no interaction is possible. Now, if key isn't held we don't have to worry, it means that
-		// _onEndInteraction() has already been called by the release of the key
-		if (_interactionData.bIsInteractKeyHeld) {
-			_endInteraction();
-		}
-	}
-}
-
 void AScalarFieldPlayerController::_beginInteraction() {
-	_interactionData.bIsInteractKeyHeld = true;
+	// Are we pressing the interaction key while focusing on an interactable actor?
+	if (!_getInteractableBeingFocused().IsValid()) {
+		return;
+	}
 
-	// Are we pressing the interaction key while hovering on an interactable actor?
-	if (const auto& interactable = _interactionData.InteractableBeingFocused; interactable.IsValid()) {
-		interactable->BeginInteraction(this);
+	// Are we already interacting with the focused actor?
+	if (_getInteractableBeingFocused() == _getInteractableBeingInteracted()) {
+		return;
+	}
 
-		if (FMath::IsNearlyZero(interactable->GetInteractionTime())) {
-			_interact();
-		} else {
-			GetWorldTimerManager().SetTimer(_interactionTimerHandle, this, &AScalarFieldPlayerController::_interact, interactable->GetInteractionTime()); 
-		}
+	EndInteraction();
+	_interactionData.InteractableBeingInteracted = _getInteractableBeingFocused();
+	
+	_getInteractableBeingInteracted()->BeginInteraction(this);
+
+	if (FMath::IsNearlyZero(_getInteractableBeingInteracted()->GetInteractionTime())) {
+		_interact();
+	} else {
+		GetWorldTimerManager().SetTimer(_interactionTimerHandle, this, &AScalarFieldPlayerController::_interact, _getInteractableBeingInteracted()->GetInteractionTime()); 
 	}
 }
 
 void AScalarFieldPlayerController::_interact() {
 	GetWorldTimerManager().ClearTimer(_interactionTimerHandle);
-	if (const auto& interactable = _interactionData.InteractableBeingFocused; interactable.IsValid()) {
-		interactable->Interact(this);
+	
+	if (_getInteractableBeingInteracted().IsValid()) {
+		_getInteractableBeingInteracted()->Interact(this);
 	}
 }
 
-void AScalarFieldPlayerController::_endInteraction() {
-	_interactionData.bIsInteractKeyHeld = false;
+void AScalarFieldPlayerController::EndInteraction() {
 	GetWorldTimerManager().ClearTimer(_interactionTimerHandle);
 	
-	if (const auto& interactable = _interactionData.InteractableBeingFocused; interactable.IsValid()) {
-		interactable->EndInteraction(this);		
+	if (_getInteractableBeingInteracted().IsValid()) {
+		_getInteractableBeingInteracted()->EndInteraction(this);		
 	}
+
+	_interactionData.InteractableBeingInteracted = nullptr;
 }

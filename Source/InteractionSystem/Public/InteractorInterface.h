@@ -4,7 +4,7 @@
 
 #include "InteractorInterface.generated.h"
 
-UINTERFACE(MinimalAPI, Blueprintable)
+UINTERFACE(MinimalAPI, NotBlueprintable)
 class UInteractorInterface : public UInterface {
 	GENERATED_BODY()
 };
@@ -15,14 +15,16 @@ class IInteractorInterface {
 public:
 	virtual bool IsInteracting() const = 0;
 	virtual double GetRemainingInteractionTime() const = 0;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void EndInteraction() = 0;
 	
 private:
 	// Focus functions
 	virtual void _performFocusCheck() = 0;
-	virtual void _endCurrentFocus() = 0;
+	virtual void _endFocus() = 0;
 
 	// Interaction functions
 	virtual void _beginInteraction() = 0;
 	virtual void _interact() = 0;
-	virtual void _endInteraction() = 0;
 };
