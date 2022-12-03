@@ -33,12 +33,22 @@ public:
 
 protected:
      void BeginPlay() override;
+
+     void Deactivate() override;
+
+     bool _canInteract(const TScriptInterface<IInteractorInterface>& interactor) const;
+
+     // Every AController currently interacting with this (player controller, AI controllerS)
+     TSet<TScriptInterface<IInteractorInterface>> _interactors;
      
      UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
      double _interactionTime;
 
      UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
      double _interactionDistance;
+
+     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
+     bool _bAllowMultipleInteractors;
 
      UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
      FText _interactableNameText;

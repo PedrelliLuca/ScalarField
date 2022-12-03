@@ -8,6 +8,7 @@ UInteractionComponent::UInteractionComponent() {
 
 	_interactionTime = 0.0;
 	_interactionDistance = 200.0;
+	_bAllowMultipleInteractors = false;
 	_interactableNameText = FText::FromString(TEXT("Interactable Object"));
 	_interactableActionText = FText::FromString(TEXT("Interact"));
 
@@ -23,6 +24,10 @@ UInteractionComponent::UInteractionComponent() {
 }
 
 void UInteractionComponent::BeginFocus(TScriptInterface<IInteractorInterface> interactor) {
+	if (!IsActive() || !IsValid(interactor.GetObject())) {
+		return;
+	}
+	
 	SetHiddenInGame(false);
 	_onBeginFocus.Broadcast(MoveTemp(interactor));
 }
@@ -33,14 +38,20 @@ void UInteractionComponent::EndFocus(TScriptInterface<IInteractorInterface> inte
 }
 
 void UInteractionComponent::BeginInteraction(TScriptInterface<IInteractorInterface> interactor) {
-	_onBeginInteraction.Broadcast(MoveTemp(interactor));
+	if (_canInteract(interactor)) {
+		_interactors.Emplace(interactor);
+		_onBeginInteraction.Broadcast(MoveTemp(interactor));
+	}
 }
 
 void UInteractionComponent::Interact(TScriptInterface<IInteractorInterface> interactor) {
-	_onInteraction.Broadcast(MoveTemp(interactor));
+	if (_canInteract(interactor)) {
+		_onInteraction.Broadcast(MoveTemp(interactor));
+	}
 }
 
 void UInteractionComponent::EndInteraction(TScriptInterface<IInteractorInterface> interactor) {
+	_interactors.Remove(interactor);
 	_onEndInteraction.Broadcast(MoveTemp(interactor));
 }
 
@@ -56,4 +67,23 @@ void UInteractionComponent::BeginPlay() {
 			meshC->SetRenderCustomDepth(true);
 		}
 	}
+}
+
+void UInteractionComponent::Deactivate() {
+	Super::Deactivate();
+	
+	for (const auto& interactor : _interactors) {
+		if (IsValid(interactor.GetObject())) {
+			EndFocus(interactor);
+			EndInteraction(interactor);
+		}
+	}
+ 	_interactors.Empty();
+}
+
+bool UInteractionComponent::_canInteract(const TScriptInterface<IInteractorInterface>& interactor) const {
+	// We want to stop multiple interactors from interacting in case multiple interactors aren't allowed.
+	const bool bIsAlreadyBeingInteracted = !_bAllowMultipleInteractors && _interactors.Num() >= 1;
+	// Moreover, the interaction cannot occur if the interactor isn't valid or this component isn't active.
+	return IsValid(interactor.GetObject()) && IsActive() && !bIsAlreadyBeingInteracted;
 }
