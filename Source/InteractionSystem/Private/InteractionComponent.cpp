@@ -45,9 +45,7 @@ void UInteractionComponent::BeginInteraction(TScriptInterface<IInteractorInterfa
 }
 
 void UInteractionComponent::Interact(TScriptInterface<IInteractorInterface> interactor) {
-	if (_canInteract(interactor)) {
-		_onInteraction.Broadcast(MoveTemp(interactor));
-	}
+	_onInteraction.Broadcast(MoveTemp(interactor));
 }
 
 void UInteractionComponent::EndInteraction(TScriptInterface<IInteractorInterface> interactor) {
