@@ -14,10 +14,20 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	_movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
 }
 
+bool AScalarFieldPlayerController::IsInteracting() const {
+	return GetWorldTimerManager().IsTimerActive(_interactionTimerHandle);
+}
+
+double AScalarFieldPlayerController::GetRemainingInteractionTime() const {
+	return GetWorldTimerManager().GetTimerRemaining(_interactionTimerHandle);
+}
+
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	Super::PlayerTick(deltaTime);
 
-	_performFocusCheck();
+	if (GetWorld()->GetRealTimeSeconds() - _interactionData.TimestampOfLastFocusCheck > _timeBetweenFocusChecks) {
+		_performFocusCheck();
+	}
 	
 	// We handled the input with the Super:: call. If the tacticalPause is on, we skip the FSM's and movement cmd tick
 	if (_bIsTacticalPauseOn) {
@@ -162,7 +172,7 @@ void AScalarFieldPlayerController::_createHUD() {
 }
 
 void AScalarFieldPlayerController::_performFocusCheck() {
-	_interactionData.TimestampOfLastInteraction = GetWorld()->GetRealTimeSeconds();
+	_interactionData.TimestampOfLastFocusCheck = GetWorld()->GetRealTimeSeconds();
 
 	// Building the cursor trace line
 	FVector cursorLoc{};

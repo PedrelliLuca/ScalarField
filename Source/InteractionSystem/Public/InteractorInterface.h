@@ -11,6 +11,10 @@ class UInteractorInterface : public UInterface {
 
 class IInteractorInterface {
 	GENERATED_BODY()
+
+public:
+	virtual bool IsInteracting() const = 0;
+	virtual double GetRemainingInteractionTime() const = 0;
 	
 private:
 	// Focus functions

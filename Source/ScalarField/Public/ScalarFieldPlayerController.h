@@ -12,18 +12,17 @@
 
 #include "ScalarFieldPlayerController.generated.h"
 
-/** Forward declaration to improve compiling times */
 class UNiagaraSystem;
 
 /**
  * \brief Stores all the data related to what the player is currently interacting with.
  */
 USTRUCT()
-struct FInteractionData {
+struct FPlayerInteractionData {
 	GENERATED_BODY()
 
 	TWeakObjectPtr<UInteractionComponent> InteractableBeingFocused = nullptr;
-	double TimestampOfLastInteraction = 0.0;
+	double TimestampOfLastFocusCheck = 0.0;
 	bool bIsInteractKeyHeld = false;
 };
 
@@ -35,6 +34,9 @@ public:
 	AScalarFieldPlayerController();
 
 	TWeakObjectPtr<UHUDWidget> GetGameplayHUD() { return _hudWidget; }
+
+	bool IsInteracting() const override;
+	double GetRemainingInteractionTime() const override;
 
 protected:
 	void PlayerTick(float deltaTime) override;
@@ -84,9 +86,12 @@ private:
 	UPROPERTY()
 	TObjectPtr<UHUDWidget> _hudWidget = nullptr;
 
-	FInteractionData _interactionData{};
+	FPlayerInteractionData _interactionData{};
 	static constexpr double INTERACTION_TRACE_LENGTH = 100000.0;
 	FTimerHandle _interactionTimerHandle{};
+
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction")
+	double _timeBetweenFocusChecks = 0.1;
 
 	bool _bIsTacticalPauseOn = false;
 };
