@@ -22,13 +22,25 @@ class INTERACTIONSYSTEM_API UInteractionComponent : public UWidgetComponent {
 public:
      UInteractionComponent();
 
+     /** \brief Shows the associated widget and communicates to the owner actor that focus has begun */
      void BeginFocus(TScriptInterface<IInteractorInterface> interactor);
+     /** \brief Hides the associated widget and communicates to the owner actor that focus has begun */
      void EndFocus(TScriptInterface<IInteractorInterface> interactor);
+     /** \brief If the interaction is possible, communicates to the owner actor that the interactor has begun the
+      * interaction process. The interactor is cached. */
      void BeginInteraction(TScriptInterface<IInteractorInterface> interactor);
+     /** \brief Communicates to the owner actor that interaction has ended. The interactor is removed from the internal
+      * cache. */
      void EndInteraction(TScriptInterface<IInteractorInterface> interactor);
+	 /** \brief If the interaction is possible, communicates to the owner actor that it's time to make the actual
+	  * interaction occur. */
      void Interact(TScriptInterface<IInteractorInterface> interactor);
 
+     /** \brief Returns the time that must elapse between BeginInteraction() and Interaction() calls. It's the
+      * interactor's responsibility to make sure the calls are performed properly. */
      double GetInteractionTime() const { return _interactionTime; }
+
+	/** \brief Returns the maximum distance the owner actor can be from any potential interactor to be interactable. */
      double GetInteractionDistance() const { return _interactionDistance; }
 
 protected:
