@@ -84,7 +84,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnTick(float deltaTime, const TObj
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UChannelingState::OnSkillExecutionAborted(const TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UChannelingState::OnAbort(const TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill channeling aborted!"));
 	return _abortExecutionForState<UIdleState>(controller);
 }

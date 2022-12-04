@@ -55,7 +55,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
 	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
-	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_beginInteraction);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_performInteractionCheck);
 
 	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
@@ -113,7 +113,7 @@ void AScalarFieldPlayerController::_onSkill5Cast() {
 }
 
 void AScalarFieldPlayerController::_onCastAborted() {
-	const auto newState = _state->OnSkillExecutionAborted(this);
+	const auto newState = _state->OnAbort(this);
 	_changingStateRoutine(newState);
 }
 

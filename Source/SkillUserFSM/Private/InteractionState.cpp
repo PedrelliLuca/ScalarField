@@ -1,22 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "IdleState.h"
+#include "InteractionState.h"
 
 #include "CastingState.h"
 #include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
 
-TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UInteractionState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UIdleState::OnInteraction(TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UInteractionState::OnInteraction(TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UInteractionState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
 	check(skillKey < KEY_ASSIGNABLE_SKILLS);
 	const auto pawn = controller->GetPawn();
 	const auto skillsContainer = pawn->FindComponentByClass<USkillsContainerComponent>();
@@ -47,22 +47,16 @@ TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillK
 	return newState;
 }
 
-TObjectPtr<USkillUserState> UIdleState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UInteractionState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UIdleState::OnAbort(TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UInteractionState::OnAbort(TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
-void UIdleState::OnEnter(TObjectPtr<AController> controller) {
-	// Movement command update
-	const auto movementSetters = controller->GetComponentsByInterface(UMovementCommandSetter::StaticClass());
-	check(movementSetters.Num() == 1);
-	const auto movementSetter = Cast<IMovementCommandSetter>(movementSetters[0]);
-	check(movementSetter != nullptr);
-	movementSetter->SetDefaultMovementMode();
+void UInteractionState::OnEnter(TObjectPtr<AController> controller) {
 }
 
-void UIdleState::OnLeave(TObjectPtr<AController> controller) {
+void UInteractionState::OnLeave(TObjectPtr<AController> controller) {
 }

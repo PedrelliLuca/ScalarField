@@ -89,7 +89,7 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UCastingState::OnSkillExecutionAborted(const TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UCastingState::OnAbort(const TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill cast aborted!"));
 	return _abortExecutionForState<UIdleState>(controller);
 }

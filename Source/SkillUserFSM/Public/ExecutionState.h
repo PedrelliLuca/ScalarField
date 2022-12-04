@@ -17,6 +17,8 @@ class SKILLUSERFSM_API UExecutionState : public USkillUserState {
 	GENERATED_BODY()
 
 public:
+	TObjectPtr<USkillUserState> OnInteraction(TObjectPtr<AController> controller) override { return _keepCurrentState(); }
+	
 	void SetSkillInExecution(TWeakObjectPtr<UAbstractSkill> skillInExecution) { _skillInExecution = skillInExecution; }
 	TObjectPtr<UAbstractSkill> GetSkillInExecution() const {
 		check(_skillInExecution.IsValid());
