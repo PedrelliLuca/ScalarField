@@ -15,10 +15,10 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 }
 
 bool AScalarFieldPlayerController::IsInteracting() const {
-	return GetWorldTimerManager().IsTimerActive(_interactionTimerHandle);
+	return _getInteractableBeingInteracted().IsValid();
 }
 
-double AScalarFieldPlayerController::GetRemainingInteractionTime() const {
+double AScalarFieldPlayerController::GetTimeLeftBeforeInteraction() const {
 	return GetWorldTimerManager().GetTimerRemaining(_interactionTimerHandle);
 }
 

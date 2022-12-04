@@ -36,7 +36,7 @@ public:
 	TWeakObjectPtr<UHUDWidget> GetGameplayHUD() { return _hudWidget; }
 
 	bool IsInteracting() const override;
-	double GetRemainingInteractionTime() const override;
+	double GetTimeLeftBeforeInteraction() const override;
 
 protected:
 	void PlayerTick(float deltaTime) override;

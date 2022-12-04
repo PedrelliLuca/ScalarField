@@ -14,8 +14,8 @@ class IInteractorInterface {
 
 public:
 	virtual bool IsInteracting() const = 0;
-	virtual double GetRemainingInteractionTime() const = 0;
 
+	virtual double GetTimeLeftBeforeInteraction() const = 0;
 	UFUNCTION(BlueprintCallable)
 	virtual void EndInteraction() = 0;
 	
