@@ -74,7 +74,7 @@ private:
 	const TWeakObjectPtr<UInteractionComponent>& _getInteractableBeingFocused() const { return _interactionData.InteractableBeingFocused; }
 
 	// Interaction functions
-	void _beginInteraction() override;
+	void _performInteractionCheck() override;
 	void _interact() override;
 	const TWeakObjectPtr<UInteractionComponent>& _getInteractableBeingInteracted() const { return _interactionData.InteractableBeingInteracted; }
 	

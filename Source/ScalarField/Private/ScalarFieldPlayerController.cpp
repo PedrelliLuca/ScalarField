@@ -221,7 +221,7 @@ void AScalarFieldPlayerController::_endFocus() {
 	_interactionData.InteractableBeingFocused = nullptr;
 }
 
-void AScalarFieldPlayerController::_beginInteraction() {
+void AScalarFieldPlayerController::_performInteractionCheck() {
 	// Are we pressing the interaction key while focusing on an interactable actor?
 	if (!_getInteractableBeingFocused().IsValid()) {
 		return;

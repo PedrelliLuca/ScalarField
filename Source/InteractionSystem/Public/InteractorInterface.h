@@ -25,6 +25,6 @@ private:
 	virtual void _endFocus() = 0;
 
 	// Interaction functions
-	virtual void _beginInteraction() = 0;
+	virtual void _performInteractionCheck() = 0;
 	virtual void _interact() = 0;
 };
