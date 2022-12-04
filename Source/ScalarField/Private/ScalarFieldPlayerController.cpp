@@ -26,7 +26,7 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	Super::PlayerTick(deltaTime);
 
 	if (GetWorld()->GetRealTimeSeconds() - _interactionData.TimestampOfLastFocusCheck > _timeBetweenFocusChecks) {
-		_performFocusCheck();
+		PerformFocusCheck();
 	}
 	
 	// We handled the input with the Super:: call. If the tacticalPause is on, we skip the FSM's and movement cmd tick
@@ -55,7 +55,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
 	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
-	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_performInteractionCheck);
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::PerformInteractionCheck);
 
 	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
@@ -170,7 +170,7 @@ void AScalarFieldPlayerController::_createHUD() {
 	_hudWidget->SetPauseStatus(_bIsTacticalPauseOn);
 }
 
-void AScalarFieldPlayerController::_performFocusCheck() {
+void AScalarFieldPlayerController::PerformFocusCheck() {
 	_interactionData.TimestampOfLastFocusCheck = GetWorld()->GetRealTimeSeconds();
 
 	// Building the cursor trace line
@@ -221,7 +221,7 @@ void AScalarFieldPlayerController::_endFocus() {
 	_interactionData.InteractableBeingFocused = nullptr;
 }
 
-void AScalarFieldPlayerController::_performInteractionCheck() {
+void AScalarFieldPlayerController::PerformInteractionCheck() {
 	// Are we pressing the interaction key while focusing on an interactable actor?
 	if (!_getInteractableBeingFocused().IsValid()) {
 		return;

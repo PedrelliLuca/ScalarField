@@ -35,6 +35,9 @@ public:
 
 	TWeakObjectPtr<UHUDWidget> GetGameplayHUD() { return _hudWidget; }
 
+	void PerformInteractionCheck() override;
+
+	void PerformFocusCheck() override;
 	bool IsInteracting() const override;
 	double GetTimeLeftBeforeInteraction() const override;
 
@@ -69,12 +72,10 @@ private:
 	void _createHUD();
 
 	// Focus functions
-	void _performFocusCheck() override;
 	void _endFocus() override;
 	const TWeakObjectPtr<UInteractionComponent>& _getInteractableBeingFocused() const { return _interactionData.InteractableBeingFocused; }
 
 	// Interaction functions
-	void _performInteractionCheck() override;
 	void _interact() override;
 	const TWeakObjectPtr<UInteractionComponent>& _getInteractableBeingInteracted() const { return _interactionData.InteractableBeingInteracted; }
 	

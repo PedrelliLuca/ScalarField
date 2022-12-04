@@ -13,18 +13,20 @@ class IInteractorInterface {
 	GENERATED_BODY()
 
 public:
-	virtual bool IsInteracting() const = 0;
-
-	virtual double GetTimeLeftBeforeInteraction() const = 0;
+	// Focus functions
+	virtual void PerformFocusCheck() = 0;
+	
+	// Interaction functions
+	virtual void PerformInteractionCheck() = 0;
 	UFUNCTION(BlueprintCallable)
 	virtual void EndInteraction() = 0;
+	virtual bool IsInteracting() const = 0;
+	virtual double GetTimeLeftBeforeInteraction() const = 0;
 	
 private:
 	// Focus functions
-	virtual void _performFocusCheck() = 0;
 	virtual void _endFocus() = 0;
 
 	// Interaction functions
-	virtual void _performInteractionCheck() = 0;
 	virtual void _interact() = 0;
 };
