@@ -24,4 +24,6 @@ public:
 
 	void OnEnter(TObjectPtr<AController> controller) override;
 	void OnLeave(TObjectPtr<AController> controller) override;
+
+	bool IsTickAffectedByPause() const override { return false; }
 };

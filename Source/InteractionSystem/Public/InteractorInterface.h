@@ -17,7 +17,7 @@ public:
 	virtual void PerformFocusCheck() = 0;
 	
 	// Interaction functions
-	virtual void PerformInteractionCheck() = 0;
+	virtual bool PerformInteractionCheck() = 0;
 	UFUNCTION(BlueprintCallable)
 	virtual void EndInteraction() = 0;
 	virtual bool IsInteracting() const = 0;

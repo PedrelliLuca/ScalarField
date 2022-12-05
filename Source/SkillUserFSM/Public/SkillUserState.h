@@ -23,6 +23,8 @@ public:
 
 	virtual void OnEnter(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnEnter, return;);
 	virtual void OnLeave(TObjectPtr<AController> controller) PURE_VIRTUAL(USkillUserState::OnLeave, return;);
+
+	virtual bool IsTickAffectedByPause() const PURE_VIRTUAL(USkillUserState::IsTickAffectedByPause, return true;);
 	
 protected:
 	TObjectPtr<USkillUserState> _keepCurrentState() { 
