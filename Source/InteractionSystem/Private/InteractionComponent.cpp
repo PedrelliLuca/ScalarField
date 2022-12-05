@@ -3,6 +3,8 @@
 
 #include "InteractionComponent.h"
 
+#include "InteractionWidget.h"
+
 UInteractionComponent::UInteractionComponent() {
 	SetComponentTickEnabled(false);
 
@@ -29,6 +31,7 @@ void UInteractionComponent::BeginFocus(TScriptInterface<IInteractorInterface> in
 	}
 	
 	SetHiddenInGame(false);
+	_refreshWidget();
 	_onBeginFocus.Broadcast(MoveTemp(interactor));
 }
 
@@ -51,6 +54,30 @@ void UInteractionComponent::Interact(TScriptInterface<IInteractorInterface> inte
 void UInteractionComponent::EndInteraction(TScriptInterface<IInteractorInterface> interactor) {
 	_interactors.Remove(interactor);
 	_onEndInteraction.Broadcast(MoveTemp(interactor));
+}
+
+double UInteractionComponent::GetInteractionPercentage() const {
+	// Show the interaction percentage of the interactor that has interacted for the longest time.
+	// This could be refactored in the future so that an array of percentages is returned, one for each interactor,
+	// with the player's one being marked. This way, the widget could show a progress bar for each interactor
+	double highestPercentage = 0.0;
+	for (const auto& interactor : _interactors) {
+		const double interactorPercentage = 1.0 - interactor->GetTimeLeftBeforeInteraction() / _interactionTime;
+		if (interactorPercentage > highestPercentage) {
+			highestPercentage = interactorPercentage;
+		}
+	}
+	return highestPercentage; 
+}
+
+void UInteractionComponent::SetInteractableNameText(const FText& newInteractableNameText)  {
+	_interactableNameText = newInteractableNameText;
+	_refreshWidget();
+}
+
+void UInteractionComponent::SetInteractableActionText(const FText& newInteractableActionText) {
+	_interactableActionText = newInteractableActionText;
+	_refreshWidget();
 }
 
 void UInteractionComponent::BeginPlay() {
@@ -80,8 +107,21 @@ void UInteractionComponent::Deactivate() {
 }
 
 bool UInteractionComponent::_canInteract(const TScriptInterface<IInteractorInterface>& interactor) const {
-	// We want to stop multiple interactors from interacting in case multiple interactors aren't allowed.
+	// We want to stop a 2nd interactor from interacting in case multiple interactors aren't allowed.
 	const bool bIsAlreadyBeingInteracted = !_bAllowMultipleInteractors && _interactors.Num() >= 1;
 	// Moreover, the interaction cannot occur if the interactor isn't valid or this component isn't active.
 	return IsValid(interactor.GetObject()) && IsActive() && !bIsAlreadyBeingInteracted;
+}
+
+void UInteractionComponent::_refreshWidget() {
+	if (bHiddenInGame) {
+		// There is no point in updating the widget if it's hidden...
+		return;
+	}
+
+	const TWeakObjectPtr<UInteractionWidget> interactionWidget = Cast<UInteractionWidget>(GetUserWidgetObject());
+	// The widget associated to an interaction component has to be an interaction widget
+	check(interactionWidget.IsValid());
+
+	interactionWidget->UpdateInteractionWidget(this);
 }

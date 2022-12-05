@@ -43,6 +43,15 @@ public:
 	/** \brief Returns the maximum distance the owner actor can be from any potential interactor to be interactable. */
 	double GetInteractionDistance() const { return _interactionDistance; }
 
+	UFUNCTION(BlueprintPure, Category = "Interaction")
+	double GetInteractionPercentage() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void SetInteractableNameText(const FText& newInteractableNameText);
+
+	UFUNCTION(BlueprintCallable, Category = "Interaction")
+	void SetInteractableActionText(const FText& newInteractableActionText);
+
 protected:
 	void BeginPlay() override;
 
@@ -92,4 +101,8 @@ protected:
 	// the interaction key is released)
 	UPROPERTY(EditDefaultsOnly, BlueprintAssignable)
 	FOnEndInteraction _onEndInteraction;
+
+private:
+	// To be called when data presented by the widget is updated
+	void _refreshWidget();
 };
