@@ -14,18 +14,28 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	_movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
 }
 
+bool AScalarFieldPlayerController::IsInteracting() const {
+	return _getInteractableBeingInteracted().IsValid();
+}
+
+double AScalarFieldPlayerController::GetTimeLeftBeforeInteraction() const {
+	return GetWorldTimerManager().GetTimerRemaining(_interactionTimerHandle);
+}
+
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	Super::PlayerTick(deltaTime);
-
-	// We handled the input with the Super:: call. If the tacticalPause is on, we skip the FSM's and movement cmd tick
-	if (_bIsTacticalPauseOn) {
-		return;
+	
+	// Generally speaking, the tick of the states should stop if the tactical pause is active. However, some states
+	// are special and are not affected by it.
+	if (!_bIsTacticalPauseOn || !_state->IsTickAffectedByPause()) {
+		const auto newState = _state->OnTick(deltaTime, this);
+		_changingStateRoutine(newState);
 	}
 
-	const auto newState = _state->OnTick(deltaTime, this);
-	_changingStateRoutine(newState);
-
-	_movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
+	// Tick of movement commands never occurs during the tactical pause.
+	if (!_bIsTacticalPauseOn) {
+		_movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
+	}
 }
 
 void AScalarFieldPlayerController::SetupInputComponent() {
@@ -35,15 +45,15 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AScalarFieldPlayerController::_onSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &AScalarFieldPlayerController::_onSetDestinationReleased);
 
-	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
-
 	InputComponent->BindAction("Skill1Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill1Cast);
 	InputComponent->BindAction("Skill2Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill2Cast);
 	InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
 	InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
 	InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
-
 	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
+	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
+
+	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_onInteractionInput);
 
 	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
@@ -101,7 +111,7 @@ void AScalarFieldPlayerController::_onSkill5Cast() {
 }
 
 void AScalarFieldPlayerController::_onCastAborted() {
-	const auto newState = _state->OnSkillExecutionAborted(this);
+	const auto newState = _state->OnAbort(this);
 	_changingStateRoutine(newState);
 }
 
@@ -156,4 +166,108 @@ void AScalarFieldPlayerController::_createHUD() {
 	_hudWidget->SetManaRegen(manaC->GetManaRegen());
 
 	_hudWidget->SetPauseStatus(_bIsTacticalPauseOn);
+}
+
+void AScalarFieldPlayerController::PerformFocusCheck() {
+	if (GetWorld()->GetRealTimeSeconds() - _interactionData.TimestampOfLastFocusCheck < _timeBetweenFocusChecks) {
+		// Too little time has passed, let's save the line trace for later
+		return;
+	}
+	
+	_interactionData.TimestampOfLastFocusCheck = GetWorld()->GetRealTimeSeconds();
+
+	// Building the cursor line trace
+	FVector cursorLoc{};
+	FVector cursorDir{};
+	DeprojectMousePositionToWorld(cursorLoc, cursorDir);
+	const auto& traceStart = cursorLoc;
+	const auto traceEnd = traceStart + cursorDir * INTERACTION_TRACE_LENGTH;
+
+	// Did we find an actor blocking the visibility channel?
+	FHitResult traceHit{};
+	if (GetWorld()->LineTraceSingleByChannel(traceHit, traceStart, traceEnd, ECollisionChannel::ECC_Visibility) && traceHit.GetActor()) {
+		// Does the actor we found have an interaction component?
+		if (TWeakObjectPtr<UInteractionComponent> hitInteractionC = traceHit.GetActor()->FindComponentByClass<UInteractionComponent>(); hitInteractionC.IsValid()) {
+			const auto pawn = GetPawn();
+			check(IsValid(pawn));
+
+			// Is the component within reach?
+			const double distance = (traceHit.ImpactPoint - pawn->GetActorLocation()).Size();
+			if (distance <= hitInteractionC->GetInteractionDistance()) {
+
+				// Is the component the one we're already focusing? If it isn't we update the interaction data,
+				// otherwise we don't do anything
+				if (hitInteractionC != _interactionData.InteractableBeingFocused) {
+					_endFocus();
+	
+					// Here the actual replacement occurs
+					_interactionData.InteractableBeingFocused = hitInteractionC;
+					hitInteractionC->BeginFocus(this);
+				}
+
+				// This is crucial: we don't call _endFocus() if we're still focusing the same interactable.
+				return;
+			}
+		}
+	}
+
+	_endFocus();
+}
+
+void AScalarFieldPlayerController::_endFocus() {
+	// Were we focusing something? If so, we call EndFocus on it, as we're no longer focusing it.
+	if (_getInteractableBeingFocused().IsValid()) {
+		_getInteractableBeingFocused()->EndFocus(this);
+	}
+	
+	// Now there's nothing we're focusing, our data must reflect that.
+	_interactionData.InteractableBeingFocused = nullptr;
+}
+
+bool AScalarFieldPlayerController::PerformInteractionCheck() {
+	// Are we pressing the interaction key while focusing on an interactable actor?
+	if (!_getInteractableBeingFocused().IsValid()) {
+		return false;
+	}
+
+	// Are we already interacting with the focused actor?
+	if (_getInteractableBeingFocused() == _getInteractableBeingInteracted()) {
+		return false;
+	}
+
+	EndInteraction();
+	_interactionData.InteractableBeingInteracted = _getInteractableBeingFocused();
+	
+	_getInteractableBeingInteracted()->BeginInteraction(this);
+
+	if (FMath::IsNearlyZero(_getInteractableBeingInteracted()->GetInteractionTime())) {
+		UE_LOG(LogTemp, Warning, TEXT("Instantenous interactions ignore tactical pause!!"));
+		_interact();
+	} else {
+		GetWorldTimerManager().SetTimer(_interactionTimerHandle, this, &AScalarFieldPlayerController::_interact, _getInteractableBeingInteracted()->GetInteractionTime()); 
+	}
+
+	return true;
+}
+
+void AScalarFieldPlayerController::_onInteractionInput() {
+	const auto newState = _state->OnInteraction(this);
+	_changingStateRoutine(newState);
+}
+
+void AScalarFieldPlayerController::_interact() {
+	GetWorldTimerManager().ClearTimer(_interactionTimerHandle);
+	
+	check(_getInteractableBeingInteracted().IsValid());
+	_getInteractableBeingInteracted()->Interact(this);
+}
+
+void AScalarFieldPlayerController::EndInteraction() {
+	GetWorldTimerManager().ClearTimer(_interactionTimerHandle);
+	
+	if (_getInteractableBeingInteracted().IsValid()) {
+		_getInteractableBeingInteracted()->EndInteraction(this);		
+	}
+
+	_interactionData.InteractableBeingInteracted = nullptr;
 }

@@ -17,10 +17,13 @@ class SKILLUSERFSM_API UIdleState : public USkillUserState {
 
 public:
 	TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) override;
+	TObjectPtr<USkillUserState> OnInteraction(TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnBeginSkillExecution(int32 skillKey, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
-	TObjectPtr<USkillUserState> OnSkillExecutionAborted(TObjectPtr<AController> controller) override;
+	TObjectPtr<USkillUserState> OnAbort(TObjectPtr<AController> controller) override;
 
 	void OnEnter(TObjectPtr<AController> controller) override;
 	void OnLeave(TObjectPtr<AController> controller) override;
+
+	bool IsTickAffectedByPause() const override { return false; }
 };

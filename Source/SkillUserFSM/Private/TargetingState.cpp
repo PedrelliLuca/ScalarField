@@ -77,7 +77,7 @@ TObjectPtr<USkillUserState> UTargetingState::OnTick(float deltaTime, TObjectPtr<
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UTargetingState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UTargetingState::OnAbort(TObjectPtr<AController> controller) {
 	UE_LOG(LogTemp, Error, TEXT("Skill targeting aborted!"));
 	return _abortExecutionForState<UIdleState>(controller);
 }

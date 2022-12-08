@@ -2,28 +2,25 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class SkillUserFSM : ModuleRules
+	public class InteractionSystem : ModuleRules
 	{
-		public SkillUserFSM(ReadOnlyTargetRules Target) : base(Target)
+		public InteractionSystem(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
 			PublicDependencyModuleNames.AddRange(
 				new string[]
 				{
-                    "Core",
-                    "CoreUObject",
-                    "Engine",
-					"SkillSystem",
-					"MovementCommand",
-					"GameplayAttributes",
+					"Core",
+					"CoreUObject",
+					"Engine",
+					"UMG",
 				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"InteractionSystem"
 					// ... add private dependencies that you statically link with here ...
 				}
 				);

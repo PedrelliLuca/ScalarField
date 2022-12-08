@@ -4,13 +4,34 @@
 #include "IdleState.h"
 
 #include "CastingState.h"
-#include "ManaComponent.h"
+#include "InteractionState.h"
+#include "InteractorInterface.h"
 #include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
 
 TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
+}
+
+TObjectPtr<USkillUserState> UIdleState::OnInteraction(TObjectPtr<AController> controller) {
+	const auto interactor = Cast<IInteractorInterface>(controller);
+	if (interactor == nullptr) {
+		return _keepCurrentState();
+	}
+
+	const bool interactionSuccessful = interactor->PerformInteractionCheck();
+
+	/* We stay in idle if one of the following is true:
+	 * 1. The interaction check failed
+	 * 2. The interaction check succeeded but the interactor is already non interacting, meaning that the interaction
+	 *	  was instantaneous and there is no need to move to the interaction state.
+	 */
+	if (!interactionSuccessful || !interactor->IsInteracting()) {
+		return _keepCurrentState();
+	}
+
+	return NewObject<UInteractionState>(controller, UInteractionState::StaticClass());
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
@@ -45,10 +66,13 @@ TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillK
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
+	if (const auto interactor = Cast<IInteractorInterface>(controller)) {
+		interactor->PerformFocusCheck();
+	}
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UIdleState::OnSkillExecutionAborted(TObjectPtr<AController> controller) {
+TObjectPtr<USkillUserState> UIdleState::OnAbort(TObjectPtr<AController> controller) {
 	return _keepCurrentState();
 }
 
