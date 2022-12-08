@@ -7,34 +7,34 @@
 #include "Components/WidgetComponent.h"
 #include "UObject/WeakInterfacePtr.h"
 
-#include "InteractionComponent.generated.h"
+#include "InteractableComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginFocus, TScriptInterface<IInteractorInterface>, interactor);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndFocus, TScriptInterface<IInteractorInterface>, interactor);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginInteraction, TScriptInterface<IInteractorInterface>, interactor);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndInteraction, TScriptInterface<IInteractorInterface>, interactor);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteraction, TScriptInterface<IInteractorInterface>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginFocus, TScriptInterface<IInteractor>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndFocus, TScriptInterface<IInteractor>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginInteraction, TScriptInterface<IInteractor>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndInteraction, TScriptInterface<IInteractor>, interactor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteraction, TScriptInterface<IInteractor>, interactor);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class INTERACTIONSYSTEM_API UInteractionComponent : public UWidgetComponent {
+class INTERACTIONSYSTEM_API UInteractableComponent : public UWidgetComponent {
      GENERATED_BODY()
      
 public:
-	UInteractionComponent();
+	UInteractableComponent();
 
     /** \brief Shows the associated widget and communicates to the owner actor that focus has begun */
-    void BeginFocus(TScriptInterface<IInteractorInterface> interactor);
+    void BeginFocus(TScriptInterface<IInteractor> interactor);
     /** \brief Hides the associated widget and communicates to the owner actor that focus has begun */
-    void EndFocus(TScriptInterface<IInteractorInterface> interactor);
+    void EndFocus(TScriptInterface<IInteractor> interactor);
     /** \brief If the interaction is possible, communicates to the owner actor that the interactor has begun the
      * interaction process. The interactor is cached. */
-    void BeginInteraction(TScriptInterface<IInteractorInterface> interactor);
+    void BeginInteraction(TScriptInterface<IInteractor> interactor);
     /** \brief Communicates to the owner actor that interaction has ended. The interactor is removed from the internal
      * cache. */
-    void EndInteraction(TScriptInterface<IInteractorInterface> interactor);
+    void EndInteraction(TScriptInterface<IInteractor> interactor);
 	/** \brief If the interaction is possible, communicates to the owner actor that it's time to make the actual
 	 * interaction occur. */
-    void Interact(TScriptInterface<IInteractorInterface> interactor);
+    void Interact(TScriptInterface<IInteractor> interactor);
 
     /** \brief Returns the time that must elapse between BeginInteraction() and Interaction() calls. It's the
      * interactor's responsibility to make sure the calls are performed properly. */
@@ -57,10 +57,10 @@ protected:
 
 	void Deactivate() override;
 
-	bool _canInteract(const TScriptInterface<IInteractorInterface>& interactor) const;
+	bool _canInteract(const TScriptInterface<IInteractor>& interactor) const;
 
 	// Every AController currently interacting with this (player controller, AI controllerS)
-	TSet<TScriptInterface<IInteractorInterface>> _interactors;
+	TSet<TScriptInterface<IInteractor>> _interactors;
      
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Interaction")
 	double _interactionTime;
