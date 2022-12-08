@@ -241,6 +241,7 @@ bool AScalarFieldPlayerController::PerformInteractionCheck() {
 	_getInteractableBeingInteracted()->BeginInteraction(this);
 
 	if (FMath::IsNearlyZero(_getInteractableBeingInteracted()->GetInteractionTime())) {
+		UE_LOG(LogTemp, Warning, TEXT("Instantenous interactions ignore tactical pause!!"));
 		_interact();
 	} else {
 		GetWorldTimerManager().SetTimer(_interactionTimerHandle, this, &AScalarFieldPlayerController::_interact, _getInteractableBeingInteracted()->GetInteractionTime()); 
