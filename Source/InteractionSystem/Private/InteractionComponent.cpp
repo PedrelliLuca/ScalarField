@@ -25,7 +25,7 @@ UInteractionComponent::UInteractionComponent() {
 	// <<<<<
 }
 
-void UInteractionComponent::BeginFocus(TScriptInterface<IInteractorInterface> interactor) {
+void UInteractionComponent::BeginFocus(TScriptInterface<IInteractor> interactor) {
 	if (!IsActive() || !IsValid(interactor.GetObject())) {
 		return;
 	}
@@ -35,23 +35,23 @@ void UInteractionComponent::BeginFocus(TScriptInterface<IInteractorInterface> in
 	_onBeginFocus.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::EndFocus(TScriptInterface<IInteractorInterface> interactor) {
+void UInteractionComponent::EndFocus(TScriptInterface<IInteractor> interactor) {
 	SetHiddenInGame(true);
 	_onEndFocus.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::BeginInteraction(TScriptInterface<IInteractorInterface> interactor) {
+void UInteractionComponent::BeginInteraction(TScriptInterface<IInteractor> interactor) {
 	if (_canInteract(interactor)) {
 		_interactors.Emplace(interactor);
 		_onBeginInteraction.Broadcast(MoveTemp(interactor));
 	}
 }
 
-void UInteractionComponent::Interact(TScriptInterface<IInteractorInterface> interactor) {
+void UInteractionComponent::Interact(TScriptInterface<IInteractor> interactor) {
 	_onInteraction.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::EndInteraction(TScriptInterface<IInteractorInterface> interactor) {
+void UInteractionComponent::EndInteraction(TScriptInterface<IInteractor> interactor) {
 	_interactors.Remove(interactor);
 	_onEndInteraction.Broadcast(MoveTemp(interactor));
 }
@@ -106,7 +106,7 @@ void UInteractionComponent::Deactivate() {
  	_interactors.Empty();
 }
 
-bool UInteractionComponent::_canInteract(const TScriptInterface<IInteractorInterface>& interactor) const {
+bool UInteractionComponent::_canInteract(const TScriptInterface<IInteractor>& interactor) const {
 	// We want to stop a 2nd interactor from interacting in case multiple interactors aren't allowed.
 	const bool bIsAlreadyBeingInteracted = !_bAllowMultipleInteractors && _interactors.Num() >= 1;
 	// Moreover, the interaction cannot occur if the interactor isn't valid or this component isn't active.

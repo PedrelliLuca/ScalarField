@@ -15,10 +15,10 @@ TObjectPtr<USkillUserState> UInteractionState::OnTargeting(TObjectPtr<AActor> ta
 }
 
 TObjectPtr<USkillUserState> UInteractionState::OnInteraction(TObjectPtr<AController> controller) {
-	const auto interactor = Cast<IInteractorInterface>(controller);
+	const auto interactors = controller->GetComponentsByInterface(UInteractor::StaticClass());
 	// How did you even get in this state if the controller isn't an interactor??
-	check(interactor != nullptr);
-
+	check(interactors.Num() == 1);
+	const auto interactor = Cast<IInteractor>(interactors[0]);
 	interactor->PerformInteractionCheck();
 	return _keepCurrentState();
 }
@@ -26,9 +26,10 @@ TObjectPtr<USkillUserState> UInteractionState::OnInteraction(TObjectPtr<AControl
 TObjectPtr<USkillUserState> UInteractionState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
 	check(skillKey < KEY_ASSIGNABLE_SKILLS);
 
-	const auto interactor = Cast<IInteractorInterface>(controller);
+	const auto interactors = controller->GetComponentsByInterface(UInteractor::StaticClass());
 	// How did you even get in this state if the controller isn't an interactor??
-	check(interactor != nullptr);
+	check(interactors.Num() == 1);
+	const auto interactor = Cast<IInteractor>(interactors[0]);
 	// If the player begins a skill cast, the pending interaction has to end.
 	interactor->EndInteraction();
 
@@ -62,9 +63,10 @@ TObjectPtr<USkillUserState> UInteractionState::OnBeginSkillExecution(const int32
 }
 
 TObjectPtr<USkillUserState> UInteractionState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
-	const auto interactor = Cast<IInteractorInterface>(controller);
+	const auto interactors = controller->GetComponentsByInterface(UInteractor::StaticClass());
 	// How did you even get in this state if the controller isn't an interactor??
-	check(interactor != nullptr);
+	check(interactors.Num() == 1);
+	const auto interactor = Cast<IInteractor>(interactors[0]);
 	
 	interactor->PerformFocusCheck();
 
@@ -78,9 +80,10 @@ TObjectPtr<USkillUserState> UInteractionState::OnTick(float deltaTime, TObjectPt
 }
 
 TObjectPtr<USkillUserState> UInteractionState::OnAbort(TObjectPtr<AController> controller) {
-	const auto interactor = Cast<IInteractorInterface>(controller);
+	const auto interactors = controller->GetComponentsByInterface(UInteractor::StaticClass());
 	// How did you even get in this state if the controller isn't an interactor??
-	check(interactor != nullptr);
+	check(interactors.Num() == 1);
+	const auto interactor = Cast<IInteractor>(interactors[0]);
 	// If the player begins a skill cast, the pending interaction has to end.
 	interactor->EndInteraction();
 	
@@ -100,9 +103,10 @@ void UInteractionState::OnEnter(TObjectPtr<AController> controller) {
 
 void UInteractionState::OnLeave(TObjectPtr<AController> controller) {
 #if DO_CHECK
-	const auto interactor = Cast<IInteractorInterface>(controller);
+	const auto interactors = controller->GetComponentsByInterface(UInteractor::StaticClass());
 	// How did you even get in this state if the controller isn't an interactor??
-	check(interactor != nullptr);
+	check(interactors.Num() == 1);
+	const auto interactor = Cast<IInteractor>(interactors[0]);
 	check(!interactor->IsInteracting());
 #endif
 }

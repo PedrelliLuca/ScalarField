@@ -15,11 +15,14 @@ TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<AActor> target, T
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnInteraction(TObjectPtr<AController> controller) {
-	const auto interactor = Cast<IInteractorInterface>(controller);
-	if (interactor == nullptr) {
+	const auto interactors = controller->GetComponentsByInterface(UInteractor::StaticClass());
+	// How did you even get in this state if the controller isn't an interactor??
+	check(interactors.Num() <= 1);
+	if (interactors.IsEmpty()) {
 		return _keepCurrentState();
 	}
 
+	const auto interactor = Cast<IInteractor>(interactors[0]);
 	const bool interactionSuccessful = interactor->PerformInteractionCheck();
 
 	/* We stay in idle if one of the following is true:
@@ -66,7 +69,11 @@ TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillK
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnTick(float deltaTime, TObjectPtr<AController> controller) {
-	if (const auto interactor = Cast<IInteractorInterface>(controller)) {
+	const auto interactors = controller->GetComponentsByInterface(UInteractor::StaticClass());
+	// How did you even get in this state if the controller isn't an interactor??
+	check(interactors.Num() <= 1);
+	if (!interactors.IsEmpty()) {
+		const auto interactor = Cast<IInteractor>(interactors[0]);
 		interactor->PerformFocusCheck();
 	}
 	return _keepCurrentState();

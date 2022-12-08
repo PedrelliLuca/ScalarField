@@ -5,11 +5,11 @@
 #include "InteractorInterface.generated.h"
 
 UINTERFACE(MinimalAPI, NotBlueprintable)
-class UInteractorInterface : public UInterface {
+class UInteractor : public UInterface {
 	GENERATED_BODY()
 };
 
-class IInteractorInterface {
+class IInteractor {
 	GENERATED_BODY()
 
 public:
