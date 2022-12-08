@@ -7,7 +7,7 @@
 #include "Components/WidgetComponent.h"
 #include "UObject/WeakInterfacePtr.h"
 
-#include "InteractionComponent.generated.h"
+#include "InteractableComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginFocus, TScriptInterface<IInteractor>, interactor);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndFocus, TScriptInterface<IInteractor>, interactor);
@@ -16,11 +16,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEndInteraction, TScriptInterface<
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteraction, TScriptInterface<IInteractor>, interactor);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class INTERACTIONSYSTEM_API UInteractionComponent : public UWidgetComponent {
+class INTERACTIONSYSTEM_API UInteractableComponent : public UWidgetComponent {
      GENERATED_BODY()
      
 public:
-	UInteractionComponent();
+	UInteractableComponent();
 
     /** \brief Shows the associated widget and communicates to the owner actor that focus has begun */
     void BeginFocus(TScriptInterface<IInteractor> interactor);

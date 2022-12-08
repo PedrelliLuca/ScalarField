@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "InteractionComponent.h"
+#include "InteractableComponent.h"
 
 #include "InteractionWidget.h"
 
-UInteractionComponent::UInteractionComponent() {
+UInteractableComponent::UInteractableComponent() {
 	SetComponentTickEnabled(false);
 
 	_interactionTime = 0.0;
@@ -25,7 +25,7 @@ UInteractionComponent::UInteractionComponent() {
 	// <<<<<
 }
 
-void UInteractionComponent::BeginFocus(TScriptInterface<IInteractor> interactor) {
+void UInteractableComponent::BeginFocus(TScriptInterface<IInteractor> interactor) {
 	if (!IsActive() || !IsValid(interactor.GetObject())) {
 		return;
 	}
@@ -35,28 +35,28 @@ void UInteractionComponent::BeginFocus(TScriptInterface<IInteractor> interactor)
 	_onBeginFocus.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::EndFocus(TScriptInterface<IInteractor> interactor) {
+void UInteractableComponent::EndFocus(TScriptInterface<IInteractor> interactor) {
 	SetHiddenInGame(true);
 	_onEndFocus.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::BeginInteraction(TScriptInterface<IInteractor> interactor) {
+void UInteractableComponent::BeginInteraction(TScriptInterface<IInteractor> interactor) {
 	if (_canInteract(interactor)) {
 		_interactors.Emplace(interactor);
 		_onBeginInteraction.Broadcast(MoveTemp(interactor));
 	}
 }
 
-void UInteractionComponent::Interact(TScriptInterface<IInteractor> interactor) {
+void UInteractableComponent::Interact(TScriptInterface<IInteractor> interactor) {
 	_onInteraction.Broadcast(MoveTemp(interactor));
 }
 
-void UInteractionComponent::EndInteraction(TScriptInterface<IInteractor> interactor) {
+void UInteractableComponent::EndInteraction(TScriptInterface<IInteractor> interactor) {
 	_interactors.Remove(interactor);
 	_onEndInteraction.Broadcast(MoveTemp(interactor));
 }
 
-double UInteractionComponent::GetInteractionPercentage() const {
+double UInteractableComponent::GetInteractionPercentage() const {
 	// Show the interaction percentage of the interactor that has interacted for the longest time.
 	// This could be refactored in the future so that an array of percentages is returned, one for each interactor,
 	// with the player's one being marked. This way, the widget could show a progress bar for each interactor
@@ -70,17 +70,17 @@ double UInteractionComponent::GetInteractionPercentage() const {
 	return highestPercentage; 
 }
 
-void UInteractionComponent::SetInteractableNameText(const FText& newInteractableNameText)  {
+void UInteractableComponent::SetInteractableNameText(const FText& newInteractableNameText)  {
 	_interactableNameText = newInteractableNameText;
 	_refreshWidget();
 }
 
-void UInteractionComponent::SetInteractableActionText(const FText& newInteractableActionText) {
+void UInteractableComponent::SetInteractableActionText(const FText& newInteractableActionText) {
 	_interactableActionText = newInteractableActionText;
 	_refreshWidget();
 }
 
-void UInteractionComponent::BeginPlay() {
+void UInteractableComponent::BeginPlay() {
 	Super::BeginPlay();
 
 	/* Enable the outline for each meshComponent that is visible. We want to show the player that the owner actor is
@@ -94,7 +94,7 @@ void UInteractionComponent::BeginPlay() {
 	}
 }
 
-void UInteractionComponent::Deactivate() {
+void UInteractableComponent::Deactivate() {
 	Super::Deactivate();
 	
 	for (const auto& interactor : _interactors) {
@@ -106,14 +106,14 @@ void UInteractionComponent::Deactivate() {
  	_interactors.Empty();
 }
 
-bool UInteractionComponent::_canInteract(const TScriptInterface<IInteractor>& interactor) const {
+bool UInteractableComponent::_canInteract(const TScriptInterface<IInteractor>& interactor) const {
 	// We want to stop a 2nd interactor from interacting in case multiple interactors aren't allowed.
 	const bool bIsAlreadyBeingInteracted = !_bAllowMultipleInteractors && _interactors.Num() >= 1;
 	// Moreover, the interaction cannot occur if the interactor isn't valid or this component isn't active.
 	return IsValid(interactor.GetObject()) && IsActive() && !bIsAlreadyBeingInteracted;
 }
 
-void UInteractionComponent::_refreshWidget() {
+void UInteractableComponent::_refreshWidget() {
 	if (bHiddenInGame) {
 		// There is no point in updating the widget if it's hidden...
 		return;

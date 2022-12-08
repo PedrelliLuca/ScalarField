@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InteractionComponent.h"
+#include "InteractableComponent.h"
 #include "Blueprint/UserWidget.h"
 
 #include "InteractionWidget.generated.h"
@@ -14,12 +14,12 @@ class INTERACTIONSYSTEM_API UInteractionWidget : public UUserWidget {
      
 public:
      UFUNCTION(BlueprintCallable, Category = "Interaction")
-     void UpdateInteractionWidget(const UInteractionComponent* interactionComponent);
+     void UpdateInteractionWidget(const UInteractableComponent* interactionComponent);
 
 protected:
      UFUNCTION(BlueprintImplementableEvent)
      void _onUpdateInteractionWidget();
 
      UPROPERTY(BlueprintReadOnly, Category = "Interaction", meta = (ExposeOnSpawn))
-     TWeakObjectPtr<const UInteractionComponent> _owningInteractionComponent;
+     TWeakObjectPtr<const UInteractableComponent> _owningInteractionComponent;
 };

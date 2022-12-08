@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InteractionComponent.h"
+#include "InteractableComponent.h"
 #include "InteractorInterface.h"
 #include "Components/ActorComponent.h"
 
@@ -16,8 +16,8 @@ USTRUCT()
 struct FPlayerInteractionData {
      GENERATED_BODY()
 
-     TWeakObjectPtr<UInteractionComponent> InteractableBeingFocused = nullptr;
-     TWeakObjectPtr<UInteractionComponent> InteractableBeingInteracted = nullptr;
+     TWeakObjectPtr<UInteractableComponent> InteractableBeingFocused = nullptr;
+     TWeakObjectPtr<UInteractableComponent> InteractableBeingInteracted = nullptr;
      double TimestampOfLastFocusCheck = 0.0;
 };
 
@@ -42,11 +42,11 @@ protected:
 private:
      // Focus functions
      void _endFocus() override;
-     const TWeakObjectPtr<UInteractionComponent>& _getInteractableBeingFocused() const { return _interactionData.InteractableBeingFocused; }
+     const TWeakObjectPtr<UInteractableComponent>& _getInteractableBeingFocused() const { return _interactionData.InteractableBeingFocused; }
 
      // Interaction functions
      void _interact() override;
-     const TWeakObjectPtr<UInteractionComponent>& _getInteractableBeingInteracted() const { return _interactionData.InteractableBeingInteracted; }
+     const TWeakObjectPtr<UInteractableComponent>& _getInteractableBeingInteracted() const { return _interactionData.InteractableBeingInteracted; }
 
      TWeakObjectPtr<APlayerController> _ownerPlayerController = nullptr;
      FPlayerInteractionData _interactionData{};

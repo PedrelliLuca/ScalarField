@@ -24,22 +24,22 @@ void UInteractorPlayerComponent::PerformFocusCheck() {
 	FHitResult traceHit{};
 	if (GetWorld()->LineTraceSingleByChannel(traceHit, traceStart, traceEnd, ECollisionChannel::ECC_Visibility) && traceHit.GetActor()) {
 		// Does the actor we found have an interaction component?
-		if (TWeakObjectPtr<UInteractionComponent> hitInteractionC = traceHit.GetActor()->FindComponentByClass<UInteractionComponent>(); hitInteractionC.IsValid()) {
+		if (TWeakObjectPtr<UInteractableComponent> hitInteractableC = traceHit.GetActor()->FindComponentByClass<UInteractableComponent>(); hitInteractableC.IsValid()) {
 			const auto pawn = _ownerPlayerController->GetPawn();
 			check(IsValid(pawn));
 
 			// Is the component within reach?
 			const double distance = (traceHit.ImpactPoint - pawn->GetActorLocation()).Size();
-			if (distance <= hitInteractionC->GetInteractionDistance()) {
+			if (distance <= hitInteractableC->GetInteractionDistance()) {
 
 				// Is the component the one we're already focusing? If it isn't we update the interaction data,
 				// otherwise we don't do anything
-				if (hitInteractionC != _interactionData.InteractableBeingFocused) {
+				if (hitInteractableC != _interactionData.InteractableBeingFocused) {
 					_endFocus();
 	
 					// Here the actual replacement occurs
-					_interactionData.InteractableBeingFocused = hitInteractionC;
-					hitInteractionC->BeginFocus(this);
+					_interactionData.InteractableBeingFocused = hitInteractableC;
+					hitInteractableC->BeginFocus(this);
 				}
 
 				// This is crucial: we don't call _endFocus() if we're still focusing the same interactable.
