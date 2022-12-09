@@ -73,3 +73,76 @@ soon!" to the player. This doesn't necessarily mean that `EndFocus()` gets calle
 at the NPC and, in that case, the `UInteractionWidget` must still visible on the merchant's head. Only once the player turns
 his head `EndFocus()` is invoked: the interaction widget disappears, and the NPC is told so and transitions to its idle
 animation.
+
+## IInteractor
+Only objects implementing the `IInteractor` interface are allowed to deal with Interactables, i.e. actors owning a
+`UInteractableComponent.` "Dealing" with Interactables means that `IInteractor`s can focus and interact with them:
+- **Focusing** an Interactable means that the `IInteractor` is aware that the Interactable exist and, at the very least,
+ready to interact with it. 
+- **Interacting** with an Interactable means that the `IInteractor` has, at the very least, communicated to the Interactable
+that it intends to interact with it (`UInteractableComponent::BeginInteraction()` has been fired). This, of course, does not
+imply that `UInteractableComponent::Interact()` has been called. However, while interacting, we're sure that the `IInteractor`
+is committed to the interaction process.
+- Focus is generally required to start an interaction, and is usually no longer necessary once the interaction has begun.
+For example, you probably don't need focus to end an interaction.  However, the relation between focus and interaction is up to the
+`IInteractor`-specific implementation.
+
+Let's get an high level picture of `IInteractor`'s main functions:
+- `PerformFocusCheck()` gets executed when it's time for the `IInteractor` to check if it is currently focusing some
+Interactable. The nature of the checks depends on the specific `IInteractor` implementation (for example, a player controller
+could check if there is an Interactable under the mouse cursor, an AI controller if there is one within a certain range that
+matches some criteria). In any case, if the check is successful and an Interactable is found, 
+`UInteractableComponent::BeginFocus()` is called. We can now say that the `IInteractor` is focusing.
+- `_endFocus()` gets called when the `IInteractor` determines that it is time to forget the Interactable being focused.
+Before that though, `UInteractableComponent::EndFocus()` gets executed.
+- `PerformInteractionCheck()` gets invoked when the `IInteractor` needs to check if it can interact with some Interactable.
+Again, the nature of the checks varies depending on the `IInteractor` (Is it focusing something? Has a key been pressed? Is
+it already interacting with that Interactable?). If the checks succeed, this function must call
+`UInteractableComponent::BeginInteraction()` and, depending on the Interactable's interaction time, call or schedule a call
+to `IInteractor::_interact()`.
+- `_interact()` job is basically to call `UInteractableComponent::Interact()`, but it might perform some additional cleanup
+work depending on the specific `IInteractor`.
+- `EndInteraction()` terminates the current interaction, if any is occurring, by calling
+`UInteractableComponent::EndInteraction()`. This function could be called by the `IInteractor` itself, or by its owner if it
+is a component. An example of this could be when we start interacting with Interactable B while waiting for interaction
+with Interactable A. However, differently from the functions above, it is quite common for `EndInteract()` to be called by
+Interactables. Take an Interactable lamp for example: when the lamp turns on, it tells the `IInteractor` that flipped its
+switch "Ok, I've been turned on, our interaction is now over".
+
+Let's now take a look at a concrete `IInteractor`, the
+
+### UInteractorPlayerComponent
+This `IInteractor` is a `UActorComponent` owned by the `AScalarFieldPlayerController` that allows the player to
+interact using the mouse cursor. Here is how this component relates to the other modules of ScalarField:
+
+![interactionSystemInScalarField](./interactionSystemBigPicture.png)
+
+- When in Idle or Interaction state, every few ticks, the controller tells its `UInteractorPlayerComponent` that it's time to
+`PerformFocusCheck()`. The function's override casts a line trace from the mouse cursor and:
+    - If an actor with an `UInteractableComponent` that's not the one we're already focusing is hit and the controller's
+    Pawn is sufficiently close to it, we store the component within the `IInteractor` and call `BeginFocus()` on it.
+    - If the condition above isn't met, we forget whatever we're currently focusing by calling `_endFocus()`.
+- When in Idle or Interaction state the E key is pressed, the controller tells its `UInteractorPlayerComponent` that it's
+time to `PerformInteractionCheck()`:
+    - We first check the cached focused component. If we're already interacting with it or the cache is empty, nothing 
+    happens and we immediately quit the interaction check.
+    - Otherwise, we first call `UInteractorPlayerComponent::EndInteraction()` to stop any interaction that is currently in
+    progress. We want the player to interact with one Interactable at a time.
+    - Finally, we set the interactable being focused as being interacted, call `UInteractableComponent::BeginInteraction()`,
+    and (schedule a) call to `_interact()`
+- The player controller changes state depending on the result of the interaction check:
+    - If the interaction check was positive, it goes to Interaction state
+    - If the interaction check was negative, it goes to Idle state
+- `EndInteraction()` is also called if the player aborts the interaction by pressing Q or if the Interactable establishes
+that the interaction is over. In such cases, we go Idle on the following tick.
+
+Let's resume the relation between Focus and Interaction for this `IInteractor`:
+- Focus is required to start the Interaction.
+- Focus is not required to perform the Interaction, i.e. for `UInteractorPlayerComponent::_interact()` and
+`UInteractableComponent::Interact()` to be called.
+- Focus is not required to call `UInteractorPlayerComponent::EndInteraction()`.
+- The player can Focus and Interactable different from the one being interacted without the interaction being aborted.
+
+These choices have been made considering that ScalarField is a RPG with Tactical Pause. For different kinds of gameplay,
+different choices might be better. For example, in a FPS, requiring focus while waiting for the `_interact()` call might
+not be a bad idea.
