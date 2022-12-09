@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "HUDWidget.h"
-#include "InteractableComponent.h"
 #include "InteractorPlayerComponent.h"
 #include "PlayerMovementCommandComponent.h"
 #include "SkillUserState.h"
