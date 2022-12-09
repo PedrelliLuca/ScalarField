@@ -1,0 +1,99 @@
+@startuml
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam sequenceParticipant underline
+skinparam linetype ortho
+
+
+class UActorComponent
+class UWidgetComponent
+class UUserWidget
+
+UActorComponent <|-- UWidgetComponent
+UUserWidget <-- UWidgetComponent
+
+package InteractionSystem {
+    interface IInteractor {
+        + virtual void PerformFocusCheck() = 0
+        + virtual bool PerformInteractionCheck() = 0
+        + virtual void <color:darkviolet>EndInteraction</color>() = 0
+        + virtual bool IsInteracting() const = 0
+        + virtual double GetTimeLeftBeforeInteraction() const = 0
+        --
+        - virtual void _endFocus() = 0
+        - virtual void _interact() = 0
+    }
+    
+    struct FPlayerInteractionData {
+        + TWeakObjectPtr<UInteractableComponent> InteractableBeingFocused
+        + TWeakObjectPtr<UInteractableComponent> InteractableBeingInteracted
+        + double TimestampOfLastFocusCheck
+    }
+    
+    class UInteractorPlayerComponent {
+        // Implementation of IInteractor
+        # void BeginPlay() override
+        --
+        - const TWeakObjectPtr<UInteractableComponent>& _getInteractableBeingFocused() const
+        - const TWeakObjectPtr<UInteractableComponent>& _getInteractableBeingInteracted() const
+        - TWeakObjectPtr<UInteractableComponent> _ownerPlayerController
+        - FPlayerInteractionData _interactionData
+        - FTimerHandle _interactionTimerHandle
+        - double <color:darkorange> _timeBetweenFocusChecks </color>
+        - static constexpr double INTERACTION_TRACE_LENGTH
+    }
+    
+    IInteractor <|.. UInteractorPlayerComponent
+    FPlayerInteractionData <-- UInteractorPlayerComponent
+    
+    class UInteractableComponent {
+        + UInteractableComponent()
+        + void BeginFocus(TScriptInterface<IInteractor> interactor)
+        + void EndFocus(TScriptInterface<IInteractor> interactor)
+        + void BeginInteraction(TScriptInterface<IInteractor> interactor)
+        + void EndInteraction(TScriptInterface<IInteractor> interactor)
+        + void Interact(TScriptInterface<IInteractor> interactor)
+        + double GetInteractionTime() const
+        + double GetInteractionDistance() const
+        + double <color:darkviolet>GetInteractionPercentage</color>() const
+        + void <color:darkviolet>SetInteractableNameText</color>(const FText& newInteractableNameText)
+        + void <color:darkviolet>SetInteractableActionText</color>(const FText& newInteractableActionText)
+        --
+        # void BeginPlay() override
+        # void Deactivate() override
+        # bool _canInteract(const TScriptInterface<IInteractor>& interactor) const
+        # TSet<TScriptInterface<IInteractor>> _interactors
+        # double <color:darkorange>_interactionTime</color>
+        # double <color:darkorange>_interactionDistance</color>
+        # bool <color:darkorange>_bAllowMultipleInteractors</color>
+        # FText <color:darkorange>_interactableNameText</color>
+        # FText <color:darkorange>_interactableActionText</color>
+        # FOnBeginFocus <color:darkorange>_onBeginFocus</color>
+        # FOnEndFocus <color:darkorange>_onEndFocus</color>
+        # FOnBeginInteraction <color:darkorange>_onBeginInteraction</color>
+        # FOnInteraction <color:darkorange>_onInteraction</color>
+        # FOnEndInteraction <color:darkorange>_onEndInteraction</color>
+        --
+        - void _refreshWidget()
+    }
+    
+    UInteractableComponent <-- FPlayerInteractionData
+    UInteractableComponent <.. UInteractorPlayerComponent
+    IInteractor <-- UInteractableComponent
+    
+    class UInteractionWidget {
+        + void <color:darkviolet>UpdateInteractionWidget</color>(const UInteractableComponent* interactionComponent)
+        --
+        # void <color:darkviolet>_onUpdateInteractionWidget</color>()
+        # TWeakObjectPtr<const UInteractableComponent> <color:darkorange>_owningInteractionComponent</color>
+    }
+    
+    UInteractableComponent <-- UInteractionWidget
+}
+
+UUserWidget <|-- UInteractionWidget
+
+UActorComponent <|-- UInteractorPlayerComponent
+UWidgetComponent <|-- UInteractableComponent
+
+@enduml

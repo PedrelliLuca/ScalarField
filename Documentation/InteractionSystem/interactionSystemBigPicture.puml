@@ -1,0 +1,50 @@
+@startuml
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 20
+skinparam sequenceParticipant underline
+skinparam linetype ortho
+
+
+package InteractionSystem {
+    interface IInteractor
+    class UInteractorPlayerComponent
+    
+    IInteractor <|.. UInteractorPlayerComponent
+}
+
+package SkillUserFSM {
+    class USkillUserState {
+        + virtual TObjectPtr<USkillUserState> OnInteraction(TObjectPtr<AController> controller) = 0
+        + virtual TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) = 0
+        + virtual bool IsTickAffectedByPause() const = 0
+    }
+    
+    class UIdleState {
+        // Overrides of USkillUserState
+    }
+    
+    USkillUserState <|-- UIdleState
+    
+    class UInteractionState {
+        // Overrides of USkillUserState
+    }
+    
+    UIdleState <.left.> UInteractionState
+    
+    USkillUserState <|-- UInteractionState
+}
+
+IInteractor <-- UIdleState
+IInteractor <-- UInteractionState
+
+package ScalarField {
+    class AScalarFieldPlayerController {
+        - TObjectPtr<USkillUserState> _state
+        - TObjectPtr<UInteractorPlayerComponent> <color:darkorange>_interactorC</color>
+    }
+}
+
+USkillUserState <-- AScalarFieldPlayerController
+UInteractorPlayerComponent <-- AScalarFieldPlayerController
+
+@enduml
