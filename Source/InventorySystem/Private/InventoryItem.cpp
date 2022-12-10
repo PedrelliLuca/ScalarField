@@ -9,6 +9,7 @@ UInventoryItem::UInventoryItem() {
 	_nameText = LOCTEXT("Name", "Item");
 	_actionText = LOCTEXT("Action", "Use");
 	_weight = 0.0;
+	_volume = 0.0;
 	_bIsStackable = false;
 	_quantity = 1;
 	_maxQuantity = 2;  

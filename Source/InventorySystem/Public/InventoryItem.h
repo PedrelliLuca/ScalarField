@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "InventoryComponent.h"
 #include "Engine/StaticMesh.h"
 
 #include "InventoryItem.generated.h"
@@ -43,7 +42,7 @@ public:
      virtual void Use(TWeakObjectPtr<APawn> pawn) {}
 
      // Called to execute some logic when the item is added to the given inventory
-     virtual void OnItemAddedToInventory(TWeakObjectPtr<UInventoryComponent> inventory) {}
+     virtual void OnItemAddedToInventory(TWeakObjectPtr<class UInventoryComponent> inventory) {}
 
 protected:
      // The mesh to display when the item is in the world 
@@ -68,6 +67,9 @@ protected:
 
      UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item", meta = (ClampMin = 0.0))
      double _weight;
+
+     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item", meta = (ClampMin = 0.0))
+     double _volume;
 
      UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
      bool _bIsStackable;
