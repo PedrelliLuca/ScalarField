@@ -23,8 +23,8 @@ namespace UnrealBuildTool.Rules
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"InteractionSystem"
-					// ... add private dependencies that you statically link with here ...
+					"InteractionSystem", 
+					"InventorySystem"
 				}
 				);
 

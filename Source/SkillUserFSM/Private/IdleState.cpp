@@ -6,6 +6,7 @@
 #include "CastingState.h"
 #include "InteractionState.h"
 #include "InteractorInterface.h"
+#include "InventoryComponent.h"
 #include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
@@ -35,6 +36,15 @@ TObjectPtr<USkillUserState> UIdleState::OnInteraction(TObjectPtr<AController> co
 	}
 
 	return NewObject<UInteractionState>(controller, UInteractionState::StaticClass());
+}
+
+TObjectPtr<USkillUserState> UIdleState::OnToggleInventory(TObjectPtr<AController> controller) {
+	const auto pawn = controller->GetPawn();
+	if (const TWeakObjectPtr<UInventoryComponent> inventory = pawn->FindComponentByClass<UInventoryComponent>(); inventory.IsValid()) {
+		
+	}
+	
+	return _keepCurrentState();
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {

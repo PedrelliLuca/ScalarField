@@ -48,6 +48,8 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 
 	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_onInteractionInput);
 
+	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AScalarFieldPlayerController::_onToggleInventoryInput);
+
 	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
 
@@ -163,5 +165,10 @@ void AScalarFieldPlayerController::_createHUD() {
 
 void AScalarFieldPlayerController::_onInteractionInput() {
 	const auto newState = _state->OnInteraction(this);
+	_changingStateRoutine(newState);
+}
+
+void AScalarFieldPlayerController::_onToggleInventoryInput() {
+	const auto newState = _state->OnToggleInventory(this);
 	_changingStateRoutine(newState);
 }

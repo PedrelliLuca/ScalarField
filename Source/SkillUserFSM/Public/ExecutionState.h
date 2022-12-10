@@ -18,6 +18,7 @@ class SKILLUSERFSM_API UExecutionState : public USkillUserState {
 
 public:
 	TObjectPtr<USkillUserState> OnInteraction(TObjectPtr<AController> controller) override { return _keepCurrentState(); }
+	TObjectPtr<USkillUserState> OnToggleInventory(TObjectPtr<AController> controller) override { return _keepCurrentState(); }
 	bool IsTickAffectedByPause() const override { return true; }
 	
 	void SetSkillInExecution(TWeakObjectPtr<UAbstractSkill> skillInExecution) { _skillInExecution = skillInExecution; }

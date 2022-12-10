@@ -44,6 +44,8 @@ private:
 	
 	void _onInteractionInput();
 
+	void _onToggleInventoryInput();
+
 	void _onTacticalPauseToggled();
 	void _answerTacticalPauseToggle(bool bIsTacticalPauseOn, double currentWorldTimeDilation);
 

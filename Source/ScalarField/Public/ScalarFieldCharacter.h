@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "HealthComponent.h"
+#include "InventoryComponent.h"
 #include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
@@ -50,11 +51,11 @@ private:
 
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* _topDownCameraComponent;
+	UCameraComponent* _topDownCameraComponent;
 
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* _cameraBoom;
+	USpringArmComponent* _cameraBoom;
 
 	UPROPERTY()
 	TObjectPtr<UPrimitiveComponent> _simpleThermalCollision = nullptr;
@@ -76,6 +77,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Damage Handling", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UTemperatureDamageHandlerComponent> _temperatureDmgHandlerC;
+
+	UPROPERTY(VisibleAnywhere, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInventoryComponent> _inventoryC;
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
