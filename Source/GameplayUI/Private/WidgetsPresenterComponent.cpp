@@ -7,11 +7,27 @@ void UWidgetsPresenterComponent::SetOwnerPlayerController(TWeakObjectPtr<APlayer
 	check(playerController.IsValid());
 	_ownerPlayerController = playerController;
 	_createHUD();
+	_createInventoryPresenter();
+}
+
+bool UWidgetsPresenterComponent::IsInventoryOnViewport() const {
+	return _inventoryPresenterWidget->IsInViewport();
+}
+
+void UWidgetsPresenterComponent::ShowInventory(TWeakObjectPtr<UInventoryComponent> inventoryComponent) {
+	check(inventoryComponent.IsValid());
+	_hudWidget->RemoveFromViewport();
+	_inventoryPresenterWidget->AddToViewport();
+}
+
+void UWidgetsPresenterComponent::HideInventory() {
+	_inventoryPresenterWidget->RemoveFromViewport();
+	_hudWidget->AddToViewport();
 }
 
 void UWidgetsPresenterComponent::_createHUD() {
 	if (!IsValid(_hudWidgetClass)) {
-		UE_LOG(LogTemp, Error, TEXT("%s() Missing UHUDWidget class. Please fill in on the Blueprint of the PlayerController."), *FString(__FUNCTION__));
+		UE_LOG(LogTemp, Error, TEXT("%s() Missing hud class. Please fill in on the Blueprint of the PlayerController."), *FString(__FUNCTION__));
 		return;
 	}
 
@@ -20,6 +36,17 @@ void UWidgetsPresenterComponent::_createHUD() {
 	}
 	_hudWidget->AddToViewport();
 	_hudWidget->BindToPawn(_ownerPlayerController->GetPawn());
+}
+
+void UWidgetsPresenterComponent::_createInventoryPresenter() {
+	if (!IsValid(_inventoryPresenterWidgetClass)) {
+		UE_LOG(LogTemp, Error, TEXT("%s() Missing inventory presenter class. Please fill in on the Blueprint of the PlayerController."), *FString(__FUNCTION__));
+		return;
+	}
+
+	if (!IsValid(_inventoryPresenterWidget)) {
+		_inventoryPresenterWidget = CreateWidget<UUserWidget>(_ownerPlayerController.Get(), _inventoryPresenterWidgetClass);
+	}
 }
 
 

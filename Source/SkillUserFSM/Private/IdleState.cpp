@@ -10,6 +10,7 @@
 #include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
+#include "WidgetsPresenterComponent.h"
 
 TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
@@ -39,10 +40,22 @@ TObjectPtr<USkillUserState> UIdleState::OnInteraction(TObjectPtr<AController> co
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnToggleInventory(TObjectPtr<AController> controller) {
-	const auto pawn = controller->GetPawn();
-	if (const TWeakObjectPtr<UInventoryComponent> inventory = pawn->FindComponentByClass<UInventoryComponent>(); inventory.IsValid()) {
-		
+	const TWeakObjectPtr<UWidgetsPresenterComponent> widgetsPresenter = controller->FindComponentByClass<UWidgetsPresenterComponent>();
+	if (!widgetsPresenter.IsValid()) {
+		return _keepCurrentState();
 	}
+
+	if (widgetsPresenter->IsInventoryOnViewport()) {
+		widgetsPresenter->HideInventory();
+		return _keepCurrentState();
+	}
+	
+	const auto pawn = controller->GetPawn();
+	check(IsValid(pawn));
+	const TWeakObjectPtr<UInventoryComponent> inventory = pawn->FindComponentByClass<UInventoryComponent>();
+	// Controllers with widget presenters must also have inventories to toggle
+	check(inventory.IsValid());
+	widgetsPresenter->ShowInventory(inventory);
 	
 	return _keepCurrentState();
 }
