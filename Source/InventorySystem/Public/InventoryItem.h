@@ -8,6 +8,8 @@
 
 #include "InventoryItem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemModified);
+
 UENUM(BlueprintType)
 enum class EItemRarity : uint8 {
      IR_Common UMETA(DisplayName = "Common"),
@@ -25,11 +27,23 @@ class INVENTORYSYSTEM_API UInventoryItem : public UObject {
 public:
      UInventoryItem();
 
+#if WITH_EDITOR
+     void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
+#endif
+
      UFUNCTION(BlueprintPure, Category = "Item")
      FORCEINLINE double GetStackWeight() const { return _quantity * _weight; }
 
+     UFUNCTION(BlueprintCallable, Category = "Item")
+     void SetQuantity(int32 newQuantity);
+
      UFUNCTION(BlueprintPure, Category = "Item")
-     virtual bool ShouldShowInInventory() const;
+     virtual bool ShouldShowInInventory() const { return true; }
+
+     virtual void Use(TWeakObjectPtr<APawn> pawn) {}
+
+     // Called to execute some logic when the item is added to the given inventory
+     virtual void OnItemAddedToInventory(TWeakObjectPtr<UInventoryComponent> inventory) {}
 
 protected:
      // The mesh to display when the item is in the world 
@@ -41,13 +55,13 @@ protected:
      TObjectPtr<UTexture2D> _inventoryThumbnail;
 
      UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-     FText _name;
+     FText _nameText;
 
      UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item", meta = (MultiLine = true))
-     FText _description;
+     FText _descriptionText;
 
      UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
-     FText _action;
+     FText _actionText;
 
      UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
      EItemRarity _rarity;
@@ -65,4 +79,7 @@ protected:
      // The number of items of this kind that this instance is currently storing
      UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (UIMin = 1, EditCondition = _bIsStackable))
      int32 _quantity;
+
+     UPROPERTY(BlueprintAssignable)
+     FOnItemModified _onItemModified;
 };
