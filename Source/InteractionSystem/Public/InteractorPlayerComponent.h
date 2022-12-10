@@ -26,6 +26,8 @@ class INTERACTIONSYSTEM_API UInteractorPlayerComponent : public UActorComponent,
      GENERATED_BODY()
      
 public:
+     UInteractorPlayerComponent();
+     
      // Focus functions
      void PerformFocusCheck() override;
 	
