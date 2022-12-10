@@ -2,9 +2,7 @@
 
 #include "ScalarFieldPlayerController.h"
 
-#include "HealthComponent.h"
 #include "IdleState.h"
-#include "ManaComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
@@ -13,6 +11,7 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 
 	_movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
 	_interactorC = CreateDefaultSubobject<UInteractorPlayerComponent>(TEXT("Interactor Component"));
+	_widgetsPresenter = CreateDefaultSubobject<UWidgetsPresenterComponent>(TEXT("Widgets Presenter"));
 }
 
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
@@ -62,7 +61,7 @@ void AScalarFieldPlayerController::BeginPlay() {
 	pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
 	_bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
 
-	_createHUD();
+	_widgetsPresenter->SetOwnerPlayerController(this);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
@@ -116,12 +115,11 @@ void AScalarFieldPlayerController::_onTacticalPauseToggled() {
 
 void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTacticalPauseOn, const double currentWorldTimeDilation) {
 	/* Here we're literally overriding whatever the UTacticalPauseWorldSubsystem just did. 
-	 * The PlayerController must never, ever, have its time dilation different from 1, since
+	 * The PlayerController must never, ever, have its time dilation close to zero, since
 	 * that would cause the player to not be able to send any kind of input. */
 	CustomTimeDilation = 1. / currentWorldTimeDilation;
 
 	_bIsTacticalPauseOn = bIsTacticalPauseOn;
-	_hudWidget->SetPauseStatus(_bIsTacticalPauseOn);
 }
 
 void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserState> newState) {
@@ -130,37 +128,6 @@ void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserSt
 		_state = newState;
 		_state->OnEnter(this);
 	}
-}
-
-void AScalarFieldPlayerController::_createHUD() {
-	// Create only once
-	check(!IsValid(_hudWidget));
-
-	if (!IsValid(_hudWidgetClass)) {
-		UE_LOG(LogTemp, Error, TEXT("%s() Missing UHUDWidget class. Please fill in on the Blueprint of the PlayerController."), *FString(__FUNCTION__));
-		return;
-	}
-
-	_hudWidget = CreateWidget<UHUDWidget>(this, _hudWidgetClass);
-    _hudWidget->AddToViewport();
-
-	const auto pawn = GetPawn();
-
-	const auto healthC = pawn->FindComponentByClass<const UHealthComponent>();
-	check(IsValid(healthC));
-
-	_hudWidget->SetCurrentHealth(healthC->GetCurrentHealth());
-	_hudWidget->SetMaxHealth(healthC->GetMaxHealth());
-	_hudWidget->SetHealthRegen(healthC->GetHealthRegen());
-
-	const auto manaC = pawn->FindComponentByClass<const UManaComponent>();
-	check(IsValid(manaC));
-
-	_hudWidget->SetCurrentMana(manaC->GetCurrentMana());
-	_hudWidget->SetMaxMana(manaC->GetMaxMana());
-	_hudWidget->SetManaRegen(manaC->GetManaRegen());
-
-	_hudWidget->SetPauseStatus(_bIsTacticalPauseOn);
 }
 
 void AScalarFieldPlayerController::_onInteractionInput() {

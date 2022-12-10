@@ -14,13 +14,17 @@ namespace UnrealBuildTool.Rules
                     "Core",
 					"CoreUObject",
 					"Engine",
-					"UMG",
+					"UMG", 
+					"GameplayAttributes",
                 }
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
+					"GameplayAttributes", 
+					"TacticalPauseSystem", 
+					"Thermodynamics", 
 					// ... add private dependencies that you statically link with here ...
 				}
 				);
