@@ -17,6 +17,7 @@ namespace UnrealBuildTool.Rules
 					"SkillSystem",
 					"MovementCommand",
 					"GameplayAttributes",
+					"GameplayUI"
 				}
 				);
 
@@ -25,7 +26,6 @@ namespace UnrealBuildTool.Rules
 				{
 					"InteractionSystem", 
 					"InventorySystem", 
-					"GameplayUI"
 				}
 				);
 

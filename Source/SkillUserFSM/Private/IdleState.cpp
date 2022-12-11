@@ -6,7 +6,7 @@
 #include "CastingState.h"
 #include "InteractionState.h"
 #include "InteractorInterface.h"
-#include "InventoryComponent.h"
+#include "InventoryLookupState.h"
 #include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
@@ -45,19 +45,7 @@ TObjectPtr<USkillUserState> UIdleState::OnToggleInventory(TObjectPtr<AController
 		return _keepCurrentState();
 	}
 
-	if (widgetsPresenter->IsInventoryOnViewport()) {
-		widgetsPresenter->HideInventory();
-		return _keepCurrentState();
-	}
-	
-	const auto pawn = controller->GetPawn();
-	check(IsValid(pawn));
-	const TWeakObjectPtr<UInventoryComponent> inventory = pawn->FindComponentByClass<UInventoryComponent>();
-	// Controllers with widget presenters must also have inventories to toggle
-	check(inventory.IsValid());
-	widgetsPresenter->ShowInventory(inventory);
-	
-	return _keepCurrentState();
+	return NewObject<UInventoryLookupState>(controller, UInventoryLookupState::StaticClass());
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
