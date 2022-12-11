@@ -19,6 +19,7 @@ class GAMEPLAYUI_API UHUDWidget : public UUserWidget {
 	
 public:
 	void BindToPawn(TWeakObjectPtr<APawn> pawn);
+	void RemovePawnBindings();
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -48,8 +49,6 @@ protected:
 	double _maxMana = 0.;
 	
 private:
-	void _removePawnBindings();
-	
 	void _setMaxHealth(double newMaxHealth);
 	void _setCurrentHealth(double newCurrentHealth);
 

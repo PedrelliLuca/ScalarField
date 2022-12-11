@@ -12,7 +12,7 @@
 
 void UHUDWidget::BindToPawn(const TWeakObjectPtr<APawn> pawn) {
 	check(pawn.IsValid());
-	_removePawnBindings();
+	RemovePawnBindings();
 	
 	_healthC = pawn->FindComponentByClass<UHealthComponent>();
 	check(_healthC.IsValid())
@@ -47,7 +47,7 @@ void UHUDWidget::BindToPawn(const TWeakObjectPtr<APawn> pawn) {
 	}
 }
 
-void UHUDWidget::_removePawnBindings() {
+void UHUDWidget::RemovePawnBindings() {
 	if (_healthC.IsValid()) {
 		_healthC->OnHealthChanged().Remove(_healthChangedHandle);
 		_healthC->OnMaxHealthChanged().Remove(_maxHealthChangedHandle);
