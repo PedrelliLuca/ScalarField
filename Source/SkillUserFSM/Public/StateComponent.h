@@ -13,6 +13,7 @@ class SKILLUSERFSM_API UStateComponent : public UActorComponent {
      
 public:
     bool IsCurrentStateAffectedByPause() const;
+    bool IsLookingAtWidget() const;
 
     void PerformTargetingBehavior(TObjectPtr<AActor> target);
     void PerformSkillExecutionBehavior(int32 skillKey);

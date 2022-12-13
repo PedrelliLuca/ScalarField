@@ -4,10 +4,15 @@
 #include "StateComponent.h"
 
 #include "IdleState.h"
+#include "InventoryLookupState.h"
 #include "SkillUserState.h"
 
 bool UStateComponent::IsCurrentStateAffectedByPause() const {
 	return _state->IsTickAffectedByPause();
+}
+
+bool UStateComponent::IsLookingAtWidget() const {
+	return _state->IsA<UInventoryLookupState>();
 }
 
 void UStateComponent::PerformTargetingBehavior(TObjectPtr<AActor> target) {

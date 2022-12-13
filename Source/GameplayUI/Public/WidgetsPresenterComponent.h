@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "Components/ActorComponent.h"
 #include "HUDWidget.h"
 #include "InventoryComponent.h"
-#include "Components/ActorComponent.h"
+#include "InventoryPresenterWidget.h"
 
 #include "WidgetsPresenterComponent.generated.h"
 
@@ -35,8 +37,8 @@ private:
      TObjectPtr<UHUDWidget> _hudWidget = nullptr;
 
      UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-     TSubclassOf<UUserWidget> _inventoryPresenterWidgetClass = nullptr;
+     TSubclassOf<UInventoryPresenterWidget> _inventoryPresenterWidgetClass = nullptr;
 
      UPROPERTY()
-     TObjectPtr<UUserWidget> _inventoryPresenterWidget = nullptr;
+     TObjectPtr<UInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
 };

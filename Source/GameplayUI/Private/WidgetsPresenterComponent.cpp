@@ -47,7 +47,7 @@ void UWidgetsPresenterComponent::_createInventoryPresenter() {
 	}
 
 	if (!IsValid(_inventoryPresenterWidget)) {
-		_inventoryPresenterWidget = CreateWidget<UUserWidget>(_ownerPlayerController.Get(), _inventoryPresenterWidgetClass);
+		_inventoryPresenterWidget = CreateWidget<UInventoryPresenterWidget>(_ownerPlayerController.Get(), _inventoryPresenterWidgetClass);
 	}
 }
 
