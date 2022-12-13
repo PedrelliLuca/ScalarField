@@ -4,6 +4,7 @@
 #include "StateComponent.h"
 
 #include "IdleState.h"
+#include "SkillUserState.h"
 
 bool UStateComponent::IsCurrentStateAffectedByPause() const {
 	return _state->IsTickAffectedByPause();

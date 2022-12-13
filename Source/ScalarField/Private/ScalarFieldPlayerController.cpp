@@ -2,7 +2,6 @@
 
 #include "ScalarFieldPlayerController.h"
 
-#include "IdleState.h"
 #include "TacticalPauseWorldSubsystem.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {

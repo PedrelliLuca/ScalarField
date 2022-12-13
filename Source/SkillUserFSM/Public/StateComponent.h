@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "SkillUserState.h"
 
 #include "StateComponent.generated.h"
 
@@ -28,7 +27,7 @@ protected:
 
 private:
     // Performs the transition to newState if the state in input is not nullptr
-    bool _performStateTransitionRoutine(TObjectPtr<USkillUserState> newState);
+    bool _performStateTransitionRoutine(TObjectPtr<class USkillUserState> newState);
 
     UPROPERTY()
 	TObjectPtr<USkillUserState> _state = nullptr;
