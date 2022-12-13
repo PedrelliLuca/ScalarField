@@ -10,6 +10,7 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	DefaultMouseCursor = EMouseCursor::Default;
 
 	_movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
+	_stateC = CreateDefaultSubobject<UStateComponent>(TEXT("State Component"));
 	_interactorC = CreateDefaultSubobject<UInteractorPlayerComponent>(TEXT("Interactor Component"));
 	_widgetsPresenter = CreateDefaultSubobject<UWidgetsPresenterComponent>(TEXT("Widgets Presenter"));
 }
@@ -19,9 +20,8 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 	
 	// Generally speaking, the tick of the states should stop if the tactical pause is active. However, some states
 	// are special and are not affected by it.
-	if (!_bIsTacticalPauseOn || !_state->IsTickAffectedByPause()) {
-		const auto newState = _state->OnTick(deltaTime, this);
-		_changingStateRoutine(newState);
+	if (!_bIsTacticalPauseOn || !_stateC->IsCurrentStateAffectedByPause()) {
+		_stateC->PerformTickBehavior(deltaTime);
 	}
 
 	// Tick of movement commands never occurs during the tactical pause.
@@ -42,21 +42,19 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
 	InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
 	InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
-	InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onCastAborted);
+	InputComponent->BindAction("AbortCast", IE_Pressed, _stateC.Get(), &UStateComponent::PerformAbortBehavior);
 	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
-	InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_onInteractionInput);
+	InputComponent->BindAction("Interact", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInteractionBehavior);
 
-	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AScalarFieldPlayerController::_onToggleInventoryInput);
+	InputComponent->BindAction("ToggleInventory", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInventoryToggleBehavior);
 
 	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
 
 void AScalarFieldPlayerController::BeginPlay() {
 	Super::BeginPlay();
-	_state = NewObject<UIdleState>(this, UIdleState::StaticClass());
-	_movementCommandC->SetDefaultMovementMode();
-
+	
 	const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
 	pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
 	_bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
@@ -75,38 +73,27 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
 void AScalarFieldPlayerController::_onSetTargetPressed() {
 	FHitResult hit;
 	GetHitResultUnderCursor(ECC_Visibility, true, hit);
-	const auto newState = _state->OnTargeting(hit.GetActor(), this);
-	_changingStateRoutine(newState);
+	_stateC->PerformTargetingBehavior(hit.GetActor());
 }
 
 void AScalarFieldPlayerController::_onSkill1Cast() {
-	const auto newState = _state->OnBeginSkillExecution(1, this);
-	_changingStateRoutine(newState);
+	_stateC->PerformSkillExecutionBehavior(1);
 }
 
 void AScalarFieldPlayerController::_onSkill2Cast() {
-	const auto newState = _state->OnBeginSkillExecution(2, this);
-	_changingStateRoutine(newState);
+	_stateC->PerformSkillExecutionBehavior(2);
 }
 
 void AScalarFieldPlayerController::_onSkill3Cast() {
-	const auto newState = _state->OnBeginSkillExecution(3, this);
-	_changingStateRoutine(newState);
+	_stateC->PerformSkillExecutionBehavior(3);
 }
 
 void AScalarFieldPlayerController::_onSkill4Cast() {
-	const auto newState = _state->OnBeginSkillExecution(4, this);
-	_changingStateRoutine(newState);
+	_stateC->PerformSkillExecutionBehavior(4);
 }
 
 void AScalarFieldPlayerController::_onSkill5Cast() {
-	const auto newState = _state->OnBeginSkillExecution(5, this);
-	_changingStateRoutine(newState);
-}
-
-void AScalarFieldPlayerController::_onCastAborted() {
-	const auto newState = _state->OnAbort(this);
-	_changingStateRoutine(newState);
+	_stateC->PerformSkillExecutionBehavior(5);
 }
 
 void AScalarFieldPlayerController::_onTacticalPauseToggled() {
@@ -120,22 +107,4 @@ void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTact
 	CustomTimeDilation = 1. / currentWorldTimeDilation;
 
 	_bIsTacticalPauseOn = bIsTacticalPauseOn;
-}
-
-void AScalarFieldPlayerController::_changingStateRoutine(TObjectPtr<USkillUserState> newState) {
-	if (IsValid(newState)) {
-		_state->OnLeave(this);
-		_state = newState;
-		_state->OnEnter(this);
-	}
-}
-
-void AScalarFieldPlayerController::_onInteractionInput() {
-	const auto newState = _state->OnInteraction(this);
-	_changingStateRoutine(newState);
-}
-
-void AScalarFieldPlayerController::_onToggleInventoryInput() {
-	const auto newState = _state->OnToggleInventory(this);
-	_changingStateRoutine(newState);
 }

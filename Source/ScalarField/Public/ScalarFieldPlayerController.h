@@ -6,7 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "InteractorPlayerComponent.h"
 #include "PlayerMovementCommandComponent.h"
-#include "SkillUserState.h"
+#include "StateComponent.h"
 #include "WidgetsPresenterComponent.h"
 
 #include "ScalarFieldPlayerController.generated.h"
@@ -38,22 +38,14 @@ private:
 	void _onSkill4Cast();
 	void _onSkill5Cast();
 
-	void _onCastAborted();
-	
-	void _onInteractionInput();
-
-	void _onToggleInventoryInput();
-
 	void _onTacticalPauseToggled();
 	void _answerTacticalPauseToggle(bool bIsTacticalPauseOn, double currentWorldTimeDilation);
 
-	void _changingStateRoutine(TObjectPtr<USkillUserState> newState);
-	
-	UPROPERTY()
-	TObjectPtr<USkillUserState> _state;
-
 	UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
 	TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
+
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	TObjectPtr<UStateComponent> _stateC;
 
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	TObjectPtr<UInteractorPlayerComponent> _interactorC;
