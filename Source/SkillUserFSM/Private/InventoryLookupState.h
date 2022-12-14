@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "SkillUserState.h"
-#include "WidgetsPresenterComponent.h"
 
 #include "InventoryLookupState.generated.h"
 
@@ -29,6 +28,4 @@ public:
 
 	bool IsTickAffectedByPause() const override { return true; }
 
-private:
-	TWeakObjectPtr<UWidgetsPresenterComponent> _widgetsPresenter = nullptr;
 };

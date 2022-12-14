@@ -2,9 +2,9 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class GameplayUI : ModuleRules
+	public class WidgetsPresentation : ModuleRules
 	{
-		public GameplayUI(ReadOnlyTargetRules Target) : base(Target)
+		public WidgetsPresentation(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
@@ -14,18 +14,15 @@ namespace UnrealBuildTool.Rules
                     "Core",
 					"CoreUObject",
 					"Engine",
-					"UMG", 
-					"GameplayAttributes", 
+					"GameplayUI",
+					"InventorySystem",
                 }
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"GameplayAttributes", 
-					"TacticalPauseSystem", 
-					"Thermodynamics", 
-					// ... add private dependencies that you statically link with here ...
+					"UMG"
 				}
 				);
 

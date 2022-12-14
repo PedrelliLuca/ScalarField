@@ -27,6 +27,7 @@ public class ScalarField : ModuleRules
             "UMG",
             "InteractionSystem",
             "InventorySystem",
+            "WidgetsPresentation"
         });
     }
 }

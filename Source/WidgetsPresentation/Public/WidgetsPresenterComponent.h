@@ -15,7 +15,7 @@
  * \brief Component that manages how the widgets behave with respect to each other
  */
 UCLASS()
-class GAMEPLAYUI_API UWidgetsPresenterComponent : public UActorComponent {
+class WIDGETSPRESENTATION_API UWidgetsPresenterComponent : public UActorComponent {
      GENERATED_BODY()
      
 public:

@@ -17,7 +17,6 @@ namespace UnrealBuildTool.Rules
 					"SkillSystem",
 					"MovementCommand",
 					"GameplayAttributes",
-					"GameplayUI"
 				}
 				);
 
@@ -25,9 +24,10 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
 					"InteractionSystem", 
-					"InventorySystem", 
-				}
-				);
+					"InventorySystem",
+                    "WidgetsPresentation",
+                }
+                );
 
 			DynamicallyLoadedModuleNames.AddRange(
 				new string[]
