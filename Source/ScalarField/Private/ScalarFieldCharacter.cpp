@@ -144,7 +144,7 @@ void AScalarFieldCharacter::_setOverlappingCells() {
 }
 
 void AScalarFieldCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {
-	check(!_materialInstance.IsNull());
+	check(_materialInstance != nullptr);
 	_materialInstance->SetVectorParameterValue(TEXT("Tint"), temperatureColor);
 }
 

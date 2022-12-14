@@ -16,13 +16,13 @@ bool UWidgetsPresenterComponent::IsInventoryOnViewport() const {
 
 void UWidgetsPresenterComponent::ShowInventory(TWeakObjectPtr<UInventoryComponent> inventoryComponent) {
 	check(inventoryComponent.IsValid());
-	_hudWidget->RemoveFromViewport();
+	_hudWidget->RemoveFromParent();
 	_hudWidget->RemovePawnBindings();
 	_inventoryPresenterWidget->AddToViewport();
 }
 
 void UWidgetsPresenterComponent::HideInventory() {
-	_inventoryPresenterWidget->RemoveFromViewport();
+	_inventoryPresenterWidget->RemoveFromParent();
 	_hudWidget->AddToViewport();
 	_hudWidget->BindToPawn(_ownerPlayerController->GetPawn());
 }
