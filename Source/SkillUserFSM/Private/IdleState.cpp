@@ -10,7 +10,6 @@
 #include "MovementCommandSetter.h"
 #include "SkillsContainerComponent.h"
 #include "TargetingState.h"
-#include "WidgetsPresenterComponent.h"
 
 TObjectPtr<USkillUserState> UIdleState::OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) {
 	return _keepCurrentState();
@@ -40,11 +39,6 @@ TObjectPtr<USkillUserState> UIdleState::OnInteraction(TObjectPtr<AController> co
 }
 
 TObjectPtr<USkillUserState> UIdleState::OnToggleInventory(TObjectPtr<AController> controller) {
-	const TWeakObjectPtr<UWidgetsPresenterComponent> widgetsPresenter = controller->FindComponentByClass<UWidgetsPresenterComponent>();
-	if (!widgetsPresenter.IsValid()) {
-		return _keepCurrentState();
-	}
-
 	return NewObject<UInventoryLookupState>(controller, UInventoryLookupState::StaticClass());
 }
 

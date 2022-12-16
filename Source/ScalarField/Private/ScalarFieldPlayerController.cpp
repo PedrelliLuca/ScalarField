@@ -3,6 +3,8 @@
 #include "ScalarFieldPlayerController.h"
 
 #include "TacticalPauseWorldSubsystem.h"
+#include "InventorySubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	bShowMouseCursor = true;
@@ -11,7 +13,7 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	_movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
 	_stateC = CreateDefaultSubobject<UStateComponent>(TEXT("State Component"));
 	_interactorC = CreateDefaultSubobject<UInteractorPlayerComponent>(TEXT("Interactor Component"));
-	_widgetsPresenter = CreateDefaultSubobject<UWidgetsPresenterComponent>(TEXT("Widgets Presenter"));
+	_widgetsPresenterC = CreateDefaultSubobject<UWidgetsPresenterComponent>(TEXT("Widgets Presenter"));
 }
 
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
@@ -58,7 +60,10 @@ void AScalarFieldPlayerController::BeginPlay() {
 	pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
 	_bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
 
-	_widgetsPresenter->SetOwnerPlayerController(this);
+	_widgetsPresenterC->SetOwnerPlayerController(this);
+
+	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventorySubsystem>();
+	inventorySubsys->SetWidgetsPresenter(_widgetsPresenterC);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {

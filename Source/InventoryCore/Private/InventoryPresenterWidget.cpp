@@ -3,13 +3,7 @@
 
 #include "InventoryPresenterWidget.h"
 
-#include "StateComponent.h"
 
-
-void UInventoryPresenterWidget::OnClose() {
-	const TWeakObjectPtr<UStateComponent> stateC = GetOwningPlayer()->FindComponentByClass<UStateComponent>();
-	check(stateC.IsValid());
-	check(stateC->IsLookingAtWidget());
-
-	stateC->PerformInventoryToggleBehavior();
+void UInventoryPresenterWidget::_onClose() {
+	_onButtonClose.Broadcast();
 }

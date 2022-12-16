@@ -27,7 +27,11 @@ public class ScalarField : ModuleRules
             "UMG",
             "InteractionSystem",
             "InventoryCore",
-            "WidgetsPresentation"
+            "WidgetsPresentation",
+        });
+
+        PrivateDependencyModuleNames.AddRange(new string[] {
+            "InventoryService",
         });
     }
 }

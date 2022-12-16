@@ -7,11 +7,19 @@
 
 #include "InventoryPresenterWidget.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnButtonClose);
+
 UCLASS()
 class INVENTORYCORE_API UInventoryPresenterWidget : public UUserWidget {
      GENERATED_BODY()
-     
+  
 public:
+    FOnButtonClose& OnButtonClose() { return _onButtonClose; }
+
+protected:
     UFUNCTION(BlueprintCallable)
-    void OnClose();
+    void _onClose();
+
+private:
+    FOnButtonClose _onButtonClose{};
 };

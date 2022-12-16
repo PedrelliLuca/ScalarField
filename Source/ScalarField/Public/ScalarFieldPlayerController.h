@@ -51,7 +51,7 @@ private:
 	TObjectPtr<UInteractorPlayerComponent> _interactorC;
 
 	UPROPERTY(VisibleAnywhere, Category = "Widgets Presentation")
-	TObjectPtr<UWidgetsPresenterComponent> _widgetsPresenter;
+	TObjectPtr<UWidgetsPresenterComponent> _widgetsPresenterC;
 
 	bool _bIsTacticalPauseOn = false;
 };

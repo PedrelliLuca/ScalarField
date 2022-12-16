@@ -2,9 +2,9 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class SkillUserFSM : ModuleRules
+	public class InventoryService : ModuleRules
 	{
-		public SkillUserFSM(ReadOnlyTargetRules Target) : base(Target)
+		public InventoryService(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
@@ -14,20 +14,16 @@ namespace UnrealBuildTool.Rules
                     "Core",
                     "CoreUObject",
                     "Engine",
-					"SkillSystem",
-					"MovementCommand",
-					"GameplayAttributes",
+                    "WidgetsPresentation",
 				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"InteractionSystem", 
-					"InventoryService",
-					"WidgetsPresentation",
-                }
-                );
+					"InventoryCore"
+				}
+				);
 
 			DynamicallyLoadedModuleNames.AddRange(
 				new string[]

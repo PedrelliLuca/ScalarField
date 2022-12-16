@@ -24,6 +24,8 @@ public:
      void ShowInventory(TWeakObjectPtr<UInventoryComponent> inventoryComponent);
      void HideInventory();
 
+     TWeakObjectPtr<UInventoryPresenterWidget> GetInventoryPresenterWidget() { return _inventoryPresenterWidget; }
+
 private:
      void _createHUD();
      void _createInventoryPresenter();

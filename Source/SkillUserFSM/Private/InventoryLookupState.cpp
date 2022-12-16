@@ -4,8 +4,10 @@
 #include "InventoryLookupState.h"
 
 #include "IdleState.h"
-#include "InventoryComponent.h"
+#include "InventorySubsystem.h"
+#include "Kismet/GameplayStatics.h"
 #include "MovementCommandSetter.h"
+#include "StateComponent.h"
 #include "WidgetsPresenterComponent.h"
 
 TObjectPtr<USkillUserState> UInventoryLookupState::OnToggleInventory(const TObjectPtr<AController> controller) {
@@ -13,18 +15,12 @@ TObjectPtr<USkillUserState> UInventoryLookupState::OnToggleInventory(const TObje
 }
 
 void UInventoryLookupState::OnEnter(TObjectPtr<AController> controller) {
-	const TWeakObjectPtr<UWidgetsPresenterComponent> widgetsPresenter = controller->FindComponentByClass<UWidgetsPresenterComponent>();
-	// How did you even get in this state if the controller cannot present widgets?
-	check(widgetsPresenter.IsValid());
-	// When you enter this state the inventory shouldn't be on the viewport, it's this state's responsibility to add it
-	check(!widgetsPresenter->IsInventoryOnViewport());
+	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventorySubsystem>();
+	inventorySubsys->ShowInventoryOfActor(controller->GetPawn());
 	
-	const auto pawn = controller->GetPawn();
-	check(IsValid(pawn));
-	const TWeakObjectPtr<UInventoryComponent> inventory = pawn->FindComponentByClass<UInventoryComponent>();
-	// Controllers with widget presenters must also have inventories to toggle
-	check(inventory.IsValid());
-	widgetsPresenter->ShowInventory(inventory);
+	const TWeakObjectPtr<UStateComponent> stateC = controller->FindComponentByClass<UStateComponent>();
+	check(stateC.IsValid());
+	_widgetClosedHandle = inventorySubsys->OnInventoryWidgetClosed().AddUObject(stateC.Get(), &UStateComponent::PerformInventoryToggleBehavior);
 	
 	const auto movementSetters = controller->GetComponentsByInterface(UMovementCommandSetter::StaticClass());
 	check(movementSetters.Num() == 1);
@@ -41,4 +37,7 @@ void UInventoryLookupState::OnLeave(TObjectPtr<AController> controller) {
 	check(widgetsPresenter.IsValid())
 	check(widgetsPresenter->IsInventoryOnViewport());
 	widgetsPresenter->HideInventory();
+
+	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventorySubsystem>();
+	inventorySubsys->OnInventoryWidgetClosed().Remove(_widgetClosedHandle);
 }

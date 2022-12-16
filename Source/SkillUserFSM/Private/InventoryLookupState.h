@@ -28,4 +28,7 @@ public:
 
 	bool IsTickAffectedByPause() const override { return true; }
 
+private:
+	FDelegateHandle _widgetClosedHandle{};
+
 };
