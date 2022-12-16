@@ -24,7 +24,7 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
 					"InteractionSystem", 
-					"InventorySystem",
+					"InventoryCore",
                     "WidgetsPresentation",
                 }
                 );

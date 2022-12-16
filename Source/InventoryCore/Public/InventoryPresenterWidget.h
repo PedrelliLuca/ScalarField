@@ -8,7 +8,7 @@
 #include "InventoryPresenterWidget.generated.h"
 
 UCLASS()
-class INVENTORYSYSTEM_API UInventoryPresenterWidget : public UUserWidget {
+class INVENTORYCORE_API UInventoryPresenterWidget : public UUserWidget {
      GENERATED_BODY()
      
 public:

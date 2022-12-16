@@ -26,7 +26,7 @@ public class ScalarField : ModuleRules
             "GameplayUI",
             "UMG",
             "InteractionSystem",
-            "InventorySystem",
+            "InventoryCore",
             "WidgetsPresentation"
         });
     }

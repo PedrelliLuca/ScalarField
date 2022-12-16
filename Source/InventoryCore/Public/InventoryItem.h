@@ -20,7 +20,7 @@ enum class EItemRarity : uint8 {
 
 // EditInlineNew? DefaultToInstanced?
 UCLASS(Blueprintable)
-class INVENTORYSYSTEM_API UInventoryItem : public UObject {
+class INVENTORYCORE_API UInventoryItem : public UObject {
      GENERATED_BODY()
      
 public:

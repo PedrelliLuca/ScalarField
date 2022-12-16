@@ -1,12 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #pragma once
-#include "InventorySystemModule.h"
+#include "InventoryCoreModule.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogInventorySystem, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogInventoryCore, Log, All);
 
-class FInventorySystemModule : public IInventorySystemModule
+class FInventoryCoreModule : public IInventoryCoreModule
 {
 	/** IModuleInterface implementation */
 	void StartupModule() override;
