@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Blueprint/UserWidget.h"
-#include "InventoryComponent.h"
+#include "InventoryItem.h"
 
 #include "InventoryItemWidget.generated.h"
 
@@ -14,4 +14,12 @@ class INVENTORYCORE_API UInventoryItemWidget : public UUserWidget {
      GENERATED_BODY()
   
 public:
+    void SetItem(const TObjectPtr<UInventoryItem>& inventoryItem);
+
+protected:
+    UFUNCTION(BlueprintImplementableEvent)
+    void _refresh();
+
+    UPROPERTY(BlueprintReadOnly, Category = "Inventory Item Widget", meta = (ExposeOnSpawn = true))
+    TObjectPtr<UInventoryItem> _inventoryItem = nullptr;
 };

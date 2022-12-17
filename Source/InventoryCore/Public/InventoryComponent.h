@@ -15,6 +15,15 @@ class INVENTORYCORE_API UInventoryComponent : public UActorComponent {
 public:
      UInventoryComponent();
 
+     UFUNCTION(BlueprintPure, Category = "Inventory")
+     FORCEINLINE double GetWeightCapacity() const { return _weightCapacity; }
+
+     UFUNCTION(BlueprintPure, Category = "Inventory")
+     FORCEINLINE double GetVolumeCapacity() const { return _volumeCapacity; }
+
+     UFUNCTION(BlueprintPure, Category = "Inventory")
+     const TArray<TObjectPtr<UInventoryItem>>& GetItems() const { return _items; }
+
 protected:
      // The maximum weight this inventory can hold. This can potentially be varied using backpacks, spells, ...
      UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")

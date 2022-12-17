@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Components/WrapBox.h"
 #include "InventoryComponent.h"
+#include "InventoryItem.h"
+#include "InventoryItemWidget.h"
 
 #include "InventoryWidget.generated.h"
 
@@ -16,4 +19,11 @@ class INVENTORYCORE_API UInventoryWidget : public UUserWidget {
 public:
     UFUNCTION(BlueprintCallable)
     void InitializeFromInventory(UInventoryComponent* inventoryC);
+
+private:
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UWrapBox> _inventoryItemsBox;
+
+    UPROPERTY()
+    TMap<TObjectPtr<UInventoryItem>, TObjectPtr<UInventoryItemWidget>> _itemsToWidgets{};
 };

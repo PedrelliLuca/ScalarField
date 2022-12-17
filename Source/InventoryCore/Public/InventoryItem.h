@@ -79,7 +79,7 @@ protected:
      int32 _maxQuantity;
 
      // The number of items of this kind that this instance is currently storing
-     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (UIMin = 1, EditCondition = _bIsStackable))
+     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item", meta = (UIMin = 1, EditCondition = _bIsStackable))
      int32 _quantity;
 
      UPROPERTY(BlueprintAssignable)
