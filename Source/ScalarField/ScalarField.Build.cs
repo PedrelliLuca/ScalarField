@@ -26,6 +26,12 @@ public class ScalarField : ModuleRules
             "GameplayUI",
             "UMG",
             "InteractionSystem",
+            "InventoryCore",
+            "WidgetsPresentation",
+        });
+
+        PrivateDependencyModuleNames.AddRange(new string[] {
+            "InventoryService",
         });
     }
 }

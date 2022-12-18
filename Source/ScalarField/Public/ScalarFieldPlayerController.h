@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "HUDWidget.h"
 #include "InteractorPlayerComponent.h"
 #include "PlayerMovementCommandComponent.h"
-#include "SkillUserState.h"
+#include "StateComponent.h"
+#include "WidgetsPresenterComponent.h"
 
 #include "ScalarFieldPlayerController.generated.h"
 
@@ -19,8 +19,6 @@ class AScalarFieldPlayerController : public APlayerController {
 
 public:
 	AScalarFieldPlayerController();
-
-	TWeakObjectPtr<UHUDWidget> GetGameplayHUD() { return _hudWidget; }
 
 protected:
 	void PlayerTick(float deltaTime) override;
@@ -40,31 +38,20 @@ private:
 	void _onSkill4Cast();
 	void _onSkill5Cast();
 
-	void _onCastAborted();
-	
-	void _onInteractionInput();
-
 	void _onTacticalPauseToggled();
 	void _answerTacticalPauseToggle(bool bIsTacticalPauseOn, double currentWorldTimeDilation);
-
-	void _changingStateRoutine(TObjectPtr<USkillUserState> newState);
-
-	void _createHUD();
-	
-	UPROPERTY()
-	TObjectPtr<USkillUserState> _state;
 
 	UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
 	TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
 
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	TObjectPtr<UStateComponent> _stateC;
+
 	UPROPERTY(VisibleAnywhere, Category = "Interaction")
 	TObjectPtr<UInteractorPlayerComponent> _interactorC;
 
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<UHUDWidget> _hudWidgetClass = nullptr;
-
-	UPROPERTY()
-	TObjectPtr<UHUDWidget> _hudWidget = nullptr;
+	UPROPERTY(VisibleAnywhere, Category = "Widgets Presentation")
+	TObjectPtr<UWidgetsPresenterComponent> _widgetsPresenterC;
 
 	bool _bIsTacticalPauseOn = false;
 };

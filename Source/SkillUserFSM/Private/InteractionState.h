@@ -5,19 +5,20 @@
 #include "CoreMinimal.h"
 #include "SkillUserState.h"
 
-#include "IdleState.generated.h"
+#include "InteractionState.generated.h"
 
 
 /**
  * \brief State representing a skill user that is not executing any skill.
  */
 UCLASS(Blueprintable)
-class SKILLUSERFSM_API UIdleState : public USkillUserState {
+class SKILLUSERFSM_API UInteractionState : public USkillUserState {
 	GENERATED_BODY()
 
 public:
 	TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnInteraction(TObjectPtr<AController> controller) override;
+	TObjectPtr<USkillUserState> OnToggleInventory(TObjectPtr<AController> controller) override { return _keepCurrentState(); }
 	TObjectPtr<USkillUserState> OnBeginSkillExecution(int32 skillKey, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnAbort(TObjectPtr<AController> controller) override;

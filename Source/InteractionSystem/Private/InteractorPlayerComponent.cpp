@@ -3,6 +3,10 @@
 
 #include "InteractorPlayerComponent.h"
 
+UInteractorPlayerComponent::UInteractorPlayerComponent() {
+	PrimaryComponentTick.bCanEverTick = false;
+}
+
 void UInteractorPlayerComponent::PerformFocusCheck() {
 	if (GetWorld()->GetRealTimeSeconds() - _interactionData.TimestampOfLastFocusCheck < _timeBetweenFocusChecks) {
 		// Too little time has passed, let's save the line trace for later

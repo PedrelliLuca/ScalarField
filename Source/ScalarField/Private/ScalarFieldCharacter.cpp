@@ -10,12 +10,9 @@
 #include "EnvironmentCell.h"
 #include "EnvironmentGridWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Materials/Material.h"
 #include "ScalarFieldPlayerController.h"
 #include "TemperatureDamageType.h"
-#include "UObject/ConstructorHelpers.h"
 
 AScalarFieldCharacter::AScalarFieldCharacter() {
 	// This is what makes the scalar field character interact with the environment grid
@@ -62,6 +59,8 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	// Create the component that handles temperature damage...
 	_temperatureDmgHandlerC = CreateDefaultSubobject<UTemperatureDamageHandlerComponent>(TEXT("Temperature Damage Handler Component"));
 
+	_inventoryC = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -102,14 +101,6 @@ void AScalarFieldCharacter::BeginPlay() {
 
 	_dmiSetup();
 	_setOverlappingCells();
-
-	_healthC->OnHealthChanged().AddUObject(this, &AScalarFieldCharacter::_healthChanged);
-	_healthC->OnMaxHealthChanged().AddUObject(this, &AScalarFieldCharacter::_maxHealthChanged);
-	_healthC->OnHealthRegenChanged().AddUObject(this, &AScalarFieldCharacter::_healthRegenChanged);
-
-	_manaC->OnManaChanged().AddUObject(this, &AScalarFieldCharacter::_manaChanged);
-	_manaC->OnMaxManaChanged().AddUObject(this, &AScalarFieldCharacter::_maxManaChanged);
-	_manaC->OnManaRegenChanged().AddUObject(this, &AScalarFieldCharacter::_manaRegenChanged);
 }
 
 void AScalarFieldCharacter::_setupThermodynamicCollisions() {
@@ -153,59 +144,12 @@ void AScalarFieldCharacter::_setOverlappingCells() {
 }
 
 void AScalarFieldCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {
-	check(!_materialInstance.IsNull());
+	check(_materialInstance != nullptr);
 	_materialInstance->SetVectorParameterValue(TEXT("Tint"), temperatureColor);
 }
 
 void AScalarFieldCharacter::_temperatureChanged(double newTemperature) {
 	const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
 	_updateMaterialTint(temperatureColor);
-
-	// Am I player-controlled?
-	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
-		pc->GetGameplayHUD()->SetTemperature(newTemperature, temperatureColor);
-	}
-}
-
-void AScalarFieldCharacter::_healthChanged(const double newHealth) const {
-	// Am I player-controlled?
-	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
-		pc->GetGameplayHUD()->SetCurrentHealth(newHealth);
-	}
-}
-
-void AScalarFieldCharacter::_maxHealthChanged(double newMaxHealth) const {
-	// Am I player-controlled?
-	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
-		pc->GetGameplayHUD()->SetMaxHealth(newMaxHealth);
-	}
-}
-
-void AScalarFieldCharacter::_healthRegenChanged(double newHealthRegen) const {
-	// Am I player-controlled?
-	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
-		pc->GetGameplayHUD()->SetHealthRegen(newHealthRegen);
-	}
-}
-
-void AScalarFieldCharacter::_manaChanged(const double newMana) const {
-	// Am I player-controlled?
-	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
-		pc->GetGameplayHUD()->SetCurrentMana(newMana);
-	}
-}
-
-void AScalarFieldCharacter::_maxManaChanged(double newMaxMana) const {
-	// Am I player-controlled?
-	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
-		pc->GetGameplayHUD()->SetMaxMana(newMaxMana);
-	}
-}
-
-void AScalarFieldCharacter::_manaRegenChanged(double newManaRegen) const {
-	// Am I player-controlled?
-	if (const auto pc = Cast<AScalarFieldPlayerController>(GetController())) {
-		pc->GetGameplayHUD()->SetManaRegen(newManaRegen);
-	}
 }
 
