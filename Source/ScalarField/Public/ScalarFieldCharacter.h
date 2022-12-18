@@ -70,7 +70,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Damage Handling", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UTemperatureDamageHandlerComponent> _temperatureDmgHandlerC;
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInventoryComponent> _inventoryC;
 
 	UPROPERTY()

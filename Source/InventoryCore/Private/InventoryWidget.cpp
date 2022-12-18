@@ -7,9 +7,10 @@
 void UInventoryWidget::InitializeFromInventory(UInventoryComponent* inventoryC) {
 	_itemsToWidgets.Empty();
 	_inventoryItemsBox->ClearChildren();
+	check(_itemWidgetClass != nullptr);
 
 	for (const auto& item : inventoryC->GetItems()) {
-		auto itemWidget = CreateWidget<UInventoryItemWidget>(GetOwningPlayer(), UInventoryWidget::StaticClass());
+		auto itemWidget = CreateWidget<UInventoryItemWidget>(GetOwningPlayer(), _itemWidgetClass);
 		itemWidget->SetItem(item);
 
 		_itemsToWidgets.Emplace(item, itemWidget);

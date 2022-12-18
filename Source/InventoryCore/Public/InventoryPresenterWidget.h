@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "InventoryWidget.h"
 
 #include "InventoryPresenterWidget.generated.h"
 
@@ -17,9 +18,14 @@ public:
     FOnButtonClose& OnButtonClose() { return _onButtonClose; }
 
 protected:
+    void NativeConstruct() override;
+
     UFUNCTION(BlueprintCallable)
     void _onClose();
 
 private:
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UInventoryWidget> _inventoryWidget;
+
     FOnButtonClose _onButtonClose{};
 };

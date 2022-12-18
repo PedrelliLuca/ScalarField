@@ -20,6 +20,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void InitializeFromInventory(UInventoryComponent* inventoryC);
 
+protected:
+    UPROPERTY(EditDefaultsOnly, NoClear, Category = "Inventory Widget")
+    TSubclassOf<UInventoryItemWidget> _itemWidgetClass = nullptr;
+
 private:
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UWrapBox> _inventoryItemsBox;

@@ -33,8 +33,23 @@ public:
      UFUNCTION(BlueprintPure, Category = "Item")
      FORCEINLINE double GetStackWeight() const { return _quantity * _weight; }
 
+     FORCEINLINE double GetWeight() const { return _weight; }
+
+     UFUNCTION(BlueprintPure, Category = "Item")
+     FORCEINLINE double GetStackVolume() const { return _quantity * _volume; }
+
+     FORCEINLINE double GetVolume() const { return _volume; }
+
+     FORCEINLINE bool IsStackable() const { return _bIsStackable; }
+
+     FORCEINLINE int32 GetMaxQuantity() const { return _maxQuantity; }
+
+     FORCEINLINE const FText& GetNameText() const { return _nameText; }
+
      UFUNCTION(BlueprintCallable, Category = "Item")
      void SetQuantity(int32 newQuantity);
+
+     FORCEINLINE int32 GetQuantity() const { return _quantity; }
 
      UFUNCTION(BlueprintPure, Category = "Item")
      virtual bool ShouldShowInInventory() const { return true; }
