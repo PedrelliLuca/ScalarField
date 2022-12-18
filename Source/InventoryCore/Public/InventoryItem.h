@@ -19,7 +19,7 @@ enum class EItemRarity : uint8 {
 };
 
 // EditInlineNew? DefaultToInstanced?
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, EditInlineNew, DefaultToInstanced)
 class INVENTORYCORE_API UInventoryItem : public UObject {
      GENERATED_BODY()
      
@@ -51,6 +51,8 @@ public:
 
      FORCEINLINE int32 GetQuantity() const { return _quantity; }
 
+     FORCEINLINE TObjectPtr<UStaticMesh> GetMesh() { return _worldMesh; }
+
      UFUNCTION(BlueprintPure, Category = "Item")
      virtual bool ShouldShowInInventory() const { return true; }
 
@@ -58,6 +60,8 @@ public:
 
      // Called to execute some logic when the item is added to the given inventory
      virtual void OnItemAddedToInventory(TWeakObjectPtr<class UInventoryComponent> inventory) {}
+
+     FOnItemModified& OnItemModified() { return _onItemModified; }
 
 protected:
      // The mesh to display when the item is in the world 

@@ -31,7 +31,7 @@ void UInteractableComponent::BeginFocus(TScriptInterface<IInteractor> interactor
 	}
 	
 	SetHiddenInGame(false);
-	_refreshWidget();
+	RefreshWidget();
 	_onBeginFocus.Broadcast(MoveTemp(interactor));
 }
 
@@ -72,12 +72,25 @@ double UInteractableComponent::GetInteractionPercentage() const {
 
 void UInteractableComponent::SetInteractableNameText(const FText& newInteractableNameText)  {
 	_interactableNameText = newInteractableNameText;
-	_refreshWidget();
+	RefreshWidget();
 }
 
 void UInteractableComponent::SetInteractableActionText(const FText& newInteractableActionText) {
 	_interactableActionText = newInteractableActionText;
-	_refreshWidget();
+	RefreshWidget();
+}
+
+void UInteractableComponent::RefreshWidget() {
+	if (bHiddenInGame) {
+		// There is no point in updating the widget if it's hidden...
+		return;
+	}
+
+	const TWeakObjectPtr<UInteractionWidget> interactionWidget = Cast<UInteractionWidget>(GetUserWidgetObject());
+	// The widget associated to an interaction component has to be an interaction widget
+	check(interactionWidget.IsValid());
+
+	interactionWidget->UpdateInteractionWidget(this);
 }
 
 void UInteractableComponent::BeginPlay() {
@@ -111,17 +124,4 @@ bool UInteractableComponent::_canInteract(const TScriptInterface<IInteractor>& i
 	const bool bIsAlreadyBeingInteracted = !_bAllowMultipleInteractors && _interactors.Num() >= 1;
 	// Moreover, the interaction cannot occur if the interactor isn't valid or this component isn't active.
 	return IsValid(interactor.GetObject()) && IsActive() && !bIsAlreadyBeingInteracted;
-}
-
-void UInteractableComponent::_refreshWidget() {
-	if (bHiddenInGame) {
-		// There is no point in updating the widget if it's hidden...
-		return;
-	}
-
-	const TWeakObjectPtr<UInteractionWidget> interactionWidget = Cast<UInteractionWidget>(GetUserWidgetObject());
-	// The widget associated to an interaction component has to be an interaction widget
-	check(interactionWidget.IsValid());
-
-	interactionWidget->UpdateInteractionWidget(this);
 }

@@ -28,6 +28,7 @@ public class ScalarField : ModuleRules
             "InteractionSystem",
             "InventoryCore",
             "WidgetsPresentation",
+            "Pickups",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
