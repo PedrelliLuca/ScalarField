@@ -46,6 +46,8 @@ public:
 
      FORCEINLINE const FText& GetNameText() const { return _nameText; }
 
+     FORCEINLINE const FText& GetActionText() const { return _actionText; }
+
      UFUNCTION(BlueprintCallable, Category = "Item")
      void SetQuantity(int32 newQuantity);
 

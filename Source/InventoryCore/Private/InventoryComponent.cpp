@@ -75,14 +75,17 @@ FItemAddResult UInventoryComponent::TryAddItem(const TObjectPtr<UInventoryItem> 
 		}
 
 		int32 amountAddable = existingItem.IsValid() ? FMath::Min(amountToAdd, existingItem->GetMaxQuantity() - existingItem->GetQuantity()) : amountToAdd;
-		FText errorText = FText::Format(LOCTEXT("InventoryErrorText", "Couldn't add all {ItemName} to the inventory."), item->GetNameText());
+		FText errorText{};
+		if (amountAddable < amountToAdd) {
+			errorText = FText::Format(LOCTEXT("ItemStackOverflowText", "The existing stack of {ItemName} in your inventory is too big to add all of the item."), item->GetNameText());
+		}
 
 		if (!FMath::IsNearlyZero(itemWeight) || !FMath::IsNearlyZero(itemVolume)) {
 			const int32 amountAddableBasedOnWeight = !FMath::IsNearlyZero(itemWeight) ? FMath::FloorToInt32((_weightCapacity - GetCurrentWeight()) / item->GetWeight()) : amountAddable;
 			amountAddable = FMath::Min(amountAddable, amountAddableBasedOnWeight);
 
 			// Does the weight restrict the amount of item we can take?
-			if (amountAddable < amountToAdd) {
+			if (amountAddable == amountAddableBasedOnWeight) {
 				errorText = FText::Format(LOCTEXT("InventoryTooMuchWeightText", "You are carrying too much weight to add the entire stack of {ItemName} to the inventory."), item->GetNameText());
 			}
 
@@ -90,11 +93,9 @@ FItemAddResult UInventoryComponent::TryAddItem(const TObjectPtr<UInventoryItem> 
 			amountAddable = FMath::Min(amountAddable, amountAddableBasedOnVolume);
 
 			// Does the volume restrict the amount of item we can take?
-			if (amountAddable < amountToAdd) {
+			if (amountAddable == amountAddableBasedOnVolume) {
 				errorText = FText::Format(LOCTEXT("InventoryTooLittleVolumeText", "You have too little space left to add the entire stack of {ItemName} to the inventory."), item->GetNameText());
 			}
-		} else if (amountAddable < amountToAdd) {
-			errorText = FText::Format(LOCTEXT("ItemStackOverflowText", "The existing stack of {ItemName} in your inventory is too big to add all of the item."), item->GetNameText());
 		}
 			
 		/* If one of the checks above reduced amountAddable to zero, it means that we can't add any items to our inventory. And since we do not allow multiple stacks of the same

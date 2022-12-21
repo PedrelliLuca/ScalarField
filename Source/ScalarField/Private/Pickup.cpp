@@ -17,12 +17,26 @@ APickup::APickup() {
 	_pickupC = CreateDefaultSubobject<UPickupComponent>(TEXT("Pickup Component"));
 }
 
+#if WITH_EDITOR
+void APickup::PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) {
+	Super::PostEditChangeProperty(propertyChangedEvent);
+
+	const auto property = propertyChangedEvent.Property;
+	const auto propertyName = property != nullptr ? property->GetFName() : NAME_None;
+
+	// If a new pickup is selected in the property editor, change the mesh to reflect the new item being selected
+	if (propertyName == GET_MEMBER_NAME_CHECKED(APickup, _itemTemplate) && IsValid(_itemTemplate)) {
+		_meshC->SetStaticMesh(_itemTemplate->GetMesh());
+	}
+}
+#endif
+
 void APickup::BeginPlay() {
 	Super::BeginPlay();
 
 	if (bNetStartup) {
 		// The actor was loaded directly from the map
-		_pickupC->InitializePickup();
+		_pickupC->InitializePickup(_itemTemplate);
 	}
 
 	if (!bNetStartup) {

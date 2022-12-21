@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Actor.h"
 #include "InteractableComponent.h"
+#include "InventoryItem.h"
 #include "PickupComponent.h"
 
 #include "Pickup.generated.h"
@@ -18,12 +19,20 @@ class SCALARFIELD_API APickup : public AActor {
 public:
     APickup();
 
+#if WITH_EDITOR
+     void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
+#endif
+
 protected:
     void BeginPlay() override;
 
 private:
     // Aligns mesh rotation with ground rotation.
     void _alignWithGround();
+
+    // Used as template to create the pickup when spawned in.
+    UPROPERTY(EditAnywhere, Instanced)
+    TObjectPtr<UInventoryItem> _itemTemplate = nullptr;
 
     UPROPERTY(EditDefaultsOnly, Category = "Components")
     TObjectPtr<UStaticMeshComponent> _meshC;

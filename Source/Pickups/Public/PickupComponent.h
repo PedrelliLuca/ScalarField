@@ -23,24 +23,17 @@ public:
     UPickupComponent();
 
     // Given an item, makes a pickup out of it.
-    void InitializePickup();
-
-#if WITH_EDITOR
-     void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
-#endif
+    void InitializePickup(TObjectPtr<const UInventoryItem> itemTemplate);
 
 protected:
     void BeginPlay() override;
 
 private:
+    UFUNCTION()
     void _onItemModified();
 
     UFUNCTION()
     void _onTakePickup(TScriptInterface<IInteractor> interactor);
-
-    // Used as template to create the pickup when spawned in.
-    UPROPERTY(EditAnywhere, Instanced)
-    TObjectPtr<UInventoryItem> _itemTemplate = nullptr;
 
     UPROPERTY()
     TObjectPtr<UInventoryItem> _item = nullptr;

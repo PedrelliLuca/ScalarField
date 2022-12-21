@@ -9,39 +9,18 @@ UPickupComponent::UPickupComponent() {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPickupComponent::InitializePickup() {
-	if (!IsValid(_itemTemplate)) {
-		return;
-	}
+void UPickupComponent::InitializePickup(const TObjectPtr<const UInventoryItem> itemTemplate) {
+	check(IsValid(itemTemplate));
 
-	check(_itemTemplate->GetClass() && _itemTemplate->GetQuantity() > 0);
-	_item = NewObject<UInventoryItem>(this, _itemTemplate->GetClass());
-	_item->SetQuantity(_itemTemplate->GetQuantity());
+	check(itemTemplate->GetClass() && itemTemplate->GetQuantity() > 0);
+	_item = NewObject<UInventoryItem>(this, itemTemplate->GetClass());
+	_item->SetQuantity(itemTemplate->GetQuantity());
 	_meshC->SetStaticMesh(_item->GetMesh());
 	_interactableC->SetInteractableNameText(_item->GetNameText());
 	_item->OnItemModified().AddDynamic(this, &UPickupComponent::_onItemModified);
 
 	_interactableC->RefreshWidget();
 }
-
-#if WITH_EDITOR
-void UPickupComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) {
-	Super::PostEditChangeProperty(propertyChangedEvent);
-
-	const auto property = propertyChangedEvent.Property;
-	const auto propertyName = property != nullptr ? property->GetFName() : NAME_None;
-
-	// If a new pickup is selected in the property editor, change the mesh to reflect the new item being selected
-	if (propertyName == GET_MEMBER_NAME_CHECKED(UPickupComponent, _itemTemplate)) {
-		// const auto initTempProperty = CastFieldChecked<FObjectPtrProperty>(property);
-		const auto meshC = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
-		check(IsValid(meshC));
-		if (IsValid(_itemTemplate)) {
-			meshC->SetStaticMesh(_itemTemplate->GetMesh());
-		}
-	}
-}
-#endif
 
 void UPickupComponent::BeginPlay() {
 	Super::BeginPlay();
