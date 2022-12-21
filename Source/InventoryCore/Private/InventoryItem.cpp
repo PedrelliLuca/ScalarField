@@ -22,6 +22,8 @@ void UInventoryItem::PostEditChangeProperty(FPropertyChangedEvent& propertyChang
 	const auto propertyName = property != nullptr ? property->GetFName() : NAME_None;
 	if (propertyName == GET_MEMBER_NAME_CHECKED(UInventoryItem, _quantity)) {
 		_quantity = FMath::Clamp(_quantity, 0, _bIsStackable ? _maxQuantity : 1);
+	} else if (propertyName == GET_MEMBER_NAME_CHECKED(UInventoryItem, _bIsStackable) && !_bIsStackable) {
+		_quantity = 1;
 	}
 }
 #endif
