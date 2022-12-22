@@ -6,7 +6,6 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/WrapBox.h"
-#include "InventoryComponent.h"
 #include "InventoryItem.h"
 #include "InventoryItemWidget.h"
 

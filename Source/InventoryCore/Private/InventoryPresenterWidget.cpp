@@ -3,6 +3,7 @@
 
 #include "InventoryPresenterWidget.h"
 
+#include "InventoryComponent.h"
 
 void UInventoryPresenterWidget::NativeConstruct() {
 	Super::NativeConstruct();

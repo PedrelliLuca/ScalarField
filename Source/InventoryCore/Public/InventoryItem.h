@@ -58,7 +58,7 @@ public:
      UFUNCTION(BlueprintPure, Category = "Item")
      virtual bool ShouldShowInInventory() const { return true; }
 
-     virtual void Use(TWeakObjectPtr<APawn> pawn) {}
+     virtual void Use(TWeakObjectPtr<AActor> actor) {}
 
      // Called to execute some logic when the item is added to the given inventory
      virtual void OnItemAddedToInventory(TWeakObjectPtr<class UInventoryComponent> inventory) {}

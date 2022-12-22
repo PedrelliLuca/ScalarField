@@ -47,6 +47,12 @@ double UInventoryComponent::GetCurrentVolume() const {
 	});
 }
 
+void UInventoryComponent::UseItem(const TWeakObjectPtr<UInventoryItem> item) {
+	check(FindItemByClass(item->GetClass()).IsValid());
+
+	item->Use(GetOwner());
+}
+
 FItemAddResult UInventoryComponent::TryAddItem(const TObjectPtr<UInventoryItem> item) {
 	check(IsValid(item));
 

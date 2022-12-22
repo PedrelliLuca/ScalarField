@@ -6,5 +6,12 @@
 void UInventoryItemWidget::SetItem(const TObjectPtr<UInventoryItem>& inventoryItem) {
 	check(IsValid(inventoryItem));
 	_inventoryItem = inventoryItem;
-	_refresh();
+	RefreshWidget();
+}
+
+FReply UInventoryItemWidget::NativeOnMouseButtonDoubleClick(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) {
+	check(IsValid(_inventoryItem));
+	_onDoubleClick.Broadcast(_inventoryItem);
+	
+	return Super::NativeOnMouseButtonDoubleClick(inGeometry, inMouseEvent);
 }

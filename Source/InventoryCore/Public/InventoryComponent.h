@@ -67,6 +67,8 @@ public:
      UFUNCTION(BlueprintPure, Category = "Inventory")
      const TArray<TObjectPtr<UInventoryItem>>& GetItems() const { return _items; }
 
+	void UseItem(TWeakObjectPtr<UInventoryItem> item);
+
      /* Tries to add an existing item into the inventory. */
      FItemAddResult TryAddItem(TObjectPtr<UInventoryItem> item);
 
