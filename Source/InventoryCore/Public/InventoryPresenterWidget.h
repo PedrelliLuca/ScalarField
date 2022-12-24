@@ -17,6 +17,8 @@ class INVENTORYCORE_API UInventoryPresenterWidget : public UUserWidget {
 public:
     FOnButtonClose& OnButtonClose() { return _onButtonClose; }
 
+    TWeakObjectPtr<UInventoryWidget> GetInventoryWidget() { return _inventoryWidget; }
+
 protected:
     void NativeConstruct() override;
 

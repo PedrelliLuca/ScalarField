@@ -9,7 +9,6 @@
 
 DECLARE_MULTICAST_DELEGATE(FOnInventoryWidgetClosed);
 
-// EditInlineNew? DefaultToInstanced?
 UCLASS()
 class INVENTORYSERVICE_API UInventoryController : public UObject {
      GENERATED_BODY()
@@ -24,7 +23,11 @@ public:
 private:
     void _onInventoryClose();
 
+	void _useItemOfInventory(TWeakObjectPtr<UInventoryItem> item, TWeakObjectPtr<UInventoryComponent> inventory);
+
     TWeakObjectPtr<UWidgetsPresenterComponent> _widgetsPresenterC = nullptr;
 
     FOnInventoryWidgetClosed _onInventoryWidgetClosed{};
+
+	FDelegateHandle _itemUsageOnPauseToggleHandle{};
 };
