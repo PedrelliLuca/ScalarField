@@ -15,3 +15,12 @@ FReply UInventoryItemWidget::NativeOnMouseButtonDoubleClick(const FGeometry& inG
 	
 	return Super::NativeOnMouseButtonDoubleClick(inGeometry, inMouseEvent);
 }
+
+FReply UInventoryItemWidget::NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) {
+	// https://michaeljcole.github.io/wiki.unrealengine.com/List_of_Key/Gamepad_Input_Names/
+	if (inMouseEvent.IsMouseButtonDown(FKey{"RightMouseButton"})) {
+		_onItemRightClick.Broadcast(_inventoryItem);
+	}
+	
+	return Super::NativeOnMouseButtonDown(inGeometry, inMouseEvent);
+}

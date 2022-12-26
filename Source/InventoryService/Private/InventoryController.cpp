@@ -45,7 +45,7 @@ void UInventoryController::_useItemOfInventory(TWeakObjectPtr<UInventoryItem> it
 		// This must have been called when the tactical pause has been turned off
 		check(!bIsTacticalPauseOn);
 
-		// I don't see how the UInventoryController could not be valid, but you never know...
+		// I don't see how the UInventoryController could not be valid, its outer is the subsystem...
 		check(IsValid(this));
 
 		// We were in tactical pause when this lambda was created, meaning that from the creation and call we do not

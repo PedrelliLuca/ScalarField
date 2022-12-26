@@ -10,6 +10,7 @@
 #include "InventoryItemWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemDoubleClick, TWeakObjectPtr<UInventoryItem>);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemRightClick, TWeakObjectPtr<UInventoryItem>);
 
 UCLASS()
 class INVENTORYCORE_API UInventoryItemWidget : public UUserWidget {
@@ -20,15 +21,19 @@ public:
 
 	FOnItemDoubleClick& OnItemDoubleClick() { return _onDoubleClick; }
 
+	FOnItemRightClick& OnItemRightClick() { return _onItemRightClick; }
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void RefreshWidget();
 
 protected:
 	FReply NativeOnMouseButtonDoubleClick(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+	FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
 
     UPROPERTY(BlueprintReadOnly, Category = "Inventory Item Widget", meta = (ExposeOnSpawn = true))
     TObjectPtr<UInventoryItem> _inventoryItem = nullptr;
 
 private:
-	FOnItemDoubleClick _onDoubleClick;
+	FOnItemDoubleClick _onDoubleClick{};
+	FOnItemRightClick _onItemRightClick{};
 };

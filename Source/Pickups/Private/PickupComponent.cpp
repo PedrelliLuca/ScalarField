@@ -9,12 +9,11 @@ UPickupComponent::UPickupComponent() {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPickupComponent::InitializePickup(const TObjectPtr<const UInventoryItem> itemTemplate) {
-	check(IsValid(itemTemplate));
+void UPickupComponent::InitializePickup(const TSubclassOf<UInventoryItem> itemClass, const int32 quantity) {
 
-	check(itemTemplate->GetClass() && itemTemplate->GetQuantity() > 0);
-	_item = NewObject<UInventoryItem>(this, itemTemplate->GetClass());
-	_item->SetQuantity(itemTemplate->GetQuantity());
+	check(itemClass && quantity > 0);
+	_item = NewObject<UInventoryItem>(this, itemClass);
+	_item->SetQuantity(quantity);
 	_meshC->SetStaticMesh(_item->GetMesh());
 	_interactableC->SetInteractableNameText(_item->GetNameText());
 	_item->OnItemModified().AddDynamic(this, &UPickupComponent::_onItemModified);

@@ -23,7 +23,7 @@ public:
     UPickupComponent();
 
     // Given an item, makes a pickup out of it.
-    void InitializePickup(TObjectPtr<const UInventoryItem> itemTemplate);
+    void InitializePickup(TSubclassOf<UInventoryItem> itemClass, int32 quantity);
 
 protected:
     void BeginPlay() override;

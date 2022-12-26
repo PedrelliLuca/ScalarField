@@ -8,6 +8,7 @@
 #include "Components/WrapBox.h"
 #include "InventoryItem.h"
 #include "InventoryItemWidget.h"
+#include "ItemDropperInterface.h"
 #include "Delegates/DelegateCombinations.h"
 
 #include "InventoryWidget.generated.h"
@@ -15,7 +16,7 @@
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemFromInventoryBeingUsed, TWeakObjectPtr<UInventoryItem>, TWeakObjectPtr<UInventoryComponent>);
 
 UCLASS()
-class INVENTORYCORE_API UInventoryWidget : public UUserWidget {
+class INVENTORYCORE_API UInventoryWidget : public UUserWidget, public IItemDropper {
      GENERATED_BODY()
   
 public:
@@ -29,7 +30,12 @@ protected:
     TSubclassOf<UInventoryItemWidget> _itemWidgetClass = nullptr;
 
 private:
+    UFUNCTION()
+    void _resetInventoryItems();
+    
     void _broadcastItemBeingUsedOnInventory(TWeakObjectPtr<UInventoryItem> item) const;
+
+    void _broadcastItemBeingDroppedFromInventory(TWeakObjectPtr<UInventoryItem> item);
     
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UWrapBox> _inventoryItemsBox;

@@ -4,6 +4,7 @@
 
 #include "TacticalPauseWorldSubsystem.h"
 #include "InventorySubsystem.h"
+#include "PickupSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
@@ -64,6 +65,9 @@ void AScalarFieldPlayerController::BeginPlay() {
 
 	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventorySubsystem>();
 	inventorySubsys->SetWidgetsPresenter(_widgetsPresenterC);
+
+	const auto pickupSubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UPickupSubsystem>();
+	pickupSubsys->RegisterItemDropper(_widgetsPresenterC->GetInventoryPresenterWidget()->GetInventoryWidget().Get());
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {

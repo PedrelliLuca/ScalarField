@@ -9,15 +9,18 @@
 #include "InteractableComponent.h"
 #include "InventoryItem.h"
 #include "PickupComponent.h"
+#include "PickupInterface.h"
 
-#include "Pickup.generated.h"
+#include "ScalarFieldPickup.generated.h"
 
 UCLASS()
-class SCALARFIELD_API APickup : public AActor {
+class SCALARFIELD_API AScalarFieldPickup : public AActor, public IPickup {
      GENERATED_BODY()
      
 public:
-    APickup();
+    AScalarFieldPickup();
+
+	 void InitializePickup(TSubclassOf<UInventoryItem> itemClass, int32 quantity) override;
 
 #if WITH_EDITOR
      void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;

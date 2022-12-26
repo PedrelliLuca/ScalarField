@@ -49,65 +49,69 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
 // Represents an inventory for an owner actor
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class INVENTORYCORE_API UInventoryComponent : public UActorComponent {
-     GENERATED_BODY()
+    GENERATED_BODY()
      
 public:
-     UInventoryComponent();
-
-     UFUNCTION(BlueprintPure, Category = "Inventory")
-     FORCEINLINE double GetWeightCapacity() const { return _weightCapacity; }
-
-     double GetCurrentWeight() const;
-
-     double GetCurrentVolume() const;
-
-     UFUNCTION(BlueprintPure, Category = "Inventory")
-     FORCEINLINE double GetVolumeCapacity() const { return _volumeCapacity; }
-
-     UFUNCTION(BlueprintPure, Category = "Inventory")
-     const TArray<TObjectPtr<UInventoryItem>>& GetItems() const { return _items; }
-
+    UInventoryComponent();
+    
+    UFUNCTION(BlueprintPure, Category = "Inventory")
+    FORCEINLINE double GetWeightCapacity() const { return _weightCapacity; }
+    
+    double GetCurrentWeight() const;
+    
+    double GetCurrentVolume() const;
+    
+    UFUNCTION(BlueprintPure, Category = "Inventory")
+    FORCEINLINE double GetVolumeCapacity() const { return _volumeCapacity; }
+    
+    UFUNCTION(BlueprintPure, Category = "Inventory")
+    const TArray<TObjectPtr<UInventoryItem>>& GetItems() const { return _items; }
+    
 	void UseItem(TWeakObjectPtr<UInventoryItem> item);
 
-     /* Tries to add an existing item into the inventory. */
-     FItemAddResult TryAddItem(TObjectPtr<UInventoryItem> item);
+	void DropItem(TWeakObjectPtr<UInventoryItem> item, int32 quantity);
 
-     /* Tries to add a certain quantity of items of a given class to the inventory. */
-     UFUNCTION(BlueprintCallable, Category = "Inventory")
-     FItemAddResult TryAddItemFromClass(TSubclassOf<UInventoryItem> itemClass, const int32 quantity);
+    /* Tries to add an existing item into the inventory. */
+    FItemAddResult TryAddItem(TObjectPtr<UInventoryItem> item);
 
-     /* Takes some quantity of the item away from the inventory. Removes the item if the quantity reaches 0. The quantity of the item
-     that was actually consumed (i.e. the one that takes into account how much of the item we have in the inventory) is returned.*/
-     int32 ConsumeItem(TObjectPtr<UInventoryItem> item, int32 quantity);
+    /* Tries to add a certain quantity of items of a given class to the inventory. */
+    UFUNCTION(BlueprintCallable, Category = "Inventory")
+    FItemAddResult TryAddItemFromClass(TSubclassOf<UInventoryItem> itemClass, const int32 quantity);
 
-     int32 ConsumeAllOfItem(TObjectPtr<UInventoryItem> item);
+    /* Takes some quantity of the item away from the inventory. Removes the item if the quantity reaches 0. The quantity of the item
+    that was actually consumed (i.e. the one that takes into account how much of the item we have in the inventory) is returned.*/
+    int32 ConsumeItem(TObjectPtr<UInventoryItem> item, int32 quantity);
 
-     bool RemoveItem(TObjectPtr<UInventoryItem> item);
+    int32 ConsumeAllOfItem(TObjectPtr<UInventoryItem> item);
 
-     // We have the given amount of the input item
-     bool HasItemOfClass(TSubclassOf<UInventoryItem> itemClass, int32 quantity = 1) const;
+    bool RemoveItem(TObjectPtr<UInventoryItem> item);
 
-     // Returns the first item with the same class as the given item
-     TWeakObjectPtr<UInventoryItem> FindItemByClass(TSubclassOf<UInventoryItem> itemClass);
+    // We have the given amount of the input item
+    bool HasItemOfClass(TSubclassOf<UInventoryItem> itemClass, int32 quantity = 1) const;
 
-     // Returns all inventory items that are children  of itemClass.
-     TArray<TWeakObjectPtr<UInventoryItem>> FindItemsByClass(TSubclassOf<UInventoryItem> itemClass);
+    // Returns the first item with the same class as the given item
+    TWeakObjectPtr<UInventoryItem> FindItemByClass(TSubclassOf<UInventoryItem> itemClass);
+
+    // Returns all inventory items that are children  of itemClass.
+    TArray<TWeakObjectPtr<UInventoryItem>> FindItemsByClass(TSubclassOf<UInventoryItem> itemClass);
+
+    FOnInventoryUpdated& OnInventoryUpdated() { return _onInventoryUpdated; }
 
 protected:
-     // The maximum weight this inventory can hold. This can potentially be varied using backpacks, spells, ...
-     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
-     double _weightCapacity;
+    // The maximum weight this inventory can hold. This can potentially be varied using backpacks, spells, ...
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
+    double _weightCapacity;
 
-     // The maximum volume this inventory can hold. This can potentially be varied using backpacks, spells, ...
-     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory", meta = (ClampMin = 0.0))
-     double _volumeCapacity;
+    // The maximum volume this inventory can hold. This can potentially be varied using backpacks, spells, ...
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory", meta = (ClampMin = 0.0))
+    double _volumeCapacity;
      
-     // Where we store the items in this inventory
-     UPROPERTY(VisibleAnywhere, Category = "Inventory")
-     TArray<TObjectPtr<UInventoryItem>> _items;
+    // Where we store the items in this inventory
+    UPROPERTY(VisibleAnywhere, Category = "Inventory")
+    TArray<TObjectPtr<UInventoryItem>> _items;
 
-     UPROPERTY(BlueprintAssignable, Category = "Inventory")
-     FOnInventoryUpdated _onInventoryUpdated;
+    UPROPERTY(BlueprintAssignable, Category = "Inventory")
+    FOnInventoryUpdated _onInventoryUpdated;
 
 private:
     // DO NOT CALL Add() or Emplace() on the _items array directly! Use this instead.
