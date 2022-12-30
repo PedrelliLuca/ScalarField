@@ -6,41 +6,37 @@
 
 #include "Components/ActorComponent.h"
 #include "HUDWidget.h"
-#include "InventoryComponent.h"
-#include "InventoryPresenterWidget.h"
+#include "NewInventoryPresenterWidget.h"
 
 #include "WidgetsPresenterComponent.generated.h"
 
 /**
- * \brief Component that manages how the widgets behave with respect to each other
+ * \brief Component that stores the widgets associated with the onwer player controlelr
  */
 UCLASS()
 class WIDGETSPRESENTATION_API UWidgetsPresenterComponent : public UActorComponent {
      GENERATED_BODY()
      
 public:
-     void SetOwnerPlayerController(TWeakObjectPtr<APlayerController> playerController);
-     bool IsInventoryOnViewport() const;
-     void ShowInventory(TWeakObjectPtr<UInventoryComponent> inventoryComponent);
-     void HideInventory();
+	TWeakInterfacePtr<IPawnBindableWidget> GetHUDWidget();
+	TWeakInterfacePtr<IInventoryContainerWidget> GetInventoryContainerWidget();
 
-     TWeakObjectPtr<UInventoryPresenterWidget> GetInventoryPresenterWidget() { return _inventoryPresenterWidget; }
+protected:
+	void BeginPlay() override;
 
 private:
-     void _createHUD();
-     void _createInventoryPresenter();
+     void _createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
+     void _createInventoryPresenter(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
      
-     TWeakObjectPtr<APlayerController> _ownerPlayerController;
-
-     UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+     UPROPERTY(EditDefaultsOnly, Category = "Pickup")
      TSubclassOf<UHUDWidget> _hudWidgetClass = nullptr;
 
      UPROPERTY()
      TObjectPtr<UHUDWidget> _hudWidget = nullptr;
 
      UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-     TSubclassOf<UInventoryPresenterWidget> _inventoryPresenterWidgetClass = nullptr;
+     TSubclassOf<UNewInventoryPresenterWidget> _inventoryPresenterWidgetClass = nullptr;
 
      UPROPERTY()
-     TObjectPtr<UInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
+     TObjectPtr<UNewInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
 };

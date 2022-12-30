@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InventoryInterface.h"
 #include "InventoryItem.h"
 #include "Components/ActorComponent.h"
 
@@ -48,7 +49,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
 
 // Represents an inventory for an owner actor
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class INVENTORYCORE_API UInventoryComponent : public UActorComponent {
+class INVENTORYCORE_API UInventoryComponent : public UActorComponent, public IInventory {
     GENERATED_BODY()
      
 public:

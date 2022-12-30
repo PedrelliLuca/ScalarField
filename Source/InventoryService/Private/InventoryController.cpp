@@ -9,7 +9,7 @@
 void UInventoryController::SetWidgetsPresenter(TWeakObjectPtr<UWidgetsPresenterComponent>&& widgetsPresenterC) {
 	check(widgetsPresenterC.IsValid());
 	_widgetsPresenterC = MoveTemp(widgetsPresenterC);
-	_widgetsPresenterC->GetInventoryPresenterWidget()->OnButtonClose().AddUObject(this, &UInventoryController::_onInventoryClose);
+	// _widgetsPresenterC->GetInventoryPresenterWidget()->OnButtonClose().AddUObject(this, &UInventoryController::_onInventoryClose);
 
 }
 
@@ -21,9 +21,9 @@ void UInventoryController::ShowInventoryOfActor(TWeakObjectPtr<AActor>&& actor) 
 	
 	check(inventory.IsValid());
 
-	_widgetsPresenterC->ShowInventory(inventory);
+	// _widgetsPresenterC->ShowInventory(inventory);
 
-	_widgetsPresenterC->GetInventoryPresenterWidget()->GetInventoryWidget()->OnItemFromInventoryBeingUsed().AddUObject(this, &UInventoryController::_useItemOfInventory);
+	// _widgetsPresenterC->GetInventoryPresenterWidget()->GetInventoryWidget()->OnItemFromInventoryBeingUsed().AddUObject(this, &UInventoryController::_useItemOfInventory);
 }
 
 void UInventoryController::_onInventoryClose() {

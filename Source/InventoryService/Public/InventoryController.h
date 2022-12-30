@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "InventoryItem.h"
 #include "WidgetsPresenterComponent.h"
 
 #include "InventoryController.generated.h"

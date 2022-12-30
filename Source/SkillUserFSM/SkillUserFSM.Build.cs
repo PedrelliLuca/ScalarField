@@ -25,7 +25,7 @@ namespace UnrealBuildTool.Rules
 				{
 					"InteractionSystem", 
 					"InventoryService",
-					"WidgetsPresentation",
+					"InventoryManipulation",
                 }
                 );
 

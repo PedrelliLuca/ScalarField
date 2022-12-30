@@ -2,6 +2,7 @@
 
 #include "ScalarFieldPlayerController.h"
 
+#include "InventoryManipulationSubsystem.h"
 #include "TacticalPauseWorldSubsystem.h"
 #include "InventorySubsystem.h"
 #include "PickupSubsystem.h"
@@ -61,13 +62,12 @@ void AScalarFieldPlayerController::BeginPlay() {
 	pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
 	_bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
 
-	_widgetsPresenterC->SetOwnerPlayerController(this);
+	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+	inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
+	inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
 
-	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventorySubsystem>();
-	inventorySubsys->SetWidgetsPresenter(_widgetsPresenterC);
-
-	const auto pickupSubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UPickupSubsystem>();
-	pickupSubsys->RegisterItemDropper(_widgetsPresenterC->GetInventoryPresenterWidget()->GetInventoryWidget().Get());
+	// const auto pickupSubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UPickupSubsystem>();
+	// pickupSubsys->RegisterItemDropper(_widgetsPresenterC->GetInventoryPresenterWidget()->GetInventoryWidget().Get());
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
