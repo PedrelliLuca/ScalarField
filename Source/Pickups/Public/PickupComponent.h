@@ -8,7 +8,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "InteractableComponent.h"
 #include "InteractorInterface.h"
-#include "InventoryItem.h"
+#include "ItemInterface.h"
 
 #include "PickupComponent.generated.h"
 
@@ -23,7 +23,7 @@ public:
     UPickupComponent();
 
     // Given an item, makes a pickup out of it.
-    void InitializePickup(TSubclassOf<UInventoryItem> itemClass, int32 quantity);
+    void InitializePickup(TSubclassOf<UObject> itemClass, int32 quantity);
 
 protected:
     void BeginPlay() override;
@@ -36,7 +36,7 @@ private:
     void _onTakePickup(TScriptInterface<IInteractor> interactor);
 
     UPROPERTY()
-    TObjectPtr<UInventoryItem> _item = nullptr;
+    TScriptInterface<IItem> _item = nullptr;
 
     TWeakObjectPtr<UStaticMeshComponent> _meshC = nullptr;
 

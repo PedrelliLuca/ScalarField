@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "PawnBindableWidgetInterface.h"
+
 #include "HUDWidget.generated.h"
 
 class UHealthComponent;
@@ -14,12 +16,16 @@ class UThermodynamicComponent;
  * 
  */
 UCLASS(Blueprintable)
-class GAMEPLAYUI_API UHUDWidget : public UUserWidget {
+class GAMEPLAYUI_API UHUDWidget : public UUserWidget, public IPawnBindableWidget {
 	GENERATED_BODY()
 	
 public:
-	void BindToPawn(TWeakObjectPtr<APawn> pawn);
-	void RemovePawnBindings();
+	void SetPawn(TWeakObjectPtr<APawn> pawn);
+	void ForgetCurrentPawn() override;
+	void BindCurrentPawn() override;
+	void UnbindCurrentPawn() override;
+	void Show() override;
+	void Hide() override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

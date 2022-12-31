@@ -15,7 +15,9 @@ namespace UnrealBuildTool.Rules
 					"CoreUObject",
 					"Engine",
 					"GameplayUI",
-					"InventoryCore",
+					"InventoryPresenter",
+					"AbstractUI",
+					"InventoryManipulation"
                 }
 				);
 

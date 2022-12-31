@@ -29,10 +29,12 @@ public class ScalarField : ModuleRules
             "InventoryCore",
             "WidgetsPresentation",
             "Pickups",
+            "InventoryManipulation",
+            "AbstractUI",
+            "InventoryPresenter"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
-            "InventoryService",
         });
     }
 }

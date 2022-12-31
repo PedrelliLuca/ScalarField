@@ -16,7 +16,8 @@ namespace UnrealBuildTool.Rules
                     "Core",
                     "CoreUObject",
                     "Engine",
-                    "UMG"
+                    "UMG",
+                    "InventoryManipulation",
                 }
                 );
 
