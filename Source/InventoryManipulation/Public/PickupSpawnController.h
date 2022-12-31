@@ -6,14 +6,14 @@
 #include "ItemInventoryWidgetInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
-#include "NewPickupSpawnController.generated.h"
+#include "PickupSpawnController.generated.h"
 
 UCLASS()
-class INVENTORYMANIPULATION_API UNewPickupSpawnController : public UObject {
+class INVENTORYMANIPULATION_API UPickupSpawnController : public UObject {
      GENERATED_BODY()
      
 public:
-     UNewPickupSpawnController();
+     UPickupSpawnController();
      
      void SetItemDropNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemDropNotifier);
      void SetPickupSpawnCallback(TFunction<FTransform()>&& pickupSpawnCallback);

@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "InventoryContainerWidgetInterface.h"
-#include "NewInventoryWidget.h"
+#include "InventoryWidget.h"
 #include "Blueprint/UserWidget.h"
 
-#include "NewInventoryPresenterWidget.generated.h"
+#include "InventoryPresenterWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnButtonClose);
 
 UCLASS()
-class INVENTORYPRESENTER_API UNewInventoryPresenterWidget : public UUserWidget, public IInventoryContainerWidget {
+class INVENTORYPRESENTER_API UInventoryPresenterWidget : public UUserWidget, public IInventoryContainerWidget {
      GENERATED_BODY()
   
 public:
@@ -25,6 +25,6 @@ private:
 	void _onClose();
 	
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UNewInventoryWidget> _inventoryWidget;
+	TObjectPtr<UInventoryWidget> _inventoryWidget;
 
 };

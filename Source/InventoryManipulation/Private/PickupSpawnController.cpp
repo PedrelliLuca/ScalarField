@@ -1,17 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "NewPickupSpawnController.h"
+#include "PickupSpawnController.h"
 
 #include "PickupInterface.h"
 #include "PickupSpawnSettings.h"
 
-UNewPickupSpawnController::UNewPickupSpawnController() {
+UPickupSpawnController::UPickupSpawnController() {
 	const auto pickupSpawnSettings = GetDefault<UPickupSpawnSettings>();
 	_pickupClass = pickupSpawnSettings->GetPickupClass();
 }
 
-void UNewPickupSpawnController::SetItemDropNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemDropNotifier) {
+void UPickupSpawnController::SetItemDropNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemDropNotifier) {
 	if (_itemDropNotifier.IsValid()) {
 		_itemDropNotifier->OnItemFromInventoryBeingUsed().Remove(_itemDropHandle);
 		_itemDropHandle.Reset();
@@ -21,22 +21,22 @@ void UNewPickupSpawnController::SetItemDropNotifier(TWeakInterfacePtr<IItemInven
 	_itemDropNotifier = MoveTemp(itemDropNotifier);
 }
 
-void UNewPickupSpawnController::SetPickupSpawnCallback(TFunction<FTransform()>&& pickupSpawnCallback) {
+void UPickupSpawnController::SetPickupSpawnCallback(TFunction<FTransform()>&& pickupSpawnCallback) {
 	_getPickupSpawnLocation = MoveTemp(pickupSpawnCallback);
 }
 
-void UNewPickupSpawnController::BindPickupSpawn() {
+void UPickupSpawnController::BindPickupSpawn() {
 	check(!_itemDropHandle.IsValid() && _itemDropNotifier.IsValid());
-	_itemDropHandle = _itemDropNotifier->OnItemFromInventoryBeingDropped().AddUObject(this, &UNewPickupSpawnController::_spawnPickup);
+	_itemDropHandle = _itemDropNotifier->OnItemFromInventoryBeingDropped().AddUObject(this, &UPickupSpawnController::_spawnPickup);
 }
 
-void UNewPickupSpawnController::UnbindPickupSpawn() {
+void UPickupSpawnController::UnbindPickupSpawn() {
 	check(_itemDropNotifier.IsValid());
 	_itemDropNotifier->OnItemFromInventoryBeingDropped().Remove(_itemDropHandle);
 	_itemDropHandle.Reset();
 }
 
-void UNewPickupSpawnController::_spawnPickup(const TWeakInterfacePtr<IItem> item, const int32 quantity, const TWeakInterfacePtr<IInventory> inventory) {
+void UPickupSpawnController::_spawnPickup(const TWeakInterfacePtr<IItem> item, const int32 quantity, const TWeakInterfacePtr<IInventory> inventory) {
 	check(item.IsValid() && inventory.IsValid());
 	const int32 droppedQuantity = inventory->ConsumeItem(item.Get(), quantity);
 

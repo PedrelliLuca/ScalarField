@@ -39,7 +39,7 @@ void UWidgetsPresenterComponent::_createInventoryPresenter(const TWeakObjectPtr<
 	check(ownerPlayerC.IsValid());
 	check(IsValid(_inventoryPresenterWidgetClass));
 	
-	_inventoryPresenterWidget = CreateWidget<UNewInventoryPresenterWidget>(ownerPlayerC.Get(), _inventoryPresenterWidgetClass);
+	_inventoryPresenterWidget = CreateWidget<UInventoryPresenterWidget>(ownerPlayerC.Get(), _inventoryPresenterWidgetClass);
 }
 
 

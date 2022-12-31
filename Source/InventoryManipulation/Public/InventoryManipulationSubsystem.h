@@ -7,7 +7,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "InventoryToggleController.h"
 #include "ItemUsageController.h"
-#include "NewPickupSpawnController.h"
+#include "PickupSpawnController.h"
 
 #include "InventoryManipulationSubsystem.generated.h"
 
@@ -37,5 +37,5 @@ private:
 	TObjectPtr<UItemUsageController> _itemUsageController = nullptr;
 
 	UPROPERTY()
-	TObjectPtr<UNewPickupSpawnController> _pickupSpawnController = nullptr;
+	TObjectPtr<UPickupSpawnController> _pickupSpawnController = nullptr;
 };

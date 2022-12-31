@@ -6,7 +6,7 @@
 
 #include "Components/ActorComponent.h"
 #include "HUDWidget.h"
-#include "NewInventoryPresenterWidget.h"
+#include "InventoryPresenterWidget.h"
 
 #include "WidgetsPresenterComponent.generated.h"
 
@@ -35,8 +35,8 @@ private:
      TObjectPtr<UHUDWidget> _hudWidget = nullptr;
 
      UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-     TSubclassOf<UNewInventoryPresenterWidget> _inventoryPresenterWidgetClass = nullptr;
+     TSubclassOf<UInventoryPresenterWidget> _inventoryPresenterWidgetClass = nullptr;
 
      UPROPERTY()
-     TObjectPtr<UNewInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
+     TObjectPtr<UInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
 };

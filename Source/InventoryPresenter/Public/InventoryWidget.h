@@ -6,12 +6,12 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/WrapBox.h"
 #include "ItemInventoryWidgetInterface.h"
-#include "NewInventoryItemWidget.h"
+#include "InventoryItemWidget.h"
 
-#include "NewInventoryWidget.generated.h"
+#include "InventoryWidget.generated.h"
 
 UCLASS()
-class INVENTORYPRESENTER_API UNewInventoryWidget : public UUserWidget, public IItemInventoryWidget {
+class INVENTORYPRESENTER_API UInventoryWidget : public UUserWidget, public IItemInventoryWidget {
      GENERATED_BODY()
   
 public:
@@ -20,7 +20,7 @@ public:
 
 protected:
      UPROPERTY(EditDefaultsOnly, NoClear, Category = "Inventory Widget")
-     TSubclassOf<UNewInventoryItemWidget> _itemWidgetClass = nullptr;
+     TSubclassOf<UInventoryItemWidget> _itemWidgetClass = nullptr;
 
 private:
      void _resetInventoryItems();

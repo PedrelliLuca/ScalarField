@@ -10,7 +10,7 @@ void UInventoryManipulationSubsystem::Initialize(FSubsystemCollectionBase& colle
 
 	_inventoryToggleController = NewObject<UInventoryToggleController>(this, UInventoryToggleController::StaticClass());
 	_itemUsageController = NewObject<UItemUsageController>(this, UItemUsageController::StaticClass());
-	_pickupSpawnController = NewObject<UNewPickupSpawnController>(this, UNewPickupSpawnController::StaticClass());
+	_pickupSpawnController = NewObject<UPickupSpawnController>(this, UPickupSpawnController::StaticClass());
 }
 
 void UInventoryManipulationSubsystem::SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryContainer) {
