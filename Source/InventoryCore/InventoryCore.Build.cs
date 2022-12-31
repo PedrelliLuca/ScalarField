@@ -16,7 +16,6 @@ namespace UnrealBuildTool.Rules
                     "Core",
                     "CoreUObject",
                     "Engine",
-                    "UMG",
                     "InventoryManipulation",
                 }
                 );
@@ -24,8 +23,6 @@ namespace UnrealBuildTool.Rules
             PrivateDependencyModuleNames.AddRange(
                 new string[]
                 {
-	                "InputCore",
-	                "SlateCore"
                 }
                 );
 

@@ -14,13 +14,6 @@ TObjectPtr<USkillUserState> UInventoryLookupState::OnToggleInventory(const TObje
 }
 
 void UInventoryLookupState::OnEnter(TObjectPtr<AController> controller) {
-	// const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventorySubsystem>();
-	// inventorySubsys->ShowInventoryOfActor(controller->GetPawn());
-	//
-	// const TWeakObjectPtr<UStateComponent> stateC = controller->FindComponentByClass<UStateComponent>();
-	// check(stateC.IsValid());
-	// _widgetClosedHandle = inventorySubsys->OnInventoryWidgetClosed().AddUObject(stateC.Get(), &UStateComponent::PerformInventoryToggleBehavior);
-
 	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
 	inventorySubsys->OpenInventoryOfActor(controller->GetPawn());
 
@@ -38,15 +31,6 @@ void UInventoryLookupState::OnEnter(TObjectPtr<AController> controller) {
 }
 
 void UInventoryLookupState::OnLeave(TObjectPtr<AController> controller) {
-	// const TWeakObjectPtr<UWidgetsPresenterComponent> widgetsPresenter = controller->FindComponentByClass<UWidgetsPresenterComponent>();
-	// // How did you even get in this state if the controller cannot present widgets?
-	// check(widgetsPresenter.IsValid())
-	// check(widgetsPresenter->IsInventoryOnViewport());
-	// widgetsPresenter->HideInventory();
-
-	// const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventorySubsystem>();
-	// inventorySubsys->OnInventoryWidgetClosed().Remove(_inventoryWidgetCloseHandle);
-	
 	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
 	inventorySubsys->CloseInventory();
 	inventorySubsys->OnInventoryClosedFromUI().Remove(_inventoryWidgetCloseHandle);

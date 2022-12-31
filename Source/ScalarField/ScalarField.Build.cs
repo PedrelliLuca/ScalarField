@@ -23,14 +23,12 @@ public class ScalarField : ModuleRules
             "TacticalPauseSystem",
             "GameplayAttributes",
             "DamageHandlers",
-            "GameplayUI",
             "UMG",
             "InteractionSystem",
             "InventoryCore",
             "WidgetsPresentation",
             "Pickups",
             "InventoryManipulation",
-            "AbstractUI",
             "InventoryPresenter"
         });
 

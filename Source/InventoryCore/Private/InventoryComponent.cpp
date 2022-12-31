@@ -5,7 +5,6 @@
 
 #include "Algo/Accumulate.h"
 #include "Algo/AnyOf.h"
-#include "ItemAddResult.h"
 
 #define LOCTEXT_NAMESPACE "InventoryComponent"
 

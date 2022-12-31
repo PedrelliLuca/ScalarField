@@ -23,7 +23,6 @@ namespace UnrealBuildTool.Rules
 				{
 					"TacticalPauseSystem",
 					"DeveloperSettings",
-					// ... add private dependencies that you statically link with here ...
 				}
 				);
 
