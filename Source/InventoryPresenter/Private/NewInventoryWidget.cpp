@@ -4,4 +4,31 @@
 #include "NewInventoryWidget.h"
 
 void UNewInventoryWidget::SetInventory(TWeakInterfacePtr<IInventory> inventory) {
+	if (_inventory.IsValid()) {
+		_inventory->OnInventoryUpdated().RemoveAll(this);
+	}
+
+	check(inventory.IsValid());
+	_inventory = MoveTemp(inventory);
+	_inventory->OnInventoryUpdated().AddUObject(this, &UNewInventoryWidget::_resetInventoryItems);
+
+	_resetInventoryItems();
+}
+
+void UNewInventoryWidget::_resetInventoryItems() {
+	check(IsValid(_itemWidgetClass));
+	_inventoryItemsBox->ClearChildren();
+
+	for (const auto& item : _inventory->GetItems()) {
+		const auto itemWidget = CreateWidget<UNewInventoryItemWidget>(GetOwningPlayer(), _itemWidgetClass);
+		itemWidget->SetItem(item);
+		itemWidget->OnItemUsage().AddUObject(this, &UNewInventoryWidget::_onItemBeingUsed);
+		// itemWidget->OnItemRightClick().AddUObject(this, &UInventoryWidget::_broadcastItemBeingDroppedFromInventory);
+
+		_inventoryItemsBox->AddChildToWrapBox(itemWidget);
+	}
+}
+
+void UNewInventoryWidget::_onItemBeingUsed(TWeakInterfacePtr<IItem> item) {
+	OnStoredItemBeingUsed().Broadcast(item, this);
 }

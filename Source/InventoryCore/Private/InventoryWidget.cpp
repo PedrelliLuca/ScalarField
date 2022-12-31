@@ -13,7 +13,7 @@ void UInventoryWidget::InitializeFromInventory(UInventoryComponent* inventoryC) 
 	}
 	
 	_inventory = inventoryC;
-	_inventory->OnInventoryUpdated().AddDynamic(this, &UInventoryWidget::_resetInventoryItems);
+	_inventory->OnInventoryUpdated().AddUObject(this, &UInventoryWidget::_resetInventoryItems);
 
 	_resetInventoryItems();
 }
@@ -25,11 +25,11 @@ void UInventoryWidget::_resetInventoryItems() {
 
 	for (const auto& item : _inventory->GetItems()) {
 		auto itemWidget = CreateWidget<UInventoryItemWidget>(GetOwningPlayer(), _itemWidgetClass);
-		itemWidget->SetItem(item);
+		// itemWidget->SetItem(item);
 		itemWidget->OnItemDoubleClick().AddUObject(this, &UInventoryWidget::_broadcastItemBeingUsedOnInventory);
 		itemWidget->OnItemRightClick().AddUObject(this, &UInventoryWidget::_broadcastItemBeingDroppedFromInventory);
 
-		_itemsToWidgets.Emplace(item, itemWidget);
+		_itemsToWidgets.Emplace(Cast<UInventoryItem>(item.GetObject()), itemWidget);
 
 		_inventoryItemsBox->AddChildToWrapBox(itemWidget);
 	}

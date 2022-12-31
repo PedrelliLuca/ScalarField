@@ -4,6 +4,7 @@
 
 #include "ClosableWidgetInterface.h"
 #include "InventoryInterface.h"
+#include "ItemContainerWidgetInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
 #include "InventoryContainerWidgetInterface.generated.h"
@@ -20,4 +21,5 @@ class IInventoryContainerWidget : public IClosableWidget {
 public:
 	virtual void ShowInventory(TWeakInterfacePtr<IInventory> inventory) = 0;
 	virtual void HideInventory() = 0;
+	virtual TWeakInterfacePtr<IItemContainerWidget> GetInventoryWidget() = 0;
 };

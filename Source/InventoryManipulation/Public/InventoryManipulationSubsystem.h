@@ -6,6 +6,7 @@
 #include "InventoryContainerWidgetInterface.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "InventoryToggleController.h"
+#include "ItemUsageController.h"
 
 #include "InventoryManipulationSubsystem.generated.h"
 
@@ -30,4 +31,7 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<UInventoryToggleController> _inventoryToggleController = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UItemUsageController> _itemUsageController = nullptr;
 };

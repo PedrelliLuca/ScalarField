@@ -34,7 +34,7 @@ void UInventoryController::_useItemOfInventory(TWeakObjectPtr<UInventoryItem> it
 	const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
 	pauseSubsys->OnTacticalPauseToggle().Remove(_itemUsageOnPauseToggleHandle);
 	if (!pauseSubsys->IsTacticalPauseOn()) {
-		inventory->UseItem(item);
+		// inventory->UseItem(item);
 		return;
 	}
 

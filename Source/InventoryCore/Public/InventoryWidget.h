@@ -43,7 +43,7 @@ private:
     UPROPERTY()
     TMap<TObjectPtr<UInventoryItem>, TObjectPtr<UInventoryItemWidget>> _itemsToWidgets{};
 
-    TWeakObjectPtr<UInventoryComponent> _inventory = __nullptr;;
+    TWeakObjectPtr<UInventoryComponent> _inventory = nullptr;
 
     FOnItemFromInventoryBeingUsed _onItemFromInventoryBeingUsed{};
 };

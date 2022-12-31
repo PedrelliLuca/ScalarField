@@ -5,7 +5,7 @@
 
 #include "InventoryInterface.h"
 
-void UInventoryToggleController::SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget>&& inventoryPresenter) {
+void UInventoryToggleController::SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryPresenter) {
 	check(inventoryPresenter.IsValid());
 	_inventoryContainer = MoveTemp(inventoryPresenter);
 	_inventoryContainer->OnCloseFromUI().AddUObject(this, &UInventoryToggleController::_inventoryWidgetClosedCallback);

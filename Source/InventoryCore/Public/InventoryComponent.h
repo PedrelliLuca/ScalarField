@@ -44,9 +44,6 @@ public:
     FText ErrorText {};
 };
 
-// When the inventory changes, broadcasts so that the UI can be updated.
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryUpdated);
-
 // Represents an inventory for an owner actor
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class INVENTORYCORE_API UInventoryComponent : public UActorComponent, public IInventory {
@@ -64,13 +61,10 @@ public:
     
     UFUNCTION(BlueprintPure, Category = "Inventory")
     FORCEINLINE double GetVolumeCapacity() const { return _volumeCapacity; }
-    
-    UFUNCTION(BlueprintPure, Category = "Inventory")
-    const TArray<TObjectPtr<UInventoryItem>>& GetItems() const { return _items; }
-    
-	void UseItem(TWeakObjectPtr<UInventoryItem> item);
 
-	void DropItem(TWeakObjectPtr<UInventoryItem> item, int32 quantity);
+    TWeakObjectPtr<AActor> GetInventoryOwner() override { return GetOwner(); }
+    
+    TArray<TWeakInterfacePtr<IItem>> GetItems() const override;
 
     /* Tries to add an existing item into the inventory. */
     FItemAddResult TryAddItem(TObjectPtr<UInventoryItem> item);
@@ -91,12 +85,10 @@ public:
     bool HasItemOfClass(TSubclassOf<UInventoryItem> itemClass, int32 quantity = 1) const;
 
     // Returns the first item with the same class as the given item
-    TWeakObjectPtr<UInventoryItem> FindItemByClass(TSubclassOf<UInventoryItem> itemClass);
+    TWeakInterfacePtr<IItem> FindItemByClass(TSubclassOf<UObject> itemClass) override;
 
     // Returns all inventory items that are children  of itemClass.
     TArray<TWeakObjectPtr<UInventoryItem>> FindItemsByClass(TSubclassOf<UInventoryItem> itemClass);
-
-    FOnInventoryUpdated& OnInventoryUpdated() { return _onInventoryUpdated; }
 
 protected:
     // The maximum weight this inventory can hold. This can potentially be varied using backpacks, spells, ...
@@ -110,9 +102,6 @@ protected:
     // Where we store the items in this inventory
     UPROPERTY(VisibleAnywhere, Category = "Inventory")
     TArray<TObjectPtr<UInventoryItem>> _items;
-
-    UPROPERTY(BlueprintAssignable, Category = "Inventory")
-    FOnInventoryUpdated _onInventoryUpdated;
 
 private:
     // DO NOT CALL Add() or Emplace() on the _items array directly! Use this instead.

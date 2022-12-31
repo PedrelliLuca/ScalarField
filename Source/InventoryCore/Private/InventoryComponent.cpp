@@ -47,10 +47,17 @@ double UInventoryComponent::GetCurrentVolume() const {
 	});
 }
 
-void UInventoryComponent::UseItem(const TWeakObjectPtr<UInventoryItem> item) {
-	check(FindItemByClass(item->GetClass()).IsValid());
+TArray<TWeakInterfacePtr<IItem>> UInventoryComponent::GetItems() const {
+	TArray<TWeakInterfacePtr<IItem>> abstractItems;
+	abstractItems.Reserve(_items.Num());
+	
+	for (const auto& item : _items) {
+		TWeakInterfacePtr<IItem> abstractItem = Cast<IItem>(item);
+		check(abstractItem.IsValid());
+		abstractItems.Emplace(MoveTemp(abstractItem));
+	}
 
-	item->Use(GetOwner());
+	return abstractItems;
 }
 
 FItemAddResult UInventoryComponent::TryAddItem(const TObjectPtr<UInventoryItem> item) {
@@ -155,7 +162,7 @@ int32 UInventoryComponent::ConsumeItem(const TObjectPtr<UInventoryItem> item, co
 	if (item->GetQuantity() == 0) {
 		RemoveItem(item);
 	} else {
-		_onInventoryUpdated.Broadcast();
+		OnInventoryUpdated().Broadcast();
 	}
 
 	return quantityActuallyConsumed;
@@ -169,7 +176,7 @@ bool UInventoryComponent::RemoveItem(const TObjectPtr<UInventoryItem> item) {
 		return false;
 	}
 
-	_onInventoryUpdated.Broadcast();
+	OnInventoryUpdated().Broadcast();
 	return true;
 }
 
@@ -179,7 +186,11 @@ bool UInventoryComponent::HasItemOfClass(const TSubclassOf<UInventoryItem> itemC
 	});
 }
 
-TWeakObjectPtr<UInventoryItem> UInventoryComponent::FindItemByClass(const TSubclassOf<UInventoryItem> itemClass) {
+TWeakInterfacePtr<IItem> UInventoryComponent::FindItemByClass(TSubclassOf<UObject> itemClass) {
+	if (!itemClass->ImplementsInterface(UItem::StaticClass())) {
+		return nullptr;
+	}
+
 	const auto itemPtr = Algo::FindByPredicate(_items, [&itemClass](const TObjectPtr<UInventoryItem>& item) {
 		check(IsValid(item));
 		return item->IsA(itemClass);
@@ -189,7 +200,9 @@ TWeakObjectPtr<UInventoryItem> UInventoryComponent::FindItemByClass(const TSubcl
 		return nullptr;
 	}
 
-	return *itemPtr;
+	const TWeakInterfacePtr<IItem> item = *itemPtr;
+	check(item.IsValid());
+	return item;
 }
 
 TArray<TWeakObjectPtr<UInventoryItem>> UInventoryComponent::FindItemsByClass(const TSubclassOf<UInventoryItem> itemClass) {
@@ -217,7 +230,7 @@ TObjectPtr<UInventoryItem> UInventoryComponent::_addItem(const TObjectPtr<UInven
 
 	newItem->OnItemAddedToInventory(this);
 	_items.Emplace(newItem);
-	_onInventoryUpdated.Broadcast();
+	OnInventoryUpdated().Broadcast();
 	return newItem;
 }
 

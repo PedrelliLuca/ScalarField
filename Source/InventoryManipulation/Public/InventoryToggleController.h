@@ -16,7 +16,7 @@ class INVENTORYMANIPULATION_API UInventoryToggleController : public UObject {
      GENERATED_BODY()
      
 public:
-     void SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget>&& inventoryPresenter);
+     void SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryPresenter);
      void SetHUDToShowOnClose(TWeakInterfacePtr<IPawnBindableWidget>&& widgetOnClose);
      
      void OpenInventoryOfActor(TWeakObjectPtr<AActor>&& actor);

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemInterface.h"
 #include "Engine/StaticMesh.h"
 
 #include "InventoryItem.generated.h"
@@ -20,7 +21,7 @@ enum class EItemRarity : uint8 {
 
 // EditInlineNew? DefaultToInstanced?
 UCLASS(Blueprintable, EditInlineNew, DefaultToInstanced)
-class INVENTORYCORE_API UInventoryItem : public UObject {
+class INVENTORYCORE_API UInventoryItem : public UObject, public IItem {
      GENERATED_BODY()
      
 public:
@@ -40,25 +41,26 @@ public:
 
      FORCEINLINE double GetVolume() const { return _volume; }
 
-     FORCEINLINE bool IsStackable() const { return _bIsStackable; }
+     bool IsStackable() const override { return _bIsStackable; }
 
-     FORCEINLINE int32 GetMaxQuantity() const { return _maxQuantity; }
+     bool ShouldShowInInventory() const override { return true; }
 
-     FORCEINLINE const FText& GetNameText() const { return _nameText; }
+     int32 GetMaxQuantity() const override { return _maxQuantity; }
+
+     const FText& GetNameText() const override { return _nameText; }
+
+     TObjectPtr<UTexture2D> GetThumbnail() override { return _inventoryThumbnail; } 
 
      FORCEINLINE const FText& GetActionText() const { return _actionText; }
 
      UFUNCTION(BlueprintCallable, Category = "Item")
-     void SetQuantity(int32 newQuantity);
+     void SetQuantity(int32 newQuantity) override;
 
-     FORCEINLINE int32 GetQuantity() const { return _quantity; }
+     int32 GetQuantity() const override { return _quantity; }
 
      FORCEINLINE TObjectPtr<UStaticMesh> GetMesh() { return _worldMesh; }
 
-     UFUNCTION(BlueprintPure, Category = "Item")
-     virtual bool ShouldShowInInventory() const { return true; }
-
-     virtual void Use(TWeakObjectPtr<AActor> actor) {}
+     void Use(TWeakObjectPtr<AActor> actor) override {}
 
      // Called to execute some logic when the item is added to the given inventory
      virtual void OnItemAddedToInventory(TWeakObjectPtr<class UInventoryComponent> inventory) {}

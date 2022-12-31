@@ -6,10 +6,12 @@ void UInventoryManipulationSubsystem::Initialize(FSubsystemCollectionBase& colle
 	Super::Initialize(collection);
 
 	_inventoryToggleController = NewObject<UInventoryToggleController>(this, UInventoryToggleController::StaticClass());
+	_itemUsageController = NewObject<UItemUsageController>(this, UItemUsageController::StaticClass());
 }
 
 void UInventoryManipulationSubsystem::SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryContainer) {
-	_inventoryToggleController->SetInventoryContainerWidget(MoveTemp(inventoryContainer));
+	_inventoryToggleController->SetInventoryContainerWidget(inventoryContainer);
+	_itemUsageController->SetItemContainerWidget(inventoryContainer->GetInventoryWidget());
 }
 
 void UInventoryManipulationSubsystem::SetHUDToShowOnClose(TWeakInterfacePtr<IPawnBindableWidget> widgetOnClose) {
@@ -18,8 +20,10 @@ void UInventoryManipulationSubsystem::SetHUDToShowOnClose(TWeakInterfacePtr<IPaw
 
 void UInventoryManipulationSubsystem::OpenInventoryOfActor(TWeakObjectPtr<AActor> actor) {
 	_inventoryToggleController->OpenInventoryOfActor(MoveTemp(actor));
+	_itemUsageController->BindItemUsage();
 }
 
 void UInventoryManipulationSubsystem::CloseInventory() {
 	_inventoryToggleController->CloseInventory();
+	_itemUsageController->UnbindItemUsage();
 }

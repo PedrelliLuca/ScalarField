@@ -12,6 +12,10 @@ void UNewInventoryPresenterWidget::HideInventory() {
 	RemoveFromParent();
 }
 
+TWeakInterfacePtr<IItemContainerWidget> UNewInventoryPresenterWidget::GetInventoryWidget() {
+	return _inventoryWidget;
+}
+
 void UNewInventoryPresenterWidget::_onClose() {
 	OnCloseFromUI().Broadcast();
 }
