@@ -4,7 +4,6 @@
 
 #include "InventoryManipulationSubsystem.h"
 #include "TacticalPauseWorldSubsystem.h"
-#include "InventorySubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
