@@ -5,28 +5,29 @@
 
 #include "TacticalPauseWorldSubsystem.h"
 
-void UItemUsageController::SetItemContainerWidget(TWeakInterfacePtr<IItemContainerWidget> itemContainer) {
-	if (_itemContainer.IsValid()) {
-		_itemContainer->OnStoredItemBeingUsed().Remove(_itemUsageHandle);
+void UItemUsageController::SetItemUsageNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemUsageNotifier) {
+	if (_itemUsageNotifier.IsValid()) {
+		_itemUsageNotifier->OnItemFromInventoryBeingUsed().Remove(_itemUsageHandle);
 		_itemUsageHandle.Reset();
 	}
 	
-	check(itemContainer.IsValid());
-	_itemContainer = MoveTemp(itemContainer);
+	check(itemUsageNotifier.IsValid());
+	_itemUsageNotifier = MoveTemp(itemUsageNotifier);
 }
 
 void UItemUsageController::BindItemUsage() {
-	check(!_itemUsageHandle.IsValid() && _itemContainer.IsValid());
-	_itemUsageHandle = _itemContainer->OnStoredItemBeingUsed().AddUObject(this, &UItemUsageController::_useItemOfInventory);
+	check(!_itemUsageHandle.IsValid() && _itemUsageNotifier.IsValid());
+	_itemUsageHandle = _itemUsageNotifier->OnItemFromInventoryBeingUsed().AddUObject(this, &UItemUsageController::_useItemOfInventory);
 }
 
 void UItemUsageController::UnbindItemUsage() {
-	check(_itemContainer.IsValid());
-	_itemContainer->OnStoredItemBeingUsed().Remove(_itemUsageHandle);
+	check(_itemUsageNotifier.IsValid());
+	_itemUsageNotifier->OnItemFromInventoryBeingUsed().Remove(_itemUsageHandle);
 	_itemUsageHandle.Reset();
 }
 
 void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory) {
+	check(item.IsValid() && inventory.IsValid());
 	const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
 	pauseSubsys->OnTacticalPauseToggle().Remove(_itemUsageOnPauseToggleHandle);
 	_itemUsageOnPauseToggleHandle.Reset();

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "InteractorInterface.h"
 #include "Components/WidgetComponent.h"
-#include "UObject/WeakInterfacePtr.h"
 
 #include "InteractableComponent.generated.h"
 

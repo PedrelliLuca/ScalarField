@@ -20,7 +20,7 @@ class SCALARFIELD_API AScalarFieldPickup : public AActor, public IPickup {
 public:
     AScalarFieldPickup();
 
-	 void InitializePickup(TSubclassOf<UInventoryItem> itemClass, int32 quantity) override;
+	 void InitializePickup(TSubclassOf<UObject> itemClass, int32 quantity) override;
 
 #if WITH_EDITOR
      void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;

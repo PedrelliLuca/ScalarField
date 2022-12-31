@@ -23,12 +23,18 @@ void UNewInventoryWidget::_resetInventoryItems() {
 		const auto itemWidget = CreateWidget<UNewInventoryItemWidget>(GetOwningPlayer(), _itemWidgetClass);
 		itemWidget->SetItem(item);
 		itemWidget->OnItemUsage().AddUObject(this, &UNewInventoryWidget::_onItemBeingUsed);
-		// itemWidget->OnItemRightClick().AddUObject(this, &UInventoryWidget::_broadcastItemBeingDroppedFromInventory);
+		itemWidget->OnItemDiscarded().AddUObject(this, &UNewInventoryWidget::_onItemBeingDropped);
 
 		_inventoryItemsBox->AddChildToWrapBox(itemWidget);
 	}
 }
 
 void UNewInventoryWidget::_onItemBeingUsed(TWeakInterfacePtr<IItem> item) {
-	OnStoredItemBeingUsed().Broadcast(item, this);
+	OnItemFromInventoryBeingUsed().Broadcast(item, _inventory);
+}
+
+void UNewInventoryWidget::_onItemBeingDropped(TWeakInterfacePtr<IItem> item) {
+	// In the future, the quantity to drop will be set using an additional widget. For the moment, we'll just all of
+	// the item.
+	OnItemFromInventoryBeingDropped().Broadcast(item, item->GetQuantity(), _inventory);
 }

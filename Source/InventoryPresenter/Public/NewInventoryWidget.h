@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WrapBox.h"
-#include "ItemContainerWidgetInterface.h"
+#include "ItemInventoryWidgetInterface.h"
 #include "NewInventoryItemWidget.h"
 
 #include "NewInventoryWidget.generated.h"
 
 UCLASS()
-class INVENTORYPRESENTER_API UNewInventoryWidget : public UUserWidget, public IItemContainerWidget {
+class INVENTORYPRESENTER_API UNewInventoryWidget : public UUserWidget, public IItemInventoryWidget {
      GENERATED_BODY()
   
 public:
@@ -26,6 +26,7 @@ private:
      void _resetInventoryItems();
 
      void _onItemBeingUsed(TWeakInterfacePtr<IItem> item);
+     void _onItemBeingDropped(TWeakInterfacePtr<IItem> item);
 
      UPROPERTY(meta = (BindWidget))
      TObjectPtr<UWrapBox> _inventoryItemsBox;

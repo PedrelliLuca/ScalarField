@@ -34,7 +34,7 @@ void UInventoryItem::SetQuantity(const int32 newQuantity) {
 	}
 
 	_quantity = FMath::Clamp(newQuantity, 0, _bIsStackable ? _maxQuantity : 1);
-	_onItemModified.Broadcast();
+	OnItemModified().Broadcast();
 }
 
 #undef LOCTEXT_NAMESPACE

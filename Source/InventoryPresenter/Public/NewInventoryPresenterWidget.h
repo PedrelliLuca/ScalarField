@@ -18,7 +18,7 @@ class INVENTORYPRESENTER_API UNewInventoryPresenterWidget : public UUserWidget, 
 public:
     void ShowInventory(TWeakInterfacePtr<IInventory> inventory) override;
 	void HideInventory() override;
-	TWeakInterfacePtr<IItemContainerWidget> GetInventoryWidget() override;
+	TWeakInterfacePtr<IItemInventoryWidget> GetInventoryWidget() override;
 
 private:
 	UFUNCTION(BlueprintCallable)

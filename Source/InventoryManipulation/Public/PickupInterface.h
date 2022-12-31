@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "InventoryItem.h"
-
 #include "PickupInterface.generated.h"
 
 UINTERFACE(MinimalAPI, NotBlueprintable)
@@ -15,5 +13,5 @@ class IPickup {
 	GENERATED_BODY()
 
 public:
-	virtual void InitializePickup(TSubclassOf<UInventoryItem> itemClass, int32 quantity) = 0;
+	virtual void InitializePickup(TSubclassOf<UObject> itemClass, int32 quantity) = 0;
 };

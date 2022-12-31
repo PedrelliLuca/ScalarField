@@ -2,16 +2,21 @@
 
 #include "InventoryManipulationSubsystem.h"
 
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
+
 void UInventoryManipulationSubsystem::Initialize(FSubsystemCollectionBase& collection) {
 	Super::Initialize(collection);
 
 	_inventoryToggleController = NewObject<UInventoryToggleController>(this, UInventoryToggleController::StaticClass());
 	_itemUsageController = NewObject<UItemUsageController>(this, UItemUsageController::StaticClass());
+	_pickupSpawnController = NewObject<UNewPickupSpawnController>(this, UNewPickupSpawnController::StaticClass());
 }
 
 void UInventoryManipulationSubsystem::SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryContainer) {
 	_inventoryToggleController->SetInventoryContainerWidget(inventoryContainer);
-	_itemUsageController->SetItemContainerWidget(inventoryContainer->GetInventoryWidget());
+	_itemUsageController->SetItemUsageNotifier(inventoryContainer->GetInventoryWidget());
+	_pickupSpawnController->SetItemDropNotifier(inventoryContainer->GetInventoryWidget());
 }
 
 void UInventoryManipulationSubsystem::SetHUDToShowOnClose(TWeakInterfacePtr<IPawnBindableWidget> widgetOnClose) {
@@ -21,9 +26,23 @@ void UInventoryManipulationSubsystem::SetHUDToShowOnClose(TWeakInterfacePtr<IPaw
 void UInventoryManipulationSubsystem::OpenInventoryOfActor(TWeakObjectPtr<AActor> actor) {
 	_inventoryToggleController->OpenInventoryOfActor(MoveTemp(actor));
 	_itemUsageController->BindItemUsage();
+	_pickupSpawnController->SetPickupSpawnCallback([actor]() {
+		check(actor.IsValid());
+		FTransform transform = actor->GetActorTransform();
+
+		if (const auto character = Cast<ACharacter>(actor)) {
+			FVector location = character->GetActorLocation();
+			location.Z -=  character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+			transform.SetLocation(MoveTemp(location));
+		}
+
+		return transform; 
+	});
+	_pickupSpawnController->BindPickupSpawn();
 }
 
 void UInventoryManipulationSubsystem::CloseInventory() {
 	_inventoryToggleController->CloseInventory();
 	_itemUsageController->UnbindItemUsage();
+	_pickupSpawnController->UnbindPickupSpawn();
 }

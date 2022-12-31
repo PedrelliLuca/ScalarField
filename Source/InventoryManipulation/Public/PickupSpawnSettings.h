@@ -10,11 +10,13 @@
 /*!
  * \brief Allows us to set up the properties of the pickups spawned by IPickupSpawners  
  */
-UCLASS(Config = "Pickups", defaultconfig, meta = (DisplayName = "Pickup Spawn Settings"))
-class PICKUPS_API UPickupSpawnSettings : public UDeveloperSettings {
+UCLASS(Config = "Pickups", DefaultConfig, meta = (DisplayName = "Pickup Spawn Settings"))
+class INVENTORYMANIPULATION_API UPickupSpawnSettings : public UDeveloperSettings {
 	GENERATED_BODY()
 
 public:
+	UPickupSpawnSettings() { CategoryName = TEXT("Pickup Spawn Settings"); }
+	
 	TSubclassOf<AActor> GetPickupClass() const { return _pickupClass; }
 
 private:

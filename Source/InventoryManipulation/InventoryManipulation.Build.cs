@@ -21,7 +21,8 @@ namespace UnrealBuildTool.Rules
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"TacticalPauseSystem"
+					"TacticalPauseSystem",
+					"DeveloperSettings",
 					// ... add private dependencies that you statically link with here ...
 				}
 				);

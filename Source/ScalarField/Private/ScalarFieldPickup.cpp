@@ -17,7 +17,7 @@ AScalarFieldPickup::AScalarFieldPickup() {
 	_pickupC = CreateDefaultSubobject<UPickupComponent>(TEXT("Pickup Component"));
 }
 
-void AScalarFieldPickup::InitializePickup(const TSubclassOf<UInventoryItem> itemClass, const int32 quantity) {
+void AScalarFieldPickup::InitializePickup(TSubclassOf<UObject> itemClass, int32 quantity){
 	_pickupC->InitializePickup(itemClass, quantity);
 }
 

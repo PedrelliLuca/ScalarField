@@ -12,7 +12,7 @@ void UNewInventoryPresenterWidget::HideInventory() {
 	RemoveFromParent();
 }
 
-TWeakInterfacePtr<IItemContainerWidget> UNewInventoryPresenterWidget::GetInventoryWidget() {
+TWeakInterfacePtr<IItemInventoryWidget> UNewInventoryPresenterWidget::GetInventoryWidget() {
 	return _inventoryWidget;
 }
 

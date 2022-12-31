@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "ItemAddResult.h"
 #include "ItemInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
@@ -20,8 +21,12 @@ class IInventory {
 	GENERATED_BODY()
 
 public:
-	virtual TWeakObjectPtr<AActor> GetInventoryOwner() = 0;
 	virtual TWeakInterfacePtr<IItem> FindItemByClass(TSubclassOf<UObject> itemClass) = 0;
+	virtual FItemAddResult TryAddItem(TWeakInterfacePtr<IItem> item) = 0;
+	virtual int32 ConsumeItem(TWeakInterfacePtr<IItem> item, int32 quantity) = 0;
+	virtual bool RemoveItem(TWeakInterfacePtr<IItem> item) = 0;
+	
+	virtual TWeakObjectPtr<AActor> GetInventoryOwner() = 0;
 	virtual TArray<TWeakInterfacePtr<IItem>> GetItems() const = 0;
 	
 	FOnInventoryUpdated& OnInventoryUpdated() { return _onInventoryUpdated; }
