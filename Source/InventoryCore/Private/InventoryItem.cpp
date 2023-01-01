@@ -11,6 +11,7 @@ UInventoryItem::UInventoryItem() {
 	_weight = 0.0;
 	_volume = 0.0;
 	_bIsStackable = false;
+	_bDoesUseConsume = true;
 	_quantity = 1;
 	_maxQuantity = 2;  
 }

@@ -32,6 +32,7 @@ public:
 	
 	virtual bool IsStackable() const = 0;
 	virtual bool ShouldShowInInventory() const = 0;
+	virtual bool DoesUseConsume() const = 0;
 
 	FOnItemModified& OnItemModified() { return _onItemModified; }
 

@@ -7,7 +7,7 @@
 
 #include "ItemInventoryWidgetInterface.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStoredItemBeingUsed, TWeakInterfacePtr<IItem>, TWeakInterfacePtr<IInventory>);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnStoredItemBeingUsed, TWeakInterfacePtr<IItem>, int32 quantityToUse, TWeakInterfacePtr<IInventory>);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemFromInventoryBeingDropped, TWeakInterfacePtr<IItem>, int32 quantityToDrop, TWeakInterfacePtr<IInventory>);
 
 UINTERFACE(MinimalAPI, NotBlueprintable)

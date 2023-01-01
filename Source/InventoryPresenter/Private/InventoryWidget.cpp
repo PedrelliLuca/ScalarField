@@ -30,11 +30,13 @@ void UInventoryWidget::_resetInventoryItems() {
 }
 
 void UInventoryWidget::_onItemBeingUsed(TWeakInterfacePtr<IItem> item) {
-	OnItemFromInventoryBeingUsed().Broadcast(item, _inventory);
+	// In the future, the quantity to use will be set using an additional widget. For the moment, we'll just use 1 of
+	// the item.
+	OnItemFromInventoryBeingUsed().Broadcast(item, 1, _inventory);
 }
 
 void UInventoryWidget::_onItemBeingDropped(TWeakInterfacePtr<IItem> item) {
-	// In the future, the quantity to drop will be set using an additional widget. For the moment, we'll just all of
-	// the item.
+	// In the future, the quantity to drop will be set using an additional widget. For the moment, we'll always drop all
+	// of the item.
 	OnItemFromInventoryBeingDropped().Broadcast(item, item->GetQuantity(), _inventory);
 }

@@ -18,7 +18,7 @@ public:
      void UnbindItemUsage();
 
 private:
-     void _useItemOfInventory(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory);
+     void _useItemOfInventory(TWeakInterfacePtr<IItem> item, int32 quantity, TWeakInterfacePtr<IInventory> inventory);
      
      TWeakInterfacePtr<IItemInventoryWidget> _itemUsageNotifier = nullptr;
 

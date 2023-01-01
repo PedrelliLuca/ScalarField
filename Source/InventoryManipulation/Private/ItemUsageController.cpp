@@ -26,7 +26,7 @@ void UItemUsageController::UnbindItemUsage() {
 	_itemUsageHandle.Reset();
 }
 
-void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory) {
+void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, const int32 quantity, TWeakInterfacePtr<IInventory> inventory) {
 	check(item.IsValid() && inventory.IsValid());
 	const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
 	pauseSubsys->OnTacticalPauseToggle().Remove(_itemUsageOnPauseToggleHandle);
@@ -37,6 +37,10 @@ void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, TW
 		check(inventory->FindItemByClass(item.GetObject()->GetClass()).IsValid());
 
 		item->Use(inventory->GetInventoryOwner());
+
+		if (item->DoesUseConsume()) {
+			inventory->ConsumeItem(item, quantity);
+		}
 		
 		return;
 	}
@@ -44,7 +48,8 @@ void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, TW
 	// The tactical pause is one, we can't use the item yet. We predispose the following lambda to be called once the
 	// tactical pause is toggled off.
 	
-	_itemUsageOnPauseToggleHandle = pauseSubsys->OnTacticalPauseToggle().AddLambda([this, item, inventory](const bool bIsTacticalPauseOn, const double currentWorldTimeDilation) {
+	_itemUsageOnPauseToggleHandle = pauseSubsys->OnTacticalPauseToggle().AddLambda([this, item, quantity, inventory]
+		(const bool bIsTacticalPauseOn, const double currentWorldTimeDilation) {
 		// This must have been called when the tactical pause has been turned off
 		check(!bIsTacticalPauseOn);
 
@@ -57,6 +62,6 @@ void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, TW
 		check(item.IsValid())
 		check(inventory.IsValid());
 		
-		_useItemOfInventory(item, inventory);
+		_useItemOfInventory(item, quantity, inventory);
 	});
 }

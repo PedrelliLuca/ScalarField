@@ -53,6 +53,7 @@ public:
      bool IsStackable() const override { return _bIsStackable; }
      UFUNCTION(BlueprintPure, Category = "Item")
      bool ShouldShowInInventory() const override { return true; }
+     bool DoesUseConsume() const override { return _bDoesUseConsume; }
 
      // Called to execute some logic when the item is added to the given inventory
      virtual void OnItemAddedToInventory(TWeakObjectPtr<class UInventoryComponent> inventory) {}
@@ -94,4 +95,7 @@ protected:
 
      UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
      bool _bIsStackable;
+
+     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Item")
+     bool _bDoesUseConsume;
 };
