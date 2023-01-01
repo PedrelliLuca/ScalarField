@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ItemInventoryWidgetInterface.h"
+#include "PickupSpawnCommandFactory.h"
 #include "UObject/WeakInterfacePtr.h"
 
 #include "PickupSpawnController.generated.h"
@@ -30,4 +31,7 @@ private:
      FDelegateHandle _itemDropHandle{};
 
      TFunction<FTransform()> _getPickupSpawnLocation;
+
+     UPROPERTY()
+     TObjectPtr<UPickupSpawnCommandFactory> _pickupSpawnCmdFactory = nullptr;
 };

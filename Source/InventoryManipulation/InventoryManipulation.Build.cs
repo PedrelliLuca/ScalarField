@@ -14,14 +14,14 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
-					"AbstractUI",
+					"AbstractUI", 
+					"TacticalPauseSystem",
 				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"TacticalPauseSystem",
 					"DeveloperSettings",
 				}
 				);

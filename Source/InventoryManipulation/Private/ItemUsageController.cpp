@@ -5,6 +5,10 @@
 
 #include "TacticalPauseWorldSubsystem.h"
 
+UItemUsageController::UItemUsageController() {
+	_itemUsageCmdFactory = CreateDefaultSubobject<UItemUsageCommandFactory>(TEXT("Item Usage Command Factory"));
+}
+
 void UItemUsageController::SetItemUsageNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemUsageNotifier) {
 	if (_itemUsageNotifier.IsValid()) {
 		_itemUsageNotifier->OnItemFromInventoryBeingUsed().Remove(_itemUsageHandle);
@@ -29,8 +33,6 @@ void UItemUsageController::UnbindItemUsage() {
 void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, const int32 quantity, TWeakInterfacePtr<IInventory> inventory) {
 	check(item.IsValid() && inventory.IsValid());
 	const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
-	pauseSubsys->OnTacticalPauseToggle().Remove(_itemUsageOnPauseToggleHandle);
-	_itemUsageOnPauseToggleHandle.Reset();
 	
 	if (!pauseSubsys->IsTacticalPauseOn()) {
 		// We are using the item from the inventory => we expect that the inventory contains the item
@@ -45,23 +47,9 @@ void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, co
 		return;
 	}
 
-	// The tactical pause is one, we can't use the item yet. We predispose the following lambda to be called once the
-	// tactical pause is toggled off.
-	
-	_itemUsageOnPauseToggleHandle = pauseSubsys->OnTacticalPauseToggle().AddLambda([this, item, quantity, inventory]
-		(const bool bIsTacticalPauseOn, const double currentWorldTimeDilation) {
-		// This must have been called when the tactical pause has been turned off
-		check(!bIsTacticalPauseOn);
-
-		// I don't see how the controller could not be valid, its outer is the subsystem...
-		check(IsValid(this));
-
-		// We were in tactical pause when this lambda was created, meaning that from the creation and call we do not
-		// expect anything to be changed on the inventory owner, whoever it is. Therefore, its inventory and the item
-		// in it must still be valid.
-		check(item.IsValid())
-		check(inventory.IsValid());
-		
-		_useItemOfInventory(item, quantity, inventory);
-	});
+	check(IsValid(_itemUsageCmdFactory));
+	_itemUsageCmdFactory->SetCommandItem(MoveTemp(item));
+	_itemUsageCmdFactory->SetCommandInventory(MoveTemp(inventory));
+	_itemUsageCmdFactory->SetCommandQuantity(quantity);
+	pauseSubsys->SetPauseOffCommand(_itemUsageCmdFactory->CreateCommand());
 }

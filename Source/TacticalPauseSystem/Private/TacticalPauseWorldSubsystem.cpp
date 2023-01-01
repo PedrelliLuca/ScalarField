@@ -17,9 +17,19 @@ void UTacticalPauseWorldSubsystem::ToggleWorldTacticalPauseStatus() {
 	} else {
 		currentWorldTimeDilation = 1.;
 		_bIsTacticalPauseOn = false;
+
+		if (IsValid(_pauseOffCommand.GetObject())) {
+			_pauseOffCommand->Execute();
+			_pauseOffCommand = nullptr;
+		}
 	}
 
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), currentWorldTimeDilation);
 
 	_onTacticalPauseToggle.Broadcast(_bIsTacticalPauseOn, currentWorldTimeDilation);
+}
+
+void UTacticalPauseWorldSubsystem::SetPauseOffCommand(TScriptInterface<IPauseCommand>&& pauseOffCommand) {
+	check(IsValid(pauseOffCommand.GetObject()));
+	_pauseOffCommand = MoveTemp(pauseOffCommand);
 }

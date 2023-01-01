@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemUsageCommandFactory.h"
 #include "ItemInventoryWidgetInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
@@ -13,6 +14,8 @@ class INVENTORYMANIPULATION_API UItemUsageController : public UObject {
      GENERATED_BODY()
      
 public:
+     UItemUsageController();
+     
      void SetItemUsageNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemUsageNotifier);
      void BindItemUsage();
      void UnbindItemUsage();
@@ -23,5 +26,7 @@ private:
      TWeakInterfacePtr<IItemInventoryWidget> _itemUsageNotifier = nullptr;
 
      FDelegateHandle _itemUsageHandle{};
-     FDelegateHandle _itemUsageOnPauseToggleHandle{};
+
+     UPROPERTY()
+     TObjectPtr<UItemUsageCommandFactory> _itemUsageCmdFactory = nullptr;
 };
