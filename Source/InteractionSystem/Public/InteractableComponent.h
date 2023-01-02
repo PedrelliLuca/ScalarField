@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "InteractorInterface.h"
 #include "Components/WidgetComponent.h"
-#include "UObject/WeakInterfacePtr.h"
 
 #include "InteractableComponent.generated.h"
 
@@ -24,17 +23,31 @@ public:
 
     /** \brief Shows the associated widget and communicates to the owner actor that focus has begun */
     void BeginFocus(TScriptInterface<IInteractor> interactor);
+
+	FOnBeginFocus& OnBeginFocus() { return _onBeginFocus; }
+
     /** \brief Hides the associated widget and communicates to the owner actor that focus has begun */
     void EndFocus(TScriptInterface<IInteractor> interactor);
+
+	FOnEndFocus& OnEndFocus() { return _onEndFocus; }
+
     /** \brief If the interaction is possible, communicates to the owner actor that the interactor has begun the
      * interaction process. The interactor is cached. */
     void BeginInteraction(TScriptInterface<IInteractor> interactor);
+
+	FOnBeginInteraction& OnBeginInteraction() { return _onBeginInteraction; }
+
     /** \brief Communicates to the owner actor that interaction has ended. The interactor is removed from the internal
      * cache. */
     void EndInteraction(TScriptInterface<IInteractor> interactor);
+
+	FOnEndInteraction& OnEndInteraction() { return _onEndInteraction; }
+
 	/** \brief If the interaction is possible, communicates to the owner actor that it's time to make the actual
 	 * interaction occur. */
     void Interact(TScriptInterface<IInteractor> interactor);
+
+	FOnInteraction& OnInteraction() { return _onInteraction; }
 
     /** \brief Returns the time that must elapse between BeginInteraction() and Interaction() calls. It's the
      * interactor's responsibility to make sure the calls are performed properly. */
@@ -51,6 +64,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Interaction")
 	void SetInteractableActionText(const FText& newInteractableActionText);
+
+	// To be called when data presented by the widget is updated
+	void RefreshWidget();
 
 protected:
 	void BeginPlay() override;
@@ -101,8 +117,4 @@ protected:
 	// the interaction key is released)
 	UPROPERTY(EditDefaultsOnly, BlueprintAssignable)
 	FOnEndInteraction _onEndInteraction;
-
-private:
-	// To be called when data presented by the widget is updated
-	void _refreshWidget();
 };

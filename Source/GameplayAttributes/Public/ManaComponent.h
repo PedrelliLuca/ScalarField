@@ -32,6 +32,8 @@ public:
 	void SetMaxMana(double maxMana, bool bUpdateMana = true);
 	void SetManaRegen(double manaRegenPerSecond);
 
+	void RestoreMana(double manaToRestore) { SetCurrentMana(GetCurrentMana() + manaToRestore);}
+
 	FOnManaChanged& OnManaChanged() { return _onManaChanged; }
 	FOnMaxManaChanged& OnMaxManaChanged() { return _onMaxManaChanged; }
 	FOnManaRegenChanged& OnManaRegenChanged() { return _onManaRegenChanged; }

@@ -11,6 +11,7 @@ UInventoryItem::UInventoryItem() {
 	_weight = 0.0;
 	_volume = 0.0;
 	_bIsStackable = false;
+	_bDoesUseConsume = true;
 	_quantity = 1;
 	_maxQuantity = 2;  
 }
@@ -22,6 +23,8 @@ void UInventoryItem::PostEditChangeProperty(FPropertyChangedEvent& propertyChang
 	const auto propertyName = property != nullptr ? property->GetFName() : NAME_None;
 	if (propertyName == GET_MEMBER_NAME_CHECKED(UInventoryItem, _quantity)) {
 		_quantity = FMath::Clamp(_quantity, 0, _bIsStackable ? _maxQuantity : 1);
+	} else if (propertyName == GET_MEMBER_NAME_CHECKED(UInventoryItem, _bIsStackable) && !_bIsStackable) {
+		_quantity = 1;
 	}
 }
 #endif
@@ -32,7 +35,7 @@ void UInventoryItem::SetQuantity(const int32 newQuantity) {
 	}
 
 	_quantity = FMath::Clamp(newQuantity, 0, _bIsStackable ? _maxQuantity : 1);
-	_onItemModified.Broadcast();
+	OnItemModified().Broadcast();
 }
 
 #undef LOCTEXT_NAMESPACE

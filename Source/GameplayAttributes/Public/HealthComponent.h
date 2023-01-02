@@ -33,6 +33,7 @@ public:
 	void SetHealthRegen(double healthRegenPerSecond);
 
 	void TakeDamage(double damage) { SetCurrentHealth(GetCurrentHealth() - damage); }
+	void Heal(double healthToAdd) { SetCurrentHealth(GetCurrentHealth() + healthToAdd); }
 
 	bool IsDead() const { return _currentHealth <= DBL_EPSILON; }
 

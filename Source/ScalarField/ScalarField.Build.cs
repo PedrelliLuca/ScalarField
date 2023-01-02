@@ -23,15 +23,16 @@ public class ScalarField : ModuleRules
             "TacticalPauseSystem",
             "GameplayAttributes",
             "DamageHandlers",
-            "GameplayUI",
             "UMG",
             "InteractionSystem",
             "InventoryCore",
             "WidgetsPresentation",
+            "Pickups",
+            "InventoryManipulation",
+            "InventoryPresenter"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
-            "InventoryService",
         });
     }
 }

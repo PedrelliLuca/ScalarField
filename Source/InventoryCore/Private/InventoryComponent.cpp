@@ -8,29 +8,6 @@
 
 #define LOCTEXT_NAMESPACE "InventoryComponent"
 
-FItemAddResult FItemAddResult::AddedNone(int32 itemQuantity, const FText& errorText) {
-	FItemAddResult addResult{itemQuantity};
-	addResult.Result = EItemAddResult::IAR_NoItemsAdded;
-	addResult.ErrorText = errorText;
-	
-	return addResult;
-}
-
-FItemAddResult FItemAddResult::AddedSome(int32 itemQuantity, int32 itemQuantityActuallyGiven, const FText& errorText) {
-	FItemAddResult addResult{itemQuantity, itemQuantityActuallyGiven};
-	addResult.Result = EItemAddResult::IAR_SomeItemsAdded;
-	addResult.ErrorText = errorText;
-	
-	return addResult;
-}
-
-FItemAddResult FItemAddResult::AddedAll(int32 itemQuantity) {
-	FItemAddResult addResult{itemQuantity};
-	addResult.Result = EItemAddResult::IAR_AllItemsAdded;
-	
-	return addResult;
-}
-
 UInventoryComponent::UInventoryComponent() {
 	PrimaryComponentTick.bCanEverTick = false;
 }
@@ -47,8 +24,21 @@ double UInventoryComponent::GetCurrentVolume() const {
 	});
 }
 
-FItemAddResult UInventoryComponent::TryAddItem(const TObjectPtr<UInventoryItem> item) {
-	check(IsValid(item));
+TArray<TWeakInterfacePtr<IItem>> UInventoryComponent::GetItems() const {
+	TArray<TWeakInterfacePtr<IItem>> abstractItems;
+	abstractItems.Reserve(_items.Num());
+	
+	for (const auto& item : _items) {
+		TWeakInterfacePtr<IItem> abstractItem = Cast<IItem>(item);
+		check(abstractItem.IsValid());
+		abstractItems.Emplace(MoveTemp(abstractItem));
+	}
+
+	return abstractItems;
+}
+
+FItemAddResult UInventoryComponent::TryAddItem(TWeakInterfacePtr<IItem> item) {
+	check(item.IsValid());
 
 	const int32 amountToAdd = item->GetQuantity();
 
@@ -69,20 +59,23 @@ FItemAddResult UInventoryComponent::TryAddItem(const TObjectPtr<UInventoryItem> 
 	if (item->IsStackable()) {
 		/* Do we already have a stack of this item in our inventory ? In this case we may need to modify the quantity to add
 		based on how much we already have on the existing stack */
-		const auto existingItem = FindItemByClass(item->GetClass());
+		const auto existingItem = FindItemByClass(item.GetObject()->GetClass());
 		if (existingItem.IsValid() && existingItem->GetMaxQuantity() == existingItem->GetQuantity()) {
 			return FItemAddResult::AddedNone(amountToAdd, FText::Format(LOCTEXT("ItemStackOverflowText", "The existing stack of {ItemName} is full, can't add more {ItemName}."), item->GetNameText()));
 		}
 
 		int32 amountAddable = existingItem.IsValid() ? FMath::Min(amountToAdd, existingItem->GetMaxQuantity() - existingItem->GetQuantity()) : amountToAdd;
-		FText errorText = FText::Format(LOCTEXT("InventoryErrorText", "Couldn't add all {ItemName} to the inventory."), item->GetNameText());
+		FText errorText{};
+		if (amountAddable < amountToAdd) {
+			errorText = FText::Format(LOCTEXT("ItemStackOverflowText", "The existing stack of {ItemName} in your inventory is too big to add all of the item."), item->GetNameText());
+		}
 
 		if (!FMath::IsNearlyZero(itemWeight) || !FMath::IsNearlyZero(itemVolume)) {
 			const int32 amountAddableBasedOnWeight = !FMath::IsNearlyZero(itemWeight) ? FMath::FloorToInt32((_weightCapacity - GetCurrentWeight()) / item->GetWeight()) : amountAddable;
 			amountAddable = FMath::Min(amountAddable, amountAddableBasedOnWeight);
 
 			// Does the weight restrict the amount of item we can take?
-			if (amountAddable < amountToAdd) {
+			if (amountAddable == amountAddableBasedOnWeight) {
 				errorText = FText::Format(LOCTEXT("InventoryTooMuchWeightText", "You are carrying too much weight to add the entire stack of {ItemName} to the inventory."), item->GetNameText());
 			}
 
@@ -90,11 +83,9 @@ FItemAddResult UInventoryComponent::TryAddItem(const TObjectPtr<UInventoryItem> 
 			amountAddable = FMath::Min(amountAddable, amountAddableBasedOnVolume);
 
 			// Does the volume restrict the amount of item we can take?
-			if (amountAddable < amountToAdd) {
+			if (amountAddable == amountAddableBasedOnVolume) {
 				errorText = FText::Format(LOCTEXT("InventoryTooLittleVolumeText", "You have too little space left to add the entire stack of {ItemName} to the inventory."), item->GetNameText());
 			}
-		} else if (amountAddable < amountToAdd) {
-			errorText = FText::Format(LOCTEXT("ItemStackOverflowText", "The existing stack of {ItemName} in your inventory is too big to add all of the item."), item->GetNameText());
 		}
 			
 		/* If one of the checks above reduced amountAddable to zero, it means that we can't add any items to our inventory. And since we do not allow multiple stacks of the same
@@ -113,7 +104,7 @@ FItemAddResult UInventoryComponent::TryAddItem(const TObjectPtr<UInventoryItem> 
 			return FItemAddResult::AddedAll(amountToAdd);
 		}
 
-		TObjectPtr<UInventoryItem> addableItem = NewObject<UInventoryItem>(this, item->GetClass());
+		TObjectPtr<UInventoryItem> addableItem = NewObject<UInventoryItem>(this, item.GetObject()->GetClass());
 		addableItem->SetQuantity(amountAddable);
 		_addItem(addableItem);
 
@@ -140,30 +131,33 @@ int32 UInventoryComponent::ConsumeAllOfItem(const TObjectPtr<UInventoryItem> ite
 	return ConsumeItem(item, item->GetQuantity());
 }
 
-int32 UInventoryComponent::ConsumeItem(const TObjectPtr<UInventoryItem> item, const int32 quantity) {
-	check(IsValid(item));
-	const int32 quantityActuallyConsumed = FMath::Min(quantity, item->GetQuantity());
-
-	item->SetQuantity(item->GetQuantity() - quantityActuallyConsumed);
-	if (item->GetQuantity() == 0) {
-		RemoveItem(item);
-	} else {
-		_onInventoryUpdated.Broadcast();
-	}
-
-	return quantityActuallyConsumed;
-}
-
-bool UInventoryComponent::RemoveItem(const TObjectPtr<UInventoryItem> item) {
-	const int32 nRemovedItems = _items.Remove(item);
+bool UInventoryComponent::RemoveItem(TWeakInterfacePtr<IItem> item) {
+	const auto concreteItem = Cast<UInventoryItem>(item.GetObject());
+	check(IsValid(concreteItem));
+	
+	const int32 nRemovedItems = _items.Remove(concreteItem);
 	check(nRemovedItems < 2);
 
 	if (nRemovedItems == 0) {
 		return false;
 	}
 
-	_onInventoryUpdated.Broadcast();
+	OnInventoryUpdated().Broadcast();
 	return true;
+}
+
+int32 UInventoryComponent::ConsumeItem(TWeakInterfacePtr<IItem> item, const int32 quantity) {
+	check(item.IsValid());
+	const int32 quantityActuallyConsumed = FMath::Min(quantity, item->GetQuantity());
+
+	item->SetQuantity(item->GetQuantity() - quantityActuallyConsumed);
+	if (item->GetQuantity() == 0) {
+		RemoveItem(item);
+	} else {
+		OnInventoryUpdated().Broadcast();
+	}
+
+	return quantityActuallyConsumed;
 }
 
 bool UInventoryComponent::HasItemOfClass(const TSubclassOf<UInventoryItem> itemClass, const int32 quantity) const {
@@ -172,7 +166,11 @@ bool UInventoryComponent::HasItemOfClass(const TSubclassOf<UInventoryItem> itemC
 	});
 }
 
-TWeakObjectPtr<UInventoryItem> UInventoryComponent::FindItemByClass(const TSubclassOf<UInventoryItem> itemClass) {
+TWeakInterfacePtr<IItem> UInventoryComponent::FindItemByClass(TSubclassOf<UObject> itemClass) {
+	if (!itemClass->ImplementsInterface(UItem::StaticClass())) {
+		return nullptr;
+	}
+
 	const auto itemPtr = Algo::FindByPredicate(_items, [&itemClass](const TObjectPtr<UInventoryItem>& item) {
 		check(IsValid(item));
 		return item->IsA(itemClass);
@@ -182,7 +180,9 @@ TWeakObjectPtr<UInventoryItem> UInventoryComponent::FindItemByClass(const TSubcl
 		return nullptr;
 	}
 
-	return *itemPtr;
+	const TWeakInterfacePtr<IItem> item = *itemPtr;
+	check(item.IsValid());
+	return item;
 }
 
 TArray<TWeakObjectPtr<UInventoryItem>> UInventoryComponent::FindItemsByClass(const TSubclassOf<UInventoryItem> itemClass) {
@@ -200,17 +200,17 @@ TArray<TWeakObjectPtr<UInventoryItem>> UInventoryComponent::FindItemsByClass(con
 	return outItems;
 }
 
-TObjectPtr<UInventoryItem> UInventoryComponent::_addItem(const TObjectPtr<UInventoryItem> item) {
-    TObjectPtr<UInventoryItem> newItem = item;
-	if (item->GetOuter() != this) {
+TObjectPtr<UInventoryItem> UInventoryComponent::_addItem(const TWeakInterfacePtr<IItem> item) {
+    TObjectPtr<UInventoryItem> newItem = Cast<UInventoryItem>(item.GetObject());
+	if (newItem->GetOuter() != this) {
 		// The item we're trying to add is not owned by this inventory component => we make a copy of it with us as outer.
-		newItem = NewObject<UInventoryItem>(this, item->GetClass());
+		newItem = NewObject<UInventoryItem>(this, item.GetObject()->GetClass());
 		newItem->SetQuantity(item->GetQuantity());
 	}
 
 	newItem->OnItemAddedToInventory(this);
 	_items.Emplace(newItem);
-	_onInventoryUpdated.Broadcast();
+	OnInventoryUpdated().Broadcast();
 	return newItem;
 }
 
