@@ -1,0 +1,41 @@
+@startuml
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipant underline
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+package SkillUserFSM {}
+package InventoryCore {}
+package InventoryManipulation {}
+package InventoryPresenter {}
+package WidgetsPresentation {}
+package ScalarField {}
+package Pickups {}
+package AbstractUI {}
+package GameplayUI {}
+
+ScalarField --> InventoryManipulation
+
+ScalarField --> WidgetsPresentation
+WidgetsPresentation --> InventoryManipulation
+WidgetsPresentation --> InventoryPresenter
+WidgetsPresentation --> GameplayUI
+WidgetsPresentation --> AbstractUI
+GameplayUI --> AbstractUI
+
+
+ScalarField --> Pickups
+Pickups -[#blue]-> InventoryManipulation
+
+InventoryPresenter --> InventoryManipulation
+InventoryPresenter --> AbstractUI
+
+ScalarField --> InventoryCore
+InventoryCore --> InventoryManipulation
+
+ScalarField --> SkillUserFSM
+SkillUserFSM -[#blue]-> InventoryManipulation
+
+InventoryManipulation --> AbstractUI
+
+@enduml

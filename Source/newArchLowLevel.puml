@@ -1,0 +1,112 @@
+@startuml
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipant underline
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+package ScalarField {
+    class AScalarFieldPlayerController
+    
+    class AScalarFieldPickup
+}
+
+package SkillUserFSM {
+    class UInventoryLookupState
+}
+
+package InventoryCore {
+    class UInventoryItem
+    class UInventoryComponent
+    
+    UInventoryComponent *-- UInventoryItem
+}
+
+package InventoryPresenter {
+    class UInventoryPresenterWidget
+    class UInventoryWidget
+    class UInventoryItemWidget
+    
+    UInventoryPresenterWidget --> UInventoryWidget
+    UInventoryWidget --> UInventoryItemWidget
+}
+
+package Pickups {
+    class UPickupComponent
+}
+
+AScalarFieldPickup --> UPickupComponent
+
+package InventoryManipulation {
+    class UInventoryManipulationSubsystem
+    
+    class UInventoryToggleController
+    class UItemUsageController
+    class UPickupSpawnController
+    
+    interface IInventoryContainerWidget
+    interface IItemInventoryWidget
+    interface IItemWidget
+    
+    interface IInventory
+    interface IItem
+    
+    interface IPickup
+    
+    struct FItemAddResult
+    
+    IInventory --> IItem
+    IInventory --> FItemAddResult
+    
+    IInventoryContainerWidget --> IInventory
+    IInventoryContainerWidget --> IItemInventoryWidget
+    IItemInventoryWidget --> IInventory
+    IItemWidget --> IItem
+    
+    
+    UInventoryManipulationSubsystem --> UInventoryToggleController
+    UInventoryManipulationSubsystem --> UItemUsageController
+    UInventoryManipulationSubsystem --> UPickupSpawnController
+
+    UInventoryToggleController --> IInventory
+    UInventoryToggleController --> IInventoryContainerWidget
+    
+    UItemUsageController --> IItemInventoryWidget
+    
+    UPickupSpawnController --> IItemInventoryWidget
+    UPickupSpawnController --> IPickup
+}
+
+AScalarFieldPlayerController --> UInventoryManipulationSubsystem
+
+UInventoryLookupState --> UInventoryManipulationSubsystem
+
+UInventoryItem --|> IItem
+UInventoryComponent --|> IInventory
+
+UInventoryPresenterWidget --|> IInventoryContainerWidget
+UInventoryWidget --|> IItemInventoryWidget
+UInventoryItemWidget --|> IItemWidget
+UInventoryItemWidget --> IItem
+
+UPickupComponent --> IItem
+UPickupComponent --> IInventory
+
+AScalarFieldPickup --|> IPickup
+
+package InteractionSystem {
+    interface IInteractor
+    class UInteractableComponent
+}
+
+UPickupComponent --> IInteractor
+UPickupComponent --> UInteractableComponent
+
+package AbstractUI {
+    interface IPawnBindableWidget
+    interface IClosableWidget
+}
+
+UInventoryToggleController --> IPawnBindableWidget
+IInventoryContainerWidget --|> IClosableWidget
+
+@enduml

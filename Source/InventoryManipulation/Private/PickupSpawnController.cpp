@@ -18,7 +18,7 @@ UPickupSpawnController::UPickupSpawnController() {
 
 void UPickupSpawnController::SetItemDropNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemDropNotifier) {
 	if (_itemDropNotifier.IsValid()) {
-		_itemDropNotifier->OnItemFromInventoryBeingUsed().Remove(_itemDropHandle);
+		_itemDropNotifier->OnItemFromInventoryBeingDropped().Remove(_itemDropHandle);
 		_itemDropHandle.Reset();
 	}
 	
