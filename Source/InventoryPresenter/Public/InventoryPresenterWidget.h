@@ -21,6 +21,9 @@ public:
 	void HideInventory() override;
 	TWeakInterfacePtr<IItemInventoryWidget> GetInventoryWidget() override;
 
+protected:
+	FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+	
 private:
 	UFUNCTION(BlueprintCallable)
 	void _onClose();
@@ -58,4 +61,6 @@ private:
 	};
 
 	FItemDropPayload _itemDropPayload{};
+
+	bool _bQuantitySetterJustDrawn = false;
 };
