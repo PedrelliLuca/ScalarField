@@ -9,11 +9,17 @@
 void UInventoryPresenterWidget::ShowInventory(TWeakInterfacePtr<IInventory> inventory) {
 	AddToViewport();
 	_inventoryWidget->SetInventory(MoveTemp(inventory));
+	_itemFromInventoryUsedHandle = _inventoryWidget->OnItemFromInventoryUsed().AddUObject(this, &UInventoryPresenterWidget::_onItemFromInventoryBeingUsed);
 	_itemFromInventoryDiscardedHandle = _inventoryWidget->OnItemFromInventoryDiscarded().AddUObject(this, &UInventoryPresenterWidget::_onItemFromInventoryBeingDiscarded);
 }
 
 void UInventoryPresenterWidget::HideInventory() {
 	RemoveFromParent();
+
+	if (_itemFromInventoryUsedHandle.IsValid()) {
+		_inventoryWidget->OnItemFromInventoryUsed().Remove(_itemFromInventoryUsedHandle);
+		_itemFromInventoryUsedHandle.Reset();
+	}
 
 	if (_itemFromInventoryDiscardedHandle.IsValid()) {
 		_inventoryWidget->OnItemFromInventoryDiscarded().Remove(_itemFromInventoryDiscardedHandle);
@@ -21,10 +27,6 @@ void UInventoryPresenterWidget::HideInventory() {
 	}
 
 	_cleanupQuantityBeingSet();
-}
-
-TWeakInterfacePtr<IItemInventoryWidget> UInventoryPresenterWidget::GetInventoryWidget() {
-	return _inventoryWidget;
 }
 
 FReply UInventoryPresenterWidget::NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) {
@@ -53,6 +55,12 @@ FReply UInventoryPresenterWidget::NativeOnMouseButtonDown(const FGeometry& inGeo
 
 void UInventoryPresenterWidget::_onClose() {
 	OnCloseFromUI().Broadcast();
+}
+
+void UInventoryPresenterWidget::_onItemFromInventoryBeingUsed(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory) {
+	// In the future, the quantity to use will be set using an additional widget. For the moment, we'll just use 1 of
+	// the item.
+	OnItemFromInventoryBeingUsed().Broadcast(MoveTemp(item), 1, MoveTemp(inventory));
 }
 
 void UInventoryPresenterWidget::_onItemFromInventoryBeingDiscarded(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory, const FPointerEvent& mouseEvent) {

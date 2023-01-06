@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ItemUsageCommandFactory.h"
-#include "ItemInventoryWidgetInterface.h"
+#include "InventoryContainerWidgetInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
 #include "ItemUsageController.generated.h"
@@ -16,14 +16,14 @@ class INVENTORYMANIPULATION_API UItemUsageController : public UObject {
 public:
      UItemUsageController();
      
-     void SetItemUsageNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemUsageNotifier);
+     void SetItemUsageNotifier(TWeakInterfacePtr<IInventoryContainerWidget> itemUsageNotifier);
      void BindItemUsage();
      void UnbindItemUsage();
 
 private:
      void _useItemOfInventory(TWeakInterfacePtr<IItem> item, int32 quantity, TWeakInterfacePtr<IInventory> inventory);
      
-     TWeakInterfacePtr<IItemInventoryWidget> _itemUsageNotifier = nullptr;
+     TWeakInterfacePtr<IInventoryContainerWidget> _itemUsageNotifier = nullptr;
 
      FDelegateHandle _itemUsageHandle{};
 

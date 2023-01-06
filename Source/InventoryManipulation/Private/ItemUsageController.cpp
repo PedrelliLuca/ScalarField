@@ -9,7 +9,7 @@ UItemUsageController::UItemUsageController() {
 	_itemUsageCmdFactory = CreateDefaultSubobject<UItemUsageCommandFactory>(TEXT("Item Usage Command Factory"));
 }
 
-void UItemUsageController::SetItemUsageNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemUsageNotifier) {
+void UItemUsageController::SetItemUsageNotifier(TWeakInterfacePtr<IInventoryContainerWidget> itemUsageNotifier) {
 	if (_itemUsageNotifier.IsValid()) {
 		_itemUsageNotifier->OnItemFromInventoryBeingUsed().Remove(_itemUsageHandle);
 		_itemUsageHandle.Reset();

@@ -50,9 +50,7 @@ void UInventoryWidget::_refreshInventoryItems() {
 }
 
 void UInventoryWidget::_onItemBeingUsed(TWeakInterfacePtr<IItem> item) {
-	// In the future, the quantity to use will be set using an additional widget. For the moment, we'll just use 1 of
-	// the item.
-	OnItemFromInventoryBeingUsed().Broadcast(item, 1, _inventory);
+	_onItemFromInventoryUsed.Broadcast(item, _inventory);
 }
 
 void UInventoryWidget::_onItemBeingDiscarded(TWeakInterfacePtr<IItem> item, const FPointerEvent& mouseEvent) {

@@ -19,7 +19,6 @@ class INVENTORYPRESENTER_API UInventoryPresenterWidget : public UUserWidget, pub
 public:
     void ShowInventory(TWeakInterfacePtr<IInventory> inventory) override;
 	void HideInventory() override;
-	TWeakInterfacePtr<IItemInventoryWidget> GetInventoryWidget() override;
 
 protected:
 	FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
@@ -28,6 +27,8 @@ private:
 	UFUNCTION(BlueprintCallable)
 	void _onClose();
 
+	void _onItemFromInventoryBeingUsed(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory);
+	
 	void _onItemFromInventoryBeingDiscarded(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory, const FPointerEvent& mouseEvent);
 
 	UFUNCTION()
@@ -46,7 +47,8 @@ private:
      
 	UPROPERTY()
 	TObjectPtr<UQuantitySetterWidget> _quantitySetter = nullptr;
-	
+
+	FDelegateHandle _itemFromInventoryUsedHandle{};
 	FDelegateHandle _itemFromInventoryDiscardedHandle{};
 
 	struct FItemDropPayload {

@@ -5,23 +5,25 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WrapBox.h"
-#include "ItemInventoryWidgetInterface.h"
+#include "InventoryInterface.h"
 #include "InventoryItemWidget.h"
 
 #include "InventoryWidget.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemFromInventoryUsed, TWeakInterfacePtr<IItem>, TWeakInterfacePtr<IInventory>);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemFromInventoryDiscarded, TWeakInterfacePtr<IItem>, TWeakInterfacePtr<IInventory>, const FPointerEvent&);
 
 UCLASS()
-class INVENTORYPRESENTER_API UInventoryWidget : public UUserWidget, public IItemInventoryWidget {
+class INVENTORYPRESENTER_API UInventoryWidget : public UUserWidget {
      GENERATED_BODY()
   
 public:
-     void SetInventory(TWeakInterfacePtr<IInventory> inventory) override;
+     void SetInventory(TWeakInterfacePtr<IInventory> inventory);
 
      UFUNCTION(BlueprintPure)
      TScriptInterface<IInventory> GetInventory() const { return _inventory.GetObject(); }
 
+     FOnItemFromInventoryUsed& OnItemFromInventoryUsed() { return _onItemFromInventoryUsed; }
      FOnItemFromInventoryDiscarded& OnItemFromInventoryDiscarded() { return _onItemFromInventoryDiscarded; }
 
 protected:
@@ -49,4 +51,5 @@ private:
      TSubclassOf<UObject> _currentClassFilter = nullptr;
      
      FOnItemFromInventoryDiscarded _onItemFromInventoryDiscarded;
+     FOnItemFromInventoryUsed _onItemFromInventoryUsed;
 };
