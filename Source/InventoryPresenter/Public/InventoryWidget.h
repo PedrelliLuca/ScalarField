@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/WrapBox.h"
-#include "Components/Overlay.h"
 #include "ItemInventoryWidgetInterface.h"
 #include "InventoryItemWidget.h"
-#include "QuantitySetterWidget.h"
 
 #include "InventoryWidget.generated.h"
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemFromInventoryDiscarded, TWeakInterfacePtr<IItem>, TWeakInterfacePtr<IInventory>, const FPointerEvent&);
 
 UCLASS()
 class INVENTORYPRESENTER_API UInventoryWidget : public UUserWidget, public IItemInventoryWidget {
@@ -21,6 +21,8 @@ public:
 
      UFUNCTION(BlueprintPure)
      TScriptInterface<IInventory> GetInventory() const { return _inventory.GetObject(); }
+
+     FOnItemFromInventoryDiscarded& OnItemFromInventoryDiscarded() { return _onItemFromInventoryDiscarded; }
 
 protected:
      UPROPERTY(EditDefaultsOnly, NoClear, Category = "Inventory Widget")
@@ -36,10 +38,7 @@ private:
      void _refreshInventoryItems();
 
      void _onItemBeingUsed(TWeakInterfacePtr<IItem> item);
-     void _onItemBeingDropped(TWeakInterfacePtr<IItem> item, const FPointerEvent& mouseEvent);
-
-     UFUNCTION()
-     void _sanitizeItemQuantity(const FText& quantityText, ETextCommit::Type commitType);
+     void _onItemBeingDiscarded(TWeakInterfacePtr<IItem> item, const FPointerEvent& mouseEvent);
      
      UPROPERTY(meta = (BindWidget))
      TObjectPtr<UWrapBox> _inventoryItemsBox;
@@ -48,15 +47,6 @@ private:
 
      UPROPERTY()
      TSubclassOf<UObject> _currentClassFilter = nullptr;
-
-     UPROPERTY(meta = (BindWidget))
-     TObjectPtr<UOverlay> _inventoryOverlay;
-
-     UPROPERTY(EditDefaultsOnly)
-     TSubclassOf<UQuantitySetterWidget> _quantitySetterClass = nullptr;
      
-     UPROPERTY()
-     TObjectPtr<UQuantitySetterWidget> _quantitySetter = nullptr;
-
-     TWeakInterfacePtr<IItem> _itemPendingDrop = nullptr;
+     FOnItemFromInventoryDiscarded _onItemFromInventoryDiscarded;
 };

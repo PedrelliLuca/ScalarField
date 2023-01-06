@@ -6,7 +6,6 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Components/EditableTextBox.h"
-#include "Delegates/DelegateCombinations.h"
 
 #include "QuantitySetterWidget.generated.h"
 

@@ -8,7 +8,6 @@
 #include "ItemInventoryWidgetInterface.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnStoredItemBeingUsed, TWeakInterfacePtr<IItem>, int32 quantityToUse, TWeakInterfacePtr<IInventory>);
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemFromInventoryBeingDropped, TWeakInterfacePtr<IItem>, int32 quantityToDrop, TWeakInterfacePtr<IInventory>);
 
 UINTERFACE(MinimalAPI, NotBlueprintable)
 class UItemInventoryWidget : public UInterface {
@@ -23,9 +22,7 @@ public:
 	virtual void SetInventory(TWeakInterfacePtr<IInventory> inventory) = 0;
 
 	FOnStoredItemBeingUsed& OnItemFromInventoryBeingUsed() { return _onItemFromInventoryBeingUsed; }
-	FOnItemFromInventoryBeingDropped& OnItemFromInventoryBeingDropped() { return _onItemFromInventoryBeingDropped; }
 	
 private:
 	FOnStoredItemBeingUsed _onItemFromInventoryBeingUsed{};
-	FOnItemFromInventoryBeingDropped _onItemFromInventoryBeingDropped{};
 };

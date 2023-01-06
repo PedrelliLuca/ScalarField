@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemInventoryWidgetInterface.h"
+#include "InventoryContainerWidgetInterface.h"
 #include "PickupSpawnCommandFactory.h"
 #include "UObject/WeakInterfacePtr.h"
 
@@ -16,7 +16,7 @@ class INVENTORYMANIPULATION_API UPickupSpawnController : public UObject {
 public:
      UPickupSpawnController();
      
-     void SetItemDropNotifier(TWeakInterfacePtr<IItemInventoryWidget> itemDropNotifier);
+     void SetItemDropNotifier(TWeakInterfacePtr<IInventoryContainerWidget> itemDropNotifier);
      void SetPickupSpawnCallback(TFunction<FTransform()>&& pickupSpawnCallback);
      void BindPickupSpawn();
      void UnbindPickupSpawn();
@@ -26,7 +26,7 @@ private:
 
      TSubclassOf<AActor> _pickupClass = nullptr;
      
-     TWeakInterfacePtr<IItemInventoryWidget> _itemDropNotifier = nullptr;
+     TWeakInterfacePtr<IInventoryContainerWidget> _itemDropNotifier = nullptr;
 
      FDelegateHandle _itemDropHandle{};
 

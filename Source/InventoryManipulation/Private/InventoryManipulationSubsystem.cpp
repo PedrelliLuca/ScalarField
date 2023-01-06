@@ -16,7 +16,7 @@ void UInventoryManipulationSubsystem::Initialize(FSubsystemCollectionBase& colle
 void UInventoryManipulationSubsystem::SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryContainer) {
 	_inventoryToggleController->SetInventoryContainerWidget(inventoryContainer);
 	_itemUsageController->SetItemUsageNotifier(inventoryContainer->GetInventoryWidget());
-	_pickupSpawnController->SetItemDropNotifier(inventoryContainer->GetInventoryWidget());
+	_pickupSpawnController->SetItemDropNotifier(inventoryContainer);
 }
 
 void UInventoryManipulationSubsystem::SetHUDToShowOnClose(TWeakInterfacePtr<IPawnBindableWidget> widgetOnClose) {
