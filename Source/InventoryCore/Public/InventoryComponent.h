@@ -18,14 +18,16 @@ public:
     UInventoryComponent();
     
     UFUNCTION(BlueprintPure, Category = "Inventory")
-    FORCEINLINE double GetWeightCapacity() const { return _weightCapacity; }
-    
-    double GetCurrentWeight() const;
-    
-    double GetCurrentVolume() const;
+    FORCEINLINE double GetWeightCapacity() const override { return _weightCapacity; }
+
+    UFUNCTION(BlueprintPure, Category = "Inventory")
+    double GetCurrentWeight() const override;
+
+    UFUNCTION(BlueprintPure, Category = "Inventory")
+    double GetCurrentVolume() const override;
     
     UFUNCTION(BlueprintPure, Category = "Inventory")
-    FORCEINLINE double GetVolumeCapacity() const { return _volumeCapacity; }
+    FORCEINLINE double GetVolumeCapacity() const override { return _volumeCapacity; }
 
     TWeakObjectPtr<AActor> GetInventoryOwner() override { return GetOwner(); }
     

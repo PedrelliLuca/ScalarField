@@ -1,0 +1,40 @@
+@startuml
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipant underline
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+package InventoryManipulation {
+    class UItemUsageController
+    class UItemUsageCommand
+    class UItemUsageCommandFactory
+    
+    UItemUsageController --> UItemUsageCommandFactory
+    UItemUsageCommandFactory -[#blue]-> UItemUsageCommand
+    
+    class UPickupSpawnController
+    class UPickupSpawnCommand
+    class UPickupSpawnCommandFactory
+    
+    UPickupSpawnController --> UPickupSpawnCommandFactory
+    UPickupSpawnCommandFactory -[#blue]-> UPickupSpawnCommand
+}
+
+package TacticalPauseSystem {
+    class UTacticalPauseWorldSubsystem
+
+    interface IPauseCommand
+    interface IPauseCommandFactory
+    
+    IPauseCommandFactory --> IPauseCommand
+    
+    UTacticalPauseWorldSubsystem --> IPauseCommand
+}
+
+UItemUsageCommandFactory --|> IPauseCommandFactory
+UItemUsageCommand --|> IPauseCommand
+
+UPickupSpawnCommandFactory --|> IPauseCommandFactory
+UPickupSpawnCommand --|> IPauseCommand
+
+@enduml

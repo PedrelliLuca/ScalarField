@@ -28,6 +28,11 @@ public:
 	
 	virtual TWeakObjectPtr<AActor> GetInventoryOwner() = 0;
 	virtual TArray<TWeakInterfacePtr<IItem>> GetItems() const = 0;
+
+	virtual double GetWeightCapacity() const = 0;
+	virtual double GetCurrentWeight() const = 0;
+	virtual double GetVolumeCapacity() const = 0;
+	virtual double GetCurrentVolume() const = 0;
 	
 	FOnInventoryUpdated& OnInventoryUpdated() { return _onInventoryUpdated; }
 	

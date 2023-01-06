@@ -4,7 +4,6 @@
 
 #include "ClosableWidgetInterface.h"
 #include "InventoryInterface.h"
-#include "ItemInventoryWidgetInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
 #include "InventoryContainerWidgetInterface.generated.h"
@@ -14,6 +13,9 @@ class UInventoryContainerWidget : public UInterface {
 	GENERATED_BODY()
 };
 
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemFromInventoryBeingUsed, TWeakInterfacePtr<IItem>, int32 quantityToUse, TWeakInterfacePtr<IInventory>);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemFromInventoryBeingDropped, TWeakInterfacePtr<IItem>, int32 quantityToDrop, TWeakInterfacePtr<IInventory>);
+
 /* Interface for widgets that can be closed by using some UI element, like a button. */
 class IInventoryContainerWidget : public IClosableWidget {
 	GENERATED_BODY()
@@ -21,5 +23,11 @@ class IInventoryContainerWidget : public IClosableWidget {
 public:
 	virtual void ShowInventory(TWeakInterfacePtr<IInventory> inventory) = 0;
 	virtual void HideInventory() = 0;
-	virtual TWeakInterfacePtr<IItemInventoryWidget> GetInventoryWidget() = 0;
+
+	FOnItemFromInventoryBeingUsed& OnItemFromInventoryBeingUsed() { return _onItemFromInventoryBeingUsed; }
+	FOnItemFromInventoryBeingDropped& OnItemFromInventoryBeingDropped() { return _onItemFromInventoryBeingDropped; }
+
+private:
+	FOnItemFromInventoryBeingUsed _onItemFromInventoryBeingUsed{};
+	FOnItemFromInventoryBeingDropped _onItemFromInventoryBeingDropped{};
 };
