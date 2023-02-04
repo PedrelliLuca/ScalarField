@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "AIController.h"
+#include "BehaviorTree/BehaviorTree.h"
 #include "Perception/AIPerceptionComponent.h"
 
 #include "EnemyMageController.generated.h"
@@ -31,6 +33,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy Mage")
 	FName _targetKeyName = FName{"Target"};
 
-	UPROPERTY(VisibleAnywhere, Category = "Enemy AI")
+	// UPROPERTY(EditDefaultsOnly,  Category = "Mage AI")
+	// TSubclassOf<UBehaviorTree> _behaviorTreeClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "Mage AI")
 	TObjectPtr<UAIPerceptionComponent> _perceptionC;
+
+	UPROPERTY(EditDefaultsOnly,  Category = "Mage AI")
+	TObjectPtr<UBehaviorTree> _behaviorTree;
 };

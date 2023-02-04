@@ -14,6 +14,13 @@ void AEnemyMageController::BeginPlay() {
 	Super::BeginPlay();
 
 	_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyMageController::_onActorSensed);
+
+	if(!IsValid(_behaviorTree)) {
+		UE_LOG(LogTemp, Error, TEXT("%s: missing Behavior Tree Class"), *FString{__FUNCTION__});
+		return;
+	}
+	
+	RunBehaviorTree(_behaviorTree);
 }
 
 void AEnemyMageController::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
