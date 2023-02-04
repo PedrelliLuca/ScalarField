@@ -29,7 +29,9 @@ public class ScalarField : ModuleRules
             "WidgetsPresentation",
             "Pickups",
             "InventoryManipulation",
-            "InventoryPresenter"
+            "InventoryPresenter",
+            "AIModule",
+            "GameplayTasks"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {

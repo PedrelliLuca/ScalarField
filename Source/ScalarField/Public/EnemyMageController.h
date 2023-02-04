@@ -33,9 +33,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Enemy Mage")
 	FName _targetKeyName = FName{"Target"};
 
-	// UPROPERTY(EditDefaultsOnly,  Category = "Mage AI")
-	// TSubclassOf<UBehaviorTree> _behaviorTreeClass;
-
 	UPROPERTY(VisibleAnywhere, Category = "Mage AI")
 	TObjectPtr<UAIPerceptionComponent> _perceptionC;
 
