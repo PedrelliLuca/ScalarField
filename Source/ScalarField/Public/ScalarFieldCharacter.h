@@ -10,6 +10,7 @@
 #include "SkillsContainerComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
 
 #include "ScalarFieldCharacter.generated.h"
 
@@ -72,6 +73,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInventoryComponent> _inventoryC;
+
+	UPROPERTY(VisibleAnywhere, Category = "AI Senses")
+	TObjectPtr<UAIPerceptionStimuliSourceComponent> _stimuliSourceC;
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;

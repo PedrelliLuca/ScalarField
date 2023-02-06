@@ -61,6 +61,8 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 
 	_inventoryC = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 
+	_stimuliSourceC = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Perception Stimuli Source Component"));
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
