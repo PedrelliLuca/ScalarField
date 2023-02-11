@@ -69,7 +69,7 @@ void UMyEnvQueryTest_Temperature::RunTest(FEnvQueryInstance& queryInstance) cons
 
 			const auto midComfort = (contextTempDmgC->GetMinComfortTemperature() + contextTempDmgC->GetMaxComfortTemperature()) * 0.5;
 			// const auto deltaTemperature = static_cast<float>(midComfort - otherThermoC->GetTemperature());
-			const auto deltaTemperature = midComfort - otherThermoC->GetTemperature();
+			const auto deltaTemperature = FMath::Abs(midComfort - otherThermoC->GetTemperature());
 
 			/* In this case, with a Linear Scoring Equation the closer the other's temperature is to the mid of the comfort interval, the better it is.*/
 			// const auto score = FMath::IsNearlyZero(deltaTemperature) ? TNumericLimits<float>::Max() : 1 / deltaTemperature;
