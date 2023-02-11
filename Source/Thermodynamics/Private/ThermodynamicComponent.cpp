@@ -68,8 +68,9 @@ void UThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> simpl
 		_possibleHeatExchangers.Empty();
 	}
 
-	// Is the input collision an actual thermodynamic collider?
+	// Is the input collision an actual thermodynamic collider? And can it generate overlap events?
 	check(simpleCollision->GetCollisionProfileName() == TEXT("HeatExchanger"));
+	check(simpleCollision->GetGenerateOverlapEvents());
 
 	_simpleCollisionC = simpleCollision;
 	_simpleCollisionC->OnComponentBeginOverlap.AddDynamic(this, &UThermodynamicComponent::_onSimpleBeginOverlap);
@@ -82,10 +83,15 @@ void UThermodynamicComponent::SetCollision(TObjectPtr<UPrimitiveComponent> simpl
 			UE_LOG(LogTemp, Warning, TEXT("%s(): Complex Collision profile name not set to \"No Collision\", it will be forced!"), *FString{__FUNCTION__});
 			complexCollision->SetCollisionProfileName(TEXT("NoCollision"));
 		}
-		_complexCollisionC = complexCollision;
 
-		// By default, the complex collision sleeps.
-		_complexCollisionC->SetComponentTickEnabled(false);
+		// I decided to not check() on the bGenerateOverlapEvents of the complex, since skeletal meshes are a classic example of meshes where this value
+		// is set to false by default and are valid complex meshes
+		if (!complexCollision->GetGenerateOverlapEvents()) {
+			UE_LOG(LogTemp, Warning, TEXT("%s(): Complex Collision set to unable to generate overlap events, it will be forced!"), *FString{__FUNCTION__});
+			complexCollision->SetGenerateOverlapEvents(true);
+		}
+
+		_complexCollisionC = complexCollision;
 	}
 
 	_bCollisionChangedSinceLastTick = true;
@@ -109,7 +115,9 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 		check(otherThermoC.IsValid());
 		const auto otherCollison = otherThermoC->_getMostComplexCollision();
 
-		// If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC. 
+		/* If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC.
+		 * CAUTION: if this returns false even though you're sure an overlap is in place, that's because one of the two
+		 * UPrimitiveComponent::bGenerateOverlapEvents attributes is set to false */
 		if (thisCollision->IsOverlappingComponent(otherCollison.Get())) {
 			/* When this is hotter than other, the delta is negative since we emit heat.
 			 * When this is colder than other, the delta is positive since we absorb heat. */
@@ -165,7 +173,6 @@ void UThermodynamicComponent::_setInitialExchangers() {
 	if (_complexCollisionC.IsValid() && _possibleHeatExchangers.Num() > 0) {
 		// We have at least one possible heat excvhanger, wake up the complex collision!
 		_complexCollisionC->SetCollisionProfileName(TEXT("HeatExchanger"));
-		_complexCollisionC->SetComponentTickEnabled(true);
 	}
 }
 
@@ -182,10 +189,9 @@ void UThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlap
 
 	_possibleHeatExchangers.Emplace(otherThermoC);
 
-	if (_complexCollisionC.IsValid() && !_complexCollisionC->IsComponentTickEnabled()) {
-		// We have at least one possible heat excvhanger, wake up the complex collision!
+	if (_complexCollisionC.IsValid() && _complexCollisionC->GetCollisionProfileName() != FName{ TEXT("HeatExchanger") }) {
+		// We have at least one possible heat excvhanger, activate the complex collision!
 		_complexCollisionC->SetCollisionProfileName(TEXT("HeatExchanger"));
-		_complexCollisionC->SetComponentTickEnabled(true);
 	}
 }
 
@@ -199,9 +205,8 @@ void UThermodynamicComponent::_onSimpleEndOverlap(UPrimitiveComponent* overlappe
 		_possibleHeatExchangers.Remove(*thermoCToRemove);
 
 		if (_complexCollisionC.IsValid() && _possibleHeatExchangers.Num() == 0) {
-			// No more possible heat exchangers, put the complex collision to sleep.
+			// No more possible heat exchangers, disable the complex collision.
 			_complexCollisionC->SetCollisionProfileName(TEXT("NoCollision"));
-			_complexCollisionC->SetComponentTickEnabled(false);
 		}
 	}
 }
