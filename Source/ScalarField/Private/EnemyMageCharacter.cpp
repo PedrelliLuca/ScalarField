@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "ScalarFieldCharacter.h"
+#include "EnemyMageCharacter.h"
 
 #include "Colorizer.h"
 #include "Components/CapsuleComponent.h"
@@ -10,7 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TemperatureDamageType.h"
 
-AScalarFieldCharacter::AScalarFieldCharacter() {
+AEnemyMageCharacter::AEnemyMageCharacter() {
 	// This is what makes the scalar field character interact with the environment grid
 	GetCapsuleComponent()->SetCollisionProfileName("GridInteractingPawn");
 
@@ -24,22 +24,9 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Rotate character to moving direction
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 640.0f, 0.0f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
-
-	// Create a camera boom...
-	_cameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	_cameraBoom->SetupAttachment(RootComponent);
-	_cameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	_cameraBoom->TargetArmLength = 800.f;
-	_cameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
-	_cameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
-
-	// Create a camera...
-	_topDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
-	_topDownCameraComponent->SetupAttachment(_cameraBoom, USpringArmComponent::SocketName);
-	_topDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 
@@ -57,14 +44,12 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 
 	_inventoryC = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 
-	_stimuliSourceC = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Perception Stimuli Source Component"));
-
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-float AScalarFieldCharacter::TakeDamage(const float damageAmount, const FDamageEvent& damageEvent, AController* const eventInstigator, AActor* const damageCauser) {
+float AEnemyMageCharacter::TakeDamage(const float damageAmount, const FDamageEvent& damageEvent, AController* const eventInstigator, AActor* const damageCauser) {
 	float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
 
 	if (damageEvent.DamageTypeClass == UTemperatureDamageType::StaticClass()) {
@@ -85,23 +70,23 @@ float AScalarFieldCharacter::TakeDamage(const float damageAmount, const FDamageE
 	return damage;
 }
 
-void AScalarFieldCharacter::Tick(float deltaTime) {
+void AEnemyMageCharacter::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 
 	_temperatureDmgHandlerC->HandleDamage(_thermodynamicC->GetTemperature());
 }
 
-void AScalarFieldCharacter::BeginPlay() {
+void AEnemyMageCharacter::BeginPlay() {
 	Super::BeginPlay();
 
 	_setupThermodynamicCollisions();
-	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_temperatureChanged);
+	_thermodynamicC->OnTemperatureChanged.AddUObject(this, &AEnemyMageCharacter::_temperatureChanged);
 
 	_dmiSetup();
 	_setOverlappingCells();
 }
 
-void AScalarFieldCharacter::_setupThermodynamicCollisions() {
+void AEnemyMageCharacter::_setupThermodynamicCollisions() {
 	const auto simpleThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{ "SimpleThermalCollision" });
 	check(simpleThermalCollisions.Num() == 1);
 	_simpleThermalCollision = Cast<UPrimitiveComponent>(simpleThermalCollisions[0]);
@@ -115,7 +100,7 @@ void AScalarFieldCharacter::_setupThermodynamicCollisions() {
 	_thermodynamicC->SetCollision(_simpleThermalCollision, _complexThermalCollision);
 }
 
-void AScalarFieldCharacter::_dmiSetup() {
+void AEnemyMageCharacter::_dmiSetup() {
 	// Setting up the DMI that changes the mesh color based on temperature
 	_materialInstance = GetMesh()->CreateDynamicMaterialInstance(0, GetMesh()->GetMaterial(0), TEXT("Thermodynamics Material"));
 
@@ -125,7 +110,7 @@ void AScalarFieldCharacter::_dmiSetup() {
 	}
 }
 
-void AScalarFieldCharacter::_setOverlappingCells() {
+void AEnemyMageCharacter::_setOverlappingCells() {
 	// Retrieve all environment cells being overlapped at startup
 	TSet<AActor*> overlappingActors;
 	GetCapsuleComponent()->GetOverlappingActors(overlappingActors, AEnvironmentCell::StaticClass());
@@ -141,12 +126,12 @@ void AScalarFieldCharacter::_setOverlappingCells() {
 	GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>()->ActivateOverlappedCells(overlappingCells);
 }
 
-void AScalarFieldCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {
+void AEnemyMageCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {
 	check(_materialInstance != nullptr);
 	_materialInstance->SetVectorParameterValue(TEXT("Tint"), temperatureColor);
 }
 
-void AScalarFieldCharacter::_temperatureChanged(double newTemperature) {
+void AEnemyMageCharacter::_temperatureChanged(double newTemperature) {
 	const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
 	_updateMaterialTint(temperatureColor);
 }
