@@ -117,7 +117,8 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 
 		/* If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC.
 		 * CAUTION: if this returns false even though you're sure an overlap is in place, that's because one of the two
-		 * UPrimitiveComponent::bGenerateOverlapEvents attributes is set to false */
+		 * UPrimitiveComponent::bGenerateOverlapEvents attributes is set to false. This can easily happen with skeletal
+		 * meshes on characters for example.*/
 		if (thisCollision->IsOverlappingComponent(otherCollison.Get())) {
 			/* When this is hotter than other, the delta is negative since we emit heat.
 			 * When this is colder than other, the delta is positive since we absorb heat. */
