@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 
-#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
+#include "AbstractSkill.h"
+#include "BehaviorTree/BTTaskNode.h"
 
 #include "BTTask_CastSpell.generated.h"
 
@@ -12,7 +13,7 @@
  * 
  */
 UCLASS()
-class SCALARFIELD_API UBTTask_CastSpell : public UBTTask_BlackboardBase {
+class SCALARFIELD_API UBTTask_CastSpell : public UBTTaskNode {
 	GENERATED_BODY()
 
 public:
@@ -20,4 +21,7 @@ public:
 	
 private:
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
+
+	UPROPERTY(EditAnywhere, Category = "Node")
+	TSubclassOf<UAbstractSkill> _skillToCast;
 };

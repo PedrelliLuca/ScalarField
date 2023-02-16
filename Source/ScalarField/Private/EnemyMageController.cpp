@@ -15,6 +15,8 @@ AEnemyMageController::AEnemyMageController() {
 void AEnemyMageController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 
+	_stateC->PerformTickBehavior(deltaTime);
+
 	_secondsSinceLastComfortTemperatureCheck += deltaTime;
 	if (_secondsSinceLastComfortTemperatureCheck >= _secondsBetweenComfortTemperatureChecks) {
 		_communicateTemperatureHarmfulness();
