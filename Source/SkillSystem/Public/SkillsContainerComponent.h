@@ -19,6 +19,8 @@ public:
 
 	TObjectPtr<UAbstractSkill> GetSkillAtIndex(uint32 index) const;
 
+	TObjectPtr<UAbstractSkill> FindSkillByClass(TSubclassOf<UAbstractSkill> skillClass) const;
+
 protected:
 	virtual void BeginPlay() override;
 
