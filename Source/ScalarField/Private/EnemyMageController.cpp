@@ -7,7 +7,9 @@
 #include "GameFramework/Character.h"
 
 AEnemyMageController::AEnemyMageController() {
+	_movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AI Movement Command Component"));
 	_perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
+	_stateC = CreateDefaultSubobject<UStateComponent>(TEXT("State Component"));
 }
 
 void AEnemyMageController::Tick(float deltaTime) {

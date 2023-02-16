@@ -43,5 +43,9 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
 		return EBTNodeResult::Failed;
 	}
 
+	// The spell execution can fail, for example:
+	// - In case the skill is on cooldown
+	// - In case the skill is already being executed
+	// - In case the current state does not allow the execution of skills
 	return stateC->PerformSkillExecutionBehavior(MoveTemp(skill)) ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
 }
