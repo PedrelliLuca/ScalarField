@@ -3,8 +3,11 @@
 #include "ScalarFieldPlayerController.h"
 
 #include "InventoryManipulationSubsystem.h"
-#include "TacticalPauseWorldSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "SkillsContainerComponent.h"
+#include "TacticalPauseWorldSubsystem.h"
+
+
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
 	bShowMouseCursor = true;
@@ -83,23 +86,73 @@ void AScalarFieldPlayerController::_onSetTargetPressed() {
 }
 
 void AScalarFieldPlayerController::_onSkill1Cast() {
-	_stateC->PerformSkillExecutionBehavior(1);
+	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+	check(IsValid(skillsContainer));
+
+	constexpr uint32 skillKey = 1;
+	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+	if (!IsValid(skill)) {
+		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
+		return;
+	}
+
+	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill2Cast() {
-	_stateC->PerformSkillExecutionBehavior(2);
+	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+	check(IsValid(skillsContainer));
+
+	constexpr uint32 skillKey = 2;
+	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+	if (!IsValid(skill)) {
+		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
+		return;
+	}
+
+	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill3Cast() {
-	_stateC->PerformSkillExecutionBehavior(3);
+	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+	check(IsValid(skillsContainer));
+
+	constexpr uint32 skillKey = 3;
+	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+	if (!IsValid(skill)) {
+		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
+		return;
+	}
+
+	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill4Cast() {
-	_stateC->PerformSkillExecutionBehavior(4);
+	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+	check(IsValid(skillsContainer));
+
+	constexpr uint32 skillKey = 4;
+	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+	if (!IsValid(skill)) {
+		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
+		return;
+	}
+
+	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill5Cast() {
-	_stateC->PerformSkillExecutionBehavior(5);
+	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+	check(IsValid(skillsContainer));
+
+	constexpr uint32 skillKey = 5;
+	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+	if (!IsValid(skill)) {
+		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
+		return;
+	}
+
+	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onTacticalPauseToggled() {
@@ -113,4 +166,9 @@ void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTact
 	CustomTimeDilation = 1. / currentWorldTimeDilation;
 
 	_bIsTacticalPauseOn = bIsTacticalPauseOn;
+}
+
+constexpr uint32 AScalarFieldPlayerController::_getSkillIdxFromKey(const uint32 key) {
+	// keys [1, 2, ..., 9, 0] => indices [0, 1, ..., 8, 9]
+	return key != 0 ? key - 1 : KEY_ASSIGNABLE_SKILLS - 1;
 }

@@ -41,6 +41,8 @@ private:
 	void _onTacticalPauseToggled();
 	void _answerTacticalPauseToggle(bool bIsTacticalPauseOn, double currentWorldTimeDilation);
 
+	constexpr uint32 _getSkillIdxFromKey(uint32 key);
+
 	UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
 	TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
 
@@ -54,6 +56,8 @@ private:
 	TObjectPtr<UWidgetsPresenterComponent> _widgetsPresenterC;
 
 	bool _bIsTacticalPauseOn = false;
+
+	static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
 };
 
 

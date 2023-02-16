@@ -13,21 +13,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnTargeting(TObjectPtr<AActor> tar
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UChannelingState::OnBeginSkillExecution(const int32 skillKey, const TObjectPtr<AController> controller) {
-	check(skillKey < KEY_ASSIGNABLE_SKILLS);
-	const auto pawn = controller->GetPawn();
-	const auto skillsContainer = pawn->FindComponentByClass<USkillsContainerComponent>();
-	check(IsValid(skillsContainer));
-
-	// keys [1, 2, ..., 9, 0] => index [0, 1, ..., 8, 9]
-	const uint32 index = skillKey != 0 ? skillKey - 1 : KEY_ASSIGNABLE_SKILLS - 1;
-	const auto skill = skillsContainer->GetSkillAtIndex(index);
-
-	if (!IsValid(skill)) {
-		UE_LOG(LogTemp, Warning, TEXT("Skill bound with key &i isn't valid!"), skillKey);
-		return _keepCurrentState();
-	}
-
+TObjectPtr<USkillUserState> UChannelingState::OnBeginSkillExecution(TObjectPtr<UAbstractSkill> skill, const TObjectPtr<AController> controller) {
 	if (skill == GetSkillInExecution()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is already being casted!"));
 		return _keepCurrentState();
@@ -41,8 +27,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnBeginSkillExecution(const int32 
 	TObjectPtr<UExecutionState> newState = nullptr;
 	if (skill->RequiresTarget()) {
 		newState = _abortExecutionForState<UTargetingState>(controller);
-	}
-	else {
+	} else {
 		newState = _abortExecutionForState<UCastingState>(controller);
 	}
 
