@@ -5,7 +5,9 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
 void UAIRotoTranslationMovement::OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) {
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(aiController, destination);
+	if (!aiController->IsFollowingAPath()) {
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(aiController, destination);
+	}
 }
 
 void UAIRotoTranslationMovement::OnStopMovement(const TObjectPtr<AAIController>& aiController) {
