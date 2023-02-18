@@ -3,6 +3,7 @@
 
 #include "BTTask_MoveToByCommand.h"
 
+// #include "AIMovementCommand.h"
 #include "AIMovementCommandComponent.h"
 #include "AISystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -42,7 +43,20 @@ EBTNodeResult::Type UBTTask_MoveToByCommand::ExecuteTask(UBehaviorTreeComponent&
 
 	auto nodeResult = _performMoveTask(ownerComp, nodeMemory);
 
-	
+	// Setting up the callback for when the BlackboardKey value changes
+	if (nodeResult == EBTNodeResult::InProgress && _bObserveBlackboardValue) {
+		const auto blackboardC = ownerComp.GetBlackboardComponent();
+		if (ensure(blackboardC)) {
+			if (memory->BBObserverDelegateHandle.IsValid()) {
+				UE_VLOG(aiController, LogBehaviorTree, Warning, TEXT("%s() \'%s\' Old BBObserverDelegateHandle is still valid! Removing old Observer."), *FString{__FUNCTION__}, *GetNodeName());
+				blackboardC->UnregisterObserver(BlackboardKey.GetSelectedKeyID(), memory->BBObserverDelegateHandle);
+			}
+
+			memory->BBObserverDelegateHandle = blackboardC->RegisterObserver(BlackboardKey.GetSelectedKeyID(), this, FOnBlackboardChangeNotification::CreateUObject(this, &UBTTask_MoveToByCommand::_onBlackboardValueChange));
+		}
+	}
+
+	return nodeResult;
 }
 
 void UBTTask_MoveToByCommand::PostLoad() {
@@ -65,21 +79,6 @@ void UBTTask_MoveToByCommand::OnNodeCreated() {
 #endif
 
 EBTNodeResult::Type UBTTask_MoveToByCommand::_performMoveTask(UBehaviorTreeComponent& onwerComp, uint8* nodeMemory) {
-	/*const auto aiMovementCommandC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
-	if (!IsValid(aiMovementCommandC)) {
-		UE_LOG(LogTemp, Error, TEXT("%s(): AI Controller does not have a Movement Command Component"), *FString{ __FUNCTION__ });
-		return EBTNodeResult::Failed;
-	}
-
-	check(BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass());
-
-	const auto blackboardC = ownerComp.GetBlackboardComponent();
-	const FVector targetLocation = blackboardC->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
-	aiMovementCommandC->GetMovementCommand()->OnStopMovement(aiController);
-	aiMovementCommandC->GetMovementCommand()->OnSetDestination(aiController, targetLocation);
-
-	return EBTNodeResult::Succeeded;*/
-	
 	auto nodeResult = EBTNodeResult::Failed;
 
 	const auto blackboardC = onwerComp.GetBlackboardComponent();
@@ -118,4 +117,12 @@ EBTNodeResult::Type UBTTask_MoveToByCommand::_performMoveTask(UBehaviorTreeCompo
 		// Constructor says only Actors and Vectors are accepted, something horrible is happening
 		checkNoEntry();
 	}
+
+	// Do stuff in command...
+
+	return EBTNodeResult::Succeeded;
+}
+
+EBlackboardNotificationResult UBTTask_MoveToByCommand::_onBlackboardValueChange(const UBlackboardComponent& blackboardC, FBlackboard::FKey changedKeyID) {
+	return EBlackboardNotificationResult::ContinueObserving;
 }

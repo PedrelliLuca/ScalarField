@@ -24,7 +24,7 @@ struct FBTMoveToByCommandTaskMemory {
 /**
  * 
  */
-UCLASS()
+UCLASS(config=Game)
 class SCALARFIELD_API UBTTask_MoveToByCommand : public UBTTask_BlackboardBase {
 	GENERATED_BODY()
 
@@ -41,6 +41,8 @@ private:
 #endif 
 	
 	EBTNodeResult::Type _performMoveTask(UBehaviorTreeComponent& onwerComp, uint8* nodeMemory);
+
+	EBlackboardNotificationResult _onBlackboardValueChange(const UBlackboardComponent& blackboardC, FBlackboard::FKey changedKeyID);
 
 	/** if set, radius of goal's capsule will be added to threshold between AI and goal location in destination reach test  */
 	UPROPERTY(Category = Node, EditAnywhere)
@@ -80,6 +82,10 @@ private:
 	
 	UPROPERTY()
 	uint32 _bStopOnOverlapNeedsUpdate : 1;
+
+	/** if move goal in BB changes the move will be redirected to new location */
+	UPROPERTY(Category = Blackboard, EditAnywhere)
+	uint32 _bObserveBlackboardValue : 1;
 
 	/** fixed distance added to threshold between AI and goal location in destination reach test */
 	UPROPERTY(config, Category = Node, EditAnywhere, meta=(ClampMin = "0.0", UIMin="0.0"))
