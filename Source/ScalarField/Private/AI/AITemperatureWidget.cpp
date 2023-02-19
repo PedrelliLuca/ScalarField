@@ -11,3 +11,23 @@ void UAITemperatureWidget::SetComfortIntervalLimits(const float upperLimit, cons
 void UAITemperatureWidget::OnTemperatureUpdate(const double newTemperature) {
 	_updateThermometer(newTemperature);
 }
+
+void UAITemperatureWidget::OnHealthUpdate(const double newHealth) {
+	_currentHealth = newHealth;
+	_updateHealth();
+}
+
+void UAITemperatureWidget::OnMaxHealthUpdate(const double newMaxHealth) {
+	_maxHealth = newMaxHealth;
+	_updateHealth();
+}
+
+void UAITemperatureWidget::OnManaUpdate(const double newMana) {
+	_currentMana = newMana;
+	_updateMana();
+}
+
+void UAITemperatureWidget::OnMaxManaUpdate(const double newMaxMana) {
+	_maxMana = newMaxMana;
+	_updateMana();
+}
