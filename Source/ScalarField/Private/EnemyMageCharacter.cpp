@@ -29,8 +29,8 @@ AEnemyMageCharacter::AEnemyMageCharacter() {
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
 	// Creation of the widget component that shows this character's temperature
-	_aiTemperatureWidgetC = CreateDefaultSubobject<UAITemperatureWidgetComponent>(TEXT("AI Temperature Widget Component"));
-	_aiTemperatureWidgetC->SetupAttachment(RootComponent);
+	_aiStatusWidgetC = CreateDefaultSubobject<UAIStatusWidgetComponent>(TEXT("AI Temperature Widget Component"));
+	_aiStatusWidgetC->SetupAttachment(RootComponent);
 
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
 

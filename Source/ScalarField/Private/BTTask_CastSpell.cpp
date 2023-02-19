@@ -4,7 +4,6 @@
 #include "BTTask_CastSpell.h"
 
 #include "AIController.h"
-#include "BehaviorTree/Blackboard/BlackboardKeyType_Class.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "SkillsContainerComponent.h"
 #include "StateComponent.h"
@@ -28,7 +27,6 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
 		return EBTNodeResult::Failed;
 	}
 
-	const auto blackboard = ownerComp.GetBlackboardComponent();
 	auto skill = skillsContainerC->FindSkillByClass(_skillToCast);
 	if (!IsValid(skill)) {
 		UE_LOG(LogTemp, Error, TEXT("%s(): AI-Controlled Pawn does not have the selected Skill"), *FString{ __FUNCTION__ });

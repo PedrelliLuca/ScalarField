@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "AITemperatureWidget.generated.h"
+#include "AIStatusWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SCALARFIELD_API UAITemperatureWidget : public UUserWidget {
+class SCALARFIELD_API UAIStatusWidget : public UUserWidget {
 	GENERATED_BODY()
 
 public:
