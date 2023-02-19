@@ -15,4 +15,14 @@ public:
 	void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) override;
 	void OnStopMovement(const TObjectPtr<AAIController>& aiController) override;
 	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) override;
+
+private:
+	/* Angular velocity of the pawn in degrees per second. */
+	UPROPERTY(EditDefaultsOnly, Category = "Rotation Only")
+	float _degreesPerSecond = 60.0f;
+
+	double _absDegreesToRotate = 0.0;
+	double _rotationSign = 1.0;
+	
+	double _degreesSoFar = 0.0;
 };
