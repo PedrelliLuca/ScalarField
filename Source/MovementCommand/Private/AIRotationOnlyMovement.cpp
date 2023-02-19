@@ -22,5 +22,8 @@ void UAIRotationOnlyMovement::OnStopMovement(const TObjectPtr<AAIController>& ai
 }
 
 void UAIRotationOnlyMovement::OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) {
-	// Do we even need this for AI?
+	/* Needed to interrupt any ongoing pathfinding-like movement (e.g. roto-translation) immediately. */
+	if (aiController->IsFollowingAPath()) {
+		aiController->StopMovement();
+	}
 }

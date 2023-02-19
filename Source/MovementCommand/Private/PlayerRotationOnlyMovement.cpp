@@ -3,6 +3,7 @@
 #include "PlayerRotationOnlyMovement.h"
 
 void UPlayerRotationOnlyMovement::OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) {
+	/* Needed to interrupt any ongoing pathfinding-like movement (e.g. roto-translation) immediately. */
 	if (playerController->IsFollowingAPath()) {
 		playerController->StopMovement();
 	}
