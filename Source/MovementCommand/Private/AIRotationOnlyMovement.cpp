@@ -11,8 +11,7 @@ void UAIRotationOnlyMovement::OnSetDestination(const TObjectPtr<AAIController>& 
 
 	const auto aiPawn = aiController->GetPawn();
 
-	auto wrDestination = destination;
-	wrDestination.Z = aiPawn->GetActorLocation().Z;
+	const auto wrDestination = destination;
 	const auto prDestination = aiPawn->GetTransform().InverseTransformPosition(wrDestination);
 	const auto prRotation = prDestination.Rotation();
 	_absDegreesToRotate = FMath::Abs(prRotation.Yaw);
