@@ -6,17 +6,17 @@
 
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
 
-#include "BTTask_MoveToBycommand.generated.h"
+#include "BTTask_SetMovementTarget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SCALARFIELD_API UBTTask_MoveToByCommand : public UBTTask_BlackboardBase {
+class SCALARFIELD_API UBTTask_SetMovementTarget : public UBTTask_BlackboardBase {
 	GENERATED_BODY()
 
 public:
-	UBTTask_MoveToByCommand();
+	UBTTask_SetMovementTarget();
 	
 private:
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
