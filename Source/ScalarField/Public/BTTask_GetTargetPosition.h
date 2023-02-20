@@ -21,6 +21,9 @@ public:
 	FBlackboardKeySelector PositionSelector{};
 
 	UPROPERTY(EditAnywhere, Category=Blackboard)
+	bool RandomizeInRadius = true;
+	
+	UPROPERTY(EditAnywhere, Category=Blackboard)
 	float Radius = 100.0f;
 	
 private:

@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "AbstractSkill.h"
 #include "CoreMinimal.h"
 #include "SkillUserState.h"
 

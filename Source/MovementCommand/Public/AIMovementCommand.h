@@ -12,7 +12,7 @@ class UAIMovementCommand : public UObject {
 	GENERATED_BODY()
 
 public:
-	virtual void OnSetDestination(const TObjectPtr<AAIController>& aiController) PURE_VIRTUAL(UAIMovementCommand::OnSetDestination, return;);
+	virtual void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) PURE_VIRTUAL(UAIMovementCommand::OnSetDestination, return;);
 	virtual void OnStopMovement(const TObjectPtr<AAIController>& aiController) PURE_VIRTUAL(UAIMovementCommand::OnStopMovement, return;);
 	virtual void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) PURE_VIRTUAL(UAIMovementCommand::OnMovementTick, return;);
 };

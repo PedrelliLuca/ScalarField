@@ -20,9 +20,9 @@ void UStateComponent::PerformTargetingBehavior(TObjectPtr<AActor> target) {
 	_performStateTransitionRoutine(MoveTemp(newState));
 }
 
-void UStateComponent::PerformSkillExecutionBehavior(const int32 skillKey) {
-	auto newState = _state->OnBeginSkillExecution(skillKey, _ownerController.Get());
-	_performStateTransitionRoutine(MoveTemp(newState));
+bool UStateComponent::PerformSkillExecutionBehavior(TObjectPtr<UAbstractSkill> skill) {
+	auto newState = _state->OnBeginSkillExecution(MoveTemp(skill), _ownerController.Get());
+	return _performStateTransitionRoutine(MoveTemp(newState));
 }
 
 void UStateComponent::PerformInteractionBehavior() {

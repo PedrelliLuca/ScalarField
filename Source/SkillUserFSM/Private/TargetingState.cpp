@@ -37,21 +37,7 @@ TObjectPtr<USkillUserState> UTargetingState::OnTargeting(TObjectPtr<AActor> targ
 	return _keepCurrentState();
 }
 
-TObjectPtr<USkillUserState> UTargetingState::OnBeginSkillExecution(const int32 skillKey, TObjectPtr<AController> controller) {
-	check(skillKey < KEY_ASSIGNABLE_SKILLS);
-	const auto pawn = controller->GetPawn();
-	const auto skillsContainer = pawn->FindComponentByClass<USkillsContainerComponent>();
-	check(IsValid(skillsContainer));
-
-	// keys [1, 2, ..., 9, 0] => index [0, 1, ..., 8, 9]
-	const uint32 index = skillKey != 0 ? skillKey - 1 : KEY_ASSIGNABLE_SKILLS - 1;
-	const auto skill = skillsContainer->GetSkillAtIndex(index);
-
-	if (!IsValid(skill)) {
-		UE_LOG(LogTemp, Warning, TEXT("Skill bound with key &i isn't valid!"), skillKey);
-		return _keepCurrentState();
-	}
-
+TObjectPtr<USkillUserState> UTargetingState::OnBeginSkillExecution(TObjectPtr<UAbstractSkill> skill, TObjectPtr<AController> controller) {
 	if (skill == GetSkillInExecution()) {
 		UE_LOG(LogTemp, Warning, TEXT("Skill is already being casted!"));
 		return _keepCurrentState();

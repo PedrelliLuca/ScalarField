@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 
 #include "AIController.h"
+#include "AIMovementCommandComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "StateComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
 
@@ -59,6 +61,12 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Temperature Search Behavior")
 	float _negativeComfortDeviationForBehaviorChange = 10.0f;
 
+	UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
+	TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
+
+	UPROPERTY(VisibleAnywhere, Category = "State")
+	TObjectPtr<UStateComponent> _stateC;
+
 	UPROPERTY(VisibleAnywhere, Category = "Mage AI")
 	TObjectPtr<UAIPerceptionComponent> _perceptionC;
 
@@ -70,6 +78,7 @@ private:
 
 	float _secondsSinceLastComfortTemperatureCheck = 0.0f;
 
+	// The controlled Character has ownership of these
 	TWeakObjectPtr<UTemperatureDamageHandlerComponent> _temperatureDmgC;
 	TWeakObjectPtr<UThermodynamicComponent> _thermoC;
 };

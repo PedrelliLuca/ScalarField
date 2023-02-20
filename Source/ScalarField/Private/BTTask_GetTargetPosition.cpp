@@ -20,6 +20,11 @@ EBTNodeResult::Type UBTTask_GetTargetPosition::ExecuteTask(UBehaviorTreeComponen
 	}
 
 	const auto targetLoc = target->GetActorLocation();
+	if (!RandomizeInRadius) {
+		blackboard->SetValueAsVector(PositionSelector.SelectedKeyName, targetLoc);
+		return EBTNodeResult::Succeeded;
+	}
+	
 	FNavLocation randomPoint{targetLoc};
 	if (navSys->GetRandomPointInNavigableRadius(targetLoc, Radius, randomPoint)) {
 		blackboard->SetValueAsVector(PositionSelector.SelectedKeyName, randomPoint.Location);

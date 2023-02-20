@@ -15,6 +15,14 @@ TObjectPtr<UAbstractSkill> USkillsContainerComponent::GetSkillAtIndex(const uint
 	return nullptr;
 }
 
+TObjectPtr<UAbstractSkill> USkillsContainerComponent::FindSkillByClass(TSubclassOf<UAbstractSkill> skillClass) const {
+	const auto skillOfClass = _skills.FindByPredicate([&skillClass](TObjectPtr<UAbstractSkill> skill) {
+		return skill->IsA(skillClass);
+	});
+
+	return skillOfClass != nullptr ? *skillOfClass : nullptr;
+}
+
 void USkillsContainerComponent::BeginPlay() {
 	Super::BeginPlay();
 

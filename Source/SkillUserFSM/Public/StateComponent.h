@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "AbstractSkill.h"
 #include "Components/ActorComponent.h"
 
 #include "StateComponent.generated.h"
@@ -16,7 +18,7 @@ public:
     bool IsLookingAtWidget() const;
 
     void PerformTargetingBehavior(TObjectPtr<AActor> target);
-    void PerformSkillExecutionBehavior(int32 skillKey);
+    bool PerformSkillExecutionBehavior(TObjectPtr<UAbstractSkill> skill);
     void PerformInteractionBehavior();
     void PerformInventoryToggleBehavior();
     void PerformTickBehavior(float deltaTime);

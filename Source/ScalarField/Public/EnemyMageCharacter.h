@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "AI/AITemperatureWidgetComponent.h"
+#include "AI/AIStatusWidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "HealthComponent.h"
 #include "InventoryComponent.h"
@@ -64,8 +64,8 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInventoryComponent> _inventoryC;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UAITemperatureWidgetComponent> _aiTemperatureWidgetC;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAIStatusWidgetComponent> _aiStatusWidgetC;
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;

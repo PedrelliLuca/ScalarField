@@ -21,7 +21,7 @@ class SKILLUSERFSM_API UChannelingState : public UExecutionState {
 
 public:
 	TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) override;
-	TObjectPtr<USkillUserState> OnBeginSkillExecution(int32 skillKey, TObjectPtr<AController> controller) override;
+	TObjectPtr<USkillUserState> OnBeginSkillExecution(TObjectPtr<UAbstractSkill> skill, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
 	TObjectPtr<USkillUserState> OnAbort(TObjectPtr<AController> controller) override;
 
