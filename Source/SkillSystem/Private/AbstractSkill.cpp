@@ -18,6 +18,13 @@ void UAbstractSkill::_endCooldown() {
 bool UAbstractSkill::IsValidTarget(const int32 index, const TObjectPtr<AActor> target) const {
 	check(_parameters.ActorTargetParameters.IsValidIndex(index));
 
+	/* TODO: implement a command pattern to test the skill validity: _parameters has an array of ITargetCondition objects
+	 * with a IsConditionVerified() virtual pure function, and this interface is implemented by the true conditions like
+	 * "are the components correct", "is the target an enemy?", "Is the target below this amount of health" and so on.
+	 * This will make unnecessary for IsValidTarget() to be virtual. Moreover, the same spell could have different
+	 * conditions depending on its caster.
+	 */
+
 	const auto targetParams = _parameters.ActorTargetParameters[index];
 	for (const auto componentClass : targetParams.RequiredComponents) {
 		if (!target->FindComponentByClass(componentClass)) {
