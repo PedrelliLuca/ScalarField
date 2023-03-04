@@ -2,9 +2,9 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class SkillSpawnedEntities : ModuleRules
+	public class DamageDealers : ModuleRules
 	{
-		public SkillSpawnedEntities(ReadOnlyTargetRules Target) : base(Target)
+		public DamageDealers(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
@@ -14,14 +14,14 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
-					"DamageDealers"
+					// In the future this will depend on DamageHandlers, the dealerC calls the handlerC on the target
 				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"Thermodynamics",
+					// ... add private dependencies that you statically link with here ...
 				}
 				);
 

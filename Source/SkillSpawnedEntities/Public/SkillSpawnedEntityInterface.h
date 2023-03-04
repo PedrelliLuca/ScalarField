@@ -14,5 +14,6 @@ class ISkillSpawnedEntity {
 	GENERATED_BODY()
 
 public:
-	virtual void SetLifetime() {}
+	virtual void SetLifetime(double lifetime) {}
+	virtual void SetCaster(TWeakObjectPtr<AActor> caster) {}
 };
