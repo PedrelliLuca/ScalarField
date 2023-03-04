@@ -2,82 +2,58 @@
 
 #include "ThermalPushSkill.h"
 
-#include "Particles/ParticleSystemComponent.h"
-#include "ThermodynamicComponent.h"
-
-UThermalPushSkill::UThermalPushSkill() {
-	_hotTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Hot Particle System"));
-	_coldTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Cold Particle System"));
-}
+#include "SkillSpawnedEntityInterface.h"
+#include "UObject/WeakInterfacePtr.h"
 
 void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
-	// Capsule component's setup
-	_pushCapsule = NewObject<UCapsuleComponent>(caster, TEXT("Thermal Push Capsule"));
-	_pushCapsule->SetupAttachment(caster->GetRootComponent());
-	_pushCapsule->SetRelativeLocation(FVector::ForwardVector * _minCapsuleHalfHeight);
-	_pushCapsule->SetRelativeRotation(FRotator{ 90., 0., 0. });
-	_pushCapsule->SetCollisionProfileName("BlockAllDynamic");
-	_pushCapsule->SetCapsuleHalfHeight(_minCapsuleHalfHeight);
-	_pushCapsule->SetCapsuleRadius(_minCapsuleRadius);
-	_pushCapsule->bMultiBodyOverlap = true;
+	const auto& thermalWindSpawner = _getFollowerActorSpawners().Last();
 
-	_pushCapsule->RegisterComponent();
+	const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(caster.Get(), TEXT("Skill SpringArm"));
+	spawnSpringArm->bDoCollisionTest = false;
+	spawnSpringArm->SetupAttachment(caster->GetRootComponent());
 
-	// Particle system's setup
-	TWeakObjectPtr<UParticleSystem> activeParticleTemplate = nullptr;
-	if (const auto thermoC = Cast<UThermodynamicComponent>(caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
-		if (thermoC->GetTemperature() > _hotThreshold) {
-			UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
-			activeParticleTemplate = _hotTemplate;
-		}
-		else if (thermoC->GetTemperature() < _coldThreshold) {
-			UE_LOG(LogTemp, Warning, TEXT("FREEZE!!!"));
-			activeParticleTemplate = _coldTemplate;
-		}
-	}
+	// The point where we have to spawn the globe relative to the target, it's also the point where the 2nd end of the arm lies
+	const auto windLocation = thermalWindSpawner.Transform.GetLocation();
 
-	if (activeParticleTemplate.IsValid()) {
-		_activeParticleSystem = NewObject<UParticleSystemComponent>(caster, TEXT("Push Particle System"));
-		_activeParticleSystem->SetupAttachment(_pushCapsule.Get());
-		_activeParticleSystem->SetTemplate(activeParticleTemplate.Get());
+	// The spring sits on the vector that goes from the target's root to the globeLocation.
+	// About the minus sign:
+	// In the spring's reference frame, the spring elongates in the -x direction. Therefore, we need to make the spring point to
+	// the location that is the opposite of the want we want the second end to be in.
+	spawnSpringArm->SetRelativeRotation((- windLocation).Rotation());
+	spawnSpringArm->TargetArmLength = windLocation.Length();
+	
+	spawnSpringArm->RegisterComponent();
+	_spawnSpringArm = spawnSpringArm;
 
-		_activeParticleSystem->RegisterComponent();
-		_activeParticleSystem->Activate(true);
-	}
-
-	_timeFromCast = 0.;
+	// Actor deferred spawn >>>>>>>>>>
+	const auto spawnActor = GetWorld()->SpawnActorDeferred<AActor>( thermalWindSpawner.ActorClass, thermalWindSpawner.Transform * caster->GetTransform());
+	const TWeakInterfacePtr<ISkillSpawnedEntity> skillSpawnedEntity = Cast<ISkillSpawnedEntity>(spawnActor);
+	// This should be granted by the UPROPERTY on FActorSpawnerParameters::ActorClass
+	check(skillSpawnedEntity.IsValid());
+	skillSpawnedEntity->SetLifetime(GetChannelingTime());
+	skillSpawnedEntity->SetCaster(caster);
+	spawnActor->FinishSpawning(thermalWindSpawner.Transform * caster->GetTransform());
+	// <<<<<<<<<<
+	
+	spawnActor->AttachToComponent(spawnSpringArm, FAttachmentTransformRules::KeepWorldTransform, spawnSpringArm->SocketName);
+	_spawnActor = spawnActor;
+	
 	_startCooldown();
-}
-
-void UThermalPushSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {
-	FlushPersistentDebugLines(GetWorld());
-
-	const double channelingTime = GetChannelingTime();
-	_timeFromCast = FMath::Clamp(_timeFromCast + deltaTime, 0., channelingTime);
-	const double alpha = _timeFromCast / channelingTime;
-	const double halfHeight = FMath::Lerp(_minCapsuleHalfHeight, _maxCapsuleHalfHeight, alpha);
-	const double radius = FMath::Lerp(_minCapsuleRadius, _maxCapsuleRadius, alpha);
-
-	// ExecuteCast() must be called before ExecuteChannelingTick()
-	check(_pushCapsule.IsValid());
-
-	_pushCapsule->SetCapsuleHalfHeight(halfHeight);
-	_pushCapsule->SetCapsuleRadius(radius);
-	_pushCapsule->SetRelativeLocation(FVector::ForwardVector * halfHeight);
-
-	DrawDebugCapsule(GetWorld(), _pushCapsule->GetComponentLocation(), _pushCapsule->GetUnscaledCapsuleHalfHeight(), _pushCapsule->GetUnscaledCapsuleRadius(),
-		_pushCapsule->GetComponentRotation().Quaternion(), FColor::Green, false);
 }
 
 void UThermalPushSkill::Abort() {
 	Super::Abort();
+	_cleanupCallback();
+}
 
-	if (_activeParticleSystem.IsValid()) {
-		_activeParticleSystem->DestroyComponent();
+void UThermalPushSkill::_cleanupCallback() {
+	GetWorld()->GetTimerManager().ClearTimer(_timerHandle);
+	
+	if (_spawnActor.IsValid()) {
+		_spawnActor->Destroy();
 	}
 
-	// Are you calling this function on a casted thermal push?
-	check(_pushCapsule.IsValid());
-
-	_pushCapsule->DestroyComponent();
+	if (_spawnSpringArm.IsValid()) {
+		_spawnSpringArm->DestroyComponent();
+	}
 }
