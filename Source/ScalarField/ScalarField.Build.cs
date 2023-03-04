@@ -15,6 +15,7 @@ public class ScalarField : ModuleRules
             "InputCore",
             "HeadMountedDisplay",
             "NavigationSystem",
+            "DeveloperSettings",
             "EnvironmentGrid",
             "SkillSystem",
             "Thermodynamics",
@@ -31,7 +32,8 @@ public class ScalarField : ModuleRules
             "InventoryManipulation",
             "InventoryPresenter",
             "AIModule",
-            "GameplayTasks"
+            "GameplayTasks",
+            "SkillSpawnedEntities"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {

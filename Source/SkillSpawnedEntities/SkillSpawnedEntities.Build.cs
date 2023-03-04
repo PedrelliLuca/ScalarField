@@ -2,9 +2,9 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class SkillSystem : ModuleRules
+	public class SkillSpawnedEntities : ModuleRules
 	{
-		public SkillSystem(ReadOnlyTargetRules Target) : base(Target)
+		public SkillSpawnedEntities(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
@@ -12,13 +12,9 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
 					"Core",
-                    "CoreUObject",
-                    "Engine",
-					"Thermodynamics",
-					"MaterialSystem",
-					"MovementCommand",
-					"SkillSpawnedEntities",
-                }
+					"CoreUObject",
+					"Engine",
+				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(

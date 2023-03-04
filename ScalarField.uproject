@@ -7,12 +7,12 @@
 		{
 			"Name": "ScalarField",
 			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine",
-				"DeveloperSettings",
-				"CoreUObject"
-			]
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SkillSpawnedEntities",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [
