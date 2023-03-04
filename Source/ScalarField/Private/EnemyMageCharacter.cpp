@@ -46,6 +46,8 @@ AEnemyMageCharacter::AEnemyMageCharacter() {
 	// Create the component that handles temperature damage...
 	_temperatureDmgHandlerC = CreateDefaultSubobject<UTemperatureDamageHandlerComponent>(TEXT("Temperature Damage Handler Component"));
 
+	_factionC = CreateDefaultSubobject<UFactionComponent>(TEXT("Faction Component"));
+
 	_inventoryC = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 
 	// Activate ticking in order to update the cursor every frame.

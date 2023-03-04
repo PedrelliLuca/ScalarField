@@ -33,7 +33,8 @@ public class ScalarField : ModuleRules
             "InventoryPresenter",
             "AIModule",
             "GameplayTasks",
-            "SkillSpawnedEntities"
+            "SkillSpawnedEntities",
+            "FactionSystem"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {

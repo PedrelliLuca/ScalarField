@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FactionComponent.h"
 
 #include "AI/AIStatusWidgetComponent.h"
 #include "GameFramework/Character.h"
@@ -63,6 +64,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInventoryComponent> _inventoryC;
+
+	UPROPERTY(VisibleAnywhere, Category = "Faction and Relationships")
+	TObjectPtr<UFactionComponent> _factionC;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Status", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAIStatusWidgetComponent> _aiStatusWidgetC;

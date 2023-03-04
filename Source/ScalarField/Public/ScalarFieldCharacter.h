@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FactionComponent.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
@@ -73,6 +74,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInventoryComponent> _inventoryC;
+
+	UPROPERTY(VisibleAnywhere, Category = "Faction and Relationships")
+	TObjectPtr<UFactionComponent> _factionC;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI Senses")
 	TObjectPtr<UAIPerceptionStimuliSourceComponent> _stimuliSourceC;
