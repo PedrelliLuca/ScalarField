@@ -25,6 +25,7 @@ namespace UnrealBuildTool.Rules
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
+					"FactionSystem"
 					// ... add private dependencies that you statically link with here ...
 				}
 				);

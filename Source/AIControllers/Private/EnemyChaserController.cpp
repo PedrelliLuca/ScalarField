@@ -5,6 +5,10 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 
+AEnemyChaserController::AEnemyChaserController() {
+	_perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
+}
+
 void AEnemyChaserController::Tick(const float deltaSeconds) {
 	Super::Tick(deltaSeconds);
 
@@ -17,11 +21,19 @@ void AEnemyChaserController::Tick(const float deltaSeconds) {
 	}
 }
 
-AEnemyChaserController::AEnemyChaserController() {
-}
-
 void AEnemyChaserController::BeginPlay() {
 	Super::BeginPlay();
+
+	if (const auto pawn = GetPawn(); IsValid(pawn)) {
+		_pawnFactionC = pawn->FindComponentByClass<UFactionComponent>();
+		if (_pawnFactionC.IsValid()) {
+			_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyChaserController::_onActorSensed);
+		} else {
+			UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Faction Component"), *FString{__FUNCTION__});
+		}	
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("%s(): Controlled Pawn is unset"), *FString{__FUNCTION__});
+	}
 	
 	if(!IsValid(_behaviorTree)) {
 		UE_LOG(LogTemp, Error, TEXT("%s(): missing Behavior Tree Class"), *FString{__FUNCTION__});
@@ -41,4 +53,18 @@ void AEnemyChaserController::_updatePatrolObjective() {
 
 	const auto blackBoard = GetBlackboardComponent();
 	blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolObjectives[_currentPatrolObjectiveIdx]);
+}
+
+void AEnemyChaserController::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
+	// Did we sense an actor belonging to some faction? If not, we consider it neutral and ignore it.
+	if (const auto factionC = actor->FindComponentByClass<UFactionComponent>()) {
+		check(_pawnFactionC.IsValid());
+
+		// Is this actor an enemy? Chasers only care about enemies.
+		if (_pawnFactionC->IsEnemyWithFaction(factionC->GetFaction())) {
+			const auto blackBoard = GetBlackboardComponent();
+			blackBoard->SetValueAsBool(_bbCanSeeEnemyKeyName, stimulus.WasSuccessfullySensed());
+			blackBoard->SetValueAsObject(_bbTargetEnemyKeyName, actor);
+		}
+	}
 }

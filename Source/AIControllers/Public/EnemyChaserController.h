@@ -6,6 +6,8 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "FactionComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 
 #include "EnemyChaserController.generated.h"
 
@@ -26,6 +28,18 @@ protected:
 
 private:
 	void _updatePatrolObjective();
+
+	UFUNCTION()
+	void _onActorSensed(AActor* actor, FAIStimulus stimulus);
+
+	UPROPERTY(VisibleAnywhere, Category = "Chaser | Perception")
+	TObjectPtr<UAIPerceptionComponent> _perceptionC;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Perception")
+	FName _bbCanSeeEnemyKeyName = "CanSeeEnemy";
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Perception")
+	FName _bbTargetEnemyKeyName = "TargetEnemy";
 	
 	UPROPERTY(EditDefaultsOnly,  Category = "Chaser | Behavior Tree")
 	TObjectPtr<UBehaviorTree> _behaviorTree;
@@ -42,4 +56,7 @@ private:
 	/** \brief Name of the Blackboard key that gets updated when a patrol objective is reached. */
 	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Patrolling Behavior")
 	FName _bbPatrolObjectiveKeyName = "PatrolObjective";
+
+	// The controlled Pawn has ownership of these
+	TWeakObjectPtr<UFactionComponent> _pawnFactionC = nullptr;
 };
