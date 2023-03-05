@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EnemyMageControllerCopy.h"
+#include "EnemyGeneralPurposeController.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 
-AEnemyMageControllerCopy::AEnemyMageControllerCopy() {
+AEnemyGeneralPurposeController::AEnemyGeneralPurposeController() {
 	_movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AI Movement Command Component"));
 	_perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 	_stateC = CreateDefaultSubobject<UStateComponent>(TEXT("State Component"));
 }
 
-void AEnemyMageControllerCopy::Tick(float deltaTime) {
+void AEnemyGeneralPurposeController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 
 	_stateC->PerformTickBehavior(deltaTime);
@@ -26,10 +26,10 @@ void AEnemyMageControllerCopy::Tick(float deltaTime) {
 	}
 }
 
-void AEnemyMageControllerCopy::BeginPlay() {
+void AEnemyGeneralPurposeController::BeginPlay() {
 	Super::BeginPlay();
 
-	_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyMageControllerCopy::_onActorSensed);
+	_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyGeneralPurposeController::_onActorSensed);
 
 	if (const auto pawn = GetPawn(); IsValid(pawn)) {
 		_temperatureDmgC = pawn->FindComponentByClass<UTemperatureDamageHandlerComponent>();
@@ -53,7 +53,7 @@ void AEnemyMageControllerCopy::BeginPlay() {
 	RunBehaviorTree(_behaviorTree);
 }
 
-void AEnemyMageControllerCopy::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
+void AEnemyGeneralPurposeController::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
 	// Did we sense a player-controlled character?
 	if (const auto character = Cast<ACharacter>(actor); IsValid(character) && character->IsPlayerControlled()) {
 		const auto blackBoard = GetBlackboardComponent();
@@ -62,7 +62,7 @@ void AEnemyMageControllerCopy::_onActorSensed(AActor* const actor, const FAIStim
 	}
 }
 
-void AEnemyMageControllerCopy::_communicateTemperatureHarmfulness() {
+void AEnemyGeneralPurposeController::_communicateTemperatureHarmfulness() {
 	if (!_thermoC.IsValid() || !_temperatureDmgC.IsValid()) {
 		return;
 	}
@@ -81,13 +81,13 @@ void AEnemyMageControllerCopy::_communicateTemperatureHarmfulness() {
 		return;
 	}
 
-	ETemperatureSearchBehaviorCopy searchBehavior = ETemperatureSearchBehaviorCopy::None;
+	ETemperatureSearchBehavior searchBehavior = ETemperatureSearchBehavior::None;
 	if (currentTemperature < comfortLowerLimit - _negativeComfortDeviationForBehaviorChange) {
-		searchBehavior = ETemperatureSearchBehaviorCopy::HottestZone;
+		searchBehavior = ETemperatureSearchBehavior::HottestZone;
 	} else if (currentTemperature < comfortUpperLimit + _positiveComfortDeviationForBehaviorChange) {
-		searchBehavior = ETemperatureSearchBehaviorCopy::ComfortableZone;
+		searchBehavior = ETemperatureSearchBehavior::ComfortableZone;
 	} else {
-		searchBehavior = ETemperatureSearchBehaviorCopy::ColdestZone;
+		searchBehavior = ETemperatureSearchBehavior::ColdestZone;
 	}
 
 	blackBoard->SetValueAsEnum(_temperatureSearchBehaviorKeyName, static_cast<uint8>(searchBehavior));

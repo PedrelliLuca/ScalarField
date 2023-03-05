@@ -12,10 +12,10 @@
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
 
-#include "EnemyMageControllerCopy.generated.h"
+#include "EnemyGeneralPurposeController.generated.h"
 
 UENUM(BlueprintType)
-enum class ETemperatureSearchBehaviorCopy : uint8 {
+enum class ETemperatureSearchBehavior : uint8 {
 	None,
 	ComfortableZone,
 	HottestZone,
@@ -26,11 +26,11 @@ enum class ETemperatureSearchBehaviorCopy : uint8 {
  * 
  */
 UCLASS()
-class AICONTROLLERS_API AEnemyMageControllerCopy : public AAIController {
+class AICONTROLLERS_API AEnemyGeneralPurposeController : public AAIController {
 	GENERATED_BODY()
 
 public:
-	AEnemyMageControllerCopy();
+	AEnemyGeneralPurposeController();
 
 	void Tick(float deltaTime) override;
 
