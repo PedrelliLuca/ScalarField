@@ -34,7 +34,8 @@ public class ScalarField : ModuleRules
             "AIModule",
             "GameplayTasks",
             "SkillSpawnedEntities",
-            "FactionSystem"
+            "FactionSystem",
+            "AIControllers"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
