@@ -12,11 +12,18 @@ AEnemyChaserController::AEnemyChaserController() {
 void AEnemyChaserController::Tick(const float deltaSeconds) {
 	Super::Tick(deltaSeconds);
 
+	if (!_patrolC.IsValid()) {
+		return;
+	}
+
 	// Did we reach our current patrol objective?
 	if (const auto pawn = GetPawn(); IsValid(pawn)) {
 		const auto pawnLocation = GetPawn()->GetActorLocation();
-		if (pawnLocation.Equals(_patrolObjectives[_currentPatrolObjectiveIdx], 50)) {
-			_updatePatrolObjective();
+		if (pawnLocation.Equals(_patrolC->GetCurrentPatrolObjective(), 50)) {
+			_patrolC->UpdatePatrolObjective();
+
+			const auto blackBoard = GetBlackboardComponent();
+			blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolC->GetCurrentPatrolObjective());
 		}
 	}
 }
@@ -24,13 +31,25 @@ void AEnemyChaserController::Tick(const float deltaSeconds) {
 void AEnemyChaserController::BeginPlay() {
 	Super::BeginPlay();
 
+	RunBehaviorTree(_behaviorTree);
+
 	if (const auto pawn = GetPawn(); IsValid(pawn)) {
 		_pawnFactionC = pawn->FindComponentByClass<UFactionComponent>();
 		if (_pawnFactionC.IsValid()) {
 			_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyChaserController::_onActorSensed);
 		} else {
-			UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Faction Component"), *FString{__FUNCTION__});
-		}	
+			UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Faction Component"), *FString{ __FUNCTION__ });
+		}
+
+		_patrolC = pawn->FindComponentByClass<UPatrolComponent>();
+		if (_patrolC.IsValid()) {
+			_patrolC->StartPatrol();
+
+			const auto blackBoard = GetBlackboardComponent();
+			blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolC->GetCurrentPatrolObjective());
+		} else {
+			UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Patrol Component"), *FString{ __FUNCTION__ });
+		}
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("%s(): Controlled Pawn is unset"), *FString{__FUNCTION__});
 	}
@@ -39,20 +58,6 @@ void AEnemyChaserController::BeginPlay() {
 		UE_LOG(LogTemp, Error, TEXT("%s(): missing Behavior Tree Class"), *FString{__FUNCTION__});
 		return;
 	}
-	
-	RunBehaviorTree(_behaviorTree);
-
-	const auto blackBoard = GetBlackboardComponent();
-	blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolObjectives[_startingPatrolObjectiveIdx]);
-	_currentPatrolObjectiveIdx = _startingPatrolObjectiveIdx;
-}
-
-void AEnemyChaserController::_updatePatrolObjective() {
-	// Traversing the array as a circle
-	_currentPatrolObjectiveIdx = (_currentPatrolObjectiveIdx + 1) % _patrolObjectives.Num();
-
-	const auto blackBoard = GetBlackboardComponent();
-	blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolObjectives[_currentPatrolObjectiveIdx]);
 }
 
 void AEnemyChaserController::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
