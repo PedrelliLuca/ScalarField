@@ -20,7 +20,6 @@ public:
 	AThermalWind();
 
 	void Tick(float deltaTime) override;
-	void SetLifetime(const double lifetime) override { _lifetime = lifetime; }
 	void SetCaster(TWeakObjectPtr<AActor> caster) override { _caster = caster; }
 
 protected:
@@ -40,21 +39,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Thermal Wind | Thresholds")
 	double _coldThreshold = 270.;
 
-	UPROPERTY(EditAnywhere, Category = "Thermal Wind | Collision")
-	double _minCapsuleHalfHeight = 10.;
-	UPROPERTY(EditAnywhere, Category = "Thermal Wind | Collision")
-	double _maxCapsuleHalfHeight = 200.;
-	UPROPERTY(EditAnywhere, Category = "Thermal Wind | Collision")
-	double _minCapsuleRadius = 5.;
-	UPROPERTY(EditAnywhere, Category = "Thermal Wind | Collision")
-	double _maxCapsuleRadius = 100.;
-
 	UPROPERTY(EditAnywhere, Category = "Thermal Wind | Particles")
 	TObjectPtr<UParticleSystem> _hotTemplate;
 	UPROPERTY(EditAnywhere, Category = "Thermal Wind | Particles")
 	TObjectPtr<UParticleSystem> _coldTemplate;
 
 	TWeakObjectPtr<AActor> _caster = nullptr;
-	double _lifetime = 0.0;
-	double _timeSinceSpawn = 0.0;
 };

@@ -17,17 +17,25 @@ UImpactOneHitDamageDealerComponent::UImpactOneHitDamageDealerComponent() {
 
 void UImpactOneHitDamageDealerComponent::BeginPlay() {
 	Super::BeginPlay();
-	_impactCapsule->OnComponentHit.AddDynamic(this, &UImpactOneHitDamageDealerComponent::_onImpactBegin);
+	_impactCapsule->OnComponentBeginOverlap.AddDynamic(this, &UImpactOneHitDamageDealerComponent::_tryApplyImpulse);
 }
 
-// TODO: at the moment this is properly called only on collisions with physics simulation ON. Find another solution based on overlap.
-void UImpactOneHitDamageDealerComponent::_onImpactBegin(UPrimitiveComponent* hitComponent, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit) {
+void UImpactOneHitDamageDealerComponent::_tryApplyImpulse(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult & sweepResult) {
 	UE_LOG(LogTemp, Warning, TEXT("%s() call!"), *FString{__FUNCTION__});
 
 	// This component cannot damage its owner nor actors that have already been damaged.
 	if (otherActor == GetOwner() || _hitActors.Contains(otherActor)) {
 		return;
 	}
+
+	/*const auto impulsePlane = FPlane{ 0.f, 0.f, 1.f, _impulseCenter.Z };
+	const auto otherLocationProj = FVector::PointPlaneProject(otherActor->GetActorLocation(), impulsePlane);*/
+
+	const auto otherLocation = otherActor->GetActorLocation();
+	const auto otherProjectedLocation = FVector{ otherLocation.X, otherLocation.Y, _impulseCenter.Z };
+	const auto impulseDirection = (otherProjectedLocation - _impulseCenter).GetSafeNormal();
+
+	otherComp->AddImpulse(impulseDirection * _impulseIntensity, NAME_None, true);
 
 	// TODO: create and check for the UImpactDamageHandlerComponent on otherActor, then call HandleDamage on it. That
 	// component will check for resistances, immunities and so on before calling AActor::TakeDamage. That's a bit

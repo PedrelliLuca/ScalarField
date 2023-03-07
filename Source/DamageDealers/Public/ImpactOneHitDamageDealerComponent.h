@@ -22,12 +22,15 @@ public:
 		_hitActors.Emplace(immuneActor);
 	}
 
+	/** \brief The source point for the impulses hitting the actors overlapping the impact capsule */
+	void SetImpulseCenter(const FVector& impulseCenter) { _impulseCenter = impulseCenter; }
+
 protected:
 	void BeginPlay() override;
 
 private:
 	UFUNCTION()
-	void _onImpactBegin(UPrimitiveComponent* hitComponent, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit);
+	void _tryApplyImpulse(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult & sweepResult);
 	
 	UPROPERTY(EditAnywhere, NoClear)
 	TObjectPtr<UCapsuleComponent> _impactCapsule;
@@ -35,5 +38,10 @@ private:
 	UPROPERTY(EditAnywhere)
 	double _impactDamage = 50.0;
 
+	UPROPERTY(EditAnywhere)
+	double _impulseIntensity = 5.0;
+
 	TSet<TWeakObjectPtr<AActor>> _hitActors;
+
+	FVector _impulseCenter;
 };

@@ -25,14 +25,14 @@ void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
 	spawnSpringArm->RegisterComponent();
 	_spawnSpringArm = spawnSpringArm;
 
-	// Actor deferred spawn >>>>>>>>>>
-	const auto spawnActor = GetWorld()->SpawnActorDeferred<AActor>( thermalWindSpawner.ActorClass, thermalWindSpawner.Transform * caster->GetTransform());
+	// Actor deferred spawn to set the caster >>>>>>>>>>
+	const auto socketTransform = spawnSpringArm->GetSocketTransform(spawnSpringArm->SocketName, ERelativeTransformSpace::RTS_World);
+	const auto spawnActor = GetWorld()->SpawnActorDeferred<AActor>( thermalWindSpawner.ActorClass, socketTransform);
 	const TWeakInterfacePtr<ISkillSpawnedEntity> skillSpawnedEntity = Cast<ISkillSpawnedEntity>(spawnActor);
 	// This should be granted by the UPROPERTY on FActorSpawnerParameters::ActorClass
 	check(skillSpawnedEntity.IsValid());
-	skillSpawnedEntity->SetLifetime(GetChannelingTime());
 	skillSpawnedEntity->SetCaster(caster);
-	spawnActor->FinishSpawning(thermalWindSpawner.Transform * caster->GetTransform());
+	spawnActor->FinishSpawning(socketTransform);
 	// <<<<<<<<<<
 	
 	spawnActor->AttachToComponent(spawnSpringArm, FAttachmentTransformRules::KeepWorldTransform, spawnSpringArm->SocketName);
