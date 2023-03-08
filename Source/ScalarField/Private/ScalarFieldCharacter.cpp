@@ -42,6 +42,7 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	_topDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
+	_impactDmgHandlerC = CreateDefaultSubobject<UPawnImpactDamageHandlerComponent>(TEXT("Impact Damage Handler Component"));
 
 	// Create a mana component...
 	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));

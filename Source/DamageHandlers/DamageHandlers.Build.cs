@@ -14,6 +14,8 @@ namespace UnrealBuildTool.Rules
                     "Core",
                     "CoreUObject",
                     "Engine",
+					"AIModule",
+					"NavigationSystem",
                 }
 				);
 

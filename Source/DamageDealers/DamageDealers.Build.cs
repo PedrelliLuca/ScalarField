@@ -14,7 +14,7 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
-					// In the future this will depend on DamageHandlers, the dealerC calls the handlerC on the target
+					"DamageHandlers",
 				}
 				);
 

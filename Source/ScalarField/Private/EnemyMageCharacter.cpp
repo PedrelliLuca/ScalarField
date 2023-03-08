@@ -45,6 +45,7 @@ AEnemyMageCharacter::AEnemyMageCharacter() {
 
 	// Create the component that handles temperature damage...
 	_temperatureDmgHandlerC = CreateDefaultSubobject<UTemperatureDamageHandlerComponent>(TEXT("Temperature Damage Handler Component"));
+	_impactDmgHandlerC = CreateDefaultSubobject<UPawnImpactDamageHandlerComponent>(TEXT("Impact Damage Handler Component"));
 
 	_factionC = CreateDefaultSubobject<UFactionComponent>(TEXT("Faction Component"));
 

@@ -11,6 +11,7 @@
 #include "HealthComponent.h"
 #include "InventoryComponent.h"
 #include "ManaComponent.h"
+#include "PawnImpactDamageHandlerComponent.h"
 #include "SkillsContainerComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
@@ -71,6 +72,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Damage Handling", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UTemperatureDamageHandlerComponent> _temperatureDmgHandlerC;
+
+	UPROPERTY(VisibleAnywhere, Category = "Damage Handling")
+	TObjectPtr<UPawnImpactDamageHandlerComponent> _impactDmgHandlerC;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInventoryComponent> _inventoryC;
