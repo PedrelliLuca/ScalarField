@@ -6,15 +6,20 @@
 #include "BehaviorTree/BlackboardComponent.h"
 
 AEnemyChaserController::AEnemyChaserController() {
+	_movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
+	_stateC = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	_perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 }
 
-void AEnemyChaserController::Tick(const float deltaSeconds) {
-	Super::Tick(deltaSeconds);
+void AEnemyChaserController::Tick(const float deltaTime) {
+	Super::Tick(deltaTime);
 
 	if (!_patrolC.IsValid()) {
 		return;
 	}
+
+	_stateC->PerformTickBehavior(deltaTime);
+	_movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
 
 	// Did we reach our current patrol objective?
 	if (const auto pawn = GetPawn(); IsValid(pawn)) {

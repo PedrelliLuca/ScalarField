@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 
 #include "AIController.h"
+#include "AIMovementCommandComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "FactionComponent.h"
 #include "Components/PatrolComponent.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "StateComponent.h"
 
 #include "EnemyChaserController.generated.h"
 
@@ -22,7 +24,7 @@ class AICONTROLLERS_API AEnemyChaserController : public AAIController {
 public:
 	AEnemyChaserController();
 
-	void Tick(float deltaSeconds) override;
+	void Tick(float deltaTime) override;
 
 protected:
 	void BeginPlay() override;
@@ -30,6 +32,12 @@ protected:
 private:
 	UFUNCTION()
 	void _onActorSensed(AActor* actor, FAIStimulus stimulus);
+
+	UPROPERTY(VisibleAnywhere, Category = "Chaser | Movement Commands")
+	TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
+
+	UPROPERTY(VisibleAnywhere, Category = "Chaser | State Machine")
+	TObjectPtr<UStateComponent> _stateC;
 
 	UPROPERTY(VisibleAnywhere, Category = "Chaser | Perception")
 	TObjectPtr<UAIPerceptionComponent> _perceptionC;
