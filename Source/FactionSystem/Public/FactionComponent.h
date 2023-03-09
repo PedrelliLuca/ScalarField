@@ -10,7 +10,7 @@
 
 #include "FactionComponent.generated.h"
 
-UCLASS()
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class FACTIONSYSTEM_API UFactionComponent : public UActorComponent {
 	GENERATED_BODY()
 
