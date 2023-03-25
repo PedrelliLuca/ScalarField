@@ -32,8 +32,7 @@ protected:
 private:
 	void _updateBlackboardOnMovementStatus(bool newIsMoving);
 
-	UFUNCTION()
-	void _onActorSensed(AActor* actor, FAIStimulus stimulus);
+	EBlackboardNotificationResult _onTargetEnemyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
 
 	UPROPERTY(VisibleAnywhere, Category = "Chaser | Movement Commands")
 	TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
@@ -45,9 +44,6 @@ private:
 	TObjectPtr<UAIPerceptionComponent> _perceptionC;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
-	FName _bbCanSeeEnemyKeyName = "CanSeeEnemy";
-
-	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
 	FName _bbTargetEnemyKeyName = "TargetEnemy";
 
 	/** \brief Name of the Blackboard key that gets updated when a patrol objective is reached. */
@@ -56,7 +52,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
 	FName _bbIsMovingKeyName = "IsMoving";
+
+	/** \brief Signals that the value of the BB key that keeps track of target has recently changed */
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
+	FName _bbTargetRecentlyChangedKeyName = "TargetRecentlyChanged";
 	
+	/** \brief For how long we'll consider as recent a change in the BB key who signals a change of the target */
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Blackboard")
+	float _targetRecentlyChangedTimer = 0.1f;
+
 	UPROPERTY(EditDefaultsOnly,  Category = "Chaser | Behavior Tree")
 	TObjectPtr<UBehaviorTree> _behaviorTree;
 

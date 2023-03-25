@@ -43,25 +43,27 @@ void AEnemyChaserController::BeginPlay() {
 
 	RunBehaviorTree(_behaviorTree);
 
-	if (const auto pawn = GetPawn(); IsValid(pawn)) {
-		/*_pawnFactionC = pawn->FindComponentByClass<UFactionComponent>();
-		if (_pawnFactionC.IsValid()) {
-			_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyChaserController::_onActorSensed);
-		} else {
-			UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Faction Component"), *FString{ __FUNCTION__ });
-		}*/
+	const auto blackBoard = GetBlackboardComponent();
 
+	// Making sure the controlled pawn has a patrolC and setting the first objective for the BB
+	if (const auto pawn = GetPawn(); IsValid(pawn)) {
 		_patrolC = pawn->FindComponentByClass<UPatrolComponent>();
 		if (_patrolC.IsValid()) {
 			_patrolC->StartPatrol();
 
-			const auto blackBoard = GetBlackboardComponent();
 			blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolC->GetCurrentPatrolObjective());
 		} else {
 			UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Patrol Component"), *FString{ __FUNCTION__ });
 		}
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("%s(): Controlled Pawn is unset"), *FString{__FUNCTION__});
+	}
+
+	const auto targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetEnemyKeyName);
+	if (targetEnemyKeyId != FBlackboard::InvalidKey) {
+		blackBoard->RegisterObserver(targetEnemyKeyId, this, FOnBlackboardChangeNotification::CreateUObject(this, &AEnemyChaserController::_onTargetEnemyChange));
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("%s(): Invald value for _bbTargetEnemyKeyName"), *FString{ __FUNCTION__ });
 	}
 
 	_movementCommandC->OnActiveMovementCmdStateChanged().AddUObject(this, &AEnemyChaserController::_updateBlackboardOnMovementStatus);
@@ -72,16 +74,15 @@ void AEnemyChaserController::_updateBlackboardOnMovementStatus(const bool newIsM
 	blackBoard->SetValueAsBool(_bbIsMovingKeyName, newIsMoving);
 }
 
-void AEnemyChaserController::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
-	// Did we sense an actor belonging to some faction? If not, we consider it neutral and ignore it.
-	//if (const auto factionC = actor->FindComponentByClass<UFactionComponent>()) {
-	//	check(_pawnFactionC.IsValid());
+EBlackboardNotificationResult AEnemyChaserController::_onTargetEnemyChange(const UBlackboardComponent& blackboard, const FBlackboard::FKey changedKeyID) {
+	// I might be pushing my luck here...
+	auto& nonConstBB = const_cast<UBlackboardComponent&>(blackboard);
+	nonConstBB.SetValueAsBool(_bbTargetRecentlyChangedKeyName, true);
 
-	//	// Is this actor an enemy? Chasers only care about enemies.
-	//	if (_pawnFactionC->IsEnemyWithFaction(factionC->GetFaction())) {
-	//		const auto blackBoard = GetBlackboardComponent();
-	//		blackBoard->SetValueAsBool(_bbCanSeeEnemyKeyName, stimulus.WasSuccessfullySensed());
-	//		blackBoard->SetValueAsObject(_bbTargetEnemyKeyName, actor);
-	//	}
-	//}
+	FTimerHandle handle;
+	GetWorldTimerManager().SetTimer(handle, [&nonConstBB, bbTargetRecentlyChangedKeyName = _bbTargetRecentlyChangedKeyName]() {
+		nonConstBB.SetValueAsBool(bbTargetRecentlyChangedKeyName, false);
+	}, _targetRecentlyChangedTimer, false);
+
+	return EBlackboardNotificationResult::ContinueObserving;
 }

@@ -15,7 +15,9 @@ namespace UnrealBuildTool.Rules
 					"CoreUObject",
 					"Engine",
 					"AIModule",
-					"FactionSystem"
+					"FactionSystem",
+					"GameplayTasks",
+					"MovementCommand",
                 }
 				);
 
