@@ -12,12 +12,8 @@ void UAIMovementCommandComponent::SetMovementMode(EMovementCommandMode mode) {
 	// We should always enter except for the first call to SetMovementMode(), when the commands' cache is empty
 	if (const auto activeCmdPtr = _modesToCommands.Find(_activeMovementMode)) {
 		const auto activeCmd = *activeCmdPtr;
-
-		// By removing before stopping movement, we avoid weird situations where we would broadcast 2 times consecutively, one for
-		// the stop of the old command and one for the activation of the new one. This way, we just broadcast the new command's activation.
-		// This might have unforseen consequences in the future, in which case you should move the removal after the OnStopMovement() call.
-		activeCmd->OnMovementStateChanged().Remove(_handleToCmdMovementStateChanged);
 		activeCmd->OnStopMovement(_ownerAIController.Get());
+		activeCmd->OnMovementStateChanged().Remove(_handleToCmdMovementStateChanged);
 	}
 
 	// In case we never entered this movement mode before, create its command and add it to the cache
