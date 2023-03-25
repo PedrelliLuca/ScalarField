@@ -12,9 +12,9 @@ class MOVEMENTCOMMAND_API UAIRotationOnlyMovement : public UAIMovementCommand {
 	GENERATED_BODY()
 
 public:
-	void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) override;
-	void OnStopMovement(const TObjectPtr<AAIController>& aiController) override;
-	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) override;
+	void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) final;
+	void OnStopMovement(const TObjectPtr<AAIController>& aiController) final;
+	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final;
 
 private:
 	/* Angular velocity of the pawn in degrees per second. */

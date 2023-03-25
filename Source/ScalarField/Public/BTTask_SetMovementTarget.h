@@ -20,5 +20,5 @@ public:
 	
 private:
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
-	
+
 };

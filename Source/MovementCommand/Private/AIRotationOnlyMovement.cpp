@@ -5,31 +5,34 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
 void UAIRotationOnlyMovement::OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) {
-	if (aiController->IsFollowingAPath()) {
-		aiController->StopMovement();
-	}
-
 	const auto aiPawn = aiController->GetPawn();
 
+	// World reference (wr) frame
 	const auto wrDestination = destination;
+
+	// Pawn reference (pr) frame
 	const auto prDestination = aiPawn->GetTransform().InverseTransformPosition(wrDestination);
 	const auto prRotation = prDestination.Rotation();
+
 	_absDegreesToRotate = FMath::Abs(prRotation.Yaw);
 	_rotationSign = FMath::Sign(prRotation.Yaw);
 	_degreesSoFar = 0.0;
+
+	_setIsMoving(true);
 }
 
 void UAIRotationOnlyMovement::OnStopMovement(const TObjectPtr<AAIController>& aiController) {
 	aiController->StopMovement();
+	_absDegreesToRotate = 0.0;
+	_degreesSoFar = 0.0;
+	_setIsMoving(false);
 }
 
 void UAIRotationOnlyMovement::OnMovementTick(const TObjectPtr<AAIController>& aiController, const float deltaTime) {
-	/* Needed to interrupt any ongoing pathfinding-like movement (e.g. roto-translation) immediately. */
-	if (aiController->IsFollowingAPath()) {
-		aiController->StopMovement();
-	}
-
 	if (FMath::IsNearlyEqual(_absDegreesToRotate, _degreesSoFar)) {
+		if (IsMoving()) {
+			_setIsMoving(false);
+		}
 		return;
 	}
 

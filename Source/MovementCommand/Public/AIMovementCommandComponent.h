@@ -20,20 +20,27 @@ public:
 	void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
 	TObjectPtr<UAIMovementCommand> GetMovementCommand() {
+		const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
 		// Did you set the movement mode before calling this?
-		check(IsValid(_activeMovementCommand));
-		return _activeMovementCommand;
+		check(activeCmd != nullptr);
+		return *activeCmd;
 	}
+
+protected:
+	void BeginPlay() override;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
 	TMap<EMovementCommandMode, TSubclassOf<UAIMovementCommand>> _modesToCommandClasses;
 
+	/** \brief Cache for already-created commands. Please UPROPERTY() TMap, don't fail me. */
+	UPROPERTY()
+	TMap<EMovementCommandMode, TObjectPtr<UAIMovementCommand>> _modesToCommands;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
 	EMovementCommandMode _defaultMovementMode;
 	
-	EMovementCommandMode _activeMovementMode;
+	EMovementCommandMode _activeMovementMode = EMovementCommandMode::MCM_None;
 
-	UPROPERTY()
-	TObjectPtr<UAIMovementCommand> _activeMovementCommand;
+	TWeakObjectPtr<AAIController> _ownerAIController = nullptr;
 };
