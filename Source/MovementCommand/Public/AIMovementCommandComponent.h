@@ -10,6 +10,9 @@
 
 #include "AIMovementCommandComponent.generated.h"
 
+// Forwards the broadcast of the currently active movement command
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnActiveMovementCmdStateChanged, bool);
+
 UCLASS()
 class MOVEMENTCOMMAND_API UAIMovementCommandComponent : public UActorComponent, public IMovementCommandSetter {
 	GENERATED_BODY()
@@ -19,6 +22,12 @@ public:
 	void SetMovementMode(EMovementCommandMode mode) override;
 	void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
+	bool IsMoving() const { 
+		const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
+		check(activeCmd != nullptr);
+		return (*activeCmd)->IsMoving();
+	}
+
 	TObjectPtr<UAIMovementCommand> GetMovementCommand() {
 		const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
 		// Did you set the movement mode before calling this?
@@ -26,10 +35,14 @@ public:
 		return *activeCmd;
 	}
 
+	FOnActiveMovementCmdStateChanged& OnActiveMovementCmdStateChanged() { return _onActiveMovementCmdStateChanged; }
+
 protected:
 	void BeginPlay() override;
 
 private:
+	void _onActiveMovementCmdStatusChange(bool newIsMoving);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
 	TMap<EMovementCommandMode, TSubclassOf<UAIMovementCommand>> _modesToCommandClasses;
 
@@ -43,4 +56,8 @@ private:
 	EMovementCommandMode _activeMovementMode = EMovementCommandMode::MCM_None;
 
 	TWeakObjectPtr<AAIController> _ownerAIController = nullptr;
+
+	FDelegateHandle _handleToCmdMovementStateChanged;
+
+	FOnActiveMovementCmdStateChanged _onActiveMovementCmdStateChanged;
 };

@@ -30,6 +30,8 @@ protected:
 	void BeginPlay() override;
 
 private:
+	void _updateBlackboardOnMovementStatus(bool newIsMoving);
+
 	UFUNCTION()
 	void _onActorSensed(AActor* actor, FAIStimulus stimulus);
 
@@ -42,18 +44,21 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Chaser | Perception")
 	TObjectPtr<UAIPerceptionComponent> _perceptionC;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Perception")
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
 	FName _bbCanSeeEnemyKeyName = "CanSeeEnemy";
 
-	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Perception")
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
 	FName _bbTargetEnemyKeyName = "TargetEnemy";
+
+	/** \brief Name of the Blackboard key that gets updated when a patrol objective is reached. */
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
+	FName _bbPatrolObjectiveKeyName = "PatrolObjective";
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
+	FName _bbIsMovingKeyName = "IsMoving";
 	
 	UPROPERTY(EditDefaultsOnly,  Category = "Chaser | Behavior Tree")
 	TObjectPtr<UBehaviorTree> _behaviorTree;
-
-	/** \brief Name of the Blackboard key that gets updated when a patrol objective is reached. */
-	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Patrolling Behavior")
-	FName _bbPatrolObjectiveKeyName = "PatrolObjective";
 
 	// The controlled Pawn has ownership of these
 	TWeakObjectPtr<UFactionComponent> _pawnFactionC = nullptr;

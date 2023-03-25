@@ -15,4 +15,10 @@ public:
 	void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) final;
 	void OnStopMovement(const TObjectPtr<AAIController>& aiController) final;
 	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final;
+
+private:
+	void _onMovementCompleted(FAIRequestID requestId, const FPathFollowingResult& result);
+	
+	TWeakObjectPtr<UPathFollowingComponent> _ownerPathFollowingC = nullptr;
+	FDelegateHandle _handleToMovementCompleted;
 };

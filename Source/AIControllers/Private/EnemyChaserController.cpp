@@ -36,15 +36,20 @@ void AEnemyChaserController::Tick(const float deltaTime) {
 void AEnemyChaserController::BeginPlay() {
 	Super::BeginPlay();
 
+	if(!IsValid(_behaviorTree)) {
+		UE_LOG(LogTemp, Error, TEXT("%s(): missing Behavior Tree Class"), *FString{__FUNCTION__});
+		return;
+	}
+
 	RunBehaviorTree(_behaviorTree);
 
 	if (const auto pawn = GetPawn(); IsValid(pawn)) {
-		_pawnFactionC = pawn->FindComponentByClass<UFactionComponent>();
+		/*_pawnFactionC = pawn->FindComponentByClass<UFactionComponent>();
 		if (_pawnFactionC.IsValid()) {
 			_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyChaserController::_onActorSensed);
 		} else {
 			UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Faction Component"), *FString{ __FUNCTION__ });
-		}
+		}*/
 
 		_patrolC = pawn->FindComponentByClass<UPatrolComponent>();
 		if (_patrolC.IsValid()) {
@@ -58,23 +63,25 @@ void AEnemyChaserController::BeginPlay() {
 	} else {
 		UE_LOG(LogTemp, Error, TEXT("%s(): Controlled Pawn is unset"), *FString{__FUNCTION__});
 	}
-	
-	if(!IsValid(_behaviorTree)) {
-		UE_LOG(LogTemp, Error, TEXT("%s(): missing Behavior Tree Class"), *FString{__FUNCTION__});
-		return;
-	}
+
+	_movementCommandC->OnActiveMovementCmdStateChanged().AddUObject(this, &AEnemyChaserController::_updateBlackboardOnMovementStatus);
+}
+
+void AEnemyChaserController::_updateBlackboardOnMovementStatus(const bool newIsMoving) {
+	const auto blackBoard = GetBlackboardComponent();
+	blackBoard->SetValueAsBool(_bbIsMovingKeyName, newIsMoving);
 }
 
 void AEnemyChaserController::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
 	// Did we sense an actor belonging to some faction? If not, we consider it neutral and ignore it.
-	if (const auto factionC = actor->FindComponentByClass<UFactionComponent>()) {
-		check(_pawnFactionC.IsValid());
+	//if (const auto factionC = actor->FindComponentByClass<UFactionComponent>()) {
+	//	check(_pawnFactionC.IsValid());
 
-		// Is this actor an enemy? Chasers only care about enemies.
-		if (_pawnFactionC->IsEnemyWithFaction(factionC->GetFaction())) {
-			const auto blackBoard = GetBlackboardComponent();
-			blackBoard->SetValueAsBool(_bbCanSeeEnemyKeyName, stimulus.WasSuccessfullySensed());
-			blackBoard->SetValueAsObject(_bbTargetEnemyKeyName, actor);
-		}
-	}
+	//	// Is this actor an enemy? Chasers only care about enemies.
+	//	if (_pawnFactionC->IsEnemyWithFaction(factionC->GetFaction())) {
+	//		const auto blackBoard = GetBlackboardComponent();
+	//		blackBoard->SetValueAsBool(_bbCanSeeEnemyKeyName, stimulus.WasSuccessfullySensed());
+	//		blackBoard->SetValueAsObject(_bbTargetEnemyKeyName, actor);
+	//	}
+	//}
 }
