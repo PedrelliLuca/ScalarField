@@ -5,14 +5,11 @@
 
 #include "IdleState.h"
 #include "InventoryLookupState.h"
+#include "ExecutionState.h"
 #include "SkillUserState.h"
 
 bool UStateComponent::IsCurrentStateAffectedByPause() const {
 	return _state->IsTickAffectedByPause();
-}
-
-bool UStateComponent::IsLookingAtWidget() const {
-	return _state->IsA<UInventoryLookupState>();
 }
 
 void UStateComponent::PerformTargetingBehavior(TObjectPtr<AActor> target) {
@@ -63,6 +60,16 @@ bool UStateComponent::_performStateTransitionRoutine(const TObjectPtr<USkillUser
 	// If the new state isn't valid, that means that we didn't transition and kept the current state
 	if (IsValid(newState)) {
 		_state->OnLeave(_ownerController.Get());
+
+		// Warn anyone listening if we moved from a Skill Execution state to another or viceversa
+		const auto isOldStateExecutionState = _state->GetClass()->IsChildOf(UExecutionState::StaticClass());
+		const auto isNewStateExecutionState = newState->GetClass()->IsChildOf(UExecutionState::StaticClass());
+		if (isNewStateExecutionState && !isOldStateExecutionState) {
+			_onSkillExecutionBegin.Broadcast();
+		} else if (!isNewStateExecutionState && isOldStateExecutionState) {
+			_onSkillExecutionEnd.Broadcast();
+		}
+
 		_state = newState;
 		_state->OnEnter(_ownerController.Get());
 		return true;

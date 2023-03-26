@@ -40,7 +40,21 @@ EBTNodeResult::Type UBTTask_SetMovementTarget::ExecuteTask(UBehaviorTreeComponen
 		checkNoEntry();
 	}
 
+	aiMovementCommandC->SetMovementParameters(_movementParameters);
 	aiMovementCommandC->GetMovementCommand()->OnSetDestination(aiController, targetLocation);
 
 	return EBTNodeResult::Succeeded;
+}
+
+FString UBTTask_SetMovementTarget::GetStaticDescription() const {
+	FString keyDesc("invalid");
+	if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass() || BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass()) {
+		keyDesc = BlackboardKey.SelectedKeyName.ToString();
+	}
+
+	return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *keyDesc);
+}
+
+FName UBTTask_SetMovementTarget::GetNodeIconName() const {
+	return FName("BTEditor.Graph.BTNode.Task.MoveTo.Icon");
 }

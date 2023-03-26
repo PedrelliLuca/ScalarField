@@ -22,6 +22,8 @@ public:
 private:
 	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
 
+	FString GetStaticDescription() const override;
+
 	UPROPERTY(EditAnywhere, Category = "Node")
 	TSubclassOf<UAbstractSkill> _skillToCast;
 };

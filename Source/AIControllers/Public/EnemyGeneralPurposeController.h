@@ -12,7 +12,7 @@
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
 
-#include "EnemyMageController.generated.h"
+#include "EnemyGeneralPurposeController.generated.h"
 
 UENUM(BlueprintType)
 enum class ETemperatureSearchBehavior : uint8 {
@@ -26,11 +26,11 @@ enum class ETemperatureSearchBehavior : uint8 {
  * 
  */
 UCLASS()
-class SCALARFIELD_API AEnemyMageController : public AAIController {
+class AICONTROLLERS_API AEnemyGeneralPurposeController : public AAIController {
 	GENERATED_BODY()
 
 public:
-	AEnemyMageController();
+	AEnemyGeneralPurposeController();
 
 	void Tick(float deltaTime) override;
 

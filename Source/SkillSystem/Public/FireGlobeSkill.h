@@ -17,7 +17,12 @@ class SKILLSYSTEM_API UFireGlobeSkill : public UAbstractSkill {
 public:
 	void ExecuteCast(TObjectPtr<AActor> caster) override;
 
+	bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const override;
+
 #if DO_CHECK
 	void CheckParametersSanity() const override;
 #endif
+
+private:
+	bool _isControlled(TObjectPtr<AActor> target) const;
 };

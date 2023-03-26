@@ -17,6 +17,7 @@ namespace UnrealBuildTool.Rules
 					"Thermodynamics",
 					"MaterialSystem",
 					"MovementCommand",
+					"SkillSpawnedEntities",
                 }
 				);
 
