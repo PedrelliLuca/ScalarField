@@ -18,6 +18,12 @@ public:
 
 private:
 	void _onMovementCompleted(FAIRequestID requestId, const FPathFollowingResult& result);
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Move Request")
+	float _acceptanceRadius = 150.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI Move Request")
+	bool _allowPartialPath = true;
 	
 	TWeakObjectPtr<UPathFollowingComponent> _ownerPathFollowingC = nullptr;
 	FDelegateHandle _handleToMovementCompleted;

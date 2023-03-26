@@ -24,7 +24,7 @@ void AEnemyChaserController::Tick(const float deltaTime) {
 	// Did we reach our current patrol objective?
 	if (const auto pawn = GetPawn(); IsValid(pawn)) {
 		const auto pawnLocation = GetPawn()->GetActorLocation();
-		if (pawnLocation.Equals(_patrolC->GetCurrentPatrolObjective(), 50)) {
+		if (pawnLocation.Equals(_patrolC->GetCurrentPatrolObjective(), _patrolC->GetPatrolObjectiveTolerance())) {
 			_patrolC->UpdatePatrolObjective();
 
 			const auto blackBoard = GetBlackboardComponent();

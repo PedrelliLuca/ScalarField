@@ -29,7 +29,7 @@ void UAIRotationOnlyMovement::OnStopMovement(const TObjectPtr<AAIController>& ai
 }
 
 void UAIRotationOnlyMovement::OnMovementTick(const TObjectPtr<AAIController>& aiController, const float deltaTime) {
-	if (FMath::IsNearlyEqual(_absDegreesToRotate, _degreesSoFar)) {
+	if (_degreesSoFar > _absDegreesToRotate - _angularTolerance) {
 		if (IsMoving()) {
 			_setIsMoving(false);
 		}
@@ -37,6 +37,8 @@ void UAIRotationOnlyMovement::OnMovementTick(const TObjectPtr<AAIController>& ai
 	}
 
 	auto degreesThisTick = _degreesPerSecond * deltaTime;
+
+	// Do not overshoot!
 	if (_degreesSoFar + degreesThisTick > _absDegreesToRotate) {
 		degreesThisTick = _absDegreesToRotate - _degreesSoFar;
 	}

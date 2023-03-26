@@ -21,10 +21,16 @@ public:
 
 	const FVector& GetCurrentPatrolObjective() const;
 
+	float GetPatrolObjectiveTolerance() const { return _patrolObjectiveTolerance; }
+
 private:
 	/** \brief Sequence of vectors defining our patrol */
 	UPROPERTY(EditInstanceOnly, Category = "Patrol")
 	TArray<FVector> _patrolObjectives;
+
+	/** \brief The maximum distance to any patrol objective that we consider acceptable */
+	UPROPERTY(EditAnywhere, Category = "Patrol")
+	float _patrolObjectiveTolerance = 150.0f;
 
 	UPROPERTY(EditInstanceOnly, Category = "Patrol", meta = (ClampMin = "0"))
 	int32 _startingPatrolObjectiveIdx = 0;

@@ -54,8 +54,15 @@ void UAIRotoTranslationMovement::OnSetDestination(const TObjectPtr<AAIController
 		FPathFindingQuery query(aiController, *navData, agentNavLocation, destination);
 		FPathFindingResult result = navSys->FindPathSync(query);
 		if (result.IsSuccessful()) {
+
+			// See UBTTask_MoveTo for a complete customization.
+			FAIMoveRequest moveReq;
+			moveReq.SetGoalLocation(destination);
+			moveReq.SetAllowPartialPath(_allowPartialPath);
+			moveReq.SetAcceptanceRadius(_acceptanceRadius);
+
 			// Found a path
-			_ownerPathFollowingC->RequestMove(FAIMoveRequest(destination), result.Path);
+			_ownerPathFollowingC->RequestMove(moveReq, result.Path);
 			_setIsMoving(true);
 
 			_handleToMovementCompleted = _ownerPathFollowingC->OnRequestFinished.AddUObject(this, &UAIRotoTranslationMovement::_onMovementCompleted);

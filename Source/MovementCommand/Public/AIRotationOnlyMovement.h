@@ -17,9 +17,13 @@ public:
 	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final;
 
 private:
-	/* Angular velocity of the pawn in degrees per second. */
-	UPROPERTY(EditDefaultsOnly, Category = "Rotation Only")
+	/** \brief Angular velocity of the pawn in degrees per second. */
+	UPROPERTY(EditDefaultsOnly, Category = "Rotation Request")
 	float _degreesPerSecond = 60.0f;
+
+	/** \brief How far from the target angle we consider the rotation to be complete. */
+	UPROPERTY(EditDefaultsOnly, Category = "Rotation Request", meta = (ClampMin = 0.f))
+	float _angularTolerance = 5.0f;
 
 	double _absDegreesToRotate = 0.0;
 	double _rotationSign = 1.0;
