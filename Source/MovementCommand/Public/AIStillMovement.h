@@ -23,4 +23,6 @@ public:
 	}
 
 	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final {}
+
+	void SetMovementParameters(const FMovementParameters& params) final {}
 };

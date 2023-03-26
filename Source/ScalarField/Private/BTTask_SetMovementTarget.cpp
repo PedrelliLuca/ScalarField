@@ -40,6 +40,7 @@ EBTNodeResult::Type UBTTask_SetMovementTarget::ExecuteTask(UBehaviorTreeComponen
 		checkNoEntry();
 	}
 
+	aiMovementCommandC->SetMovementParameters(_movementParameters);
 	aiMovementCommandC->GetMovementCommand()->OnSetDestination(aiController, targetLocation);
 
 	return EBTNodeResult::Succeeded;

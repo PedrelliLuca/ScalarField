@@ -27,6 +27,12 @@ void UAIMovementCommandComponent::SetMovementMode(EMovementCommandMode mode) {
 	_handleToCmdMovementStateChanged = _modesToCommands[_activeMovementMode]->OnMovementStateChanged().AddUObject(this, &UAIMovementCommandComponent::_onActiveMovementCmdStatusChange);
 }
 
+void UAIMovementCommandComponent::SetMovementParameters(const FMovementParameters& params) {
+	for (const auto& modeToCommand : _modesToCommands) {
+		modeToCommand.Value->SetMovementParameters(params);
+	}
+}
+
 void UAIMovementCommandComponent::BeginPlay() {
 	Super::BeginPlay();
 

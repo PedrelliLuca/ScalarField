@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "AIMovementCommand.h"
+#include "Parameters/RotationOnlyMovementParameters.h"
 
 #include "AIRotationOnlyMovement.generated.h"
 
@@ -16,14 +18,11 @@ public:
 	void OnStopMovement(const TObjectPtr<AAIController>& aiController) final;
 	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final;
 
-private:
-	/** \brief Angular velocity of the pawn in degrees per second. */
-	UPROPERTY(EditDefaultsOnly, Category = "Rotation Request")
-	float _degreesPerSecond = 60.0f;
+	void SetMovementParameters(const FMovementParameters& params) final;
 
-	/** \brief How far from the target angle we consider the rotation to be complete. */
-	UPROPERTY(EditDefaultsOnly, Category = "Rotation Request", meta = (ClampMin = 0.f))
-	float _angularTolerance = 5.0f;
+private:
+	UPROPERTY(EditDefaultsOnly)
+	FRotationOnlyMovementParameters _movementParameters;
 
 	double _absDegreesToRotate = 0.0;
 	double _rotationSign = 1.0;

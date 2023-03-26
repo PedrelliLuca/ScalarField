@@ -7,6 +7,7 @@
 #include "AIMovementCommand.h"
 #include "Components/ActorComponent.h"
 #include "MovementCommandSetter.h"
+#include "Parameters/MovementParameters.h"
 
 #include "AIMovementCommandComponent.generated.h"
 
@@ -21,6 +22,8 @@ public:
 	bool IsInMovementMode(EMovementCommandMode mode) const override { return _activeMovementMode == mode; }
 	void SetMovementMode(EMovementCommandMode mode) override;
 	void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
+
+	void SetMovementParameters(const FMovementParameters& params);
 
 	bool IsMoving() const { 
 		const auto activeCmd = _modesToCommands.Find(_activeMovementMode);

@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "AIMovementCommand.h"
+#include "Parameters/RotoTranslationMovementParameters.h"
 
 #include "AIRotoTranslationMovement.generated.h"
 
@@ -16,15 +18,14 @@ public:
 	void OnStopMovement(const TObjectPtr<AAIController>& aiController) final;
 	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final;
 
+	void SetMovementParameters(const FMovementParameters& params) final;
+
 private:
 	void _onMovementCompleted(FAIRequestID requestId, const FPathFollowingResult& result);
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI Move Request")
-	float _acceptanceRadius = 150.0f;
+	UPROPERTY(EditDefaultsOnly)
+	FRotoTranslationMovementParameters _movementParameters;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI Move Request")
-	bool _allowPartialPath = true;
-	
 	TWeakObjectPtr<UPathFollowingComponent> _ownerPathFollowingC = nullptr;
 	FDelegateHandle _handleToMovementCompleted;
 };

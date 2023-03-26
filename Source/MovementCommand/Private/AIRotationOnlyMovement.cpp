@@ -29,14 +29,14 @@ void UAIRotationOnlyMovement::OnStopMovement(const TObjectPtr<AAIController>& ai
 }
 
 void UAIRotationOnlyMovement::OnMovementTick(const TObjectPtr<AAIController>& aiController, const float deltaTime) {
-	if (_degreesSoFar > _absDegreesToRotate - _angularTolerance) {
+	if (_degreesSoFar > _absDegreesToRotate - _movementParameters.AngularTolerance) {
 		if (IsMoving()) {
 			_setIsMoving(false);
 		}
 		return;
 	}
 
-	auto degreesThisTick = _degreesPerSecond * deltaTime;
+	auto degreesThisTick = _movementParameters.DegreesPerSecond * deltaTime;
 
 	// Do not overshoot!
 	if (_degreesSoFar + degreesThisTick > _absDegreesToRotate) {
@@ -46,4 +46,8 @@ void UAIRotationOnlyMovement::OnMovementTick(const TObjectPtr<AAIController>& ai
 	aiController->GetPawn()->AddActorLocalRotation(_rotationSign * FRotator{0.0, degreesThisTick, 0.0});
 
 	_degreesSoFar += degreesThisTick;
+}
+
+void UAIRotationOnlyMovement::SetMovementParameters(const FMovementParameters& params) {
+	_movementParameters = params.RotationOnlyMovementParameters;
 }

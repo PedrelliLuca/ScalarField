@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
+#include "Parameters/MovementParameters.h"
 
 #include "BTTask_SetMovementTarget.generated.h"
 
@@ -26,4 +27,7 @@ private:
 #if WITH_EDITOR
 	FName GetNodeIconName() const override;
 #endif // WITH_EDITOR
+
+	UPROPERTY(EditAnywhere)
+	FMovementParameters _movementParameters;
 };

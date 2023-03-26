@@ -58,8 +58,8 @@ void UAIRotoTranslationMovement::OnSetDestination(const TObjectPtr<AAIController
 			// See UBTTask_MoveTo for a complete customization.
 			FAIMoveRequest moveReq;
 			moveReq.SetGoalLocation(destination);
-			moveReq.SetAllowPartialPath(_allowPartialPath);
-			moveReq.SetAcceptanceRadius(_acceptanceRadius);
+			moveReq.SetAllowPartialPath(_movementParameters.AllowPartialPath);
+			moveReq.SetAcceptanceRadius(_movementParameters.AcceptanceRadius);
 
 			// Found a path
 			_ownerPathFollowingC->RequestMove(moveReq, result.Path);
@@ -86,6 +86,10 @@ void UAIRotoTranslationMovement::OnStopMovement(const TObjectPtr<AAIController>&
 
 void UAIRotoTranslationMovement::OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) {
 	// Do we even need this for AI?
+}
+
+void UAIRotoTranslationMovement::SetMovementParameters(const FMovementParameters& params) {
+	_movementParameters = params.RotoTranslationMovementParameters;
 }
 
 void UAIRotoTranslationMovement::_onMovementCompleted(FAIRequestID requestId, const FPathFollowingResult& result) {
