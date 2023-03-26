@@ -42,6 +42,7 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 	_topDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	_thermodynamicC = CreateDefaultSubobject<UThermodynamicComponent>(TEXT("Thermodynamic Component"));
+	_impactDmgHandlerC = CreateDefaultSubobject<UPawnImpactDamageHandlerComponent>(TEXT("Impact Damage Handler Component"));
 
 	// Create a mana component...
 	_manaC = CreateDefaultSubobject<UManaComponent>(TEXT("Mana Component"));
@@ -57,6 +58,8 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 
 	_inventoryC = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory Component"));
 
+	_factionC = CreateDefaultSubobject<UFactionComponent>(TEXT("Faction Component"));
+
 	_stimuliSourceC = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("Perception Stimuli Source Component"));
 
 	// Activate ticking in order to update the cursor every frame.
@@ -67,15 +70,12 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 float AScalarFieldCharacter::TakeDamage(const float damageAmount, const FDamageEvent& damageEvent, AController* const eventInstigator, AActor* const damageCauser) {
 	float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
 
-	if (damageEvent.DamageTypeClass == UTemperatureDamageType::StaticClass()) {
-		check(IsValid(_healthC));
+	check(IsValid(_healthC));
 
-		// TODO: apply damage resistances here
+	// TODO: apply damage resistances here
 
-		if (!_healthC->IsDead()) {
-			_healthC->TakeDamage(damageAmount);
-		}
-
+	if (!_healthC->IsDead()) {
+		_healthC->TakeDamage(damageAmount);
 	}
 
 	/*if (_healthC->IsDead()) {

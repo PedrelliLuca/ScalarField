@@ -45,3 +45,8 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
 	// - In case the current state does not allow the execution of skills
 	return stateC->PerformSkillExecutionBehavior(MoveTemp(skill)) ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
 }
+
+FString UBTTask_CastSpell::GetStaticDescription() const {
+	const auto skillName = _skillToCast->GetClass()->GetName();
+	return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *skillName);
+}

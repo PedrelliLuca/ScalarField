@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MyEnvQueryTest_Temperature.h"
+#include "EnvQueryTest_Temperature.h"
 
 #include "EnvironmentQuery/Contexts/EnvQueryContext_Querier.h"
 #include "EnvironmentQuery/Items/EnvQueryItemType_Actor.h"
@@ -9,13 +9,13 @@
 #include "ThermodynamicComponent.h"
 
 
-UMyEnvQueryTest_Temperature::UMyEnvQueryTest_Temperature(const FObjectInitializer& objectInitializer) : Super(objectInitializer) {
+UEnvQueryTest_Temperature::UEnvQueryTest_Temperature(const FObjectInitializer& objectInitializer) : Super(objectInitializer) {
 	_querier = UEnvQueryContext_Querier::StaticClass();
 	Cost = EEnvTestCost::Low;
 	ValidItemType = UEnvQueryItemType_Actor::StaticClass();
 }
 
-void UMyEnvQueryTest_Temperature::RunTest(FEnvQueryInstance& queryInstance) const {
+void UEnvQueryTest_Temperature::RunTest(FEnvQueryInstance& queryInstance) const {
 	UObject* const queryOwner = queryInstance.Owner.Get();
 	if (queryOwner == nullptr) {
 		return;
@@ -81,7 +81,7 @@ void UMyEnvQueryTest_Temperature::RunTest(FEnvQueryInstance& queryInstance) cons
 	}
 }
 
-FText UMyEnvQueryTest_Temperature::GetDescriptionTitle() const {
+FText UEnvQueryTest_Temperature::GetDescriptionTitle() const {
 	FString modeDescription;
 	switch (_testMode) {
 		case EEnvTestTemperature::Absolute:
@@ -100,6 +100,6 @@ FText UMyEnvQueryTest_Temperature::GetDescriptionTitle() const {
 	return FText::FromString(FString::Printf(TEXT("%s %s"), *modeDescription, *Super::GetDescriptionTitle().ToString()));
 }
 
-FText UMyEnvQueryTest_Temperature::GetDescriptionDetails() const {
+FText UEnvQueryTest_Temperature::GetDescriptionDetails() const {
 	return DescribeFloatTestParams();
 }

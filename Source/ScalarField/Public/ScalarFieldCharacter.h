@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FactionComponent.h"
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
@@ -10,6 +11,7 @@
 #include "HealthComponent.h"
 #include "InventoryComponent.h"
 #include "ManaComponent.h"
+#include "PawnImpactDamageHandlerComponent.h"
 #include "SkillsContainerComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
@@ -71,8 +73,14 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Damage Handling", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UTemperatureDamageHandlerComponent> _temperatureDmgHandlerC;
 
+	UPROPERTY(VisibleAnywhere, Category = "Damage Handling")
+	TObjectPtr<UPawnImpactDamageHandlerComponent> _impactDmgHandlerC;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInventoryComponent> _inventoryC;
+
+	UPROPERTY(VisibleAnywhere, Category = "Faction and Relationships")
+	TObjectPtr<UFactionComponent> _factionC;
 
 	UPROPERTY(VisibleAnywhere, Category = "AI Senses")
 	TObjectPtr<UAIPerceptionStimuliSourceComponent> _stimuliSourceC;

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EnvironmentQuery/EnvQueryTest.h"
-#include "MyEnvQueryTest_Temperature.generated.h"
+#include "EnvQueryTest_Temperature.generated.h"
 
 UENUM()
 namespace EEnvTestTemperature
@@ -20,11 +20,11 @@ namespace EEnvTestTemperature
  * 
  */
 UCLASS()
-class SCALARFIELD_API UMyEnvQueryTest_Temperature : public UEnvQueryTest {
+class SCALARFIELD_API UEnvQueryTest_Temperature : public UEnvQueryTest {
 	GENERATED_BODY()
 	
 public:
-	UMyEnvQueryTest_Temperature(const FObjectInitializer& objectInitializer);
+	UEnvQueryTest_Temperature(const FObjectInitializer& objectInitializer);
 
 private:
 	void RunTest(FEnvQueryInstance& QueryInstance) const override;

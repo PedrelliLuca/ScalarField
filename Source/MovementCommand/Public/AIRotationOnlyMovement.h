@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "AIMovementCommand.h"
+#include "Parameters/RotationOnlyMovementParameters.h"
 
 #include "AIRotationOnlyMovement.generated.h"
 
@@ -12,14 +14,15 @@ class MOVEMENTCOMMAND_API UAIRotationOnlyMovement : public UAIMovementCommand {
 	GENERATED_BODY()
 
 public:
-	void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) override;
-	void OnStopMovement(const TObjectPtr<AAIController>& aiController) override;
-	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) override;
+	void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) final;
+	void OnStopMovement(const TObjectPtr<AAIController>& aiController) final;
+	void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final;
+
+	void SetMovementParameters(const FMovementParameters& params) final;
 
 private:
-	/* Angular velocity of the pawn in degrees per second. */
-	UPROPERTY(EditDefaultsOnly, Category = "Rotation Only")
-	float _degreesPerSecond = 60.0f;
+	UPROPERTY(EditDefaultsOnly)
+	FRotationOnlyMovementParameters _movementParameters;
 
 	double _absDegreesToRotate = 0.0;
 	double _rotationSign = 1.0;

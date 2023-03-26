@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "EnemyMageController.h"
+#include "EnemyGeneralPurposeController.h"
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 
-AEnemyMageController::AEnemyMageController() {
+AEnemyGeneralPurposeController::AEnemyGeneralPurposeController() {
 	_movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AI Movement Command Component"));
 	_perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 	_stateC = CreateDefaultSubobject<UStateComponent>(TEXT("State Component"));
 }
 
-void AEnemyMageController::Tick(float deltaTime) {
+void AEnemyGeneralPurposeController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 
 	_stateC->PerformTickBehavior(deltaTime);
@@ -26,10 +26,10 @@ void AEnemyMageController::Tick(float deltaTime) {
 	}
 }
 
-void AEnemyMageController::BeginPlay() {
+void AEnemyGeneralPurposeController::BeginPlay() {
 	Super::BeginPlay();
 
-	_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyMageController::_onActorSensed);
+	_perceptionC->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyGeneralPurposeController::_onActorSensed);
 
 	if (const auto pawn = GetPawn(); IsValid(pawn)) {
 		_temperatureDmgC = pawn->FindComponentByClass<UTemperatureDamageHandlerComponent>();
@@ -53,7 +53,7 @@ void AEnemyMageController::BeginPlay() {
 	RunBehaviorTree(_behaviorTree);
 }
 
-void AEnemyMageController::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
+void AEnemyGeneralPurposeController::_onActorSensed(AActor* const actor, const FAIStimulus stimulus) {
 	// Did we sense a player-controlled character?
 	if (const auto character = Cast<ACharacter>(actor); IsValid(character) && character->IsPlayerControlled()) {
 		const auto blackBoard = GetBlackboardComponent();
@@ -62,7 +62,7 @@ void AEnemyMageController::_onActorSensed(AActor* const actor, const FAIStimulus
 	}
 }
 
-void AEnemyMageController::_communicateTemperatureHarmfulness() {
+void AEnemyGeneralPurposeController::_communicateTemperatureHarmfulness() {
 	if (!_thermoC.IsValid() || !_temperatureDmgC.IsValid()) {
 		return;
 	}

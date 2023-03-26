@@ -6,8 +6,9 @@
 
 UENUM()
 enum class EMovementCommandMode : uint8 {
-	MCM_Still = 0				UMETA(DisplayName = "Still"),
-	MCM_Rotation = 1			UMETA(DisplayName = "Rotation"),
-	MCM_Translation = 2			UMETA(DisplayName = "Translation"),
-	MCM_RotoTranslation = 3		UMETA(DisplayName = "Roto-Translation"),
+	MCM_None = 0                UMETA(DisplayName = "None"),
+	MCM_Still = 1				UMETA(DisplayName = "Still"),
+	MCM_Rotation = 2			UMETA(DisplayName = "Rotation"),
+	MCM_Translation = 3			UMETA(DisplayName = "Translation"),
+	MCM_RotoTranslation = 4		UMETA(DisplayName = "Roto-Translation"),
 };

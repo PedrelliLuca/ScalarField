@@ -7,8 +7,12 @@
 #include "AIMovementCommand.h"
 #include "Components/ActorComponent.h"
 #include "MovementCommandSetter.h"
+#include "Parameters/MovementParameters.h"
 
 #include "AIMovementCommandComponent.generated.h"
+
+// Forwards the broadcast of the currently active movement command
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnActiveMovementCmdStateChanged, bool);
 
 UCLASS()
 class MOVEMENTCOMMAND_API UAIMovementCommandComponent : public UActorComponent, public IMovementCommandSetter {
@@ -19,21 +23,44 @@ public:
 	void SetMovementMode(EMovementCommandMode mode) override;
 	void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
-	TObjectPtr<UAIMovementCommand> GetMovementCommand() {
-		// Did you set the movement mode before calling this?
-		check(IsValid(_activeMovementCommand));
-		return _activeMovementCommand;
+	void SetMovementParameters(const FMovementParameters& params);
+
+	bool IsMoving() const { 
+		const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
+		check(activeCmd != nullptr);
+		return (*activeCmd)->IsMoving();
 	}
 
+	TObjectPtr<UAIMovementCommand> GetMovementCommand() {
+		const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
+		// Did you set the movement mode before calling this?
+		check(activeCmd != nullptr);
+		return *activeCmd;
+	}
+
+	FOnActiveMovementCmdStateChanged& OnActiveMovementCmdStateChanged() { return _onActiveMovementCmdStateChanged; }
+
+protected:
+	void BeginPlay() override;
+
 private:
+	void _onActiveMovementCmdStatusChange(bool newIsMoving);
+
 	UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
 	TMap<EMovementCommandMode, TSubclassOf<UAIMovementCommand>> _modesToCommandClasses;
+
+	/** \brief Cache for already-created commands. Please UPROPERTY() TMap, don't fail me. */
+	UPROPERTY()
+	TMap<EMovementCommandMode, TObjectPtr<UAIMovementCommand>> _modesToCommands;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
 	EMovementCommandMode _defaultMovementMode;
 	
-	EMovementCommandMode _activeMovementMode;
+	EMovementCommandMode _activeMovementMode = EMovementCommandMode::MCM_None;
 
-	UPROPERTY()
-	TObjectPtr<UAIMovementCommand> _activeMovementCommand;
+	TWeakObjectPtr<AAIController> _ownerAIController = nullptr;
+
+	FDelegateHandle _handleToCmdMovementStateChanged;
+
+	FOnActiveMovementCmdStateChanged _onActiveMovementCmdStateChanged;
 };
