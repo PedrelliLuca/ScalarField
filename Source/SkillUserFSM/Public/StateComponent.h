@@ -9,13 +9,15 @@
 
 #include "StateComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnSkillExecutionBegin);
+DECLARE_MULTICAST_DELEGATE(FOnSkillExecutionEnd);
+
 UCLASS()
 class SKILLUSERFSM_API UStateComponent : public UActorComponent {
      GENERATED_BODY()
      
 public:
     bool IsCurrentStateAffectedByPause() const;
-    bool IsLookingAtWidget() const;
 
     void PerformTargetingBehavior(TObjectPtr<AActor> target);
     bool PerformSkillExecutionBehavior(TObjectPtr<UAbstractSkill> skill);
@@ -24,6 +26,8 @@ public:
     void PerformTickBehavior(float deltaTime);
     void PerformAbortBehavior();
 
+    FOnSkillExecutionBegin& OnSkillExecutionBegin() { return _onSkillExecutionBegin; }
+    FOnSkillExecutionEnd& OnSkillExecutionEnd() { return _onSkillExecutionEnd; }
 
 protected:
     void BeginPlay() override;
@@ -36,4 +40,7 @@ private:
 	TObjectPtr<USkillUserState> _state = nullptr;
 
     TWeakObjectPtr<AController> _ownerController = nullptr;
+
+    FOnSkillExecutionBegin _onSkillExecutionBegin;
+    FOnSkillExecutionEnd _onSkillExecutionEnd;
 };

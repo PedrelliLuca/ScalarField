@@ -22,8 +22,6 @@ void UImpactOneHitDamageDealerComponent::BeginPlay() {
 }
 
 void UImpactOneHitDamageDealerComponent::_tryApplyImpulse(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult & sweepResult) {
-	UE_LOG(LogTemp, Warning, TEXT("%s() call!"), *FString{__FUNCTION__});
-
 	// This component cannot damage its owner nor actors that have already been damaged.
 	if (otherActor == GetOwner() || _hitActors.Contains(otherActor)) {
 		return;

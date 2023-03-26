@@ -34,6 +34,9 @@ private:
 
 	EBlackboardNotificationResult _onTargetEnemyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
 
+	void _onSkillExecutionBegin();
+	void _onSkillExecutionEnd();
+
 	UPROPERTY(VisibleAnywhere, Category = "Chaser | Movement Commands")
 	TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
 
@@ -52,6 +55,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
 	FName _bbIsMovingKeyName = "IsMoving";
+
+	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")
+	FName _bbIsCastingKeyName = "IsCasting";
 
 	/** \brief Signals that the value of the BB key that keeps track of target has recently changed */
 	UPROPERTY(EditDefaultsOnly, Category = "Chaser | Key Names")

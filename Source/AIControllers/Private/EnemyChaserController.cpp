@@ -45,7 +45,7 @@ void AEnemyChaserController::BeginPlay() {
 
 	const auto blackBoard = GetBlackboardComponent();
 
-	// Making sure the controlled pawn has a patrolC and setting the first objective for the BB
+	// Making sure the controlled pawn has a patrolC and setting the first objective for the BB.
 	if (const auto pawn = GetPawn(); IsValid(pawn)) {
 		_patrolC = pawn->FindComponentByClass<UPatrolComponent>();
 		if (_patrolC.IsValid()) {
@@ -59,6 +59,7 @@ void AEnemyChaserController::BeginPlay() {
 		UE_LOG(LogTemp, Error, TEXT("%s(): Controlled Pawn is unset"), *FString{__FUNCTION__});
 	}
 
+	// Setting up the logic that lets the BT know if the Target Enemy has just changed or not.
 	const auto targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetEnemyKeyName);
 	if (targetEnemyKeyId != FBlackboard::InvalidKey) {
 		blackBoard->RegisterObserver(targetEnemyKeyId, this, FOnBlackboardChangeNotification::CreateUObject(this, &AEnemyChaserController::_onTargetEnemyChange));
@@ -66,7 +67,13 @@ void AEnemyChaserController::BeginPlay() {
 		UE_LOG(LogTemp, Error, TEXT("%s(): Invald value for _bbTargetEnemyKeyName"), *FString{ __FUNCTION__ });
 	}
 
+
+	// Setting up the logic that lets the BT know if we're moving or not.
 	_movementCommandC->OnActiveMovementCmdStateChanged().AddUObject(this, &AEnemyChaserController::_updateBlackboardOnMovementStatus);
+
+	// Setting up the logic that lets the BT know if we're casting or not.
+	_stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyChaserController::_onSkillExecutionBegin);
+	_stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyChaserController::_onSkillExecutionEnd);
 }
 
 void AEnemyChaserController::_updateBlackboardOnMovementStatus(const bool newIsMoving) {
@@ -85,4 +92,14 @@ EBlackboardNotificationResult AEnemyChaserController::_onTargetEnemyChange(const
 	}, _targetRecentlyChangedTimer, false);
 
 	return EBlackboardNotificationResult::ContinueObserving;
+}
+
+void AEnemyChaserController::_onSkillExecutionBegin() {
+	const auto blackBoard = GetBlackboardComponent();
+	blackBoard->SetValueAsBool(_bbIsCastingKeyName, true);
+}
+
+void AEnemyChaserController::_onSkillExecutionEnd() {
+	const auto blackBoard = GetBlackboardComponent();
+	blackBoard->SetValueAsBool(_bbIsCastingKeyName, false);
 }
