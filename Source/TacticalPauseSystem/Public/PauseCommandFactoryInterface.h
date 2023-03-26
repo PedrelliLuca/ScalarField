@@ -7,13 +7,13 @@
 
 UINTERFACE(MinimalAPI, NotBlueprintable)
 class UPauseCommandFactory : public UInterface {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 /* Interface representing an inventory. */
 class IPauseCommandFactory {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual TScriptInterface<IPauseCommand> CreateCommand() = 0;
+    virtual TScriptInterface<IPauseCommand> CreateCommand() = 0;
 };

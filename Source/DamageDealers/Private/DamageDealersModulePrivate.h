@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogDamageDealers, Log, All);
 
 class FDamageDealersModule : public IDamageDealersModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

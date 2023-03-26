@@ -14,55 +14,55 @@
 
 UCLASS()
 class INVENTORYPRESENTER_API UInventoryPresenterWidget : public UUserWidget, public IInventoryContainerWidget {
-     GENERATED_BODY()
-  
+    GENERATED_BODY()
+
 public:
     void ShowInventory(TWeakInterfacePtr<IInventory> inventory) override;
-	void HideInventory() override;
+    void HideInventory() override;
 
 protected:
-	FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
-	
+    FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+
 private:
-	UFUNCTION(BlueprintCallable)
-	void _onClose();
+    UFUNCTION(BlueprintCallable)
+    void _onClose();
 
-	void _onItemFromInventoryBeingUsed(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory);
-	
-	void _onItemFromInventoryBeingDiscarded(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory, const FPointerEvent& mouseEvent);
+    void _onItemFromInventoryBeingUsed(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory);
 
-	UFUNCTION()
-	void _onQuantitySetterCommit(const FText& quantityText, ETextCommit::Type commitType);
+    void _onItemFromInventoryBeingDiscarded(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory, const FPointerEvent& mouseEvent);
 
-	void _cleanupQuantityBeingSet();
-	
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UInventoryWidget> _inventoryWidget;
+    UFUNCTION()
+    void _onQuantitySetterCommit(const FText& quantityText, ETextCommit::Type commitType);
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UOverlay> _mainOverlay;
+    void _cleanupQuantityBeingSet();
 
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UQuantitySetterWidget> _quantitySetterClass = nullptr;
-     
-	UPROPERTY()
-	TObjectPtr<UQuantitySetterWidget> _quantitySetter = nullptr;
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UInventoryWidget> _inventoryWidget;
 
-	FDelegateHandle _itemFromInventoryUsedHandle{};
-	FDelegateHandle _itemFromInventoryDiscardedHandle{};
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UOverlay> _mainOverlay;
 
-	struct FItemDropPayload {
-		bool IsValid() const { return ItemPendingDrop.IsValid() && InventoryPendingDrop.IsValid(); }
-		void Reset() {
-			ItemPendingDrop = nullptr;
-			InventoryPendingDrop = nullptr;
-		}
-		
-		TWeakInterfacePtr<IItem> ItemPendingDrop = nullptr;
-		TWeakInterfacePtr<IInventory> InventoryPendingDrop = nullptr;
-	};
+    UPROPERTY(EditDefaultsOnly)
+    TSubclassOf<UQuantitySetterWidget> _quantitySetterClass = nullptr;
 
-	FItemDropPayload _itemDropPayload{};
+    UPROPERTY()
+    TObjectPtr<UQuantitySetterWidget> _quantitySetter = nullptr;
 
-	bool _bQuantitySetterJustDrawn = false;
+    FDelegateHandle _itemFromInventoryUsedHandle{};
+    FDelegateHandle _itemFromInventoryDiscardedHandle{};
+
+    struct FItemDropPayload {
+        bool IsValid() const { return ItemPendingDrop.IsValid() && InventoryPendingDrop.IsValid(); }
+        void Reset() {
+            ItemPendingDrop = nullptr;
+            InventoryPendingDrop = nullptr;
+        }
+
+        TWeakInterfacePtr<IItem> ItemPendingDrop = nullptr;
+        TWeakInterfacePtr<IInventory> InventoryPendingDrop = nullptr;
+    };
+
+    FItemDropPayload _itemDropPayload{};
+
+    bool _bQuantitySetterJustDrawn = false;
 };

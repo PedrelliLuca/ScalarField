@@ -10,20 +10,20 @@
 #include "BTTask_CastSpell.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class SCALARFIELD_API UBTTask_CastSpell : public UBTTaskNode {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UBTTask_CastSpell();
-	
+    UBTTask_CastSpell();
+
 private:
-	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
+    EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
 
-	FString GetStaticDescription() const override;
+    FString GetStaticDescription() const override;
 
-	UPROPERTY(EditAnywhere, Category = "Node")
-	TSubclassOf<UAbstractSkill> _skillToCast;
+    UPROPERTY(EditAnywhere, Category = "Node")
+    TSubclassOf<UAbstractSkill> _skillToCast;
 };

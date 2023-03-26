@@ -15,15 +15,15 @@
 
 UCLASS()
 class SCALARFIELD_API AScalarFieldPickup : public AActor, public IPickup {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
     AScalarFieldPickup();
 
-	 void InitializePickup(TSubclassOf<UObject> itemClass, int32 quantity) override;
+    void InitializePickup(TSubclassOf<UObject> itemClass, int32 quantity) override;
 
 #if WITH_EDITOR
-     void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
+    void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
 
 protected:

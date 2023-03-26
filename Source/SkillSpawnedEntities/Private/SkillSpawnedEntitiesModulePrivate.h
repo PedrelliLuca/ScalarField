@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogSkillSpawnedEntities, Log, All);
 
 class FSkillSpawnedEntitiesModule : public ISkillSpawnedEntitiesModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

@@ -7,24 +7,23 @@
 
 #include "IdleState.generated.h"
 
-
 /**
  * \brief State representing a skill user that is not executing any skill.
  */
 UCLASS(Blueprintable)
 class SKILLUSERFSM_API UIdleState : public USkillUserState {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) override;
-	TObjectPtr<USkillUserState> OnInteraction(TObjectPtr<AController> controller) override;
-	TObjectPtr<USkillUserState> OnToggleInventory(TObjectPtr<AController> controller) override;
-	TObjectPtr<USkillUserState> OnBeginSkillExecution(TObjectPtr<UAbstractSkill> skill, TObjectPtr<AController> controller) override;
-	TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
-	TObjectPtr<USkillUserState> OnAbort(TObjectPtr<AController> controller) override;
+    TObjectPtr<USkillUserState> OnTargeting(TObjectPtr<AActor> target, TObjectPtr<AController> controller) override;
+    TObjectPtr<USkillUserState> OnInteraction(TObjectPtr<AController> controller) override;
+    TObjectPtr<USkillUserState> OnToggleInventory(TObjectPtr<AController> controller) override;
+    TObjectPtr<USkillUserState> OnBeginSkillExecution(TObjectPtr<UAbstractSkill> skill, TObjectPtr<AController> controller) override;
+    TObjectPtr<USkillUserState> OnTick(float deltaTime, TObjectPtr<AController> controller) override;
+    TObjectPtr<USkillUserState> OnAbort(TObjectPtr<AController> controller) override;
 
-	void OnEnter(TObjectPtr<AController> controller) override;
-	void OnLeave(TObjectPtr<AController> controller) override;
+    void OnEnter(TObjectPtr<AController> controller) override;
+    void OnLeave(TObjectPtr<AController> controller) override;
 
-	bool IsTickAffectedByPause() const override { return false; }
+    bool IsTickAffectedByPause() const override { return false; }
 };

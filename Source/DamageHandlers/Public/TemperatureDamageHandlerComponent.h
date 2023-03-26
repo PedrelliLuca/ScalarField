@@ -2,17 +2,16 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "CoreMinimal.h"
 
 #include "TemperatureDamageHandlerComponent.generated.h"
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DAMAGEHANDLERS_API UTemperatureDamageHandlerComponent : public UActorComponent {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
+public:
     UTemperatureDamageHandlerComponent();
 
     void HandleDamage(double temperature);
@@ -28,7 +27,7 @@ public:
     bool IsTemperatureComfortable(const double temperature) const { return temperature >= _minComfortTemperature && temperature <= _maxComfortTemperature; }
 
 #if WITH_EDITOR
-	void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
+    void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
 
 private:

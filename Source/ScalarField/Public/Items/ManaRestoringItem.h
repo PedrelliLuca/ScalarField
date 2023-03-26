@@ -9,14 +9,14 @@
 
 UCLASS(Blueprintable)
 class SCALARFIELD_API UManaRestoringItem : public UInventoryItem {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
-     UManaRestoringItem();
-	
-     void Use(TWeakObjectPtr<AActor> actor) override;
+    UManaRestoringItem();
+
+    void Use(TWeakObjectPtr<AActor> actor) override;
 
 protected:
-     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Healing")
-     double _manaRestoringAmount;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Healing")
+    double _manaRestoringAmount;
 };

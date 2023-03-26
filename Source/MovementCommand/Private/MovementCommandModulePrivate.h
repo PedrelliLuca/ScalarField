@@ -5,9 +5,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogMovementCommand, Log, All);
 
-class FMovementCommandModule : public IMovementCommandModule
-{
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+class FMovementCommandModule : public IMovementCommandModule {
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

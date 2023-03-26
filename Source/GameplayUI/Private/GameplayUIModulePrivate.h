@@ -5,9 +5,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogGameplayUI, Log, All);
 
-class FGameplayUIModule : public IGameplayUIModule
-{
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+class FGameplayUIModule : public IGameplayUIModule {
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

@@ -2,28 +2,28 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AbstractSkill.h"
+#include "CoreMinimal.h"
 
 #include "CarbonizeSkill.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Blueprintable)
 class SKILLSYSTEM_API UCarbonizeSkill : public UAbstractSkill {
-	GENERATED_BODY()
-	
-public:
-	void ExecuteCast(TObjectPtr<AActor> caster) override;
+    GENERATED_BODY()
 
-	bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const override;
+public:
+    void ExecuteCast(TObjectPtr<AActor> caster) override;
+
+    bool IsValidTarget(int32 targetIndex, TObjectPtr<AActor> target) const override;
 
 #if DO_CHECK
-	void CheckParametersSanity() const override;
+    void CheckParametersSanity() const override;
 #endif
 
 private:
-	UPROPERTY(EditAnywhere, Category = "CarbonizeParameters")
-	double _carbonizationTemperature = 900.;
+    UPROPERTY(EditAnywhere, Category = "CarbonizeParameters")
+    double _carbonizationTemperature = 900.;
 };

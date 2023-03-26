@@ -6,13 +6,13 @@
 
 UINTERFACE(MinimalAPI, NotBlueprintable)
 class UPauseCommand : public UInterface {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 /* Interface representing an inventory. */
 class IPauseCommand {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void Execute() = 0;
+    virtual void Execute() = 0;
 };

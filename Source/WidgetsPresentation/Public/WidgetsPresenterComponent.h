@@ -15,28 +15,28 @@
  */
 UCLASS()
 class WIDGETSPRESENTATION_API UWidgetsPresenterComponent : public UActorComponent {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
-	TWeakInterfacePtr<IPawnBindableWidget> GetHUDWidget();
-	TWeakInterfacePtr<IInventoryContainerWidget> GetInventoryContainerWidget();
+    TWeakInterfacePtr<IPawnBindableWidget> GetHUDWidget();
+    TWeakInterfacePtr<IInventoryContainerWidget> GetInventoryContainerWidget();
 
 protected:
-	void BeginPlay() override;
+    void BeginPlay() override;
 
 private:
-     void _createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
-     void _createInventoryPresenter(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
-     
-     UPROPERTY(EditDefaultsOnly, Category = "Pickup")
-     TSubclassOf<UHUDWidget> _hudWidgetClass = nullptr;
+    void _createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
+    void _createInventoryPresenter(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
 
-     UPROPERTY()
-     TObjectPtr<UHUDWidget> _hudWidget = nullptr;
+    UPROPERTY(EditDefaultsOnly, Category = "Pickup")
+    TSubclassOf<UHUDWidget> _hudWidgetClass = nullptr;
 
-     UPROPERTY(EditDefaultsOnly, Category = "Widgets")
-     TSubclassOf<UInventoryPresenterWidget> _inventoryPresenterWidgetClass = nullptr;
+    UPROPERTY()
+    TObjectPtr<UHUDWidget> _hudWidget = nullptr;
 
-     UPROPERTY()
-     TObjectPtr<UInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
+    UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+    TSubclassOf<UInventoryPresenterWidget> _inventoryPresenterWidgetClass = nullptr;
+
+    UPROPERTY()
+    TObjectPtr<UInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
 };

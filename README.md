@@ -40,3 +40,9 @@ Exceptions:
 7. Function parameters and local variables: always use `camelCase`.
 8. const usage: follow `const T`, `const T&`, and `const *T`.
 9. boolean variables: follow the same rules of private/public variables, but with the `b` prefix. e.g. private variable `_bDead`. public variable `bCamelCase` (because is still camel case, since the first letter is lower case).
+
+To run `clang-format` on every `.h` and `.cpp` file in the `Source` folder, execute the following command:
+
+```
+find Source/ -iname *.h -o -iname *.cpp | xargs clang-format -i
+```

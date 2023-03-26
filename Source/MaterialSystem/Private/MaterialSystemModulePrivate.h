@@ -5,9 +5,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogMaterialSystem, Log, All);
 
-class FMaterialSystemModule : public IMaterialSystemModule
-{
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+class FMaterialSystemModule : public IMaterialSystemModule {
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

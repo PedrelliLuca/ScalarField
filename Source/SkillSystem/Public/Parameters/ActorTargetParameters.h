@@ -6,14 +6,14 @@
 
 USTRUCT(Blueprintable)
 struct FActorTargetParameters {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Actor Components")
-	TArray<TSubclassOf<UActorComponent>> RequiredComponents{};
+    UPROPERTY(EditAnywhere, Category = "Actor Components")
+    TArray<TSubclassOf<UActorComponent>> RequiredComponents{};
 
-	UPROPERTY(EditAnywhere, Category = "Range")
-	double MaxDistance = 0.;
+    UPROPERTY(EditAnywhere, Category = "Range")
+    double MaxDistance = 0.;
 
-	TWeakObjectPtr<AActor> Target;
+    TWeakObjectPtr<AActor> Target;
 };

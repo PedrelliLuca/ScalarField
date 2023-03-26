@@ -11,14 +11,12 @@
 
 UCLASS()
 class INVENTORYPRESENTER_API UQuantitySetterWidget : public UUserWidget {
-     GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-     TWeakObjectPtr<UEditableTextBox> GetQuantityTextBox() { return _quantityTextBox; }
+    TWeakObjectPtr<UEditableTextBox> GetQuantityTextBox() { return _quantityTextBox; }
 
 private:
-     
-     UPROPERTY(meta = (BindWidget))
-     TObjectPtr<UEditableTextBox> _quantityTextBox;
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UEditableTextBox> _quantityTextBox;
 };
-

@@ -5,9 +5,8 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleInterface.h"
 
-class PICKUPS_API IPickupsModule : public IModuleInterface
-{
-    public:
-    //add the public interface of the module here if it is necessary
-    //nothing related to the implementation should be exposed 
+class PICKUPS_API IPickupsModule : public IModuleInterface {
+public:
+    // add the public interface of the module here if it is necessary
+    // nothing related to the implementation should be exposed
 };

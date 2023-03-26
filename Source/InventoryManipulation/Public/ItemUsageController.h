@@ -3,30 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemUsageCommandFactory.h"
 #include "InventoryContainerWidgetInterface.h"
+#include "ItemUsageCommandFactory.h"
 #include "UObject/WeakInterfacePtr.h"
 
 #include "ItemUsageController.generated.h"
 
 UCLASS()
 class INVENTORYMANIPULATION_API UItemUsageController : public UObject {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
-     UItemUsageController();
-     
-     void SetItemUsageNotifier(TWeakInterfacePtr<IInventoryContainerWidget> itemUsageNotifier);
-     void BindItemUsage();
-     void UnbindItemUsage();
+    UItemUsageController();
+
+    void SetItemUsageNotifier(TWeakInterfacePtr<IInventoryContainerWidget> itemUsageNotifier);
+    void BindItemUsage();
+    void UnbindItemUsage();
 
 private:
-     void _useItemOfInventory(TWeakInterfacePtr<IItem> item, int32 quantity, TWeakInterfacePtr<IInventory> inventory);
-     
-     TWeakInterfacePtr<IInventoryContainerWidget> _itemUsageNotifier = nullptr;
+    void _useItemOfInventory(TWeakInterfacePtr<IItem> item, int32 quantity, TWeakInterfacePtr<IInventory> inventory);
 
-     FDelegateHandle _itemUsageHandle{};
+    TWeakInterfacePtr<IInventoryContainerWidget> _itemUsageNotifier = nullptr;
 
-     UPROPERTY()
-     TObjectPtr<UItemUsageCommandFactory> _itemUsageCmdFactory = nullptr;
+    FDelegateHandle _itemUsageHandle{};
+
+    UPROPERTY()
+    TObjectPtr<UItemUsageCommandFactory> _itemUsageCmdFactory = nullptr;
 };

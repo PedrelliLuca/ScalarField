@@ -2,22 +2,22 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AbstractSkill.h"
+#include "CoreMinimal.h"
 
 #include "IceWallSkill.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Blueprintable)
 class SKILLSYSTEM_API UIceWallSkill : public UAbstractSkill {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	void ExecuteCast(TObjectPtr<AActor> caster) override;
+    void ExecuteCast(TObjectPtr<AActor> caster) override;
 
 #if DO_CHECK
-	void CheckParametersSanity() const override;
+    void CheckParametersSanity() const override;
 #endif
 };

@@ -9,15 +9,15 @@
 #include "BTTask_CancelSpell.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class AIBUILDINGBLOCKS_API UBTTask_CancelSpell : public UBTTaskNode {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	UBTTask_CancelSpell();
-	
+    UBTTask_CancelSpell();
+
 private:
-	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
+    EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
 };

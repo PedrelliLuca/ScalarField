@@ -14,33 +14,33 @@
  */
 UCLASS(Blueprintable)
 class SCALARFIELD_API AThermodynamicActor : public AActor {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	AThermodynamicActor();
+    AThermodynamicActor();
 
-	void SetTemperature(double temperature, bool updateInitialTemperature = false) { _thermodynamicC->SetTemperature(temperature, updateInitialTemperature); }
-	void SetHeatCapacity(double heatCapacity) { _thermodynamicC->SetHeatCapacity(heatCapacity); }
+    void SetTemperature(double temperature, bool updateInitialTemperature = false) { _thermodynamicC->SetTemperature(temperature, updateInitialTemperature); }
+    void SetHeatCapacity(double heatCapacity) { _thermodynamicC->SetHeatCapacity(heatCapacity); }
 
 protected:
-	void BeginPlay() override;
+    void BeginPlay() override;
 
 private:
-	void _setupThermodynamicCollisions();
-	void _updateMaterialBasedOnTemperature(double temperature);
+    void _setupThermodynamicCollisions();
+    void _updateMaterialBasedOnTemperature(double temperature);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UStaticMeshComponent> _staticMesh;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UStaticMeshComponent> _staticMesh;
 
-	UPROPERTY()
-	TObjectPtr<UPrimitiveComponent> _simpleThermalCollision = nullptr;
+    UPROPERTY()
+    TObjectPtr<UPrimitiveComponent> _simpleThermalCollision = nullptr;
 
-	UPROPERTY()
-	TObjectPtr<UPrimitiveComponent> _complexThermalCollision = nullptr;
+    UPROPERTY()
+    TObjectPtr<UPrimitiveComponent> _complexThermalCollision = nullptr;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UThermodynamicComponent> _thermodynamicC;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Thermodynamics", meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UThermodynamicComponent> _thermodynamicC;
 
-	UPROPERTY()
-	TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
+    UPROPERTY()
+    TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 };

@@ -2,26 +2,27 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "CoreMinimal.h"
 
 #include "MaterialsContainerComponent.generated.h"
 
 UENUM()
-enum class EMaterial : uint8 {
-	M_Carbon = 0    UMETA(DisplayName = "Carbon"),
-	M_Water = 1     UMETA(DisplayName = "Water"),
-	M_Dirt = 2      UMETA(DisplayName = "Dirt"),
+enum class EMaterial : uint8
+{
+    M_Carbon = 0 UMETA(DisplayName = "Carbon"),
+    M_Water = 1 UMETA(DisplayName = "Water"),
+    M_Dirt = 2 UMETA(DisplayName = "Dirt"),
 };
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MATERIALSYSTEM_API UMaterialsContainerComponent : public UActorComponent {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
-	bool HasMaterial(EMaterial material) const { return _materialsToQuantities.Contains(material); }
+public:
+    bool HasMaterial(EMaterial material) const { return _materialsToQuantities.Contains(material); }
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Materials")
-	TMap<EMaterial, double> _materialsToQuantities;
+    UPROPERTY(EditAnywhere, Category = "Materials")
+    TMap<EMaterial, double> _materialsToQuantities;
 };

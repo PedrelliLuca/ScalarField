@@ -10,24 +10,24 @@
 #include "BTTask_SetMovementTarget.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class SCALARFIELD_API UBTTask_SetMovementTarget : public UBTTask_BlackboardBase {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UBTTask_SetMovementTarget();
-	
-private:
-	EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
+    UBTTask_SetMovementTarget();
 
-	FString GetStaticDescription() const override;
+private:
+    EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
+
+    FString GetStaticDescription() const override;
 
 #if WITH_EDITOR
-	FName GetNodeIconName() const override;
+    FName GetNodeIconName() const override;
 #endif // WITH_EDITOR
 
-	UPROPERTY(EditAnywhere)
-	FMovementParameters _movementParameters;
+    UPROPERTY(EditAnywhere)
+    FMovementParameters _movementParameters;
 };

@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemInterface.h"
 #include "InventoryInterface.h"
+#include "ItemInterface.h"
 #include "PauseCommandInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
@@ -12,17 +12,17 @@
 
 UCLASS()
 class INVENTORYMANIPULATION_API UPickupSpawnCommand : public UObject, public IPauseCommand {
-     GENERATED_BODY()
+    GENERATED_BODY()
 
-     friend class UPickupSpawnCommandFactory;
-     
+    friend class UPickupSpawnCommandFactory;
+
 public:
-     void Execute() override;
+    void Execute() override;
 
 private:
-     TWeakInterfacePtr<IItem> _item = nullptr;
-     TWeakInterfacePtr<IInventory> _inventory = nullptr;
-     int32 _quantity = 0;
-     TFunction<FTransform()> _getPickupLocationCallback = nullptr;
-     TSubclassOf<AActor> _pickupClass = nullptr;
+    TWeakInterfacePtr<IItem> _item = nullptr;
+    TWeakInterfacePtr<IInventory> _inventory = nullptr;
+    int32 _quantity = 0;
+    TFunction<FTransform()> _getPickupLocationCallback = nullptr;
+    TSubclassOf<AActor> _pickupClass = nullptr;
 };

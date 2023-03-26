@@ -1,45 +1,42 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "WidgetsPresenterComponent.h"
 
 TWeakInterfacePtr<IPawnBindableWidget> UWidgetsPresenterComponent::GetHUDWidget() {
-	TWeakInterfacePtr<IPawnBindableWidget> asPawnBindable = Cast<IPawnBindableWidget>(_hudWidget);
-	check(asPawnBindable.IsValid());
-	return asPawnBindable;
+    TWeakInterfacePtr<IPawnBindableWidget> asPawnBindable = Cast<IPawnBindableWidget>(_hudWidget);
+    check(asPawnBindable.IsValid());
+    return asPawnBindable;
 }
 
 TWeakInterfacePtr<IInventoryContainerWidget> UWidgetsPresenterComponent::GetInventoryContainerWidget() {
-	TWeakInterfacePtr<IInventoryContainerWidget> asInventoryContainer = Cast<IInventoryContainerWidget>(_inventoryPresenterWidget);
-	check(asInventoryContainer.IsValid());
-	return asInventoryContainer;
+    TWeakInterfacePtr<IInventoryContainerWidget> asInventoryContainer = Cast<IInventoryContainerWidget>(_inventoryPresenterWidget);
+    check(asInventoryContainer.IsValid());
+    return asInventoryContainer;
 }
 
 void UWidgetsPresenterComponent::BeginPlay() {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-	const TWeakObjectPtr<APlayerController> playerC = Cast<APlayerController>(GetOwner());
-	check(playerC.IsValid());
-	
-	_createHUD(playerC);
-	_createInventoryPresenter(playerC);
+    const TWeakObjectPtr<APlayerController> playerC = Cast<APlayerController>(GetOwner());
+    check(playerC.IsValid());
+
+    _createHUD(playerC);
+    _createInventoryPresenter(playerC);
 }
 
 void UWidgetsPresenterComponent::_createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC) {
-	check(ownerPlayerC.IsValid());
-	check(IsValid(_hudWidgetClass));
+    check(ownerPlayerC.IsValid());
+    check(IsValid(_hudWidgetClass));
 
-	_hudWidget = CreateWidget<UHUDWidget>(ownerPlayerC.Get(), _hudWidgetClass);
-	_hudWidget->SetPawn(ownerPlayerC->GetPawn());
-	_hudWidget->BindCurrentPawn();
-	_hudWidget->AddToViewport();
+    _hudWidget = CreateWidget<UHUDWidget>(ownerPlayerC.Get(), _hudWidgetClass);
+    _hudWidget->SetPawn(ownerPlayerC->GetPawn());
+    _hudWidget->BindCurrentPawn();
+    _hudWidget->AddToViewport();
 }
 
 void UWidgetsPresenterComponent::_createInventoryPresenter(const TWeakObjectPtr<APlayerController>& ownerPlayerC) {
-	check(ownerPlayerC.IsValid());
-	check(IsValid(_inventoryPresenterWidgetClass));
-	
-	_inventoryPresenterWidget = CreateWidget<UInventoryPresenterWidget>(ownerPlayerC.Get(), _inventoryPresenterWidgetClass);
+    check(ownerPlayerC.IsValid());
+    check(IsValid(_inventoryPresenterWidgetClass));
+
+    _inventoryPresenterWidget = CreateWidget<UInventoryPresenterWidget>(ownerPlayerC.Get(), _inventoryPresenterWidgetClass);
 }
-
-

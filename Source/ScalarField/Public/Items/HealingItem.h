@@ -9,14 +9,14 @@
 
 UCLASS(Blueprintable)
 class SCALARFIELD_API UHealingItem : public UInventoryItem {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
-     UHealingItem();
-	
-     void Use(TWeakObjectPtr<AActor> actor) override;
+    UHealingItem();
+
+    void Use(TWeakObjectPtr<AActor> actor) override;
 
 protected:
-     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Healing")
-     double _healAmount;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Healing")
+    double _healAmount;
 };

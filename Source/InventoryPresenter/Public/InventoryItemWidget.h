@@ -15,27 +15,27 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemDiscarded, TWeakInterfacePtr<IItem>,
 
 UCLASS()
 class INVENTORYPRESENTER_API UInventoryItemWidget : public UUserWidget {
-     GENERATED_BODY()
-  
+    GENERATED_BODY()
+
 public:
-	void SetItem(TWeakInterfacePtr<IItem> item);
+    void SetItem(TWeakInterfacePtr<IItem> item);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void RefreshWidget();
+    UFUNCTION(BlueprintImplementableEvent)
+    void RefreshWidget();
 
-	UFUNCTION(BlueprintPure)
-	TScriptInterface<IItem> GetItem() const { return _item.GetObject(); }
+    UFUNCTION(BlueprintPure)
+    TScriptInterface<IItem> GetItem() const { return _item.GetObject(); }
 
-	FOnItemUsage& OnItemUsage() { return _onItemUsage; }
-	FOnItemDiscarded& OnItemDiscarded() { return _onItemDiscarded; }
-	
+    FOnItemUsage& OnItemUsage() { return _onItemUsage; }
+    FOnItemDiscarded& OnItemDiscarded() { return _onItemDiscarded; }
+
 protected:
-	FReply NativeOnMouseButtonDoubleClick(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
-	FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+    FReply NativeOnMouseButtonDoubleClick(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+    FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
 
-	TWeakInterfacePtr<IItem> _item = nullptr;
+    TWeakInterfacePtr<IItem> _item = nullptr;
 
 private:
-	FOnItemUsage _onItemUsage{};
-	FOnItemDiscarded _onItemDiscarded{};
+    FOnItemUsage _onItemUsage{};
+    FOnItemDiscarded _onItemDiscarded{};
 };

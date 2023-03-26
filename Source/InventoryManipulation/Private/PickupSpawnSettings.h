@@ -8,18 +8,18 @@
 #include "PickupSpawnSettings.generated.h"
 
 /*!
- * \brief Allows us to set up the properties of the pickups spawned by IPickupSpawners  
+ * \brief Allows us to set up the properties of the pickups spawned by IPickupSpawners
  */
 UCLASS(Config = "Pickups", DefaultConfig, meta = (DisplayName = "Pickup Spawn Settings"))
 class INVENTORYMANIPULATION_API UPickupSpawnSettings : public UDeveloperSettings {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UPickupSpawnSettings() { CategoryName = TEXT("Pickup Spawn Settings"); }
-	
-	TSubclassOf<AActor> GetPickupClass() const { return _pickupClass; }
+    UPickupSpawnSettings() { CategoryName = TEXT("Pickup Spawn Settings"); }
+
+    TSubclassOf<AActor> GetPickupClass() const { return _pickupClass; }
 
 private:
-	UPROPERTY(EditAnywhere, Config, Category = "Pickup", meta = (MustImplement = "Pickup"))
-	TSubclassOf<AActor> _pickupClass;
+    UPROPERTY(EditAnywhere, Config, Category = "Pickup", meta = (MustImplement = "Pickup"))
+    TSubclassOf<AActor> _pickupClass;
 };

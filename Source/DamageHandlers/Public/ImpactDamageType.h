@@ -8,10 +8,7 @@
 // TODO: move this to DamageHandlers once you'll make the UImpactDamageHandlerComponent
 UCLASS(MinimalAPI, const, Blueprintable, BlueprintType)
 class UImpactDamageType : public UDamageType {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
 };
-
-
-

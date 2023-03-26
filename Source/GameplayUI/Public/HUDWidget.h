@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "CoreMinimal.h"
 #include "PawnBindableWidgetInterface.h"
 
 #include "HUDWidget.generated.h"
@@ -13,68 +13,68 @@ class UManaComponent;
 class UThermodynamicComponent;
 
 /**
- * 
+ *
  */
 UCLASS(Blueprintable)
 class GAMEPLAYUI_API UHUDWidget : public UUserWidget, public IPawnBindableWidget {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	void SetPawn(TWeakObjectPtr<APawn> pawn);
-	void ForgetCurrentPawn() override;
-	void BindCurrentPawn() override;
-	void UnbindCurrentPawn() override;
-	void Show() override;
-	void Hide() override;
+    void SetPawn(TWeakObjectPtr<APawn> pawn);
+    void ForgetCurrentPawn() override;
+    void BindCurrentPawn() override;
+    void UnbindCurrentPawn() override;
+    void Show() override;
+    void Hide() override;
 
 protected:
-	UFUNCTION(BlueprintImplementableEvent)
-	void _setHealth();
-	UFUNCTION(BlueprintImplementableEvent)
-	void _setHealthRegen(double newHealthRegen);
+    UFUNCTION(BlueprintImplementableEvent)
+    void _setHealth();
+    UFUNCTION(BlueprintImplementableEvent)
+    void _setHealthRegen(double newHealthRegen);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void _setMana();
-	UFUNCTION(BlueprintImplementableEvent)
-	void _setManaRegen(double newManaRegen);
+    UFUNCTION(BlueprintImplementableEvent)
+    void _setMana();
+    UFUNCTION(BlueprintImplementableEvent)
+    void _setManaRegen(double newManaRegen);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void _setTemperature(double temperature, FLinearColor temperatureColor);
+    UFUNCTION(BlueprintImplementableEvent)
+    void _setTemperature(double temperature, FLinearColor temperatureColor);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void _setPauseStatus(bool bIsGamePaused);
-	
-	UPROPERTY(BlueprintReadOnly, Category = "Health")
-	double _currentHealth = 0.;
-	UPROPERTY(BlueprintReadOnly, Category = "Health")
-	double _maxHealth = 0.;
+    UFUNCTION(BlueprintImplementableEvent)
+    void _setPauseStatus(bool bIsGamePaused);
 
-	UPROPERTY(BlueprintReadOnly, Category = "Mana")
-	double _currentMana = 0.;
-	UPROPERTY(BlueprintReadOnly, Category = "Mana")
-	double _maxMana = 0.;
-	
+    UPROPERTY(BlueprintReadOnly, Category = "Health")
+    double _currentHealth = 0.;
+    UPROPERTY(BlueprintReadOnly, Category = "Health")
+    double _maxHealth = 0.;
+
+    UPROPERTY(BlueprintReadOnly, Category = "Mana")
+    double _currentMana = 0.;
+    UPROPERTY(BlueprintReadOnly, Category = "Mana")
+    double _maxMana = 0.;
+
 private:
-	void _setMaxHealth(double newMaxHealth);
-	void _setCurrentHealth(double newCurrentHealth);
+    void _setMaxHealth(double newMaxHealth);
+    void _setCurrentHealth(double newCurrentHealth);
 
-	void _setMaxMana(double newMaxMana);
-	void _setCurrentMana(double newCurrentMana);
-	
-	void _onTemperatureChange(double newTemperture);
+    void _setMaxMana(double newMaxMana);
+    void _setCurrentMana(double newCurrentMana);
 
-	void _onTacticalPauseToggle(bool bIsTacticalPauseOn, double);
+    void _onTemperatureChange(double newTemperture);
 
-	FDelegateHandle _healthChangedHandle;
-	FDelegateHandle _maxHealthChangedHandle;
-	FDelegateHandle _healthRegenChangedHandle;
-	FDelegateHandle _manaChangedHandle;
-	FDelegateHandle _maxManaChangedHandle;
-	FDelegateHandle _manaRegenChangedHandle;
-	FDelegateHandle _temperatureChangedHandle;
-	FDelegateHandle _pauseToggleHandle;
+    void _onTacticalPauseToggle(bool bIsTacticalPauseOn, double);
 
-	TWeakObjectPtr<UHealthComponent> _healthC = nullptr;
-	TWeakObjectPtr<UManaComponent> _manaC = nullptr;
-	TWeakObjectPtr<UThermodynamicComponent> _thermoC = nullptr;
+    FDelegateHandle _healthChangedHandle;
+    FDelegateHandle _maxHealthChangedHandle;
+    FDelegateHandle _healthRegenChangedHandle;
+    FDelegateHandle _manaChangedHandle;
+    FDelegateHandle _maxManaChangedHandle;
+    FDelegateHandle _manaRegenChangedHandle;
+    FDelegateHandle _temperatureChangedHandle;
+    FDelegateHandle _pauseToggleHandle;
+
+    TWeakObjectPtr<UHealthComponent> _healthC = nullptr;
+    TWeakObjectPtr<UManaComponent> _manaC = nullptr;
+    TWeakObjectPtr<UThermodynamicComponent> _thermoC = nullptr;
 };

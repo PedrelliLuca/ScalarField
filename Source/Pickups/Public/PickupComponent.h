@@ -17,8 +17,8 @@
  */
 UCLASS()
 class PICKUPS_API UPickupComponent : public UActorComponent {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
     UPickupComponent();
 

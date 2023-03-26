@@ -5,8 +5,9 @@
 #include "Faction.generated.h"
 
 UENUM(BlueprintType)
-enum class EFaction : uint8 {
-	Factionless UMETA(FisplayName = "Factionless"),
-	GoodGuys	UMETA(DisplayName = "Good Guys"),
-	BadGuys		UMETA(DisplayName = "Bad Guys")
+enum class EFaction : uint8
+{
+    Factionless UMETA(FisplayName = "Factionless"),
+    GoodGuys UMETA(DisplayName = "Good Guys"),
+    BadGuys UMETA(DisplayName = "Bad Guys")
 };
