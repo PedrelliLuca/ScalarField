@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "CoreMinimal.h"
 #include "InventoryInterface.h"
 #include "InventoryItem.h"
 
@@ -13,10 +13,10 @@
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class INVENTORYCORE_API UInventoryComponent : public UActorComponent, public IInventory {
     GENERATED_BODY()
-     
+
 public:
     UInventoryComponent();
-    
+
     UFUNCTION(BlueprintPure, Category = "Inventory")
     FORCEINLINE double GetWeightCapacity() const override { return _weightCapacity; }
 
@@ -25,12 +25,12 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "Inventory")
     double GetCurrentVolume() const override;
-    
+
     UFUNCTION(BlueprintPure, Category = "Inventory")
     FORCEINLINE double GetVolumeCapacity() const override { return _volumeCapacity; }
 
     TWeakObjectPtr<AActor> GetInventoryOwner() override { return GetOwner(); }
-    
+
     TArray<TWeakInterfacePtr<IItem>> GetItems() const override;
 
     /* Tries to add an existing item into the inventory. */
@@ -65,7 +65,7 @@ protected:
     // The maximum volume this inventory can hold. This can potentially be varied using backpacks, spells, ...
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory", meta = (ClampMin = 0.0))
     double _volumeCapacity;
-     
+
     // Where we store the items in this inventory
     UPROPERTY(VisibleAnywhere, Category = "Inventory")
     TArray<TObjectPtr<UInventoryItem>> _items;

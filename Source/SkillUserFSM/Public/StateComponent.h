@@ -14,8 +14,8 @@ DECLARE_MULTICAST_DELEGATE(FOnSkillExecutionEnd);
 
 UCLASS()
 class SKILLUSERFSM_API UStateComponent : public UActorComponent {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
     bool IsCurrentStateAffectedByPause() const;
 
@@ -37,7 +37,7 @@ private:
     bool _performStateTransitionRoutine(TObjectPtr<class USkillUserState> newState);
 
     UPROPERTY()
-	TObjectPtr<USkillUserState> _state = nullptr;
+    TObjectPtr<USkillUserState> _state = nullptr;
 
     TWeakObjectPtr<AController> _ownerController = nullptr;
 

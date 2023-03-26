@@ -8,9 +8,9 @@
 
 USTRUCT(Blueprintable)
 struct FFollowerActorSpawnerParameters : public FActorSpawnerParameters {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Spring Arm")
-	double Damping = 0.;
+    UPROPERTY(EditAnywhere, Category = "Spring Arm")
+    double Damping = 0.;
 };

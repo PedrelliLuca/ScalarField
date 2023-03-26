@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogAIControllers, Log, All);
 
 class FAIControllersModule : public IAIControllersModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

@@ -15,25 +15,25 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FOnTacticalPauseToggle, bool, double);
  */
 UCLASS()
 class TACTICALPAUSESYSTEM_API UTacticalPauseWorldSubsystem : public UWorldSubsystem {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	void OnWorldBeginPlay(UWorld& InWorld) override;
+    void OnWorldBeginPlay(UWorld& InWorld) override;
 
-	bool IsTacticalPauseOn() const { return _bIsTacticalPauseOn; }
-	void ToggleWorldTacticalPauseStatus();
-	
-	FOnTacticalPauseToggle& OnTacticalPauseToggle() { return _onTacticalPauseToggle; }
+    bool IsTacticalPauseOn() const { return _bIsTacticalPauseOn; }
+    void ToggleWorldTacticalPauseStatus();
 
-	void SetPauseOffCommand(TScriptInterface<IPauseCommand>&& pauseOffCommand);
-	
+    FOnTacticalPauseToggle& OnTacticalPauseToggle() { return _onTacticalPauseToggle; }
+
+    void SetPauseOffCommand(TScriptInterface<IPauseCommand>&& pauseOffCommand);
+
 private:
-	UPROPERTY()
-	TScriptInterface<IPauseCommand> _pauseOffCommand = nullptr;
-	
-	bool _bIsTacticalPauseOn = false;
+    UPROPERTY()
+    TScriptInterface<IPauseCommand> _pauseOffCommand = nullptr;
 
-	float _tacticalPauseTimeDilation = 0.;
+    bool _bIsTacticalPauseOn = false;
 
-	FOnTacticalPauseToggle _onTacticalPauseToggle;
+    float _tacticalPauseTimeDilation = 0.;
+
+    FOnTacticalPauseToggle _onTacticalPauseToggle;
 };

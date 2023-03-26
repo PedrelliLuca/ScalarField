@@ -2,24 +2,24 @@
 
 #pragma once
 
+#include "Blueprint/UserWidget.h"
 #include "CoreMinimal.h"
 #include "InteractableComponent.h"
-#include "Blueprint/UserWidget.h"
 
 #include "InteractionWidget.generated.h"
 
 UCLASS()
 class INTERACTIONSYSTEM_API UInteractionWidget : public UUserWidget {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
-     UFUNCTION(BlueprintCallable, Category = "Interaction")
-     void UpdateInteractionWidget(const UInteractableComponent* interactionComponent);
+    UFUNCTION(BlueprintCallable, Category = "Interaction")
+    void UpdateInteractionWidget(const UInteractableComponent* interactionComponent);
 
 protected:
-     UFUNCTION(BlueprintImplementableEvent)
-     void _onUpdateInteractionWidget();
+    UFUNCTION(BlueprintImplementableEvent)
+    void _onUpdateInteractionWidget();
 
-     UPROPERTY(BlueprintReadOnly, Category = "Interaction", meta = (ExposeOnSpawn))
-     TWeakObjectPtr<const UInteractableComponent> _owningInteractionComponent;
+    UPROPERTY(BlueprintReadOnly, Category = "Interaction", meta = (ExposeOnSpawn))
+    TWeakObjectPtr<const UInteractableComponent> _owningInteractionComponent;
 };

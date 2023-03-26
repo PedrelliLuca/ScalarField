@@ -10,21 +10,21 @@
 #include "ThermalPushSkill.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(Blueprintable)
 class SKILLSYSTEM_API UThermalPushSkill : public UAbstractSkill {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	void ExecuteCast(TObjectPtr<AActor> caster) override;
-	void Abort() override;
+    void ExecuteCast(TObjectPtr<AActor> caster) override;
+    void Abort() override;
 
 private:
-	void _cleanupCallback();
-	
-	FTimerHandle _timerHandle;
+    void _cleanupCallback();
 
-	TWeakObjectPtr<USpringArmComponent> _spawnSpringArm = nullptr;
-	TWeakObjectPtr<AActor> _spawnActor = nullptr;
+    FTimerHandle _timerHandle;
+
+    TWeakObjectPtr<USpringArmComponent> _spawnSpringArm = nullptr;
+    TWeakObjectPtr<AActor> _spawnActor = nullptr;
 };

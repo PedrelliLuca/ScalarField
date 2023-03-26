@@ -8,14 +8,14 @@
 
 USTRUCT(Blueprintable)
 struct MOVEMENTCOMMAND_API FRotationOnlyMovementParameters {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	/** \brief Angular velocity of the pawn in degrees per second. */
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
-	float DegreesPerSecond = 60.0f;
+    /** \brief Angular velocity of the pawn in degrees per second. */
+    UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
+    float DegreesPerSecond = 60.0f;
 
-	/** \brief How far from the target angle we consider the rotation to be complete. */
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
-	float AngularTolerance = 5.0f;
+    /** \brief How far from the target angle we consider the rotation to be complete. */
+    UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
+    float AngularTolerance = 5.0f;
 };

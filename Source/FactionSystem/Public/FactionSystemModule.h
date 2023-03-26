@@ -6,7 +6,7 @@
 #include "Modules/ModuleInterface.h"
 
 class FACTIONSYSTEM_API IFactionSystemModule : public IModuleInterface {
-    public:
-    //add the public interface of the module here if it is necessary
-    //nothing related to the implementation should be exposed 
+public:
+    // add the public interface of the module here if it is necessary
+    // nothing related to the implementation should be exposed
 };

@@ -10,26 +10,26 @@
 #include "EnvQueryTest_Relationship.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class AIBUILDINGBLOCKS_API UEnvQueryTest_Relationship : public UEnvQueryTest {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	UEnvQueryTest_Relationship(const FObjectInitializer& objectInitializer);
+    UEnvQueryTest_Relationship(const FObjectInitializer& objectInitializer);
 
 private:
-	void RunTest(FEnvQueryInstance& QueryInstance) const override;
+    void RunTest(FEnvQueryInstance& QueryInstance) const override;
 
-	FText GetDescriptionTitle() const override;
-	FText GetDescriptionDetails() const override;
+    FText GetDescriptionTitle() const override;
+    FText GetDescriptionDetails() const override;
 
-	/** testing mode */
-	UPROPERTY(EditDefaultsOnly, Category = "Relationship")
-	ERelationship _relationshipToSearchFor;
+    /** testing mode */
+    UPROPERTY(EditDefaultsOnly, Category = "Relationship")
+    ERelationship _relationshipToSearchFor;
 
-	/** context */
-	UPROPERTY(EditDefaultsOnly, Category = "Relationship")
-	TSubclassOf<UEnvQueryContext> _querier;
+    /** context */
+    UPROPERTY(EditDefaultsOnly, Category = "Relationship")
+    TSubclassOf<UEnvQueryContext> _querier;
 };

@@ -7,13 +7,9 @@
 #include "ScalarFieldGameMode.generated.h"
 
 UCLASS(minimalapi)
-class AScalarFieldGameMode : public AGameModeBase
-{
-	GENERATED_BODY()
+class AScalarFieldGameMode : public AGameModeBase {
+    GENERATED_BODY()
 
 public:
-	AScalarFieldGameMode();
+    AScalarFieldGameMode();
 };
-
-
-

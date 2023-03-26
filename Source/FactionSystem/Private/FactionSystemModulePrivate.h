@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogFactionSystem, Log, All);
 
 class FFactionSystemModule : public IFactionSystemModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

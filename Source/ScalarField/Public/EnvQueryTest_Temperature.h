@@ -7,36 +7,35 @@
 #include "EnvQueryTest_Temperature.generated.h"
 
 UENUM()
-namespace EEnvTestTemperature
+namespace EEnvTestTemperature {
+enum Type
 {
-	enum Type
-	{
-		Absolute,
-		Relative
-	};
+    Absolute,
+    Relative
+};
 }
 
 /**
- * 
+ *
  */
 UCLASS()
 class SCALARFIELD_API UEnvQueryTest_Temperature : public UEnvQueryTest {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	UEnvQueryTest_Temperature(const FObjectInitializer& objectInitializer);
+    UEnvQueryTest_Temperature(const FObjectInitializer& objectInitializer);
 
 private:
-	void RunTest(FEnvQueryInstance& QueryInstance) const override;
+    void RunTest(FEnvQueryInstance& QueryInstance) const override;
 
-	FText GetDescriptionTitle() const override;
-	FText GetDescriptionDetails() const override;
+    FText GetDescriptionTitle() const override;
+    FText GetDescriptionDetails() const override;
 
-	/** testing mode */
-	UPROPERTY(EditDefaultsOnly, Category=Temperature)
-	TEnumAsByte<EEnvTestTemperature::Type> _testMode;
+    /** testing mode */
+    UPROPERTY(EditDefaultsOnly, Category = Temperature)
+    TEnumAsByte<EEnvTestTemperature::Type> _testMode;
 
-	/** context */
-	UPROPERTY(EditDefaultsOnly, Category=Temperature)
-	TSubclassOf<UEnvQueryContext> _querier;
+    /** context */
+    UPROPERTY(EditDefaultsOnly, Category = Temperature)
+    TSubclassOf<UEnvQueryContext> _querier;
 };

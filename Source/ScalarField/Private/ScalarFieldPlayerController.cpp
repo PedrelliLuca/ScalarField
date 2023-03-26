@@ -7,168 +7,166 @@
 #include "SkillsContainerComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
 
-
-
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
-	bShowMouseCursor = true;
-	DefaultMouseCursor = EMouseCursor::Default;
+    bShowMouseCursor = true;
+    DefaultMouseCursor = EMouseCursor::Default;
 
-	_movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
-	_stateC = CreateDefaultSubobject<UStateComponent>(TEXT("State Component"));
-	_interactorC = CreateDefaultSubobject<UInteractorPlayerComponent>(TEXT("Interactor Component"));
-	_widgetsPresenterC = CreateDefaultSubobject<UWidgetsPresenterComponent>(TEXT("Widgets Presenter"));
+    _movementCommandC = CreateDefaultSubobject<UPlayerMovementCommandComponent>(TEXT("Movement Command Component"));
+    _stateC = CreateDefaultSubobject<UStateComponent>(TEXT("State Component"));
+    _interactorC = CreateDefaultSubobject<UInteractorPlayerComponent>(TEXT("Interactor Component"));
+    _widgetsPresenterC = CreateDefaultSubobject<UWidgetsPresenterComponent>(TEXT("Widgets Presenter"));
 }
 
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
-	Super::PlayerTick(deltaTime);
-	
-	// Generally speaking, the tick of the states should stop if the tactical pause is active. However, some states
-	// are special and are not affected by it.
-	if (!_bIsTacticalPauseOn || !_stateC->IsCurrentStateAffectedByPause()) {
-		_stateC->PerformTickBehavior(deltaTime);
-	}
+    Super::PlayerTick(deltaTime);
 
-	// Tick of movement commands never occurs during the tactical pause.
-	if (!_bIsTacticalPauseOn) {
-		_movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
-	}
+    // Generally speaking, the tick of the states should stop if the tactical pause is active. However, some states
+    // are special and are not affected by it.
+    if (!_bIsTacticalPauseOn || !_stateC->IsCurrentStateAffectedByPause()) {
+        _stateC->PerformTickBehavior(deltaTime);
+    }
+
+    // Tick of movement commands never occurs during the tactical pause.
+    if (!_bIsTacticalPauseOn) {
+        _movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
+    }
 }
 
 void AScalarFieldPlayerController::SetupInputComponent() {
-	// set up gameplay key bindings
-	Super::SetupInputComponent();
+    // set up gameplay key bindings
+    Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &AScalarFieldPlayerController::_onSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &AScalarFieldPlayerController::_onSetDestinationReleased);
+    InputComponent->BindAction("SetDestination", IE_Pressed, this, &AScalarFieldPlayerController::_onSetDestinationPressed);
+    InputComponent->BindAction("SetDestination", IE_Released, this, &AScalarFieldPlayerController::_onSetDestinationReleased);
 
-	InputComponent->BindAction("Skill1Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill1Cast);
-	InputComponent->BindAction("Skill2Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill2Cast);
-	InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
-	InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
-	InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
-	InputComponent->BindAction("AbortCast", IE_Pressed, _stateC.Get(), &UStateComponent::PerformAbortBehavior);
-	InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
+    InputComponent->BindAction("Skill1Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill1Cast);
+    InputComponent->BindAction("Skill2Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill2Cast);
+    InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
+    InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
+    InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
+    InputComponent->BindAction("AbortCast", IE_Pressed, _stateC.Get(), &UStateComponent::PerformAbortBehavior);
+    InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
-	InputComponent->BindAction("Interact", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInteractionBehavior);
+    InputComponent->BindAction("Interact", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInteractionBehavior);
 
-	InputComponent->BindAction("ToggleInventory", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInventoryToggleBehavior);
+    InputComponent->BindAction("ToggleInventory", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInventoryToggleBehavior);
 
-	InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
+    InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
 
 void AScalarFieldPlayerController::BeginPlay() {
-	Super::BeginPlay();
-	
-	const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
-	pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
-	_bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
+    Super::BeginPlay();
 
-	const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
-	inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
-	inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
+    const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
+    pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
+    _bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
 
-	// const auto pickupSubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UPickupSubsystem>();
-	// pickupSubsys->RegisterItemDropper(_widgetsPresenterC->GetInventoryPresenterWidget()->GetInventoryWidget().Get());
+    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+    inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
+    inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
+
+    // const auto pickupSubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UPickupSubsystem>();
+    // pickupSubsys->RegisterItemDropper(_widgetsPresenterC->GetInventoryPresenterWidget()->GetInventoryWidget().Get());
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
-	_movementCommandC->GetMovementCommand()->OnStopMovement(this);
+    _movementCommandC->GetMovementCommand()->OnStopMovement(this);
 }
 
 void AScalarFieldPlayerController::_onSetDestinationReleased() {
-	_movementCommandC->GetMovementCommand()->OnSetDestination(this);
+    _movementCommandC->GetMovementCommand()->OnSetDestination(this);
 }
 
 void AScalarFieldPlayerController::_onSetTargetPressed() {
-	FHitResult hit;
-	GetHitResultUnderCursor(ECC_Visibility, true, hit);
-	_stateC->PerformTargetingBehavior(hit.GetActor());
+    FHitResult hit;
+    GetHitResultUnderCursor(ECC_Visibility, true, hit);
+    _stateC->PerformTargetingBehavior(hit.GetActor());
 }
 
 void AScalarFieldPlayerController::_onSkill1Cast() {
-	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-	check(IsValid(skillsContainer));
+    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+    check(IsValid(skillsContainer));
 
-	constexpr uint32 skillKey = 1;
-	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-	if (!IsValid(skill)) {
-		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
-		return;
-	}
+    constexpr uint32 skillKey = 1;
+    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+    if (!IsValid(skill)) {
+        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+        return;
+    }
 
-	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill2Cast() {
-	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-	check(IsValid(skillsContainer));
+    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+    check(IsValid(skillsContainer));
 
-	constexpr uint32 skillKey = 2;
-	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-	if (!IsValid(skill)) {
-		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
-		return;
-	}
+    constexpr uint32 skillKey = 2;
+    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+    if (!IsValid(skill)) {
+        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+        return;
+    }
 
-	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill3Cast() {
-	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-	check(IsValid(skillsContainer));
+    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+    check(IsValid(skillsContainer));
 
-	constexpr uint32 skillKey = 3;
-	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-	if (!IsValid(skill)) {
-		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
-		return;
-	}
+    constexpr uint32 skillKey = 3;
+    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+    if (!IsValid(skill)) {
+        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+        return;
+    }
 
-	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill4Cast() {
-	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-	check(IsValid(skillsContainer));
+    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+    check(IsValid(skillsContainer));
 
-	constexpr uint32 skillKey = 4;
-	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-	if (!IsValid(skill)) {
-		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
-		return;
-	}
+    constexpr uint32 skillKey = 4;
+    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+    if (!IsValid(skill)) {
+        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+        return;
+    }
 
-	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill5Cast() {
-	const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-	check(IsValid(skillsContainer));
+    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+    check(IsValid(skillsContainer));
 
-	constexpr uint32 skillKey = 5;
-	auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-	if (!IsValid(skill)) {
-		UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{ __FUNCTION__ });
-		return;
-	}
+    constexpr uint32 skillKey = 5;
+    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+    if (!IsValid(skill)) {
+        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+        return;
+    }
 
-	_stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onTacticalPauseToggled() {
-	GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->ToggleWorldTacticalPauseStatus();
+    GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->ToggleWorldTacticalPauseStatus();
 }
 
 void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTacticalPauseOn, const double currentWorldTimeDilation) {
-	/* Here we're literally overriding whatever the UTacticalPauseWorldSubsystem just did. 
-	 * The PlayerController must never, ever, have its time dilation close to zero, since
-	 * that would cause the player to not be able to send any kind of input. */
-	CustomTimeDilation = 1. / currentWorldTimeDilation;
+    /* Here we're literally overriding whatever the UTacticalPauseWorldSubsystem just did.
+     * The PlayerController must never, ever, have its time dilation close to zero, since
+     * that would cause the player to not be able to send any kind of input. */
+    CustomTimeDilation = 1. / currentWorldTimeDilation;
 
-	_bIsTacticalPauseOn = bIsTacticalPauseOn;
+    _bIsTacticalPauseOn = bIsTacticalPauseOn;
 }
 
 constexpr uint32 AScalarFieldPlayerController::_getSkillIdxFromKey(const uint32 key) {
-	// keys [1, 2, ..., 9, 0] => indices [0, 1, ..., 8, 9]
-	return key != 0 ? key - 1 : KEY_ASSIGNABLE_SKILLS - 1;
+    // keys [1, 2, ..., 9, 0] => indices [0, 1, ..., 8, 9]
+    return key != 0 ? key - 1 : KEY_ASSIGNABLE_SKILLS - 1;
 }

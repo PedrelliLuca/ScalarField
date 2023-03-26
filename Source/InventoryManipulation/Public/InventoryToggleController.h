@@ -13,22 +13,22 @@ DECLARE_MULTICAST_DELEGATE(FOnInventoryClosedFromUI);
 
 UCLASS()
 class INVENTORYMANIPULATION_API UInventoryToggleController : public UObject {
-     GENERATED_BODY()
-     
-public:
-     void SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryPresenter);
-     void SetHUDToShowOnClose(TWeakInterfacePtr<IPawnBindableWidget>&& widgetOnClose);
-     
-     void OpenInventoryOfActor(TWeakObjectPtr<AActor>&& actor);
-     void CloseInventory();
+    GENERATED_BODY()
 
-     FOnInventoryClosedFromUI& OnInventoryClosedFromUI() { return _onInventoryClosedFromUI; }
+public:
+    void SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryPresenter);
+    void SetHUDToShowOnClose(TWeakInterfacePtr<IPawnBindableWidget>&& widgetOnClose);
+
+    void OpenInventoryOfActor(TWeakObjectPtr<AActor>&& actor);
+    void CloseInventory();
+
+    FOnInventoryClosedFromUI& OnInventoryClosedFromUI() { return _onInventoryClosedFromUI; }
 
 private:
-     void _inventoryWidgetClosedCallback();
-     
-     TWeakInterfacePtr<IInventoryContainerWidget> _inventoryContainer = nullptr;
-     TWeakInterfacePtr<IPawnBindableWidget> _hudToShowOnClose = nullptr;
+    void _inventoryWidgetClosedCallback();
 
-     FOnInventoryClosedFromUI _onInventoryClosedFromUI{};
+    TWeakInterfacePtr<IInventoryContainerWidget> _inventoryContainer = nullptr;
+    TWeakInterfacePtr<IPawnBindableWidget> _hudToShowOnClose = nullptr;
+
+    FOnInventoryClosedFromUI _onInventoryClosedFromUI{};
 };

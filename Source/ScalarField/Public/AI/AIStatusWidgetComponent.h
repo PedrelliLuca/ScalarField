@@ -10,20 +10,20 @@
 #include "AIStatusWidgetComponent.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class SCALARFIELD_API UAIStatusWidgetComponent : public UWidgetComponent {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
-	UAIStatusWidgetComponent();
+    UAIStatusWidgetComponent();
 
 protected:
-	void BeginPlay() override;
+    void BeginPlay() override;
 
 private:
-	void _bindTemperatureComponent(UAIStatusWidget* statusWidget) const;
-	void _bindHealthComponent(UAIStatusWidget* statusWidget) const;
-	void _bindManaComponent(UAIStatusWidget* statusWidget) const;
+    void _bindTemperatureComponent(UAIStatusWidget* statusWidget) const;
+    void _bindHealthComponent(UAIStatusWidget* statusWidget) const;
+    void _bindManaComponent(UAIStatusWidget* statusWidget) const;
 };

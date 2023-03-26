@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemInterface.h"
 #include "InventoryInterface.h"
+#include "ItemInterface.h"
 #include "PauseCommandInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
@@ -12,15 +12,15 @@
 
 UCLASS()
 class INVENTORYMANIPULATION_API UItemUsageCommand : public UObject, public IPauseCommand {
-     GENERATED_BODY()
+    GENERATED_BODY()
 
-     friend class UItemUsageCommandFactory;
-     
+    friend class UItemUsageCommandFactory;
+
 public:
-     void Execute() override;
+    void Execute() override;
 
 private:
-     TWeakInterfacePtr<IItem> _item = nullptr;
-     TWeakInterfacePtr<IInventory> _inventory = nullptr;
-     int32 _quantity = 0;
+    TWeakInterfacePtr<IItem> _item = nullptr;
+    TWeakInterfacePtr<IInventory> _inventory = nullptr;
+    int32 _quantity = 0;
 };

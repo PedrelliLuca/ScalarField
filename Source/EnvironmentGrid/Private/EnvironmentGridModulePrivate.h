@@ -5,9 +5,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogEnvironmentGrid, Log, All);
 
-class FEnvironmentGridModule : public IEnvironmentGridModule
-{
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
+class FEnvironmentGridModule : public IEnvironmentGridModule {
+    /** IModuleInterface implementation */
+    virtual void StartupModule() override;
+    virtual void ShutdownModule() override;
 };

@@ -6,13 +6,13 @@
 
 UINTERFACE(MinimalAPI)
 class UImpactDamageHandler : public UInterface {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 /* Interface representing an inventory. */
 class IImpactDamageHandler {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void HandleImpact(const FVector& velocity, double damage, AActor* damageCauser) = 0;
+    virtual void HandleImpact(const FVector& velocity, double damage, AActor* damageCauser) = 0;
 };

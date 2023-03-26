@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogAIBuildingBlocks, Log, All);
 
 class FAIBuildingBlocksModule : public IAIBuildingBlocksModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

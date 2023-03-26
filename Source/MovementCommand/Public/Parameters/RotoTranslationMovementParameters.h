@@ -8,12 +8,12 @@
 
 USTRUCT(Blueprintable)
 struct MOVEMENTCOMMAND_API FRotoTranslationMovementParameters {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
-	float AcceptanceRadius = 150.0f;
+    UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f))
+    float AcceptanceRadius = 150.0f;
 
-	UPROPERTY(EditAnywhere)
-	bool AllowPartialPath = true;
+    UPROPERTY(EditAnywhere)
+    bool AllowPartialPath = true;
 };

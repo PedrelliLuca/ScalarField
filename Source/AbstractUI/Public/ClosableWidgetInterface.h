@@ -8,16 +8,16 @@ DECLARE_MULTICAST_DELEGATE(FOnCloseFromUI);
 
 UINTERFACE(MinimalAPI, NotBlueprintable)
 class UClosableWidget : public UInterface {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 /* Interface for widgets that can be closed by using some UI element, like a button. */
 class IClosableWidget {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	FOnCloseFromUI& OnCloseFromUI() { return _onCloseFromUI; }
-	
+    FOnCloseFromUI& OnCloseFromUI() { return _onCloseFromUI; }
+
 private:
-	FOnCloseFromUI _onCloseFromUI{};
+    FOnCloseFromUI _onCloseFromUI{};
 };

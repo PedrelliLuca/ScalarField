@@ -7,13 +7,11 @@ DEFINE_LOG_CATEGORY(LogInventoryCore);
 
 IMPLEMENT_MODULE(FInventoryCoreModule, InventoryCore);
 
-void FInventoryCoreModule::StartupModule()
-{
+void FInventoryCoreModule::StartupModule() {
     // This code will execute after your module is loaded into memory (but after global variables are initialized, of course.)
 }
 
-void FInventoryCoreModule::ShutdownModule()
-{
+void FInventoryCoreModule::ShutdownModule() {
     // This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
     // we call this function before unloading the module.
 }

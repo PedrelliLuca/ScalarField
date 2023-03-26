@@ -13,13 +13,13 @@
  */
 UCLASS(Blueprintable)
 class SCALARFIELD_API AAirMolecule : public AThermodynamicActor {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	AAirMolecule();
-	void SetThermalCapsuleDimensions(const double radius, const double halfHeight);
+    AAirMolecule();
+    void SetThermalCapsuleDimensions(const double radius, const double halfHeight);
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Mesh")
-	TObjectPtr<UCapsuleComponent> _capsuleThermalCollision;
+    UPROPERTY(VisibleAnywhere, Category = "Mesh")
+    TObjectPtr<UCapsuleComponent> _capsuleThermalCollision;
 };

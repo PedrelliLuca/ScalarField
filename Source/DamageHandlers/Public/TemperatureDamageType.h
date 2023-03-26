@@ -7,10 +7,7 @@
 
 UCLASS(MinimalAPI, const, Blueprintable, BlueprintType)
 class UTemperatureDamageType : public UDamageType {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
 };
-
-
-

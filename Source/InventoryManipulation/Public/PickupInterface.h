@@ -6,12 +6,12 @@
 
 UINTERFACE(MinimalAPI, NotBlueprintable)
 class UPickup : public UInterface {
-	GENERATED_BODY()
+    GENERATED_BODY()
 };
 
 class IPickup {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	virtual void InitializePickup(TSubclassOf<UObject> itemClass, int32 quantity) = 0;
+    virtual void InitializePickup(TSubclassOf<UObject> itemClass, int32 quantity) = 0;
 };

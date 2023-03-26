@@ -11,27 +11,27 @@
 
 UCLASS()
 class INVENTORYMANIPULATION_API UPickupSpawnController : public UObject {
-     GENERATED_BODY()
-     
+    GENERATED_BODY()
+
 public:
-     UPickupSpawnController();
-     
-     void SetItemDropNotifier(TWeakInterfacePtr<IInventoryContainerWidget> itemDropNotifier);
-     void SetPickupSpawnCallback(TFunction<FTransform()>&& pickupSpawnCallback);
-     void BindPickupSpawn();
-     void UnbindPickupSpawn();
+    UPickupSpawnController();
+
+    void SetItemDropNotifier(TWeakInterfacePtr<IInventoryContainerWidget> itemDropNotifier);
+    void SetPickupSpawnCallback(TFunction<FTransform()>&& pickupSpawnCallback);
+    void BindPickupSpawn();
+    void UnbindPickupSpawn();
 
 private:
-     void _spawnPickup(TWeakInterfacePtr<IItem> item, int32 quantity, TWeakInterfacePtr<IInventory> inventory);
+    void _spawnPickup(TWeakInterfacePtr<IItem> item, int32 quantity, TWeakInterfacePtr<IInventory> inventory);
 
-     TSubclassOf<AActor> _pickupClass = nullptr;
-     
-     TWeakInterfacePtr<IInventoryContainerWidget> _itemDropNotifier = nullptr;
+    TSubclassOf<AActor> _pickupClass = nullptr;
 
-     FDelegateHandle _itemDropHandle{};
+    TWeakInterfacePtr<IInventoryContainerWidget> _itemDropNotifier = nullptr;
 
-     TFunction<FTransform()> _getPickupSpawnLocation;
+    FDelegateHandle _itemDropHandle{};
 
-     UPROPERTY()
-     TObjectPtr<UPickupSpawnCommandFactory> _pickupSpawnCmdFactory = nullptr;
+    TFunction<FTransform()> _getPickupSpawnLocation;
+
+    UPROPERTY()
+    TObjectPtr<UPickupSpawnCommandFactory> _pickupSpawnCmdFactory = nullptr;
 };

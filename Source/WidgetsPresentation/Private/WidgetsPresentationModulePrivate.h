@@ -5,9 +5,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogWidgetsPresentation, Log, All);
 
-class FWidgetsPresentationModule : public IWidgetsPresentationModule
-{
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+class FWidgetsPresentationModule : public IWidgetsPresentationModule {
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

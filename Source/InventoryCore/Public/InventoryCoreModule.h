@@ -5,9 +5,8 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleInterface.h"
 
-class INVENTORYCORE_API IInventoryCoreModule : public IModuleInterface
-{
-    public:
-    //add the public interface of the module here if it is necessary
-    //nothing related to the implementation should be exposed 
+class INVENTORYCORE_API IInventoryCoreModule : public IModuleInterface {
+public:
+    // add the public interface of the module here if it is necessary
+    // nothing related to the implementation should be exposed
 };

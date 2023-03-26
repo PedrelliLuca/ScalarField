@@ -3,31 +3,30 @@
 #pragma once
 
 #include "AbstractSkill.h"
-#include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "CoreMinimal.h"
 
 #include "SkillsContainerComponent.generated.h"
 
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SKILLSYSTEM_API USkillsContainerComponent : public UActorComponent {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
-	USkillsContainerComponent();
+public:
+    // Sets default values for this component's properties
+    USkillsContainerComponent();
 
-	TObjectPtr<UAbstractSkill> GetSkillAtIndex(uint32 index) const;
+    TObjectPtr<UAbstractSkill> GetSkillAtIndex(uint32 index) const;
 
-	TObjectPtr<UAbstractSkill> FindSkillByClass(TSubclassOf<UAbstractSkill> skillClass) const;
+    TObjectPtr<UAbstractSkill> FindSkillByClass(TSubclassOf<UAbstractSkill> skillClass) const;
 
 protected:
-	virtual void BeginPlay() override;
+    virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Skills")
-	TArray<TSubclassOf<UAbstractSkill>> _skillsClasses;
+    UPROPERTY(EditAnywhere, Category = "Skills")
+    TArray<TSubclassOf<UAbstractSkill>> _skillsClasses;
 
-	UPROPERTY()
-	TArray<TObjectPtr<UAbstractSkill>> _skills;
+    UPROPERTY()
+    TArray<TObjectPtr<UAbstractSkill>> _skills;
 };
