@@ -5,7 +5,7 @@
 void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
     const auto& coldConeSpawner = _getFollowerActorSpawners()[0];
 
-    _spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Globe SpringArm"));
+    _spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Cone of Cold SpringArm"));
     _spawnSpringArm->bDoCollisionTest = false;
     _spawnSpringArm->SetupAttachment(caster->GetRootComponent());
 
