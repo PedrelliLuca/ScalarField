@@ -25,7 +25,9 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
                     "SkillSystem",
-                    "SkillUserFSM"
+                    "SkillUserFSM",
+					"DamageHandlers",
+					"Thermodynamics"
                 }
 				);
 
