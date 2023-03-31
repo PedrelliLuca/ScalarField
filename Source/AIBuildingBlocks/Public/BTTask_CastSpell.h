@@ -13,7 +13,7 @@
  *
  */
 UCLASS()
-class SCALARFIELD_API UBTTask_CastSpell : public UBTTaskNode {
+class AIBUILDINGBLOCKS_API UBTTask_CastSpell : public UBTTaskNode {
     GENERATED_BODY()
 
 public:
