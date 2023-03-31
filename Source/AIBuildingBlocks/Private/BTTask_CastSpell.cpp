@@ -36,6 +36,11 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
         return EBTNodeResult::Failed;
     }
 
+    if (skill->RequiresTarget()) {
+        UE_LOG(LogTemp, Error, TEXT("%s(): Selected skill does not require a target. Employ \"Cast Spell on Target\" node."), *FString{__FUNCTION__});
+        return EBTNodeResult::Failed;
+    }
+
     // The spell execution can fail, for example:
     // - In case the skill is on cooldown
     // - In case the skill is already being executed
@@ -44,6 +49,10 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
 }
 
 FString UBTTask_CastSpell::GetStaticDescription() const {
-    const auto skillName = _skillToCast->GetClass()->GetName();
-    return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *skillName);
+    FString skillDesc{"invalid"};
+    if (IsValid(_skillToCast)) {
+        skillDesc = _skillToCast->GetClass()->GetName();
+    }
+
+    return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *skillDesc);
 }
