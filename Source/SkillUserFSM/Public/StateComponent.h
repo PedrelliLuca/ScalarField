@@ -19,7 +19,19 @@ class SKILLUSERFSM_API UStateComponent : public UActorComponent {
 public:
     bool IsCurrentStateAffectedByPause() const;
 
-    void PerformTargetingBehavior(TObjectPtr<AActor> target);
+    /**
+     * \brief Sets a target for the skill currently in execution. If the target is valid, the execution of the skills continues and true is returned. If the
+     * target is invalid or no skill is in execution, false is returned and the current state is kept.
+     */
+    bool PerformTargetingBehavior(TObjectPtr<AActor> target);
+
+    /**
+     * \brief Starts the execution of the skill in input. Returns true if the execution can start, false otherwise. Execution start can fail in many cases. For
+     * example:
+     * - In case the skill is on cooldown
+     * - In case the skill is already being executed
+     * - In case the current state does not allow the execution of skills
+     */
     bool PerformSkillExecutionBehavior(TObjectPtr<UAbstractSkill> skill);
     void PerformInteractionBehavior();
     void PerformInventoryToggleBehavior();
@@ -33,7 +45,10 @@ protected:
     void BeginPlay() override;
 
 private:
-    // Performs the transition to newState if the state in input is not nullptr
+    /**
+     * \brief Performs a transition to newState. If newState is nullptr, it means that we should keep the current state, and no transition is performed.
+     * Returns true if the transition has been performed successfully (newState != nullptr), false otherwise.
+     */
     bool _performStateTransitionRoutine(TObjectPtr<class USkillUserState> newState);
 
     UPROPERTY()
