@@ -75,7 +75,7 @@ TObjectPtr<USkillUserState> UChannelingState::OnAbort(const TObjectPtr<AControll
 
 void UChannelingState::OnEnter(const TObjectPtr<AController> controller) {
     const auto skill = GetSkillInExecution();
-    check(IsValid(skill) && skill->RequiresChanneling() && skill->GetChannelingManaCost() > 0.);
+    check(IsValid(skill) && skill->RequiresChanneling());
     UE_LOG(LogTemp, Warning, TEXT("Channeling..."));
 
     // Movement command update

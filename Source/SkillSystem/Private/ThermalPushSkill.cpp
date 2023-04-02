@@ -8,9 +8,14 @@
 void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
     const auto& thermalWindSpawner = _getFollowerActorSpawners().Last();
 
-    const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(caster.Get(), TEXT("Skill SpringArm"));
+    auto target = caster;
+    if (RequiresTarget()) {
+        target = _getActorTargets().Last().Target.Get();
+    }
+
+    const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(target.Get(), TEXT("Skill SpringArm"));
     spawnSpringArm->bDoCollisionTest = false;
-    spawnSpringArm->SetupAttachment(caster->GetRootComponent());
+    spawnSpringArm->SetupAttachment(target->GetRootComponent());
 
     // The point where we have to spawn the globe relative to the target, it's also the point where the 2nd end of the arm lies
     const auto windLocation = thermalWindSpawner.Transform.GetLocation();
@@ -28,10 +33,18 @@ void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
     // Actor deferred spawn to set the caster >>>>>>>>>>
     const auto socketTransform = spawnSpringArm->GetSocketTransform(spawnSpringArm->SocketName, ERelativeTransformSpace::RTS_World);
     const auto spawnActor = GetWorld()->SpawnActorDeferred<AActor>(thermalWindSpawner.ActorClass, socketTransform);
+
+    // A simple cast like the following will return null if the interface is implemented in BP instead of C++. This is because the C++ side has no idea the
+    // actor implements the interface in such cases, as explained here https://forums.unrealengine.com/t/c-interface-implemented-in-bp-is-null/491758.
+    // Why may I want the implementation on the BP side?
+    // Some skill-spawned actors, like the Fire Globe, don't require any custom logic: you just want them to implement the interface so that it's selectable
+    // from the dropdown menu of FActorSpawnerParameters::ActorClass. For cases like these, the BP-side implementation is perfect, and I don't care about
+    // calling the interface-specific functions, bceause there is no important logic these skill-spawned entities have to execute.
     const TWeakInterfacePtr<ISkillSpawnedEntity> skillSpawnedEntity = Cast<ISkillSpawnedEntity>(spawnActor);
-    // This should be granted by the UPROPERTY on FActorSpawnerParameters::ActorClass
-    check(skillSpawnedEntity.IsValid());
-    skillSpawnedEntity->SetCaster(caster);
+    if (skillSpawnedEntity.IsValid()) {
+        skillSpawnedEntity->SetCaster(caster);
+    }
+
     spawnActor->FinishSpawning(socketTransform);
     // <<<<<<<<<<
 

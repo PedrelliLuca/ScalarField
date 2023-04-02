@@ -9,7 +9,7 @@ class USkillSpawnedEntity : public UInterface {
     GENERATED_BODY()
 };
 
-/* Interface representing an inventory. */
+/* Interface representing some entity spawned by a spell caster using some skill. */
 class ISkillSpawnedEntity {
     GENERATED_BODY()
 
