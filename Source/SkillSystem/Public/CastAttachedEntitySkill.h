@@ -7,13 +7,13 @@
 #include "AbstractSkill.h"
 #include "GameFramework/SpringArmComponent.h"
 
-#include "ThermalPushSkill.generated.h"
+#include "CastAttachedEntitySkill.generated.h"
 
 /**
  *
  */
 UCLASS(Blueprintable)
-class SKILLSYSTEM_API UThermalPushSkill : public UAbstractSkill {
+class SKILLSYSTEM_API UCastAttachedEntitySkill : public UAbstractSkill {
     GENERATED_BODY()
 
 public:

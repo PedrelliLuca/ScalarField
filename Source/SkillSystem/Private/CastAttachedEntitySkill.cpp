@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ThermalPushSkill.h"
+#include "CastAttachedEntitySkill.h"
 
 #include "SkillSpawnedEntityInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
-void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
+void UCastAttachedEntitySkill::ExecuteCast(TObjectPtr<AActor> caster) {
     const auto& thermalWindSpawner = _getFollowerActorSpawners().Last();
 
     auto target = caster;
@@ -54,12 +54,12 @@ void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
     _startCooldown();
 }
 
-void UThermalPushSkill::Abort() {
+void UCastAttachedEntitySkill::Abort() {
     Super::Abort();
     _cleanupCallback();
 }
 
-void UThermalPushSkill::_cleanupCallback() {
+void UCastAttachedEntitySkill::_cleanupCallback() {
     GetWorld()->GetTimerManager().ClearTimer(_timerHandle);
 
     if (_spawnActor.IsValid()) {
