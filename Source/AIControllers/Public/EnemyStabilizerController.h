@@ -11,6 +11,8 @@
 #include "FactionComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "StateComponent.h"
+#include "ThermodynamicComponent.h"
+#include "TemperatureDamageHandlerComponent.h"
 
 #include "EnemyStabilizerController.generated.h"
 
@@ -63,6 +65,9 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
     FName _bbTargetRecentlyChangedKeyName = "TargetRecentlyChanged";
 
+    UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
+    FName _bbIAmColdKeyName = "IAmCold";
+
     /** \brief For how long we'll consider as recent a change in the BB key who signals a change of the target */
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Blackboard")
     float _targetRecentlyChangedTimer = 0.1f;
@@ -73,4 +78,6 @@ private:
     // The controlled Pawn has ownership of these
     TWeakObjectPtr<UFactionComponent> _pawnFactionC = nullptr;
     TWeakObjectPtr<UPatrolComponent> _patrolC = nullptr;
+    TWeakObjectPtr<UThermodynamicComponent> _thermodynamicC = nullptr;
+    TWeakObjectPtr<UTemperatureDamageHandlerComponent> _tempDmgHandlerC = nullptr;
 };

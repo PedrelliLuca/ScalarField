@@ -20,17 +20,21 @@ void AEnemyStabilizerController::Tick(float deltaTime) {
     _stateC->PerformTickBehavior(deltaTime);
     _movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
 
-    // Did we reach our current patrol objective?
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
+        const auto blackBoard = GetBlackboardComponent();
+
+        // Did we reach our current patrol objective?
         const auto pawnLocation = GetPawn()->GetActorLocation();
-        if (pawnLocation.Equals(_patrolC->GetCurrentPatrolObjective(), _patrolC->GetPatrolObjectiveTolerance())) {
+        if (_patrolC.IsValid() && pawnLocation.Equals(_patrolC->GetCurrentPatrolObjective(), _patrolC->GetPatrolObjectiveTolerance())) {
             _patrolC->UpdatePatrolObjective();
 
-            const auto blackBoard = GetBlackboardComponent();
             blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolC->GetCurrentPatrolObjective());
         }
-    }
 
+        if (_thermodynamicC.IsValid() && _tempDmgHandlerC.IsValid()) {
+            blackBoard->SetValueAsBool(_bbIAmColdKeyName, _thermodynamicC->GetTemperature() < _tempDmgHandlerC->GetMinComfortTemperature());
+        }
+    }
 }
 
 void AEnemyStabilizerController::BeginPlay() {
@@ -54,6 +58,16 @@ void AEnemyStabilizerController::BeginPlay() {
             blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolC->GetCurrentPatrolObjective());
         } else {
             UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Patrol Component"), *FString{__FUNCTION__});
+        }
+
+        _thermodynamicC = pawn->FindComponentByClass<UThermodynamicComponent>();
+        if (!_thermodynamicC.IsValid()) {
+            UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Thermodynamic Component"), *FString{__FUNCTION__});
+        }
+
+        _tempDmgHandlerC = pawn->FindComponentByClass<UTemperatureDamageHandlerComponent>();
+        if (!_tempDmgHandlerC.IsValid()) {
+            UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Temperature Damage Handler Component"), *FString{__FUNCTION__});
         }
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s(): Controlled Pawn is unset"), *FString{__FUNCTION__});
