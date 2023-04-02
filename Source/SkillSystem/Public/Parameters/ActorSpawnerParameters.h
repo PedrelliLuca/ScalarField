@@ -9,7 +9,7 @@ struct FActorSpawnerParameters {
     GENERATED_BODY()
 
 public:
-    UPROPERTY(EditAnywhere, Category = "Actor", meta = (MustImplement = "CastEntity"))
+    UPROPERTY(EditAnywhere, Category = "Actor", meta = (MustImplement = "SkillSpawnedEntity"))
     TSubclassOf<AActor> ActorClass = nullptr;
 
     UPROPERTY(EditAnywhere, Category = "Actor")

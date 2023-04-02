@@ -2,7 +2,7 @@
 
 #include "ThermalPushSkill.h"
 
-#include "CastEntityInterface.h"
+#include "SkillSpawnedEntityInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
 void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
@@ -40,7 +40,7 @@ void UThermalPushSkill::ExecuteCast(TObjectPtr<AActor> caster) {
     // Some skill-spawned actors, like the Fire Globe, don't require any custom logic: you just want them to implement the interface so that it's selectable
     // from the dropdown menu of FActorSpawnerParameters::ActorClass. For cases like these, the BP-side implementation is perfect, and I don't care about
     // calling the interface-specific functions, bceause there is no important logic these skill-spawned entities have to execute.
-    const TWeakInterfacePtr<ICastEntity> skillSpawnedEntity = Cast<ICastEntity>(spawnActor);
+    const TWeakInterfacePtr<ISkillSpawnedEntity> skillSpawnedEntity = Cast<ISkillSpawnedEntity>(spawnActor);
     if (skillSpawnedEntity.IsValid()) {
         skillSpawnedEntity->SetCaster(caster);
     }

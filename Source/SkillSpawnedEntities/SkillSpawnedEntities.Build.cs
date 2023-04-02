@@ -14,8 +14,7 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
-					"DamageDealers",
-					"SkillSystem"
+					"DamageDealers"
 				}
 				);
 

@@ -8,12 +8,12 @@
 #include "ImpactOneHitDamageDealerComponent.h"
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "CastEntityInterface.h"
+#include "SkillSpawnedEntityInterface.h"
 
 #include "ThermalWind.generated.h"
 
 UCLASS()
-class SKILLSPAWNEDENTITIES_API AThermalWind : public AActor, public ICastEntity {
+class SKILLSPAWNEDENTITIES_API AThermalWind : public AActor, public ISkillSpawnedEntity {
     GENERATED_BODY()
 
 public:
