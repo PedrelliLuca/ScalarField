@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include "SkillSpawnedEntityInterface.generated.h"
+#include "CastEntityInterface.generated.h"
 
 UINTERFACE(MinimalAPI)
-class USkillSpawnedEntity : public UInterface {
+class UCastEntity : public UInterface {
     GENERATED_BODY()
 };
 
 /* Interface representing some entity spawned by a spell caster using some skill. */
-class ISkillSpawnedEntity {
+class ICastEntity {
     GENERATED_BODY()
 
 public:
