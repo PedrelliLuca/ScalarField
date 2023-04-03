@@ -18,6 +18,7 @@ namespace UnrealBuildTool.Rules
 					"FactionSystem",
 					"GameplayTasks",
 					"MovementCommand",
+					"GameplayAttributes"
                 }
 				);
 

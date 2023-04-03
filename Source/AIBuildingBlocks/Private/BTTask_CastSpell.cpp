@@ -4,6 +4,7 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
 #include "StateComponent.h"
 
@@ -41,11 +42,15 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
         return EBTNodeResult::Failed;
     }
 
-    // The spell execution can fail, for example:
-    // - In case the skill is on cooldown
-    // - In case the skill is already being executed
-    // - In case the current state does not allow the execution of skills
-    return stateC->PerformSkillExecutionBehavior(MoveTemp(skill)) ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
+    if (!_needsManaAvailabilityToCast || _isManaAvailableForSkill(aiController, skill)) {
+        // The spell execution can fail, for example:
+        // - In case the skill is on cooldown
+        // - In case the skill is already being executed
+        // - In case the current state does not allow the execution of skills
+        return stateC->PerformSkillExecutionBehavior(MoveTemp(skill)) ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
+    }
+
+    return EBTNodeResult::Failed;
 }
 
 FString UBTTask_CastSpell::GetStaticDescription() const {
@@ -55,4 +60,14 @@ FString UBTTask_CastSpell::GetStaticDescription() const {
     }
 
     return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *skillDesc);
+}
+
+bool UBTTask_CastSpell::_isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill) {
+    if (const auto pawn = aiController->GetPawn(); IsValid(pawn)) {
+        if (const auto manaC = pawn->FindComponentByClass<UManaComponent>(); IsValid(manaC)) {
+            return manaC->GetCurrentMana() >= skill->GetCastManaCost() + skill->GetChannelingManaCost();
+        }
+    }
+
+    return false;
 }

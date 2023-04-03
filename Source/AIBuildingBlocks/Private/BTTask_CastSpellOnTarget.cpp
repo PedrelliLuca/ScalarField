@@ -5,6 +5,7 @@
 #include "AIController.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "ManaComponent.h"
 #include "SkillsContainerComponent.h"
 
 UBTTask_CastSpellOnTarget::UBTTask_CastSpellOnTarget() {
@@ -56,6 +57,16 @@ EBTNodeResult::Type UBTTask_CastSpellOnTarget::_determineCastSuccessWithoutTarge
     return stateC->PerformSkillExecutionBehavior(skill) ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
 }
 
+bool UBTTask_CastSpellOnTarget::_isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill) {
+    if (const auto pawn = aiController->GetPawn(); IsValid(pawn)) {
+        if (const auto manaC = pawn->FindComponentByClass<UManaComponent>(); IsValid(manaC)) {
+            return manaC->GetCurrentMana() >= skill->GetCastManaCost() + skill->GetChannelingManaCost();
+        }
+    }
+
+    return false;
+}
+
 EBTNodeResult::Type UBTTask_CastSpellOnTarget::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
     if (!IsValid(_skillToCast)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): Skill to cast hasn't been selected"), *FString{__FUNCTION__});
@@ -86,33 +97,35 @@ EBTNodeResult::Type UBTTask_CastSpellOnTarget::ExecuteTask(UBehaviorTreeComponen
         return EBTNodeResult::Failed;
     }
 
-    // Target selected, start execution!
-    const auto isExecutionStarted = stateC->PerformSkillExecutionBehavior(skill);
-    if (!isExecutionStarted) {
-        // The excution start can fail for many valid reason (e.g. in case the skill is on cooldown), don't throw errors from here!
-        return EBTNodeResult::Failed;
+    if (!_needsManaAvailabilityToCast || _isManaAvailableForSkill(aiController, skill)) {
+        const auto isExecutionStarted = stateC->PerformSkillExecutionBehavior(skill);
+        if (!isExecutionStarted) {
+            // The excution start can fail for many valid reason (e.g. in case the skill is on cooldown), don't throw errors from here!
+            return EBTNodeResult::Failed;
+        }
+
+        // Execution has started, let's see if the targeting operation is successful.
+        const auto keyValue = ownerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
+        const auto targetActor = Cast<AActor>(keyValue);
+        const auto isTargetingSuccessful = stateC->PerformTargetingBehavior(targetActor);
+
+        if (isTargetingSuccessful) {
+            return EBTNodeResult::Succeeded;
+        }
+
+        // The targeting operation returned false. This means that either:
+        // A) The BT logic is passing an invalid target (which is an AI design mistake)
+        // B) The target was fine per se, but the skills requires more than one of them, so the targeting phase must continue.
+        //
+        // At the moment, there isn't a single skill I made that requires multiple targets, so we should always get here because of A). A) is an AI design
+        // mistake: we must signal it, then abort the skill execution and revert to idle state. In the future, when B) will happen, we'll have to distinguish it
+        // from A) somehow (enum?). B) is not a design error: this node will have to handle multiple BlackboardKeys and call PerformTargetingBehavior() for each
+        // one of them.
+
+        UE_LOG(LogTemp, Error, TEXT("%s(): Skill targeting failed, invalid target in input! Check the skill requirements and the BT."), *FString{__FUNCTION__});
+        stateC->PerformAbortBehavior();
     }
 
-    // Execution has started, let's see if the targeting operation is successful.
-    const auto keyValue = ownerComp.GetBlackboardComponent()->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
-    const auto targetActor = Cast<AActor>(keyValue);
-    const auto isTargetingSuccessful = stateC->PerformTargetingBehavior(targetActor);
-
-    if (isTargetingSuccessful) {
-        return EBTNodeResult::Succeeded;
-    }
-
-    // The targeting operation returned false. This means that either:
-    // A) The BT logic is passing an invalid target (which is an AI design mistake)
-    // B) The target was fine per se, but the skills requires more than one of them, so the targeting phase must continue.
-    //
-    // At the moment, there isn't a single skill I made that requires multiple targets, so we should always get here because of A). A) is an AI design mistake:
-    // we must signal it, then abort the skill execution and revert to idle state.
-    // In the future, when B) will happen, we'll have to distinguish it from A) somehow (enum?). B) is not a design error: this node will have to handle
-    // multiple BlackboardKeys and call PerformTargetingBehavior() for each one of them.
-
-    UE_LOG(LogTemp, Error, TEXT("%s(): Skill targeting failed, invalid target in input! Check the skill requirements and the BT."), *FString{__FUNCTION__});
-    stateC->PerformAbortBehavior();
     return EBTNodeResult::Failed;
 }
 
