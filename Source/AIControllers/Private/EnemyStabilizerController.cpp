@@ -2,6 +2,7 @@
 
 #include "EnemyStabilizerController.h"
 
+#include "Algo/AnyOf.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 AEnemyStabilizerController::AEnemyStabilizerController() {
@@ -34,6 +35,15 @@ void AEnemyStabilizerController::Tick(float deltaTime) {
         if (_thermodynamicC.IsValid() && _tempDmgHandlerC.IsValid()) {
             blackBoard->SetValueAsBool(_bbIAmColdKeyName, _thermodynamicC->GetTemperature() < _tempDmgHandlerC->GetMinComfortTemperature());
         }
+
+        // This is quite bad performance-wise, I should find another way
+        if (_castInfluencerActor != nullptr) {
+            TArray<AActor*> pawnAttachedActors;
+            pawn->GetAttachedActors(pawnAttachedActors);
+            const auto foundInfluencerActor = Algo::AnyOf(pawnAttachedActors,
+                [castInfluencerActor = _castInfluencerActor](AActor* const attachedActor) { return attachedActor->IsA(castInfluencerActor); });
+            blackBoard->SetValueAsBool(_bbIsTargetAttachedToActor, foundInfluencerActor);
+        }
     }
 }
 
@@ -42,6 +52,10 @@ void AEnemyStabilizerController::BeginPlay() {
 
     if (!IsValid(_behaviorTree)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): missing Behavior Tree Class"), *FString{__FUNCTION__});
+        return;
+    }
+
+    if (!ensureMsgf(IsValid(_castInfluencerActor), TEXT("%s(): missing cast-influencing actor, this stabilizer won't cast"), *FString{__FUNCTION__})) {
         return;
     }
 

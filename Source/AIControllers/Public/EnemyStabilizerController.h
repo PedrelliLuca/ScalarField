@@ -68,6 +68,13 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
     FName _bbIAmColdKeyName = "IAmCold";
 
+    UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
+    FName _bbIsTargetAttachedToActor = "IsTargetAttachedToActor";
+
+    /** \brief The attachment of the controlled pawn to this actor determines whether casting is possible or not. */
+    UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Behavior-Influencing Properties")
+    TSubclassOf<AActor> _castInfluencerActor = nullptr;
+
     /** \brief For how long we'll consider as recent a change in the BB key who signals a change of the target */
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Blackboard")
     float _targetRecentlyChangedTimer = 0.1f;
