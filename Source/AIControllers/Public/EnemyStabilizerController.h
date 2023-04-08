@@ -36,6 +36,8 @@ private:
 
     EBlackboardNotificationResult _onTargetAllyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
 
+    void _checkTargetAllyForAttachment();
+
     void _onSkillExecutionBegin();
     void _onSkillExecutionEnd();
 
@@ -71,9 +73,12 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
     FName _bbIsTargetAttachedToActor = "IsTargetAttachedToActor";
 
-    /** \brief The attachment of the controlled pawn to this actor determines whether casting is possible or not. */
+    /** \brief The attachment of the controlled pawn to this actor determines whether we can set the actor as target of our spell or not. */
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Behavior-Influencing Properties")
     TSubclassOf<AActor> _castInfluencerActor = nullptr;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Behavior-Influencing Properties")
+    float _timeBetweenInfluencerChecks = 1.0f;
 
     /** \brief For how long we'll consider as recent a change in the BB key who signals a change of the target */
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Blackboard")
@@ -81,7 +86,9 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Behavior Tree")
     TObjectPtr<UBehaviorTree> _behaviorTree;
-
+    
+    float _timeSinceInfluencerCheck = 0.0f;
+    
     // The controlled Pawn has ownership of these
     TWeakObjectPtr<UFactionComponent> _pawnFactionC = nullptr;
     TWeakObjectPtr<UPatrolComponent> _patrolC = nullptr;

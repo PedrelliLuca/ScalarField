@@ -11,7 +11,19 @@ AEnemyStabilizerController::AEnemyStabilizerController() {
     _perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 }
 
-void AEnemyStabilizerController::Tick(float deltaTime) {
+void AEnemyStabilizerController::_checkTargetAllyForAttachment() {
+    const auto blackBoard = GetBlackboardComponent();
+    if (const auto targetAlly = Cast<AActor>(blackBoard->GetValueAsObject(_bbTargetAllyKeyName)); IsValid(targetAlly)) {
+        TArray<AActor*> pawnAttachedActors;
+        targetAlly->GetAttachedActors(pawnAttachedActors);
+        
+        const auto foundInfluencerActor = Algo::AnyOf(
+            pawnAttachedActors, [castInfluencerActor = _castInfluencerActor](AActor* const attachedActor) { return attachedActor->IsA(castInfluencerActor); });
+        blackBoard->SetValueAsBool(_bbIsTargetAttachedToActor, foundInfluencerActor);
+    }
+}
+
+void AEnemyStabilizerController::Tick(const float deltaTime) {
     Super::Tick(deltaTime);
 
     if (!_patrolC.IsValid()) {
@@ -35,14 +47,14 @@ void AEnemyStabilizerController::Tick(float deltaTime) {
         if (_thermodynamicC.IsValid() && _tempDmgHandlerC.IsValid()) {
             blackBoard->SetValueAsBool(_bbIAmColdKeyName, _thermodynamicC->GetTemperature() < _tempDmgHandlerC->GetMinComfortTemperature());
         }
+    }
 
-        // This is quite bad performance-wise, I should find another way
-        if (_castInfluencerActor != nullptr) {
-            TArray<AActor*> pawnAttachedActors;
-            pawn->GetAttachedActors(pawnAttachedActors);
-            const auto foundInfluencerActor = Algo::AnyOf(pawnAttachedActors,
-                [castInfluencerActor = _castInfluencerActor](AActor* const attachedActor) { return attachedActor->IsA(castInfluencerActor); });
-            blackBoard->SetValueAsBool(_bbIsTargetAttachedToActor, foundInfluencerActor);
+    if (_castInfluencerActor != nullptr) {
+        _timeSinceInfluencerCheck += deltaTime;
+
+        if (_timeSinceInfluencerCheck > _timeBetweenInfluencerChecks) {
+            _checkTargetAllyForAttachment();
+            _timeSinceInfluencerCheck = 0.0f;
         }
     }
 }
@@ -113,6 +125,8 @@ EBlackboardNotificationResult AEnemyStabilizerController::_onTargetAllyChange(co
     // I might be pushing my luck here...
     auto& nonConstBB = const_cast<UBlackboardComponent&>(blackboard);
     nonConstBB.SetValueAsBool(_bbTargetRecentlyChangedKeyName, true);
+
+    _checkTargetAllyForAttachment();
 
     FTimerHandle handle;
     GetWorldTimerManager().SetTimer(
