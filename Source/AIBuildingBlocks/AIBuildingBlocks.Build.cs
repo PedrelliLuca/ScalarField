@@ -18,6 +18,7 @@ namespace UnrealBuildTool.Rules
 					"FactionSystem",
 					"GameplayTasks",
 					"MovementCommand",
+					"GameplayAttributes"
                 }
 				);
 
@@ -25,7 +26,9 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
                     "SkillSystem",
-                    "SkillUserFSM"
+                    "SkillUserFSM",
+					"DamageHandlers",
+					"Thermodynamics"
                 }
 				);
 

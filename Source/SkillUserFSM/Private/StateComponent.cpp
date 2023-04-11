@@ -11,13 +11,17 @@ bool UStateComponent::IsCurrentStateAffectedByPause() const {
     return _state->IsTickAffectedByPause();
 }
 
-void UStateComponent::PerformTargetingBehavior(TObjectPtr<AActor> target) {
+bool UStateComponent::PerformTargetingBehavior(TObjectPtr<AActor> target) {
     auto newState = _state->OnTargeting(MoveTemp(target), _ownerController.Get());
-    _performStateTransitionRoutine(MoveTemp(newState));
+
+    // If OnTargeting() doesn't produce a new state, it means that the targeting failed.
+    return _performStateTransitionRoutine(MoveTemp(newState));
 }
 
 bool UStateComponent::PerformSkillExecutionBehavior(TObjectPtr<UAbstractSkill> skill) {
     auto newState = _state->OnBeginSkillExecution(MoveTemp(skill), _ownerController.Get());
+
+    // If OnBeginSkillExecution() doesn't produce a new state, it means that the skill execution cannot start.
     return _performStateTransitionRoutine(MoveTemp(newState));
 }
 
