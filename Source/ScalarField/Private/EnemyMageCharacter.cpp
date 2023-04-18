@@ -8,6 +8,8 @@
 #include "EnvironmentCell.h"
 #include "EnvironmentGridWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "InventoryManipulationSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 #include "TemperatureDamageType.h"
 
 AEnemyMageCharacter::AEnemyMageCharacter() {
@@ -89,6 +91,10 @@ void AEnemyMageCharacter::BeginPlay() {
 
     _dmiSetup();
     _setOverlappingCells();
+
+    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+    check(IsValid(inventorySubsys));
+    inventorySubsys->SetupDeathDropForActor(this);
 }
 
 void AEnemyMageCharacter::_setupThermodynamicCollisions() {
