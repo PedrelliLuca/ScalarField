@@ -48,5 +48,5 @@ void UInventoryManipulationSubsystem::CloseInventory() {
 }
 
 void UInventoryManipulationSubsystem::SetupDeathDropForActor(TObjectPtr<AActor> actor) {
-    _pickupSpawnController->BindInventoryDropForActor(MoveTemp(actor));
+    _pickupSpawnController->BindPickupsDropAtDeath(MoveTemp(actor));
 }

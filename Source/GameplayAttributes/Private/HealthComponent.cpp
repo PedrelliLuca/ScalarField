@@ -30,6 +30,9 @@ void UHealthComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyCha
 void UHealthComponent::SetCurrentHealth(const double health) {
     _currentHealth = FMath::Clamp(health, 0., _maxHealth);
     _onHealthChanged.Broadcast(_currentHealth);
+    if (FMath::IsNearlyZero(_currentHealth)) {
+        _onDeath.Broadcast();
+    }
 }
 
 void UHealthComponent::SetMaxHealth(double maxHealth, const bool bUpdateHealth /*= true*/) {
