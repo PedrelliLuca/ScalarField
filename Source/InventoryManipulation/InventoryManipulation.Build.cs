@@ -16,8 +16,9 @@ namespace UnrealBuildTool.Rules
 					"Engine",
 					"AbstractUI", 
 					"TacticalPauseSystem",
-				}
-				);
+                    "GameplayAttributes",
+                }
+                );
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]

@@ -42,6 +42,23 @@ void UPickupSpawnController::UnbindPickupSpawn() {
     _itemDropHandle.Reset();
 }
 
+void UPickupSpawnController::BindPickupsDropAtDeath(const TObjectPtr<AActor> actor) {
+    const auto healthC = actor->FindComponentByClass<UHealthComponent>();
+    if (!ensureMsgf(IsValid(healthC), TEXT("%s(): Can't bind death pickup drop for actor, no UHealthComponent"), *FString{__FUNCTION__})) {
+        return;
+    }
+
+    const TWeakInterfacePtr inventoryC = actor->FindComponentByInterface<IInventory>();
+    if (!ensureMsgf(inventoryC.IsValid(), TEXT("%s(): Can't bind death pickup drop for actor, no IInventory"), *FString{__FUNCTION__})) {
+        return;
+    }
+
+    auto handle = healthC->OnDeath().AddUObject(this, &UPickupSpawnController::_dropPickupsOnDeath);
+
+    auto deathDropParams = FDeathDropParams{healthC, inventoryC, handle };
+    _actorToDeathDropParams.Emplace(actor, MoveTemp(deathDropParams));
+}
+
 void UPickupSpawnController::_spawnPickup(TWeakInterfacePtr<IItem> item, const int32 quantity, TWeakInterfacePtr<IInventory> inventory) {
     check(item.IsValid() && inventory.IsValid());
     const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
@@ -67,4 +84,25 @@ void UPickupSpawnController::_spawnPickup(TWeakInterfacePtr<IItem> item, const i
     _pickupSpawnCmdFactory->SetCommandInventory(MoveTemp(inventory));
     _pickupSpawnCmdFactory->SetCommandQuantity(quantity);
     pauseSubsys->SetPauseOffCommand(_pickupSpawnCmdFactory->CreateCommand());
+}
+
+void UPickupSpawnController::_dropPickupsOnDeath(const TObjectPtr<AActor> deadActor) {
+    check(IsValid(deadActor));
+    const auto& deathDropParams = _actorToDeathDropParams.FindChecked(deadActor);
+
+    const auto& inventory = deathDropParams.InventoryToDrop;
+    for (const auto& item : inventory->GetItems()) {
+        auto transform = deadActor->GetActorTransform();
+
+        if (const auto deadCharacter = Cast<ACharacter>(deadActor)) {
+            auto location = deadCharacter->GetActorLocation();
+            location.Z -= character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+            transform.SetLocation(MoveTemp(location));
+        }
+
+        return transform;
+    }
+
+    deathDropParams.DeadHealthC->OnDeath().Remove(deathDropParams.OnDeathHandle);
+    _actorToDeathDropParams.Remove(deadActor);
 }

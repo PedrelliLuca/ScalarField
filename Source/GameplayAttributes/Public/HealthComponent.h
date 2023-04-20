@@ -9,7 +9,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, double);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChanged, double);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthRegenChanged, double);
-DECLARE_MULTICAST_DELEGATE(FOnDeath);
+DECLARE_MULTICAST_DELEGATE(FOnDeath, TObjectPtr<AActor>);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class GAMEPLAYATTRIBUTES_API UHealthComponent : public UActorComponent {
