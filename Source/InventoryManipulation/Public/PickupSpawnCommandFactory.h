@@ -20,7 +20,7 @@ public:
     void SetCommandItem(TWeakInterfacePtr<IItem> item);
     void SetCommandInventory(TWeakInterfacePtr<IInventory> inventory);
     void SetCommandQuantity(int32 quantity);
-    void SetPickupLocationCallback(TFunction<FTransform()> pickupLocationCallback);
+    void SetPickupSpawnLocationCallback(TFunction<FTransform()> pickupLocationCallback);
     void SetPickupClass(TSubclassOf<AActor> pickupClass);
 
 private:

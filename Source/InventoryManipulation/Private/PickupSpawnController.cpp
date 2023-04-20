@@ -25,10 +25,15 @@ void UPickupSpawnController::SetItemDropNotifier(TWeakInterfacePtr<IInventoryCon
     _itemDropNotifier = MoveTemp(itemDropNotifier);
 }
 
-void UPickupSpawnController::SetPickupSpawnCallback(TFunction<FTransform()>&& pickupSpawnCallback) {
-    pickupSpawnCallback.CheckCallable();
-    _getPickupSpawnLocation = MoveTemp(pickupSpawnCallback);
-    _pickupSpawnCmdFactory->SetPickupLocationCallback(_getPickupSpawnLocation);
+void UPickupSpawnController::SetPickupTransformCallbackForUIDrop(TFunction<FTransform()>&& pickupTransformCallback) {
+    pickupTransformCallback.CheckCallable();
+    _getPickupTransformUICallback = MoveTemp(pickupTransformCallback);
+    _pickupSpawnCmdFactory->SetPickupSpawnLocationCallback(_getPickupTransformUICallback);
+}
+
+void UPickupSpawnController::SetPickupTransformCallbackForDeathDrop(TFunction<FTransform(TObjectPtr<AActor>)>&& pickupTransformCallback) {
+    pickupTransformCallback.CheckCallable();
+    _getPickupTransformDeathCallback = MoveTemp(pickupTransformCallback);
 }
 
 void UPickupSpawnController::BindPickupSpawn() {
@@ -69,7 +74,7 @@ void UPickupSpawnController::_spawnPickup(TWeakInterfacePtr<IItem> item, const i
         spawnParams.bNoFail = true;
         spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-        const FTransform spawnTransform = _getPickupSpawnLocation();
+        const FTransform spawnTransform = _getPickupTransformUICallback();
 
         check(IsValid(_pickupClass));
 
@@ -91,18 +96,26 @@ void UPickupSpawnController::_dropPickupsOnDeath(const TObjectPtr<AActor> deadAc
     const auto& deathDropParams = _actorToDeathDropParams.FindChecked(deadActor);
 
     const auto& inventory = deathDropParams.InventoryToDrop;
+
+    // Drop every single item in the inventory.
     for (const auto& item : inventory->GetItems()) {
-        auto transform = deadActor->GetActorTransform();
+        const int32 droppedQuantity = inventory->ConsumeItem(item.Get(), item->GetQuantity());
 
-        if (const auto deadCharacter = Cast<ACharacter>(deadActor)) {
-            auto location = deadCharacter->GetActorLocation();
-            location.Z -= character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-            transform.SetLocation(MoveTemp(location));
-        }
+        FActorSpawnParameters spawnParams{};
+        spawnParams.bNoFail = true;
+        spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-        return transform;
+        const FTransform spawnTransform = _getPickupTransformDeathCallback(deadActor);
+
+        check(IsValid(_pickupClass));
+
+        const TWeakInterfacePtr<IPickup> pickup = GetWorld()->SpawnActor<AActor>(_pickupClass, spawnTransform, spawnParams);
+        check(pickup.IsValid());
+
+        pickup->InitializePickup(item.GetObject()->GetClass(), droppedQuantity);
     }
 
+    // Cache cleanup.
     deathDropParams.DeadHealthC->OnDeath().Remove(deathDropParams.OnDeathHandle);
     _actorToDeathDropParams.Remove(deadActor);
 }

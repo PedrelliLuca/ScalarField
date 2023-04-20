@@ -19,7 +19,12 @@ public:
     UPickupSpawnController();
 
     void SetItemDropNotifier(TWeakInterfacePtr<IInventoryContainerWidget> itemDropNotifier);
-    void SetPickupSpawnCallback(TFunction<FTransform()>&& pickupSpawnCallback);
+
+    /** \brief The reason we have this is so that the widget doesn't have to send _spawnPickup informations on the actor owning the inventory. */
+    void SetPickupTransformCallbackForUIDrop(TFunction<FTransform()>&& pickupTransformCallback);
+
+    void SetPickupTransformCallbackForDeathDrop(TFunction<FTransform(TObjectPtr<AActor>)>&& pickupTransformCallback);
+
     void BindPickupSpawn();
     void UnbindPickupSpawn();
 
@@ -38,7 +43,8 @@ private:
 
     FDelegateHandle _itemDropHandle{};
 
-    TFunction<FTransform()> _getPickupSpawnLocation;
+    TFunction<FTransform()> _getPickupTransformUICallback;
+    TFunction<FTransform(TObjectPtr<AActor>)> _getPickupTransformDeathCallback;
 
     UPROPERTY()
     TObjectPtr<UPickupSpawnCommandFactory> _pickupSpawnCmdFactory = nullptr;
