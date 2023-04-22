@@ -18,7 +18,6 @@ enum class EItemRarity : uint8
     IR_Legendary UMETA(DisplayName = "Legendary"),
 };
 
-// EditInlineNew? DefaultToInstanced?
 UCLASS(Blueprintable, EditInlineNew, DefaultToInstanced)
 class INVENTORYCORE_API UInventoryItem : public UObject, public IItem {
     GENERATED_BODY()

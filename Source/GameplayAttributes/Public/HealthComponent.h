@@ -9,6 +9,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, double);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChanged, double);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthRegenChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeath, TObjectPtr<AActor>);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class GAMEPLAYATTRIBUTES_API UHealthComponent : public UActorComponent {
@@ -39,6 +40,7 @@ public:
     FOnHealthChanged& OnHealthChanged() { return _onHealthChanged; }
     FOnMaxHealthChanged& OnMaxHealthChanged() { return _onMaxHealthChanged; }
     FOnHealthRegenChanged& OnHealthRegenChanged() { return _onHealthRegenChanged; }
+    FOnDeath& OnDeath() { return _onDeath; }
 
 protected:
     void BeginPlay() override;
@@ -57,4 +59,5 @@ private:
     FOnHealthChanged _onHealthChanged;
     FOnMaxHealthChanged _onMaxHealthChanged;
     FOnHealthRegenChanged _onHealthRegenChanged;
+    FOnDeath _onDeath;
 };

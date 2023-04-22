@@ -52,8 +52,8 @@ FItemAddResult UInventoryComponent::TryAddItem(TWeakInterfacePtr<IItem> item) {
     have a stack of health potions and a stack of mana potions, resulting in 2 stacks of potions. */
 
     if (item->IsStackable()) {
-        /* Do we already have a stack of this item in our inventory ? In this case we may need to modify the quantity to add
-        based on how much we already have on the existing stack */
+        /* Do we already have a stack of this item in our inventory ? In this case we may need to modify the quantity to add based on how much we already have
+         * on the existing stack */
         const auto existingItem = FindItemByClass(item.GetObject()->GetClass());
         if (existingItem.IsValid() && existingItem->GetMaxQuantity() == existingItem->GetQuantity()) {
             return FItemAddResult::AddedNone(amountToAdd,
@@ -199,6 +199,16 @@ TArray<TWeakObjectPtr<UInventoryItem>> UInventoryComponent::FindItemsByClass(con
     Algo::Transform(itemsOfClass, outItems, [](const TObjectPtr<UInventoryItem>& item) { return TWeakObjectPtr<UInventoryItem>(item); });
 
     return outItems;
+}
+
+void UInventoryComponent::BeginPlay() {
+    Super::BeginPlay();
+
+    for (const auto startingItem : _startingItems) {
+        [[maybe_unused]] const auto itemAddResult = TryAddItem(startingItem);
+        ensureAlwaysMsgf(
+            itemAddResult.Result == EItemAddResult::IAR_AllItemsAdded, TEXT("Couldn't add all starting items: %s"), *itemAddResult.ErrorText.ToString());
+    }
 }
 
 TObjectPtr<UInventoryItem> UInventoryComponent::_addItem(const TWeakInterfacePtr<IItem> item) {

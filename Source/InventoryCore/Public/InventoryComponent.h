@@ -58,6 +58,8 @@ public:
     TArray<TWeakObjectPtr<UInventoryItem>> FindItemsByClass(TSubclassOf<UInventoryItem> itemClass);
 
 protected:
+    void BeginPlay() override;
+
     // The maximum weight this inventory can hold. This can potentially be varied using backpacks, spells, ...
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory")
     double _weightCapacity;
@@ -69,6 +71,10 @@ protected:
     // Where we store the items in this inventory
     UPROPERTY(VisibleAnywhere, Category = "Inventory")
     TArray<TObjectPtr<UInventoryItem>> _items;
+
+    // Allows for a set of initial items to be added to our instances.
+    UPROPERTY(EditAnywhere, Instanced, Category = "Inventory")
+    TArray<UInventoryItem*> _startingItems;
 
 private:
     // DO NOT CALL Add() or Emplace() on the _items array directly! Use this instead.

@@ -29,6 +29,8 @@ public:
 
     FOnInventoryClosedFromUI& OnInventoryClosedFromUI() { return _inventoryToggleController->OnInventoryClosedFromUI(); }
 
+    void SetupDeathDropForActor(TObjectPtr<AActor> actor);
+
 private:
     UPROPERTY()
     TObjectPtr<UInventoryToggleController> _inventoryToggleController = nullptr;

@@ -36,7 +36,7 @@ void UPickupSpawnCommandFactory::SetPickupClass(TSubclassOf<AActor> pickupClass)
     _pickupClass = MoveTemp(pickupClass);
 }
 
-void UPickupSpawnCommandFactory::SetPickupLocationCallback(TFunction<FTransform()> pickupLocationCallback) {
+void UPickupSpawnCommandFactory::SetPickupSpawnLocationCallback(TFunction<FTransform()> pickupLocationCallback) {
     pickupLocationCallback.CheckCallable();
     _getPickupLocationCallback = MoveTemp(pickupLocationCallback);
 }

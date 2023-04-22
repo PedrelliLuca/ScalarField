@@ -11,6 +11,20 @@ void UInventoryManipulationSubsystem::Initialize(FSubsystemCollectionBase& colle
     _inventoryToggleController = NewObject<UInventoryToggleController>(this, UInventoryToggleController::StaticClass());
     _itemUsageController = NewObject<UItemUsageController>(this, UItemUsageController::StaticClass());
     _pickupSpawnController = NewObject<UPickupSpawnController>(this, UPickupSpawnController::StaticClass());
+
+    // TODO: this should only be a default value, this class should provide an API for this callback to be decided by the users.
+    _pickupSpawnController->SetPickupTransformCallbackForDeathDrop([](const TObjectPtr<AActor> deadActor) {
+        check(IsValid(deadActor));
+        auto transform = deadActor->GetActorTransform();
+
+        if (const auto deadCharacter = Cast<ACharacter>(deadActor)) {
+            FVector location = deadCharacter->GetActorLocation();
+            location.Z -= deadCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+            transform.SetLocation(MoveTemp(location));
+        }
+
+        return transform;
+    });
 }
 
 void UInventoryManipulationSubsystem::SetInventoryContainerWidget(TWeakInterfacePtr<IInventoryContainerWidget> inventoryContainer) {
@@ -26,7 +40,7 @@ void UInventoryManipulationSubsystem::SetHUDToShowOnClose(TWeakInterfacePtr<IPaw
 void UInventoryManipulationSubsystem::OpenInventoryOfActor(TWeakObjectPtr<AActor> actor) {
     _inventoryToggleController->OpenInventoryOfActor(MoveTemp(actor));
     _itemUsageController->BindItemUsage();
-    _pickupSpawnController->SetPickupSpawnCallback([actor]() {
+    _pickupSpawnController->SetPickupTransformCallbackForUIDrop([actor]() {
         check(actor.IsValid());
         FTransform transform = actor->GetActorTransform();
 
@@ -45,4 +59,8 @@ void UInventoryManipulationSubsystem::CloseInventory() {
     _inventoryToggleController->CloseInventory();
     _itemUsageController->UnbindItemUsage();
     _pickupSpawnController->UnbindPickupSpawn();
+}
+
+void UInventoryManipulationSubsystem::SetupDeathDropForActor(TObjectPtr<AActor> actor) {
+    _pickupSpawnController->BindPickupsDropAtDeath(MoveTemp(actor));
 }
