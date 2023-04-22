@@ -206,8 +206,8 @@ void UInventoryComponent::BeginPlay() {
 
     for (const auto startingItem : _startingItems) {
         [[maybe_unused]] const auto itemAddResult = TryAddItem(startingItem);
-        ensureMsgf(
-            itemAddResult.Result == EItemAddResult::IAR_AllItemsAdded, TEXT("%s(): Couldn't add all of starting item to character"), *FString{__FUNCTION__});
+        ensureAlwaysMsgf(
+            itemAddResult.Result == EItemAddResult::IAR_AllItemsAdded, TEXT("Couldn't add all starting items: %s"), *itemAddResult.ErrorText.ToString());
     }
 }
 

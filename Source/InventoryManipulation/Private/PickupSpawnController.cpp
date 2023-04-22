@@ -53,14 +53,14 @@ void UPickupSpawnController::BindPickupsDropAtDeath(const TObjectPtr<AActor> act
         return;
     }
 
-    const TWeakInterfacePtr inventoryC = actor->FindComponentByInterface<IInventory>();
+    const TWeakInterfacePtr<IInventory> inventoryC = actor->FindComponentByInterface<UInventory>();
     if (!ensureMsgf(inventoryC.IsValid(), TEXT("%s(): Can't bind death pickup drop for actor, no IInventory"), *FString{__FUNCTION__})) {
         return;
     }
 
     auto handle = healthC->OnDeath().AddUObject(this, &UPickupSpawnController::_dropPickupsOnDeath);
 
-    auto deathDropParams = FDeathDropParams{healthC, inventoryC, handle };
+    auto deathDropParams = FDeathDropParams{healthC, inventoryC, MoveTemp(handle)};
     _actorToDeathDropParams.Emplace(actor, MoveTemp(deathDropParams));
 }
 
@@ -96,6 +96,7 @@ void UPickupSpawnController::_dropPickupsOnDeath(const TObjectPtr<AActor> deadAc
     const auto& deathDropParams = _actorToDeathDropParams.FindChecked(deadActor);
 
     const auto& inventory = deathDropParams.InventoryToDrop;
+    check(inventory.IsValid());
 
     // Drop every single item in the inventory.
     for (const auto& item : inventory->GetItems()) {
