@@ -43,6 +43,9 @@ private:
 
     void _temperatureChanged(double newTemperature);
 
+    void _die();
+    void _onDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);
+
     /** Top down camera */
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
     UCameraComponent* _topDownCameraComponent;
@@ -87,5 +90,10 @@ private:
     UPROPERTY()
     TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 
+    UPROPERTY(EditAnywhere, Category = "Animation")
+    TObjectPtr<UAnimMontage> _deathMontage = nullptr;
+
     static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
+
+    FOnMontageEnded _montageEndedDelegate;
 };
