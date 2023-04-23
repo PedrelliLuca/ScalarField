@@ -2,15 +2,15 @@
 
 #include "EnemyMageCharacter.h"
 
+#include "AIController.h"
+#include "BrainComponent.h"
 #include "Colorizer.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/DecalComponent.h"
 #include "EnvironmentCell.h"
 #include "EnvironmentGridWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InventoryManipulationSubsystem.h"
 #include "Kismet/GameplayStatics.h"
-#include "TemperatureDamageType.h"
 
 AEnemyMageCharacter::AEnemyMageCharacter() {
     // This is what makes the scalar field character interact with the environment grid
@@ -70,9 +70,9 @@ float AEnemyMageCharacter::TakeDamage(
         _healthC->TakeDamage(damageAmount);
     }
 
-    /*if (_healthC->IsDead()) {
-        OnDeath();
-    }*/
+    if (_healthC->IsDead()) {
+        _die();
+    }
 
     return damage;
 }
@@ -145,4 +145,33 @@ void AEnemyMageCharacter::_updateMaterialTint(const FLinearColor temperatureColo
 void AEnemyMageCharacter::_temperatureChanged(double newTemperature) {
     const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
     _updateMaterialTint(temperatureColor);
+}
+
+void AEnemyMageCharacter::_die() {
+    const auto aiController = GetController<AAIController>();
+    check(IsValid(aiController));
+
+    _healthC->SetHealthRegen(0.0);
+    _manaC->SetManaRegen(0.0);
+
+    GetMovementComponent()->StopMovementImmediately();
+
+    const auto reason = FString{TEXT("Death")};
+    aiController->GetBrainComponent()->StopLogic(reason);
+
+    constexpr float playRate = 1.0f;
+    const bool playedSuccessfully = PlayAnimMontage(_deathMontage, playRate) > 0.0f;
+    if (playedSuccessfully) {
+        const auto animInstance = GetMesh()->GetAnimInstance();
+        if (!_montageEndedDelegate.IsBound()) {
+            _montageEndedDelegate.BindUObject(this, &AEnemyMageCharacter::_onDeathMontageEnded);
+        }
+
+        animInstance->Montage_SetEndDelegate(_montageEndedDelegate, _deathMontage);
+    }
+}
+
+void AEnemyMageCharacter::_onDeathMontageEnded(UAnimMontage* const montage, const bool bInterrupted) {
+    check(montage == _deathMontage);
+    Destroy();
 }

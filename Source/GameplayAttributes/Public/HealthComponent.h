@@ -35,6 +35,7 @@ public:
     void TakeDamage(double damage) { SetCurrentHealth(GetCurrentHealth() - damage); }
     void Heal(double healthToAdd) { SetCurrentHealth(GetCurrentHealth() + healthToAdd); }
 
+    UFUNCTION(BlueprintPure)
     bool IsDead() const { return _currentHealth <= DBL_EPSILON; }
 
     FOnHealthChanged& OnHealthChanged() { return _onHealthChanged; }
