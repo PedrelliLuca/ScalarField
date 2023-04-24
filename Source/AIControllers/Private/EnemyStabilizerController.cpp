@@ -16,7 +16,7 @@ void AEnemyStabilizerController::_checkTargetAllyForAttachment() {
     if (const auto targetAlly = Cast<AActor>(blackBoard->GetValueAsObject(_bbTargetAllyKeyName)); IsValid(targetAlly)) {
         TArray<AActor*> pawnAttachedActors;
         targetAlly->GetAttachedActors(pawnAttachedActors);
-        
+
         const auto foundInfluencerActor = Algo::AnyOf(
             pawnAttachedActors, [castInfluencerActor = _castInfluencerActor](AActor* const attachedActor) { return attachedActor->IsA(castInfluencerActor); });
         blackBoard->SetValueAsBool(_bbIsTargetAttachedToActor, foundInfluencerActor);
