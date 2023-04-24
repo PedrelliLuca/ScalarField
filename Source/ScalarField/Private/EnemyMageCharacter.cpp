@@ -60,15 +60,16 @@ AEnemyMageCharacter::AEnemyMageCharacter() {
 
 float AEnemyMageCharacter::TakeDamage(
     const float damageAmount, const FDamageEvent& damageEvent, AController* const eventInstigator, AActor* const damageCauser) {
-    float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
-
-    check(IsValid(_healthC));
+    // Dead things can't take any more damage
+    if (_healthC->IsDead()) {
+        return 0.0f;
+    }
+    
+    const float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
 
     // TODO: apply damage resistances here
 
-    if (!_healthC->IsDead()) {
-        _healthC->TakeDamage(damageAmount);
-    }
+    _healthC->TakeDamage(damageAmount);
 
     if (_healthC->IsDead()) {
         _die();
