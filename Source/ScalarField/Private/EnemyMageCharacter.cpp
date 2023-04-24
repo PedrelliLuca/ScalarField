@@ -64,7 +64,7 @@ float AEnemyMageCharacter::TakeDamage(
     if (_healthC->IsDead()) {
         return 0.0f;
     }
-    
+
     const float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
 
     // TODO: apply damage resistances here
@@ -164,11 +164,13 @@ void AEnemyMageCharacter::_die() {
     const bool playedSuccessfully = PlayAnimMontage(_deathMontage, playRate) > 0.0f;
     if (playedSuccessfully) {
         const auto animInstance = GetMesh()->GetAnimInstance();
-        if (!_montageEndedDelegate.IsBound()) {
-            _montageEndedDelegate.BindUObject(this, &AEnemyMageCharacter::_onDeathMontageEnded);
+        if (!_montageBlendingOutStartDelegate.IsBound()) {
+            _montageBlendingOutStartDelegate.BindUObject(this, &AEnemyMageCharacter::_onDeathMontageEnded);
         }
 
-        animInstance->Montage_SetEndDelegate(_montageEndedDelegate, _deathMontage);
+        // Montage_SetEndDelegate() is not good, because the end of the delegate is way after its blend out time. In other words, you'd see the character going
+        // back to the idle animation.
+        animInstance->Montage_SetBlendingOutDelegate(_montageBlendingOutStartDelegate, _deathMontage);
     }
 }
 

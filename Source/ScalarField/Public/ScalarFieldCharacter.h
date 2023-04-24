@@ -95,5 +95,5 @@ private:
 
     static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
 
-    FOnMontageEnded _montageEndedDelegate;
+    FOnMontageBlendingOutStarted _montageBlendingOutStartDelegate;
 };

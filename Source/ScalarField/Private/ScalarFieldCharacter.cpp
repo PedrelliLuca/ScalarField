@@ -6,8 +6,8 @@
 #include "Components/CapsuleComponent.h"
 #include "EnvironmentCell.h"
 #include "EnvironmentGridWorldSubsystem.h"
-#include "MovementCommandSetter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "MovementCommandSetter.h"
 
 AScalarFieldCharacter::AScalarFieldCharacter() {
     // This is what makes the scalar field character interact with the environment grid
@@ -72,7 +72,7 @@ float AScalarFieldCharacter::TakeDamage(
     if (_healthC->IsDead()) {
         return 0.0f;
     }
-    
+
     const float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
 
     // TODO: apply damage resistances here
@@ -161,7 +161,7 @@ void AScalarFieldCharacter::_die() {
     const auto playerController = GetController<APlayerController>();
     check(IsValid(playerController));
     playerController->DisableInput(playerController);
-    
+
     const TWeakInterfacePtr<IMovementCommandSetter> movementCmdSetter = playerController->FindComponentByInterface<UMovementCommandSetter>();
     check(movementCmdSetter.IsValid());
     movementCmdSetter->SetMovementMode(EMovementCommandMode::MCM_Still);
@@ -170,11 +170,13 @@ void AScalarFieldCharacter::_die() {
     const bool playedSuccessfully = PlayAnimMontage(_deathMontage, playRate) > 0.0f;
     if (playedSuccessfully) {
         const auto animInstance = GetMesh()->GetAnimInstance();
-        if (!_montageEndedDelegate.IsBound()) {
-            _montageEndedDelegate.BindUObject(this, &AScalarFieldCharacter::_onDeathMontageEnded);
+        if (!_montageBlendingOutStartDelegate.IsBound()) {
+            _montageBlendingOutStartDelegate.BindUObject(this, &AScalarFieldCharacter::_onDeathMontageEnded);
         }
 
-        animInstance->Montage_SetEndDelegate(_montageEndedDelegate, _deathMontage);
+        // Montage_SetEndDelegate() is not good, because the end of the delegate is way after its blend out time. In other words, you'd see the character going
+        // back to the idle animation.
+        animInstance->Montage_SetBlendingOutDelegate(_montageBlendingOutStartDelegate, _deathMontage);
     }
 }
 
