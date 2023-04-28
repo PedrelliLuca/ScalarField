@@ -21,7 +21,7 @@ public:
      * this function.
      * The skill's caster can only be set once, subsequent calls won't do anything.
      */
-    void SetCaster(TObjectPtr<AActor> caster);
+    void SetCaster(const TObjectPtr<AActor>& caster);
 
     /** \brief Casts the skill. The function check()s for the skill's caster, so make sure you set it before calling this. */
     virtual void ExecuteCast() PURE_VIRTUAL(UAbstractSkill::Execute, return;);
@@ -63,7 +63,7 @@ protected:
 
     const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
 
-    // Allows for a set of initial items to be added to our instances.
+    // Set conditions that must be verified to cast the skill
     UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
     TArray<USkillCastCondition*> _castConditions;
 
