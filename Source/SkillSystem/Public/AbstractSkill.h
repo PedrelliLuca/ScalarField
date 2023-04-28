@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SkillCastConditionInterface.h"
+#include "SkillCastCondition.h"
 #include "Parameters/SkillParameters.h"
 
 #include "AbstractSkill.generated.h"
@@ -65,7 +65,7 @@ protected:
 
     // Allows for a set of initial items to be added to our instances.
     UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
-    TArray<TObjectPtr<USkillCastCondition>> _castConditions;
+    TArray<USkillCastCondition*> _castConditions;
 
 private:
     bool _bIsOnCooldown = false;

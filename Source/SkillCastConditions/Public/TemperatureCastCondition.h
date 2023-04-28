@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SkillCastConditionInterface.h"
+#include "SkillCastCondition.h"
 #include "ThermodynamicComponent.h"
 
 #include "TemperatureCastCondition.generated.h"
@@ -20,7 +20,7 @@ enum class ETemperatureComparisonStyle : uint8
 };
 
 UCLASS(Blueprintable, EditInlineNew, DefaultToInstanced)
-class SKILLCASTCONDITIONS_API UTemperatureCastCondition : public UObject, public ISkillCastCondition {
+class SKILLCASTCONDITIONS_API UTemperatureCastCondition : public USkillCastCondition {
     GENERATED_BODY()
 
 public:
