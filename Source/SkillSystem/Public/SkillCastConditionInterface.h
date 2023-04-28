@@ -9,7 +9,7 @@ class USkillCastCondition : public UInterface {
     GENERATED_BODY()
 };
 
-/* Interface representing an inventory. */
+/* Represents a condition that must be verified in order to cast a skill. */
 class ISkillCastCondition {
     GENERATED_BODY()
 

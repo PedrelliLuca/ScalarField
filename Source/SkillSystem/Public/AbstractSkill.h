@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SkillCastConditionInterface.h"
 #include "Parameters/SkillParameters.h"
 
 #include "AbstractSkill.generated.h"
@@ -61,6 +62,10 @@ protected:
     void _endCooldown();
 
     const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
+
+    // Allows for a set of initial items to be added to our instances.
+    UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
+    TArray<TObjectPtr<USkillCastCondition>> _castConditions;
 
 private:
     bool _bIsOnCooldown = false;

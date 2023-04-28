@@ -4,17 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "SkillCastConditionInterface.h"
+#include "ThermodynamicComponent.h"
 
 #include "TemperatureCastCondition.generated.h"
 
-/** \brief Ways to compare the skill owner's temperature with the condition's temperature. */
+/** \brief Ways to compare the subject's temperature with the condition's temperature. E.g., "Less Than" means that the subject's temperature will have to
+ * be smaller than this condition's temperature. */
 UENUM(BlueprintType)
-enum class ETemperatureComparison : uint8
+enum class ETemperatureComparisonStyle : uint8
 {
-    TC_None UMETA(DisplayName = "None"),
-    TC_Equal UMETA(DisplayName = "Equal"),
-    TC_LessThan UMETA(DisplayName = "Less Than"),
-    TC_GreaterThan UMETA(DisplayName = "Greater Than")
+    TCS_None UMETA(DisplayName = "None"),
+    TCS_Equality UMETA(DisplayName = "Equality"),
+    TCS_LessThan UMETA(DisplayName = "Less Than"),
+    TCS_GreaterThan UMETA(DisplayName = "Greater Than")
 };
 
 UCLASS(Blueprintable, EditInlineNew, DefaultToInstanced)
@@ -31,10 +33,11 @@ protected:
     UPROPERTY(EditAnywhere)
     double _castConditionTemperature = 300.0;
 
-    /** \brief Determines how the skill owner's temperature will be compared with _castConditionTemperature */
+    /** \brief Determines how the subject's temperature will be compared with _castConditionTemperature */
     UPROPERTY(EditAnywhere)
-    ETemperatureComparison _temperatureComparison = ETemperatureComparison::TC_None;
+    ETemperatureComparisonStyle _temperatureComparison = ETemperatureComparisonStyle::TCS_None;
 
 private:
     TWeakObjectPtr<AActor> _conditionSubject;
+    TWeakObjectPtr<UThermodynamicComponent> _subjectThermoC;
 };
