@@ -21,7 +21,8 @@ public:
     UBTTask_CastSpellOnTarget();
 
 private:
-    EBTNodeResult::Type _determineCastSuccessWithTarget(const UBehaviorTreeComponent& ownerComp, const TObjectPtr<UStateComponent>& stateC, const TObjectPtr<UAbstractSkill>& skill);
+    EBTNodeResult::Type _determineCastSuccessWithTarget(
+        const UBehaviorTreeComponent& ownerComp, const TObjectPtr<UStateComponent>& stateC, const TObjectPtr<UAbstractSkill>& skill);
     EBTNodeResult::Type _determineCastSuccessWithoutTarget(const TObjectPtr<UStateComponent>& stateC, const TObjectPtr<UAbstractSkill>& skill);
     bool _isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill);
 

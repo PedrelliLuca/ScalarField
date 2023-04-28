@@ -4,11 +4,10 @@
 
 #include "Colorizer.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/DecalComponent.h"
 #include "EnvironmentCell.h"
 #include "EnvironmentGridWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "TemperatureDamageType.h"
+#include "MovementCommandSetter.h"
 
 AScalarFieldCharacter::AScalarFieldCharacter() {
     // This is what makes the scalar field character interact with the environment grid
@@ -69,19 +68,20 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 
 float AScalarFieldCharacter::TakeDamage(
     const float damageAmount, const FDamageEvent& damageEvent, AController* const eventInstigator, AActor* const damageCauser) {
-    float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
+    // Dead things can't take any more damage
+    if (_healthC->IsDead()) {
+        return 0.0f;
+    }
 
-    check(IsValid(_healthC));
+    const float damage = Super::TakeDamage(damageAmount, damageEvent, eventInstigator, damageCauser);
 
     // TODO: apply damage resistances here
 
-    if (!_healthC->IsDead()) {
-        _healthC->TakeDamage(damageAmount);
-    }
+    _healthC->TakeDamage(damageAmount);
 
-    /*if (_healthC->IsDead()) {
-        OnDeath();
-    }*/
+    if (_healthC->IsDead()) {
+        _die();
+    }
 
     return damage;
 }
@@ -150,4 +150,40 @@ void AScalarFieldCharacter::_updateMaterialTint(const FLinearColor temperatureCo
 void AScalarFieldCharacter::_temperatureChanged(double newTemperature) {
     const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
     _updateMaterialTint(temperatureColor);
+}
+
+void AScalarFieldCharacter::_die() {
+    _healthC->SetHealthRegen(0.0);
+    _manaC->SetManaRegen(0.0);
+
+    GetMovementComponent()->StopMovementImmediately();
+
+    const auto playerController = GetController<APlayerController>();
+    check(IsValid(playerController));
+    playerController->DisableInput(playerController);
+
+    const TWeakInterfacePtr<IMovementCommandSetter> movementCmdSetter = playerController->FindComponentByInterface<UMovementCommandSetter>();
+    check(movementCmdSetter.IsValid());
+    movementCmdSetter->SetMovementMode(EMovementCommandMode::MCM_Still);
+
+    constexpr float playRate = 1.0f;
+    const bool playedSuccessfully = PlayAnimMontage(_deathMontage, playRate) > 0.0f;
+    if (playedSuccessfully) {
+        const auto animInstance = GetMesh()->GetAnimInstance();
+        if (!_montageBlendingOutStartDelegate.IsBound()) {
+            _montageBlendingOutStartDelegate.BindUObject(this, &AScalarFieldCharacter::_onDeathMontageEnded);
+        }
+
+        // Montage_SetEndDelegate() is not good, because the end of the delegate is way after its blend out time. In other words, you'd see the character going
+        // back to the idle animation.
+        animInstance->Montage_SetBlendingOutDelegate(_montageBlendingOutStartDelegate, _deathMontage);
+    }
+}
+
+void AScalarFieldCharacter::_onDeathMontageEnded(UAnimMontage* const montage, const bool bInterrupted) {
+    check(montage == _deathMontage);
+    const auto playerController = GetController<APlayerController>();
+    check(IsValid(playerController));
+
+    // playerController->RestartLevel();
 }

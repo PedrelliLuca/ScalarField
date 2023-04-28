@@ -41,6 +41,9 @@ private:
 
     void _temperatureChanged(double newTemperature);
 
+    void _die();
+    void _onDeathMontageEnded(UAnimMontage* montage, bool bInterrupted);
+
     UPROPERTY()
     TObjectPtr<UPrimitiveComponent> _simpleThermalCollision = nullptr;
 
@@ -77,5 +80,10 @@ private:
     UPROPERTY()
     TObjectPtr<UMaterialInstanceDynamic> _materialInstance;
 
+    UPROPERTY(EditAnywhere, Category = "Animation")
+    TObjectPtr<UAnimMontage> _deathMontage = nullptr;
+
     static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
+
+    FOnMontageBlendingOutStarted _montageBlendingOutStartDelegate;
 };

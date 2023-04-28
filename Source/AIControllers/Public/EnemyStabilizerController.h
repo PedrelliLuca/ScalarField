@@ -11,8 +11,8 @@
 #include "FactionComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "StateComponent.h"
-#include "ThermodynamicComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
+#include "ThermodynamicComponent.h"
 
 #include "EnemyStabilizerController.generated.h"
 
@@ -86,9 +86,9 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Behavior Tree")
     TObjectPtr<UBehaviorTree> _behaviorTree;
-    
+
     float _timeSinceInfluencerCheck = 0.0f;
-    
+
     // The controlled Pawn has ownership of these
     TWeakObjectPtr<UFactionComponent> _pawnFactionC = nullptr;
     TWeakObjectPtr<UPatrolComponent> _patrolC = nullptr;
