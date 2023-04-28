@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogSkillCastConditions, Log, All);
 
 class FSkillCastConditionsModule : public ISkillCastConditionsModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };
