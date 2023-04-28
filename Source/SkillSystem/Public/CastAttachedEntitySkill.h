@@ -17,7 +17,7 @@ class SKILLSYSTEM_API UCastAttachedEntitySkill : public UAbstractSkill {
     GENERATED_BODY()
 
 public:
-    void ExecuteCast(TObjectPtr<AActor> caster) override;
+    void ExecuteCast() override;
     void Abort() override;
 
 private:

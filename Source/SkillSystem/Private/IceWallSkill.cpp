@@ -2,10 +2,12 @@
 
 #include "IceWallSkill.h"
 
-void UIceWallSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
-    const auto& iceWallSpawner = _getActorSpawners()[0];
+void UIceWallSkill::ExecuteCast() {
+    const auto& caster = _getCaster();
+    check(caster.IsValid());
 
     const FTransform& casterToWorld = caster->GetTransform();
+    const auto& iceWallSpawner = _getActorSpawners()[0];
     const TWeakObjectPtr<AActor> spawnActor = GetWorld()->SpawnActor<AActor>(iceWallSpawner.ActorClass, iceWallSpawner.Transform * casterToWorld);
 
     FTimerHandle timerHandle;

@@ -49,7 +49,7 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
             _casterManaC->SetCurrentMana(currentMana - _manaLeftToPay);
         }
 
-        skill->ExecuteCast(_caster.Get());
+        skill->ExecuteCast();
         return _determineStateBasedOnSkillChanneling(skill, controller);
     }
 
