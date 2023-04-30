@@ -42,7 +42,7 @@
 		{
 			"Name": "SkillCastConditions",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "PreDefault"
 		}
 	],
 	"Plugins": [
