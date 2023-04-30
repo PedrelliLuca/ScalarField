@@ -48,9 +48,14 @@ TObjectPtr<USkillUserState> UCastingState::OnTick(const float deltaTime, const T
             }
             _casterManaC->SetCurrentMana(currentMana - _manaLeftToPay);
         }
+        
+        if (skill->CanBeCast()) {
+            skill->ExecuteCast();
+            return _determineStateBasedOnSkillChanneling(skill, controller);
+        }
 
-        skill->ExecuteCast();
-        return _determineStateBasedOnSkillChanneling(skill, controller);
+        UE_LOG(LogTemp, Error, TEXT("Some cast condition wasn't satisfied, cast aborted!"));
+        return _abortExecutionForState<UIdleState>(controller);
     }
 
     if (_casterManaC.IsValid()) { // No mana component == free skill

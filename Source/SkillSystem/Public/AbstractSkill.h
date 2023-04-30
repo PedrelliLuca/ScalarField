@@ -25,6 +25,9 @@ public:
 
     /** \brief Casts the skill. The function check()s for the skill's caster, so make sure you set it before calling this. */
     virtual void ExecuteCast() PURE_VIRTUAL(UAbstractSkill::Execute, return;);
+
+    bool CanBeCast() const;
+    
     /** \brief Executes a tick of the skill's channeling process. The function check()s for the skill's caster, so make sure you set it before calling this. */
     virtual void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {}
 

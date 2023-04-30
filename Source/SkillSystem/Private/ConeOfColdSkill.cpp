@@ -45,8 +45,14 @@ void UConeOfColdSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<A
 void UConeOfColdSkill::Abort() {
     Super::Abort();
 
-    _spawnActor->Destroy();
-    _spawnSpringArm->DestroyComponent();
+    if (_spawnActor.IsValid()) {
+        _spawnActor->Destroy();
+        
+    }
+    if (_spawnSpringArm.IsValid()) {
+        _spawnSpringArm->DestroyComponent();
+    }
+    
     _cone = nullptr;
 }
 
