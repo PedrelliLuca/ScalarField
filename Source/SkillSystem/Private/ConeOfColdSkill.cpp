@@ -47,12 +47,11 @@ void UConeOfColdSkill::Abort() {
 
     if (_spawnActor.IsValid()) {
         _spawnActor->Destroy();
-        
     }
     if (_spawnSpringArm.IsValid()) {
         _spawnSpringArm->DestroyComponent();
     }
-    
+
     _cone = nullptr;
 }
 
