@@ -13,20 +13,24 @@ void UNewIdleState::SetPawn(TObjectPtr<APawn> subjectPawn) {
 
         _subjectSkillsContainerC = _subjectPawn->FindComponentByClass<UNewSkillsContainerComponent>();
         check(_subjectSkillsContainerC.IsValid());
+
+        const auto controller = _subjectPawn->GetController();
+        check(IsValid(controller));
+        _movementCommandSetter = Cast<IMovementCommandSetter>(controller->FindComponentByInterface<UMovementCommandSetter>());
+        check(_movementCommandSetter.IsValid());
     }
 }
 
 void UNewIdleState::OnEnter() {
-    // Movement command update
-    const auto controller = _subjectPawn->GetController();
-    const auto movementSetter = Cast<IMovementCommandSetter>(controller->FindComponentByInterface<UMovementCommandSetter>());
-    check(movementSetter != nullptr);
-    movementSetter->SetDefaultMovementMode();
+    _movementCommandSetter->SetDefaultMovementMode();
 }
 
 void UNewIdleState::OnLeave() {
 }
 
 TScriptInterface<IFSMState> UNewIdleState::TryExecuteSkillAtIndex(const uint32 index) {
-    _subjectSkillsContainerC->TryExecuteSkillAtIndex(index);
+    _subjectSkillsContainerC->TryCastSkillAtIndex(index);
+
+    // TODO: return something useful
+    return nullptr;
 }

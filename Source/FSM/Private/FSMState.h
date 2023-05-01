@@ -20,6 +20,6 @@ public:
 
     virtual void OnEnter() = 0;
     virtual void OnLeave() = 0;
-    
+
     virtual TScriptInterface<IFSMState> TryExecuteSkillAtIndex(uint32 index) = 0;
 };

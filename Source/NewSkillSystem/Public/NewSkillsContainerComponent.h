@@ -32,7 +32,7 @@
 //     static FSkillExecutionResult ExecutionFailed(int32 itemQuantity, const FText& errorText);
 //     static FSkillExecutionResult ExecutionNeedsTargets(int32 itemQuantity, int32 itemQuantityActuallyGiven, const FText& errorText);
 //     static FSkillExecutionResult ExecutionStarted(int32 itemQuantity);
-//     
+//
 //
 //     UPROPERTY(BlueprintReadOnly, Category = "Item Add Result")
 //     EItemAddResult Result = EItemAddResult::IAR_NoItemsAdded;
@@ -46,19 +46,16 @@ class NEWSKILLSYSTEM_API UNewSkillsContainerComponent : public UActorComponent {
     GENERATED_BODY()
 
 public:
-    bool TryExecuteSkillAtIndex(uint32 index);
+    UNewSkillsContainerComponent();
 
-    void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
+    bool TryCastSkillAtIndex(uint32 index);
 
 protected:
     void BeginPlay() override;
-        
 
 private:
     UPROPERTY(EditAnywhere, Category = "Skills")
     TArray<TObjectPtr<UNewAbstractSkill>> _skills{};
 
     TWeakObjectPtr<UNewAbstractSkill> _selectedSkill = nullptr;
-
-    TMap<TWeakObjectPtr<UNewAbstractSkill>, float> _skillsToCooldowns{};
 };

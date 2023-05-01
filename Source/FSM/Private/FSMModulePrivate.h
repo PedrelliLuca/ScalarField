@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogFSM, Log, All);
 
 class FFSMModule : public IFSMModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };
