@@ -23,8 +23,10 @@ TObjectPtr<UAbstractSkill> USkillsContainerComponent::FindSkillByClass(TSubclass
 void USkillsContainerComponent::BeginPlay() {
     Super::BeginPlay();
 
+    const auto caster = GetOwner();
     for (const auto skillClass : _skillsClasses) {
-        const auto skill = NewObject<UAbstractSkill>(GetOwner(), skillClass);
+        const auto skill = NewObject<UAbstractSkill>(caster, skillClass);
+        skill->SetCaster(caster);
 
 #if DO_CHECK
         skill->CheckParametersSanity();

@@ -5,13 +5,14 @@
 #include "SkillSpawnedEntityInterface.h"
 #include "UObject/WeakInterfacePtr.h"
 
-void UCastAttachedEntitySkill::ExecuteCast(TObjectPtr<AActor> caster) {
+void UCastAttachedEntitySkill::ExecuteCast() {
     const auto& thermalWindSpawner = _getFollowerActorSpawners().Last();
 
-    auto target = caster;
+    auto target = _getCaster();
     if (RequiresTarget()) {
-        target = _getActorTargets().Last().Target.Get();
+        target = _getActorTargets().Last().Target;
     }
+    check(target.IsValid());
 
     const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(target.Get(), TEXT("Skill SpringArm"));
     spawnSpringArm->bDoCollisionTest = false;
@@ -39,10 +40,10 @@ void UCastAttachedEntitySkill::ExecuteCast(TObjectPtr<AActor> caster) {
     // Why may I want the implementation on the BP side?
     // Some skill-spawned actors, like the Fire Globe, don't require any custom logic: you just want them to implement the interface so that it's selectable
     // from the dropdown menu of FActorSpawnerParameters::ActorClass. For cases like these, the BP-side implementation is perfect, and I don't care about
-    // calling the interface-specific functions, bceause there is no important logic these skill-spawned entities have to execute.
+    // calling the interface-specific functions since there is no important logic these skill-spawned entities have to execute.
     const TWeakInterfacePtr<ISkillSpawnedEntity> skillSpawnedEntity = Cast<ISkillSpawnedEntity>(spawnActor);
     if (skillSpawnedEntity.IsValid()) {
-        skillSpawnedEntity->SetCaster(caster);
+        skillSpawnedEntity->SetCaster(_getCaster());
     }
 
     spawnActor->FinishSpawning(socketTransform);

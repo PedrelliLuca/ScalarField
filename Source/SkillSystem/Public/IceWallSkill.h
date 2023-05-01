@@ -15,7 +15,7 @@ class SKILLSYSTEM_API UIceWallSkill : public UAbstractSkill {
     GENERATED_BODY()
 
 public:
-    void ExecuteCast(TObjectPtr<AActor> caster) override;
+    void ExecuteCast() override;
 
 #if DO_CHECK
     void CheckParametersSanity() const override;

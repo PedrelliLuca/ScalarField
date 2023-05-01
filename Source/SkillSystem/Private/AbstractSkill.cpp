@@ -14,6 +14,29 @@ void UAbstractSkill::_endCooldown() {
     _bIsOnCooldown = false;
 }
 
+void UAbstractSkill::SetCaster(const TObjectPtr<AActor>& caster) {
+    // Make sure that the caster is not valid before setting it.
+    if (ensureMsgf(!_caster.IsValid(), TEXT("Caster can be set only once and has already been set."))) {
+        check(IsValid(caster));
+        _caster = caster;
+
+        for (const auto castCondition : _castConditions) {
+            castCondition->SetConditionSubject(caster);
+        }
+    }
+}
+
+bool UAbstractSkill::CanBeCast() const {
+    bool canBeCast = true;
+    for (const auto castCondition : _castConditions) {
+        if (!castCondition->IsVerified()) {
+            canBeCast = false;
+        }
+    }
+
+    return canBeCast;
+}
+
 bool UAbstractSkill::IsValidTarget(const int32 index, const TObjectPtr<AActor> target) const {
     check(_parameters.ActorTargetParameters.IsValidIndex(index));
 

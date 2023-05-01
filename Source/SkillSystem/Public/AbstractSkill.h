@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Parameters/SkillParameters.h"
+#include "SkillCastCondition.h"
 
 #include "AbstractSkill.generated.h"
 
@@ -15,9 +16,19 @@ class SKILLSYSTEM_API UAbstractSkill : public UObject {
     GENERATED_BODY()
 
 public:
-    /** TODO: add description */
-    virtual void ExecuteCast(TObjectPtr<AActor> caster) PURE_VIRTUAL(UAbstractSkill::Execute, return;);
+    /** \brief Sets the caster of the skill. This function must be called immediately after skill creation: the caster is a crucial for skills' execution.
+     * The caster should be a parameter for the skill's constructor, but since Unreal does not allow constructor arguments with NewObject I was forced to make
+     * this function.
+     * The skill's caster can only be set once, subsequent calls won't do anything.
+     */
+    void SetCaster(const TObjectPtr<AActor>& caster);
 
+    /** \brief Casts the skill. The function check()s for the skill's caster, so make sure you set it before calling this. */
+    virtual void ExecuteCast() PURE_VIRTUAL(UAbstractSkill::Execute, return;);
+
+    bool CanBeCast() const;
+
+    /** \brief Executes a tick of the skill's channeling process. The function check()s for the skill's caster, so make sure you set it before calling this. */
     virtual void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {}
 
     virtual void Abort() { _removeAllTargets(); }
@@ -53,9 +64,17 @@ protected:
     void _startCooldown();
     void _endCooldown();
 
+    const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
+
+    // Set conditions that must be verified to cast the skill
+    UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
+    TArray<USkillCastCondition*> _castConditions;
+
 private:
     bool _bIsOnCooldown = false;
 
     UPROPERTY(EditAnywhere)
     FSkillParameters _parameters;
+
+    TWeakObjectPtr<AActor> _caster;
 };

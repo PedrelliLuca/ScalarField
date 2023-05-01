@@ -5,7 +5,7 @@
 #include "MaterialsContainerComponent.h"
 #include "ThermodynamicComponent.h"
 
-void UCarbonizeSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
+void UCarbonizeSkill::ExecuteCast() {
     const auto target = _getActorTargets()[0].Target;
 
     // TODO: make carbonize consume carbon material

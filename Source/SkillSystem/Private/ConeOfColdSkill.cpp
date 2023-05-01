@@ -2,14 +2,16 @@
 
 #include "ConeOfColdSkill.h"
 
-void UConeOfColdSkill::ExecuteCast(const TObjectPtr<AActor> caster) {
-    const auto& coldConeSpawner = _getFollowerActorSpawners()[0];
+void UConeOfColdSkill::ExecuteCast() {
+    const auto& caster = _getCaster();
+    check(caster.IsValid());
 
-    _spawnSpringArm = NewObject<USpringArmComponent>(caster, TEXT("Cone of Cold SpringArm"));
+    _spawnSpringArm = NewObject<USpringArmComponent>(caster.Get(), TEXT("Cone of Cold SpringArm"));
     _spawnSpringArm->bDoCollisionTest = false;
     _spawnSpringArm->SetupAttachment(caster->GetRootComponent());
 
     // The point where we have to spawn the globe relative to the caster, it's also the point where the 2nd end of the arm lies
+    const auto& coldConeSpawner = _getFollowerActorSpawners()[0];
     const FVector coneLocation = coldConeSpawner.Transform.GetLocation();
 
     // The spring sits on the vector that goes from the caster's root to the globeLocation.
@@ -43,8 +45,13 @@ void UConeOfColdSkill::ExecuteChannelingTick(float deltaTime, const TObjectPtr<A
 void UConeOfColdSkill::Abort() {
     Super::Abort();
 
-    _spawnActor->Destroy();
-    _spawnSpringArm->DestroyComponent();
+    if (_spawnActor.IsValid()) {
+        _spawnActor->Destroy();
+    }
+    if (_spawnSpringArm.IsValid()) {
+        _spawnSpringArm->DestroyComponent();
+    }
+
     _cone = nullptr;
 }
 
