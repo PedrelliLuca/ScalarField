@@ -10,10 +10,19 @@
 /**
  * \brief State representing a skill user that is not executing any skill.
  */
-UCLASS(Blueprintable)
-class FSM_API UNewIdleState : public UFSMState {
+UCLASS()
+class FSM_API UNewIdleState : public UObject, public IFSMState {
     GENERATED_BODY()
 
 public:
+    void SetPawn(TObjectPtr<APawn> subjectPawn) override;
+    
+    void OnEnter() override;
+    void OnLeave() override;
 
+    TScriptInterface<IFSMState> TryExecuteSkillAtIndex(uint32 index) override;
+
+private:
+    TWeakObjectPtr<APawn> _subjectPawn = nullptr
+    TWeakObjectPtr<UNewSkillsContainerComponent> _subjectSkillsContainerC = nullptr;
 };

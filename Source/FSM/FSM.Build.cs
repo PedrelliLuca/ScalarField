@@ -14,12 +14,14 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
+					"NewSkillSystem",
 				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
+					"MovementCommand"
 					// ... add private dependencies that you statically link with here ...
 				}
 				);

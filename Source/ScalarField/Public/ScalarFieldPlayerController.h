@@ -26,6 +26,9 @@ protected:
 
     void BeginPlay() override;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
+    bool _bNewSkillSystem = false;
+
 private:
     /** Input handlers for SetDestination action. */
     void _onSetDestinationPressed();
