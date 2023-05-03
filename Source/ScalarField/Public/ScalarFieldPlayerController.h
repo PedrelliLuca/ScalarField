@@ -44,7 +44,7 @@ private:
     void _onTacticalPauseToggled();
     void _answerTacticalPauseToggle(bool bIsTacticalPauseOn, double currentWorldTimeDilation);
 
-    constexpr uint32 _getSkillIdxFromKey(uint32 key);
+    constexpr int32 _getSkillIdxFromKey(int32 key);
 
     UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
     TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;

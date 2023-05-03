@@ -28,7 +28,7 @@ void UNewIdleState::OnEnter() {
 void UNewIdleState::OnLeave() {
 }
 
-TScriptInterface<IFSMState> UNewIdleState::TryExecuteSkillAtIndex(const uint32 index) {
+TScriptInterface<IFSMState> UNewIdleState::TryCastSkillAtIndex(const int32 index) {
     _subjectSkillsContainerC->TryCastSkillAtIndex(index);
 
     // TODO: return something useful

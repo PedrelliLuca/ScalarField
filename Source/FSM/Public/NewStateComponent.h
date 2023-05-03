@@ -14,7 +14,7 @@ class FSM_API UNewStateComponent : public UActorComponent {
     GENERATED_BODY()
 
 public:
-    void TryExecuteSkillAtIndex(uint32 index);
+    void TryCastSkillAtIndex(uint32 index);
 
 protected:
     void BeginPlay() override;

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FSMState.h"
 #include "MovementCommandSetter.h"
+#include "NewSkillsContainerComponent.h"
 
 #include "NewIdleState.generated.h"
 
@@ -21,7 +22,7 @@ public:
     void OnEnter() override;
     void OnLeave() override;
 
-    TScriptInterface<IFSMState> TryExecuteSkillAtIndex(uint32 index) override;
+    TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) override;
 
 private:
     TWeakObjectPtr<APawn> _subjectPawn = nullptr;

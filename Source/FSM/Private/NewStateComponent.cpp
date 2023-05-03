@@ -4,8 +4,8 @@
 
 #include "ConcreteStates/NewIdleState.h"
 
-void UNewStateComponent::TryExecuteSkillAtIndex(uint32 index) {
-    auto newState = _state->TryExecuteSkillAtIndex(index);
+void UNewStateComponent::TryCastSkillAtIndex(const uint32 index) {
+    auto newState = _state->TryCastSkillAtIndex(index);
     _performStateTransition(MoveTemp(newState));
 }
 

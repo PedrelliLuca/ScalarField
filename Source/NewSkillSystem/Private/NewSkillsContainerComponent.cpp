@@ -8,10 +8,9 @@ UNewSkillsContainerComponent::UNewSkillsContainerComponent() {
     PrimaryComponentTick.bCanEverTick = false;
 }
 
-bool UNewSkillsContainerComponent::TryCastSkillAtIndex(const uint32 index) {
+FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 index) {
     checkf(index < _skills.Num(), TEXT("There is no skill at index %i"), index);
-    _skills[index]->TryCast();
-    return false;
+    return _skills[index]->TryCast();
 }
 
 void UNewSkillsContainerComponent::BeginPlay() {
