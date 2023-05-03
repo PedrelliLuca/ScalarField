@@ -10,6 +10,8 @@ UNewSkillsContainerComponent::UNewSkillsContainerComponent() {
 
 FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 index) {
     checkf(index < _skills.Num(), TEXT("There is no skill at index %i"), index);
+    check(IsValid(_skills[index]));
+
     return _skills[index]->TryCast();
 }
 
@@ -18,6 +20,6 @@ void UNewSkillsContainerComponent::BeginPlay() {
 
     const auto caster = GetOwner();
     for (const auto skill : _skills) {
-        // skill->SetCaster(caster);
+        skill->SetCaster(caster);
     }
 }

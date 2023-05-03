@@ -16,4 +16,18 @@ class NEWSKILLSYSTEM_API UNewAbstractSkill : public UObject {
 
 public:
     FSkillCastResult TryCast();
+
+    void SetCaster(TObjectPtr<AActor> caster);
+
+protected:
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill", meta = (ClampMin = "0"))
+    float _cooldown = 1.0f;
+
+private:
+    void _onCooldownEnded();
+
+    TWeakObjectPtr<AActor> _caster;
+
+    FTimerHandle _cooldownTimer{};
+    bool _onCooldown = false;
 };
