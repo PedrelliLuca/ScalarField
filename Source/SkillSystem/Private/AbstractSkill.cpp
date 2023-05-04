@@ -19,22 +19,7 @@ void UAbstractSkill::SetCaster(const TObjectPtr<AActor>& caster) {
     if (ensureMsgf(!_caster.IsValid(), TEXT("Caster can be set only once and has already been set."))) {
         check(IsValid(caster));
         _caster = caster;
-
-        for (const auto castCondition : _castConditions) {
-            castCondition->SetConditionSubject(caster);
-        }
     }
-}
-
-bool UAbstractSkill::CanBeCast() const {
-    bool canBeCast = true;
-    for (const auto castCondition : _castConditions) {
-        if (!castCondition->IsVerified()) {
-            canBeCast = false;
-        }
-    }
-
-    return canBeCast;
 }
 
 bool UAbstractSkill::IsValidTarget(const int32 index, const TObjectPtr<AActor> target) const {

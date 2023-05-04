@@ -10,6 +10,8 @@ enum class ESkillCastResult : uint8
     None,
     Fail_OnCooldown,
     Fail_MissingTarget,
+    Fail_CastConditionsViolated,
+    Fail_InsufficientMana,
     Success
 };
 
@@ -20,6 +22,8 @@ public:
     // Functions to standardize instances of this class
     static FSkillCastResult CastFail_Cooldown();
     static FSkillCastResult CastFail_MissingTarget();
+    static FSkillCastResult CastFail_CastConditionsViolated();
+    static FSkillCastResult CastFail_InsufficientMana();
     static FSkillCastResult CastSuccess();
 
     ESkillCastResult GetCastResult() const { return _result; }
@@ -40,17 +44,30 @@ private:
 
 FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_Cooldown() {
     auto result = ESkillCastResult::Fail_OnCooldown;
-    auto errorText = LOCTEXT("SkillCastOnCooldownText", "Couldn't cast skill, it's on cooldown.");
+    auto errorText = LOCTEXT("SkillCast_OnCooldownText", "Couldn't cast skill, it's on cooldown.");
 
     return FSkillCastResult{result, MoveTemp(errorText)};
 }
 
-// TODO: in the future, this could take an integer representing the number of missing targets, so that the message could be more meaningful.
+// TODO: in the future, this could take an integer representing the number of missing targets, so that the message can be more meaningful.
 FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_MissingTarget() {
     auto result = ESkillCastResult::Fail_OnCooldown;
-    auto errorText = LOCTEXT("SkillCastMissingTargetText", "Couldn't cast skill, targets are missing");
+    auto errorText = LOCTEXT("SkillCast_MissingTargetText", "Couldn't cast skill, targets are missing.");
 
     return FSkillCastResult{result, MoveTemp(errorText)};
+}
+
+// TODO: in the future, this will take an array of errors coming from the violated cast conditions, so that the message can be more meaningful.
+FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_CastConditionsViolated() {
+    auto result = ESkillCastResult::Fail_CastConditionsViolated;
+    auto errorText = LOCTEXT("SkillCast_ConditionsViolatedText", "Couldn't cast skill, some condition on caster is vioalted.");
+    return FSkillCastResult(result, MoveTemp(errorText));
+}
+
+FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_InsufficientMana() {
+    auto result = ESkillCastResult::Fail_InsufficientMana;
+    auto errorText = LOCTEXT("SkillCast_InsufficientManaText", "Couldn't cast skill, insufficient mana.");
+    return FSkillCastResult(result, MoveTemp(errorText));
 }
 
 FORCEINLINE FSkillCastResult FSkillCastResult::CastSuccess() {
