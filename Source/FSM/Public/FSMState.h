@@ -22,4 +22,7 @@ public:
     virtual void OnLeave() = 0;
 
     virtual TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) = 0;
+
+protected:
+    TScriptInterface<IFSMState> _keepCurrentState() const { return nullptr; }
 };

@@ -34,6 +34,8 @@ public:
 
     const FText& GetErrorText() const { return _errorText; }
 
+    bool IsFailure() const { return !_errorText.IsEmpty(); }
+
 private:
     FSkillCastResult(ESkillCastResult result, FText&& errorText)
         : _result(result)

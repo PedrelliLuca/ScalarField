@@ -41,6 +41,8 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
 
 void UNewAbstractSkill::Abort() {
     _isTickAllowed = false;
+    _onCastPhaseFinish.Clear();
+    _onChannelingPhaseFinish.Clear();
     _skillAbort();
 }
 
