@@ -15,7 +15,10 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
         return FSkillCastResult::CastFail_CastConditionsViolated();
     }
 
-    // TODO: if is casting or channeling, abort before casting.
+    // In case we're in cast or channeling phase, i.e. in case we're ticking, abort the old execution before starting the new one.
+    if (_isTickAllowed) {
+        Abort();
+    }
 
     if (FMath::IsNearlyZero(_castSeconds)) {
         _skillCast();
@@ -28,6 +31,11 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
     _elapsedExecutionSeconds = 0.0f;
 
     return FSkillCastResult::CastDeferred();
+}
+
+void UNewAbstractSkill::Abort() {
+    _isTickAllowed = false;
+    _skillAbort();
 }
 
 void UNewAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {

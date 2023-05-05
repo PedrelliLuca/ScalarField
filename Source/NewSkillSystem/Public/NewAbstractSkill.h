@@ -25,6 +25,8 @@ public:
      * SetCaster() will trigger a check. */
     FSkillCastResult TryCast();
 
+    void Abort();
+
     void SetCaster(TObjectPtr<AActor> caster);
 
     void Tick(float deltaTime) override;
@@ -72,6 +74,8 @@ private:
     virtual void _skillCast() PURE_VIRTUAL(UNewAbstractSkill::_skillCast, return;);
     /** \brief Represents the concrete channeling of the skill, skill-specific logic for channeling ticks is executed in here. */
     virtual void _skillChannelingTick(float deltaTime) PURE_VIRTUAL(UNewAbstractSkill::_channelingTickLogic, return;);
+    /** \brief Represents the concrete abortion of the skill, skill-specific logic for cleanup is executed in here. */
+    virtual void _skillAbort() PURE_VIRTUAL(UNewAbstractSkill::_channelingTickLogic, return;);
 
     void _castTick(float deltaTime);
     void _channelingTick(float deltaTime);
