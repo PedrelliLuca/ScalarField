@@ -7,10 +7,12 @@
 #include "ManaComponent.h"
 #include "SkillCastCondition.h"
 #include "SkillCastResult.h"
+#include "SkillChannelingResult.h"
 
 #include "NewAbstractSkill.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCastPhaseFinish, FSkillCastResult);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnChannelingPhaseFinish, FSkillChannelingResult);
 
 /** A skill of the ScalarField game. This can't be an interface because it's meant to be employed with the "Instanced" UPROPERTY specifier, see
  * UNewSkillsContainerComponent. */
@@ -19,6 +21,8 @@ class NEWSKILLSYSTEM_API UNewAbstractSkill : public UObject, public FTickableGam
     GENERATED_BODY()
 
 public:
+    /** \brief Starts the skill casting process. This function can have many outcomes, you can see all of them in ESkillCastResult. Calling this function before
+     * SetCaster() will trigger a check. */
     FSkillCastResult TryCast();
 
     void SetCaster(TObjectPtr<AActor> caster);
@@ -28,14 +32,17 @@ public:
     /** \brief Determines whether this skill is ready to tick or not by checking whether the skill's caster is valid or not. */
     bool IsTickable() const override;
 
-    /** \brief Determines whether this skill can tick or not. Skills are allowed to tick while they're in execution, i.e. when they're being cast or channeled.
-     */
+    /** \brief Determines whether this skill can tick or not. Skills are allowed to tick during their cast and channeling phases. */
     bool IsAllowedToTick() const override;
 
     /** \brief We have to override this because it's virtual pure in FTickableGameObject, but in practice it's not needed. */
     TStatId GetStatId() const override { return TStatId{}; }
 
+    /** \brief Returns the delegate broadcasting what's going on during the casting phase tick. */
     FOnCastPhaseFinish& OnCastPhaseFinish() { return _onCastPhaseFinish; }
+
+    /** \brief Returns the delegate broadcasting what's going on during the channeling phase tick. */
+    FOnChannelingPhaseFinish& OnChannelingPhaseFinish() { return _onChannelingPhaseFinish; }
 
 protected:
     /** \brief The time it takes for the skill to be castable again. The countdown starts from the moment the cast is complete. */
@@ -62,9 +69,14 @@ protected:
 
 private:
     /** \brief Represents the concrete cast of the skill, skill-specific logic for the cast is executed in here. */
-    virtual void _cast() PURE_VIRTUAL(UNewAbstractSkill::_cast, return;);
+    virtual void _skillCast() PURE_VIRTUAL(UNewAbstractSkill::_skillCast, return;);
+    /** \brief Represents the concrete channeling of the skill, skill-specific logic for channeling ticks is executed in here. */
+    virtual void _skillChannelingTick(float deltaTime) PURE_VIRTUAL(UNewAbstractSkill::_channelingTickLogic, return;);
 
-    void _abort();
+    void _castTick(float deltaTime);
+    void _channelingTick(float deltaTime);
+
+    FSkillCastResult _determineCastSuccessKind();
 
     bool _areCastConditionsVerified() const;
 
@@ -83,7 +95,8 @@ private:
     bool _isTickAllowed = false;
 
     float _elapsedExecutionSeconds = 0.0f;
-    float _executionManaLeftToPay = 0.0f;
+    float _castManaLeftToPay = 0.0f;
 
     FOnCastPhaseFinish _onCastPhaseFinish{};
+    FOnChannelingPhaseFinish _onChannelingPhaseFinish{};
 };

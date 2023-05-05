@@ -12,7 +12,9 @@ enum class ESkillCastResult : uint8
     Fail_MissingTarget,
     Fail_CastConditionsViolated,
     Fail_InsufficientMana,
-    Success
+    Deferred,
+    Success_IntoChanneling,
+    Success_IntoExecutionEnd,
 };
 
 // Struct that collects the enum representing the cast request outcome and the error associated with it
@@ -24,7 +26,9 @@ public:
     static FSkillCastResult CastFail_MissingTarget();
     static FSkillCastResult CastFail_CastConditionsViolated();
     static FSkillCastResult CastFail_InsufficientMana();
-    static FSkillCastResult CastSuccess();
+    static FSkillCastResult CastDeferred();
+    static FSkillCastResult CastSuccess_IntoChanneling();
+    static FSkillCastResult CastSuccess_IntoExecutionEnd();
 
     ESkillCastResult GetCastResult() const { return _result; }
 
@@ -40,7 +44,7 @@ private:
     FText _errorText{};
 };
 
-#define LOCTEXT_NAMESPACE "SkillExecutionResult"
+#define LOCTEXT_NAMESPACE "SkillCastResult"
 
 FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_Cooldown() {
     auto result = ESkillCastResult::Fail_OnCooldown;
@@ -70,8 +74,16 @@ FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_InsufficientMana() {
     return FSkillCastResult(result, MoveTemp(errorText));
 }
 
-FORCEINLINE FSkillCastResult FSkillCastResult::CastSuccess() {
-    return FSkillCastResult{ESkillCastResult::Success, FText{}};
+FORCEINLINE FSkillCastResult FSkillCastResult::CastDeferred() {
+    return FSkillCastResult{ESkillCastResult::Deferred, FText{}};
+}
+
+FORCEINLINE FSkillCastResult FSkillCastResult::CastSuccess_IntoChanneling() {
+    return FSkillCastResult{ESkillCastResult::Success_IntoChanneling, FText{}};
+}
+
+FORCEINLINE FSkillCastResult FSkillCastResult::CastSuccess_IntoExecutionEnd() {
+    return FSkillCastResult{ESkillCastResult::Success_IntoExecutionEnd, FText{}};
 }
 
 #undef LOCTEXT_NAMESPACE
