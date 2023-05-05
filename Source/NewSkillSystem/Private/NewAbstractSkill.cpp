@@ -21,7 +21,13 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
     }
 
     if (FMath::IsNearlyZero(_castSeconds)) {
+        const auto currentMana = _casterManaC->GetCurrentMana();
+        if (currentMana < _castManaCost) {
+            return FSkillCastResult::CastFail_InsufficientMana();
+        }
+        _casterManaC->SetCurrentMana(currentMana - _castManaCost);
         _skillCast();
+        
         GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UNewAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
         return _determineCastSuccessKind();
     }
