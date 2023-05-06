@@ -14,11 +14,6 @@ void UNewIdleState::SetPawn(TObjectPtr<APawn> subjectPawn) {
 
         _subjectSkillsContainerC = _subjectPawn->FindComponentByClass<UNewSkillsContainerComponent>();
         check(_subjectSkillsContainerC.IsValid());
-
-        const auto controller = _subjectPawn->GetController();
-        check(IsValid(controller));
-        _movementCommandSetter = Cast<IMovementCommandSetter>(controller->FindComponentByInterface<UMovementCommandSetter>());
-        check(_movementCommandSetter.IsValid());
     }
 }
 
