@@ -10,6 +10,7 @@
 #include "SkillCastCondition.h"
 #include "SkillCastResult.h"
 #include "SkillChannelingResult.h"
+#include "TacticalPauseWorldSubsystem.h"
 #include "UObject/WeakInterfacePtr.h"
 
 #include "NewAbstractSkill.generated.h"
@@ -126,4 +127,6 @@ private:
 
     FOnCastPhaseFinish _onCastPhaseEnd{};
     FOnChannelingPhaseFinish _onChannelingPhaseEnd{};
+
+    TWeakObjectPtr<UTacticalPauseWorldSubsystem> _pauseSubSys = nullptr;
 };

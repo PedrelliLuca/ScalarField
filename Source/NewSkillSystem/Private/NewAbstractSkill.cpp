@@ -76,6 +76,16 @@ void UNewAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
 }
 
 void UNewAbstractSkill::Tick(const float deltaTime) {
+    if (!_pauseSubSys.IsValid()) {
+        _pauseSubSys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
+        check(_pauseSubSys.IsValid());
+    }
+
+    // Unfortunately, setting the global time dilation doesn't work with FTickableGameObjects. We have to manually pause ticking like follows.
+    if (_pauseSubSys->IsTacticalPauseOn()) {
+        return;
+    }
+
     if (_elapsedExecutionSeconds < _castSeconds) {
         _castTick(deltaTime);
     } else if (_elapsedExecutionSeconds < _castSeconds + _channelingSeconds) {
