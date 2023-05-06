@@ -2,8 +2,6 @@
 
 #include "NewIdleState.h"
 
-#include "NewCastState.h"
-#include "NewChannelingState.h"
 #include "NewSkillsContainerComponent.h"
 
 void UNewIdleState::SetPawn(TObjectPtr<APawn> subjectPawn) {
@@ -25,21 +23,10 @@ void UNewIdleState::OnLeave() {
 
 TScriptInterface<IFSMState> UNewIdleState::TryCastSkillAtIndex(const int32 index) {
     const auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
-
-    TScriptInterface<IFSMState> newState = _keepCurrentState();
-
-    // TODO: Manage castResultValue == ESkillCastResult::Fail_MissingTarget
-    const auto castResultValue = skillCastResult.GetCastResult();
-    if (castResultValue == ESkillCastResult::Deferred) {
-        newState = NewObject<UNewCastState>(GetOuter(), UNewCastState::StaticClass());
-        newState->SetPawn(_subjectPawn.Get());
-    } else if (castResultValue == ESkillCastResult::Success_IntoChanneling) {
-        newState = NewObject<UNewChannelingState>(GetOuter(), UNewChannelingState::StaticClass());
-        newState->SetPawn(_subjectPawn.Get());
-    } else if (skillCastResult.IsFailure()) {
-        // TODO: send error to manager of some kind
+    if (skillCastResult.IsFailure()) {
+        // TODO: properly manage error text via error system
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
     }
 
-    return newState;
+    return _keepCurrentState();
 }
