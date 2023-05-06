@@ -67,6 +67,10 @@ void AScalarFieldPlayerController::BeginPlay() {
     const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
     inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
     inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
+
+    if (_bNewSkillSystem) {
+        _movementCommandC->SetDefaultMovementMode();
+    }
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {

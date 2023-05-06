@@ -19,6 +19,8 @@ public:
 
     FSkillCastResult TryCastSkillAtIndex(int32 index);
 
+    TWeakObjectPtr<UNewAbstractSkill> GetCurrentlyExecutedSkill() const { return _currentlyExecutedSkill; }
+
 protected:
     void BeginPlay() override;
 

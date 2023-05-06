@@ -2,7 +2,6 @@
 
 #include "NewIdleState.h"
 
-#include "MovementCommandSetter.h"
 #include "NewCastState.h"
 #include "NewChannelingState.h"
 #include "NewSkillsContainerComponent.h"
@@ -24,7 +23,6 @@ void UNewIdleState::SetPawn(TObjectPtr<APawn> subjectPawn) {
 }
 
 void UNewIdleState::OnEnter() {
-    _movementCommandSetter->SetDefaultMovementMode();
 }
 
 void UNewIdleState::OnLeave() {

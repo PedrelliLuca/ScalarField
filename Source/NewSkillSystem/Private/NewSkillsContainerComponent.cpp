@@ -20,8 +20,8 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
         const auto castResultValue = skillCastResult.GetCastResult();
         if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
             _currentlyExecutedSkill = _skills[index];
-            _currentlyExecutedSkill->OnCastPhaseFinish().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
-            _currentlyExecutedSkill->OnChannelingPhaseFinish().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
+            _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
+            _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
         }
     }
 
@@ -44,12 +44,8 @@ void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const F
     if (castResultValue != ESkillCastResult::Success_IntoChanneling) {
         _currentlyExecutedSkill = nullptr;
     }
-
-    // TODO: Broadcast outside so that state can transition
 }
 
-void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult) {
+void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(const FSkillChannelingResult skillChannelingResult) {
     _currentlyExecutedSkill = nullptr;
-
-    // TODO: Broadcast outside so that states can transition
 }

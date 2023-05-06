@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "FSMState.h"
-#include "MovementCommandSetter.h"
 #include "NewSkillsContainerComponent.h"
 
 #include "NewIdleState.generated.h"
@@ -27,5 +26,4 @@ public:
 private:
     TWeakObjectPtr<APawn> _subjectPawn = nullptr;
     TWeakObjectPtr<UNewSkillsContainerComponent> _subjectSkillsContainerC = nullptr;
-    TWeakInterfacePtr<IMovementCommandSetter> _movementCommandSetter = nullptr;
 };

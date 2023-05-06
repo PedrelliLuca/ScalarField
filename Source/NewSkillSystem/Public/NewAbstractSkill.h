@@ -49,10 +49,10 @@ public:
 #pragma endregion
 
     /** \brief Returns the delegate broadcasting what's going on during the casting phase tick. */
-    FOnCastPhaseFinish& OnCastPhaseFinish() { return _onCastPhaseFinish; }
+    FOnCastPhaseFinish& OnCastPhaseEnd() { return _onCastPhaseEnd; }
 
     /** \brief Returns the delegate broadcasting what's going on during the channeling phase tick. */
-    FOnChannelingPhaseFinish& OnChannelingPhaseFinish() { return _onChannelingPhaseFinish; }
+    FOnChannelingPhaseFinish& OnChannelingPhaseEnd() { return _onChannelingPhaseEnd; }
 
 protected:
     /** \brief The time it takes for the skill to be castable again. The countdown starts from the moment the cast is complete. */
@@ -125,6 +125,6 @@ private:
     float _elapsedExecutionSeconds = 0.0f;
     float _castManaLeftToPay = 0.0f;
 
-    FOnCastPhaseFinish _onCastPhaseFinish{};
-    FOnChannelingPhaseFinish _onChannelingPhaseFinish{};
+    FOnCastPhaseFinish _onCastPhaseEnd{};
+    FOnChannelingPhaseFinish _onChannelingPhaseEnd{};
 };
