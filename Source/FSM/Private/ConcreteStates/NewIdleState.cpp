@@ -27,17 +27,15 @@ TScriptInterface<IFSMState> UNewIdleState::TryCastSkillAtIndex(const int32 index
     const auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
 
     TScriptInterface<IFSMState> newState = _keepCurrentState();
-    
+
     // TODO: Manage castResultValue == ESkillCastResult::Fail_MissingTarget
     const auto castResultValue = skillCastResult.GetCastResult();
     if (castResultValue == ESkillCastResult::Deferred) {
         newState = NewObject<UNewCastState>(GetOuter(), UNewCastState::StaticClass());
         newState->SetPawn(_subjectPawn.Get());
-        // TODO: tell cast state to bind to skills container's delegate
     } else if (castResultValue == ESkillCastResult::Success_IntoChanneling) {
         newState = NewObject<UNewChannelingState>(GetOuter(), UNewChannelingState::StaticClass());
         newState->SetPawn(_subjectPawn.Get());
-        // TODO: tell channeling state to bind to skills container's delegate
     } else if (skillCastResult.IsFailure()) {
         // TODO: send error to manager of some kind
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());

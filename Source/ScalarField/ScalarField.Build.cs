@@ -39,7 +39,8 @@ public class ScalarField : ModuleRules
             "AIBuildingBlocks",
             "SkillCastConditions",
             "NewSkillSystem",
-            "FSM"
+            "FSM",
+            "ConcreteSkills",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {

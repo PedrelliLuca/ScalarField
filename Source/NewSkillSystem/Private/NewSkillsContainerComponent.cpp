@@ -20,6 +20,8 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
         const auto castResultValue = skillCastResult.GetCastResult();
         if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
             _currentlyExecutedSkill = _skills[index];
+
+            // You don't need to handle the removal from these delegates, UAbstractSkill automatically takes care of that.
             _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
             _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
         }

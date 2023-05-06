@@ -55,13 +55,12 @@ public:
     FOnChannelingPhaseFinish& OnChannelingPhaseEnd() { return _onChannelingPhaseEnd; }
 
 protected:
+    const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
+    float _getChannelingSeconds() const { return _channelingSeconds; }
+
     /** \brief The time it takes for the skill to be castable again. The countdown starts from the moment the cast is complete. */
     UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.0"))
     float _cooldownSeconds = 1.0f;
-
-    /** \brief The cost in mana to both cast and channel the skill. */
-    UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.0"))
-    float _totalManaCost = 50.0f;
 
     /** \brief Duration of the cast phase of the skill. */
     UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
