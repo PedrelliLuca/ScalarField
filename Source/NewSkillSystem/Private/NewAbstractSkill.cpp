@@ -6,12 +6,14 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
     check(_caster.IsValid());
 
     if (_onCooldown) {
+        _setMovementModeIfPossible(EMovementModeToSet::Default);
         return FSkillCastResult::CastFail_Cooldown();
     }
 
     // TODO: if targets are required by this skill, check if all of them are available and return a specific FSkillCastResult kind.
 
     if (!_areCastConditionsVerified()) {
+        _setMovementModeIfPossible(EMovementModeToSet::Default);
         return FSkillCastResult::CastFail_CastConditionsViolated();
     }
 
@@ -23,11 +25,12 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
     if (FMath::IsNearlyZero(_castSeconds)) {
         const auto currentMana = _casterManaC->GetCurrentMana();
         if (currentMana < _castManaCost) {
+            _setMovementModeIfPossible(EMovementModeToSet::Default);
             return FSkillCastResult::CastFail_InsufficientMana();
         }
         _casterManaC->SetCurrentMana(currentMana - _castManaCost);
         _skillCast();
-        
+
         GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UNewAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
         return _determineCastSuccessKind();
     }
@@ -36,10 +39,12 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
     _castManaLeftToPay = _castManaCost;
     _elapsedExecutionSeconds = 0.0f;
 
+    _setMovementModeIfPossible(EMovementModeToSet::Cast);
     return FSkillCastResult::CastDeferred();
 }
 
 void UNewAbstractSkill::Abort() {
+    // TODO: empty the targets' array here once you'll implement it.
     _isTickAllowed = false;
     _onCastPhaseFinish.Clear();
     _onChannelingPhaseFinish.Clear();
@@ -57,6 +62,15 @@ void UNewAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
 
         for (const auto castCondition : _castConditions) {
             castCondition->SetConditionSubject(caster);
+        }
+
+        if (const auto casterAsPawn = Cast<APawn>(caster); IsValid(casterAsPawn)) {
+            // TODO: update this once the IMovementCommandSetter will be on the pawn
+            if (const auto casterController = casterAsPawn->GetController(); IsValid(casterController)) {
+                // We don't check(_casterMovementSetterC.IsValid()), casters are allowed to not have a movement setter. In such case, the skill won't change
+                // their movement mode.
+                _casterMovementSetterC = Cast<IMovementCommandSetter>(casterController->FindComponentByInterface<UMovementCommandSetter>());
+            }
         }
     }
 }
@@ -84,6 +98,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
     // Cast conditions must be verified during the entire cast phase.
     if (!_areCastConditionsVerified()) {
         _isTickAllowed = false;
+        _setMovementModeIfPossible(EMovementModeToSet::Default);
         _onCastPhaseFinish.Broadcast(FSkillCastResult::CastFail_CastConditionsViolated());
         return;
     }
@@ -95,6 +110,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
             if (currentMana < _castManaLeftToPay) {
                 _casterManaC->SetCurrentMana(0.0f);
                 _isTickAllowed = false;
+                _setMovementModeIfPossible(EMovementModeToSet::Default);
                 _onCastPhaseFinish.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
                 return;
             }
@@ -117,6 +133,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
             _isTickAllowed = false;
+            _setMovementModeIfPossible(EMovementModeToSet::Default);
             _onCastPhaseFinish.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
             return;
         }
@@ -144,6 +161,7 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
             _isTickAllowed = false;
+            _setMovementModeIfPossible(EMovementModeToSet::Default);
             _onChannelingPhaseFinish.Broadcast(FSkillChannelingResult::ChannelingFail_InsufficientMana());
             return;
         }
@@ -156,6 +174,7 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
 
     if (FMath::IsNearlyEqual(_elapsedExecutionSeconds, executionSeconds)) {
         _isTickAllowed = false;
+        _setMovementModeIfPossible(EMovementModeToSet::Default);
         _onChannelingPhaseFinish.Broadcast(FSkillChannelingResult::ChannelingSuccess());
     }
 }
@@ -164,11 +183,13 @@ FSkillCastResult UNewAbstractSkill::_determineCastSuccessKind() {
     if (_channelingSeconds > 0.0f) {
         // This skill requires channeling
         _isTickAllowed = true;
+        _setMovementModeIfPossible(EMovementModeToSet::Channeling);
         return FSkillCastResult::CastSuccess_IntoChanneling();
     }
 
     // This skill does not require channeling
     _isTickAllowed = false;
+    _setMovementModeIfPossible(EMovementModeToSet::Default);
     return FSkillCastResult::CastSuccess_IntoExecutionEnd();
 }
 
@@ -184,4 +205,23 @@ bool UNewAbstractSkill::_areCastConditionsVerified() const {
 
 void UNewAbstractSkill::_onCooldownEnded() {
     _onCooldown = false;
+}
+
+void UNewAbstractSkill::_setMovementModeIfPossible(const EMovementModeToSet movementModeToSet) const {
+    // It's ok for the caster to not have a movement setter. In such case, the skill won't affect its movement.
+    if (!_casterMovementSetterC.IsValid()) {
+        return;
+    }
+
+    switch (movementModeToSet) {
+        case EMovementModeToSet::Default:
+            _casterMovementSetterC->SetDefaultMovementMode();
+            break;
+        case EMovementModeToSet::Cast:
+            _casterMovementSetterC->SetMovementMode(_castMovementMode);
+            break;
+        case EMovementModeToSet::Channeling:
+            _casterMovementSetterC->SetMovementMode(_channelingMovementMode);
+            break;
+    }
 }

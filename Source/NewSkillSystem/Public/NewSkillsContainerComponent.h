@@ -25,7 +25,7 @@ protected:
 private:
     void _onCurrentlyExecutedSkillCastPhaseEnd(FSkillCastResult skillCastResult);
     void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
-    
+
     UPROPERTY(EditAnywhere, Instanced, Category = "Skills")
     TArray<TObjectPtr<UNewAbstractSkill>> _skills{};
 

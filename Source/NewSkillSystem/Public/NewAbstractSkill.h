@@ -5,9 +5,12 @@
 #include "CoreMinimal.h"
 
 #include "ManaComponent.h"
+#include "MovementCommandMode.h"
+#include "MovementCommandSetter.h"
 #include "SkillCastCondition.h"
 #include "SkillCastResult.h"
 #include "SkillChannelingResult.h"
+#include "UObject/WeakInterfacePtr.h"
 
 #include "NewAbstractSkill.generated.h"
 
@@ -25,9 +28,12 @@ public:
      * SetCaster() will trigger a check. */
     FSkillCastResult TryCast();
 
+    /** \brief Aborts the skill execution: clears the delegates, clears the targets, and stops tick. */
     void Abort();
 
     void SetCaster(TObjectPtr<AActor> caster);
+
+#pragma region FTickableGameObject
 
     void Tick(float deltaTime) override;
 
@@ -39,6 +45,8 @@ public:
 
     /** \brief We have to override this because it's virtual pure in FTickableGameObject, but in practice it's not needed. */
     TStatId GetStatId() const override { return TStatId{}; }
+
+#pragma endregion
 
     /** \brief Returns the delegate broadcasting what's going on during the casting phase tick. */
     FOnCastPhaseFinish& OnCastPhaseFinish() { return _onCastPhaseFinish; }
@@ -69,6 +77,13 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
     float _channelingManaCost = 50.0f;
 
+    // UPROPERTY(EditAnywhere, Category = "Movement Modes")
+    // EMovementCommandMode _targetingMovementMode;
+    UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
+    EMovementCommandMode _castMovementMode;
+    UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
+    EMovementCommandMode _channelingMovementMode;
+
 private:
     /** \brief Represents the concrete cast of the skill, skill-specific logic for the cast is executed in here. */
     virtual void _skillCast() PURE_VIRTUAL(UNewAbstractSkill::_skillCast, return;);
@@ -86,12 +101,21 @@ private:
 
     void _onCooldownEnded();
 
+    enum class EMovementModeToSet : uint8
+    {
+        Default,
+        Cast,
+        Channeling,
+    };
+    void _setMovementModeIfPossible(EMovementModeToSet movementModeToSet) const;
+
     /** \brief Conditions that must be verified to cast the skill. */
     UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
     TArray<TObjectPtr<USkillCastCondition>> _castConditions{};
 
     TWeakObjectPtr<AActor> _caster = nullptr;
     TWeakObjectPtr<UManaComponent> _casterManaC = nullptr;
+    TWeakInterfacePtr<IMovementCommandSetter> _casterMovementSetterC = nullptr;
 
     FTimerHandle _cooldownTimer{};
     bool _onCooldown = false;
