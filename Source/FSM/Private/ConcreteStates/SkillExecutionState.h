@@ -6,13 +6,13 @@
 #include "FSMState.h"
 #include "NewSkillsContainerComponent.h"
 
-#include "NewIdleState.generated.h"
+#include "SkillExecutionState.generated.h"
 
 /**
  * \brief State representing a skill user that is not executing any skill.
  */
 UCLASS()
-class FSM_API UNewIdleState : public UObject, public IFSMState {
+class FSM_API USkillExecutionState : public UObject, public IFSMState {
     GENERATED_BODY()
 
 public:

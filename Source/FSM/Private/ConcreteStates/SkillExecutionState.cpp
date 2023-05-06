@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "NewIdleState.h"
+#include "SkillExecutionState.h"
 
 #include "NewSkillsContainerComponent.h"
 
-void UNewIdleState::SetPawn(TObjectPtr<APawn> subjectPawn) {
+void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
     // Make sure that the pawn is not valid before setting it.
     if (ensureMsgf(!_subjectPawn.IsValid(), TEXT("State Subject can be set only once and has already been set."))) {
         check(IsValid(subjectPawn));
@@ -15,13 +15,13 @@ void UNewIdleState::SetPawn(TObjectPtr<APawn> subjectPawn) {
     }
 }
 
-void UNewIdleState::OnEnter() {
+void USkillExecutionState::OnEnter() {
 }
 
-void UNewIdleState::OnLeave() {
+void USkillExecutionState::OnLeave() {
 }
 
-TScriptInterface<IFSMState> UNewIdleState::TryCastSkillAtIndex(const int32 index) {
+TScriptInterface<IFSMState> USkillExecutionState::TryCastSkillAtIndex(const int32 index) {
     const auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
     if (skillCastResult.IsFailure()) {
         // TODO: properly manage error text via error system

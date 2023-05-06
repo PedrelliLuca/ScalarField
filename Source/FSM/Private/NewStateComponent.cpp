@@ -2,7 +2,7 @@
 
 #include "NewStateComponent.h"
 
-#include "ConcreteStates/NewIdleState.h"
+#include "ConcreteStates/SkillExecutionState.h"
 
 void UNewStateComponent::TryCastSkillAtIndex(const uint32 index) {
     auto newState = _state->TryCastSkillAtIndex(index);
@@ -15,7 +15,7 @@ void UNewStateComponent::BeginPlay() {
     _ownerPawn = Cast<APawn>(GetOwner());
     check(_ownerPawn.IsValid());
 
-    _state = NewObject<UNewIdleState>(this, UNewIdleState::StaticClass());
+    _state = NewObject<USkillExecutionState>(this, USkillExecutionState::StaticClass());
     _state->SetPawn(_ownerPawn.Get());
     _state->OnEnter();
 }
