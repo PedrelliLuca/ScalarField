@@ -29,9 +29,11 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
             return FSkillCastResult::CastFail_InsufficientMana();
         }
         _casterManaC->SetCurrentMana(currentMana - _castManaCost);
-        _skillCast();
 
+        _skillCast();
         GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UNewAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
+        _onCooldown = true;
+
         return _determineCastSuccessKind();
     }
 
@@ -131,6 +133,8 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
 
         _skillCast();
         GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UNewAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
+        _onCooldown = true;
+
         auto endCastResult = _determineCastSuccessKind();
         _onCastPhaseEnd.Broadcast(MoveTemp(endCastResult));
         _onCastPhaseEnd.Clear();
