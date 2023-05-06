@@ -178,10 +178,14 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
 
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
-            _isTickAllowed = false;
+            
             _setMovementModeIfPossible(EMovementModeToSet::Default);
+            
             _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingFail_InsufficientMana());
             _onChannelingPhaseEnd.Clear();
+            
+            _isTickAllowed = false;
+            _skillAbort();
             return;
         }
 
@@ -192,10 +196,13 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
     _elapsedExecutionSeconds += deltaTime;
 
     if (FMath::IsNearlyEqual(_elapsedExecutionSeconds, executionSeconds)) {
-        _isTickAllowed = false;
         _setMovementModeIfPossible(EMovementModeToSet::Default);
+        
         _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingSuccess());
         _onChannelingPhaseEnd.Clear();
+
+        _isTickAllowed = false;
+        _skillAbort();
     }
 }
 

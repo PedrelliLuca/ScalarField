@@ -4,15 +4,17 @@
 
 #include "CoreMinimal.h"
 
+#include "GameFramework/SpringArmComponent.h"
 #include "NewAbstractSkill.h"
 
-#include "CastDetachedActorSkill.generated.h"
+#include "CastAttachedActorSkill.generated.h"
 
 /**
- * \brief A cast-only skill that spawns an actor in the world. Once casted, the caster doesn't have control over the actor's lifetime.
+ * TODO: make this work even with a target != from the caster.
+ * \brief A cast-only skill that spawns an actor attached to the caster. The attachment lasts for the entire channeling phase.
  */
 UCLASS(Blueprintable)
-class CONCRETESKILLS_API UCastDetachedActorSkill : public UNewAbstractSkill {
+class CONCRETESKILLS_API UCastAttachedActorSkill : public UNewAbstractSkill {
     GENERATED_BODY()
 
 protected:
@@ -25,15 +27,13 @@ protected:
     /** \brief Transform of the actor to spawn relative to its parent. This actor won't be attached to the caster, so this relative transform only holds when
      * spawning. */
     UPROPERTY(EditAnywhere, Category = "Detached Actor")
-    FTransform _actorToCaster = FTransform::Identity;
-
-    /** \brief Lifetime of the actor to spawn. A negative value means infinite lifetime. A value of zero means the lifetime is equal to the channeling seconds.
-     */
-    UPROPERTY(EditAnywhere, Category = "Detached Actor")
-    float _actorLifetimeSeconds = -1.f;
+    FTransform _actorToTarget = FTransform::Identity;
 
 private:
     void _skillCast() override;
     void _skillChannelingTick(float deltaTime) override;
     void _skillAbort() override;
+
+    TWeakObjectPtr<USpringArmComponent> _spawnSpringArm = nullptr;
+    TWeakObjectPtr<AActor> _spawnActor = nullptr;
 };

@@ -21,6 +21,7 @@ namespace UnrealBuildTool.Rules
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
+					"SkillSpawnedEntities"
 					// ... add private dependencies that you statically link with here ...
 				}
 				);
