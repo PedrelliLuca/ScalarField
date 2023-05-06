@@ -19,7 +19,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnChannelingPhaseFinish, FSkillChannelingRe
 
 /** A skill of the ScalarField game. This can't be an interface because it's meant to be employed with the "Instanced" UPROPERTY specifier, see
  * UNewSkillsContainerComponent. */
-UCLASS(NotBlueprintable, Abstract, DefaultToInstanced)
+UCLASS(NotBlueprintable, Abstract)
 class NEWSKILLSYSTEM_API UNewAbstractSkill : public UObject, public FTickableGameObject {
     GENERATED_BODY()
 

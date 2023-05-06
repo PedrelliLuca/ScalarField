@@ -24,14 +24,15 @@ public:
 protected:
     void BeginPlay() override;
 
+    UPROPERTY(EditAnywhere, Category = "Skills")
+    TArray<TSubclassOf<UNewAbstractSkill>> _skillClasses{};
+
 private:
     void _onCurrentlyExecutedSkillCastPhaseEnd(FSkillCastResult skillCastResult);
     void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
 
-    UPROPERTY(EditAnywhere, Instanced, Category = "Skills")
+    UPROPERTY()
     TArray<TObjectPtr<UNewAbstractSkill>> _skills{};
 
     TWeakObjectPtr<UNewAbstractSkill> _currentlyExecutedSkill = nullptr;
-
-    // TODO: make a pair of delegates to broadcast to states
 };

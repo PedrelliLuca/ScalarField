@@ -34,8 +34,11 @@ void UNewSkillsContainerComponent::BeginPlay() {
     Super::BeginPlay();
 
     const auto caster = GetOwner();
-    for (const auto& skill : _skills) {
+    _skills.Reserve(_skillClasses.Num());
+    for (const auto& skillClass : _skillClasses) {
+        auto skill = NewObject<UNewAbstractSkill>(this, skillClass);
         skill->SetCaster(caster);
+        _skills.Emplace(MoveTemp(skill));
     }
 }
 
