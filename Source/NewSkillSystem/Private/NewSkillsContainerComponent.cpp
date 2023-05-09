@@ -14,7 +14,9 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
 
     const auto skillCastResult = _skills[index]->TryCast();
     if (!skillCastResult.IsFailure()) {
-        if (_currentlyExecutedSkill.IsValid()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
+
+        if (_currentlyExecutedSkill.IsValid() && _skills[index] != _currentlyExecutedSkill) {
             _currentlyExecutedSkill->Abort();
         }
         const auto castResultValue = skillCastResult.GetCastResult();
