@@ -14,8 +14,6 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
 
     const auto skillCastResult = _skills[index]->TryCast();
     if (!skillCastResult.IsFailure()) {
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
-
         if (_currentlyExecutedSkill.IsValid() && _skills[index] != _currentlyExecutedSkill) {
             _currentlyExecutedSkill->Abort();
         }
@@ -27,6 +25,8 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
             _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
             _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
         }
+    } else {
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
     }
 
     return skillCastResult;
