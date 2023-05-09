@@ -50,6 +50,7 @@ void UNewAbstractSkill::Abort() {
     _isTickAllowed = false;
     _onCastPhaseEnd.Clear();
     _onChannelingPhaseEnd.Clear();
+    _setMovementModeIfPossible(EMovementModeToSet::Default);
     _skillAbort();
 }
 
