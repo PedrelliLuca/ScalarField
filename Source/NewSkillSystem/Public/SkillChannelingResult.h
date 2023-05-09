@@ -24,6 +24,8 @@ public:
 
     const FText& GetErrorText() const { return _errorText; }
 
+    bool IsFailure() const { return !_errorText.IsEmpty(); }
+
 private:
     FSkillChannelingResult(ESkillChannelingResult result, FText&& errorText)
         : _result(result)

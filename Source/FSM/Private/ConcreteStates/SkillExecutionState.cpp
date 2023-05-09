@@ -23,10 +23,5 @@ void USkillExecutionState::OnLeave() {
 
 TScriptInterface<IFSMState> USkillExecutionState::TryCastSkillAtIndex(const int32 index) {
     const auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
-    if (skillCastResult.IsFailure()) {
-        // TODO: properly manage error text via error system
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
-    }
-
     return _keepCurrentState();
 }

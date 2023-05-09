@@ -48,11 +48,16 @@ void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const F
     const auto castResultValue = skillCastResult.GetCastResult();
 
     // Success_IntoChanneling is the only result doesn't determine the end of the current skill execution.
-    if (castResultValue != ESkillCastResult::Success_IntoChanneling) {
+    if (skillCastResult.IsFailure()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
+    } else if (castResultValue != ESkillCastResult::Success_IntoChanneling) {
         _currentlyExecutedSkill = nullptr;
     }
 }
 
 void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(const FSkillChannelingResult skillChannelingResult) {
+    if (skillChannelingResult.IsFailure()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
+    }
     _currentlyExecutedSkill = nullptr;
 }
