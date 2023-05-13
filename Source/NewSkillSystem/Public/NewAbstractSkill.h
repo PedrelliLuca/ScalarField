@@ -95,7 +95,11 @@ private:
     void _castTick(float deltaTime);
     void _channelingTick(float deltaTime);
 
-    FSkillCastResult _determineCastSuccessKind();
+    /** \brief Function to call whenever the cast is over. Makes _onCastPhaseEnd broadcast, and executes some extra logic depend on whether the skill requires
+     * channeling or not.
+     * - Channeling required: movement mode is set to channeling, tick is started if the skill has no cast time.
+     * - Channeling not required: Abort() is called. */
+    FSkillCastResult _endCast();
 
     bool _areCastConditionsVerified() const;
 

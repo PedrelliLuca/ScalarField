@@ -34,9 +34,11 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
         GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UNewAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
         _onCooldown = true;
 
-        return _determineCastSuccessKind();
+        const auto castResult = _endCast();
+        return castResult;
     }
 
+    // Skills that have a casting phase need this kind of setup
     _isTickAllowed = true;
     _castManaLeftToPay = _castManaCost;
     _elapsedExecutionSeconds = 0.0f;
@@ -121,7 +123,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
             const auto currentMana = _casterManaC->GetCurrentMana();
             if (currentMana < _castManaLeftToPay) {
                 _casterManaC->SetCurrentMana(0.0f);
-                
+
                 _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
                 Abort();
                 return;
@@ -133,10 +135,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
         GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UNewAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
         _onCooldown = true;
 
-        auto endCastResult = _determineCastSuccessKind();
-        _onCastPhaseEnd.Broadcast(MoveTemp(endCastResult));
-        _onCastPhaseEnd.Clear();
-
+        _endCast();
         _elapsedExecutionSeconds += _castSeconds - _elapsedExecutionSeconds;
         return;
     }
@@ -147,7 +146,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
 
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
-            
+
             _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
             Abort();
             return;
@@ -193,18 +192,26 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
     }
 }
 
-FSkillCastResult UNewAbstractSkill::_determineCastSuccessKind() {
-    if (_channelingSeconds > 0.0f) {
-        // This skill requires channeling
-        _isTickAllowed = true;
+FSkillCastResult UNewAbstractSkill::_endCast() {
+    if (_channelingSeconds > 0.0f) {             // This skill requires channeling
+        if (FMath::IsNearlyZero(_castSeconds)) { // This skill cast was immediate
+            _isTickAllowed = true;
+            _elapsedExecutionSeconds = 0.0f;
+        }
+
+        auto toChannelingResult = FSkillCastResult::CastSuccess_IntoChanneling();
+        _onCastPhaseEnd.Broadcast(toChannelingResult);
+        _onCastPhaseEnd.Clear();
+
         _setMovementModeIfPossible(EMovementModeToSet::Channeling);
-        return FSkillCastResult::CastSuccess_IntoChanneling();
+        return toChannelingResult;
     }
 
-    // This skill does not require channeling
-    _isTickAllowed = false;
-    _setMovementModeIfPossible(EMovementModeToSet::Default);
-    return FSkillCastResult::CastSuccess_IntoExecutionEnd();
+    // This skill does not require channeling => it's over!
+    auto toExecutionEndResult = FSkillCastResult::CastSuccess_IntoExecutionEnd();
+    _onCastPhaseEnd.Broadcast(toExecutionEndResult);
+    Abort();
+    return toExecutionEndResult;
 }
 
 bool UNewAbstractSkill::_areCastConditionsVerified() const {
