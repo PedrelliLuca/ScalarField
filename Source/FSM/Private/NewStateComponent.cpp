@@ -9,6 +9,11 @@ void UNewStateComponent::TryCastSkillAtIndex(const uint32 index) {
     _performStateTransition(MoveTemp(newState));
 }
 
+void UNewStateComponent::TryAbortSkillInExecution() {
+    auto newState = _state->TryAbortSkillInExecution();
+    _performStateTransition(MoveTemp(newState));
+}
+
 void UNewStateComponent::BeginPlay() {
     Super::BeginPlay();
 

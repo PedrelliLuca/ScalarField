@@ -13,23 +13,27 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
     check(IsValid(_skills[index]));
 
     const auto skillCastResult = _skills[index]->TryCast();
-    if (!skillCastResult.IsFailure()) {
-        if (_currentlyExecutedSkill.IsValid() && _skills[index] != _currentlyExecutedSkill) {
-            _currentlyExecutedSkill->Abort();
-        }
-        const auto castResultValue = skillCastResult.GetCastResult();
-        if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
-            _currentlyExecutedSkill = _skills[index];
-
-            // You don't need to handle the removal from these delegates, UAbstractSkill automatically takes care of that.
-            _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
-            _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
-        }
-    } else {
+    if (skillCastResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
+        return skillCastResult;
     }
 
+    // The cast didn't result in a failure. In case some skill was being executed, we abort it.
+    AbortSkillInExecution();
+
+    // Update the skill being executed with the new one
+    _setNewSkillInExecution(index, skillCastResult.GetCastResult());
+
     return skillCastResult;
+}
+
+bool UNewSkillsContainerComponent::AbortSkillInExecution() {
+    if (_currentlyExecutedSkill.IsValid()) {
+        _currentlyExecutedSkill->Abort();
+        _currentlyExecutedSkill = nullptr;
+        return true;
+    }
+    return false;
 }
 
 void UNewSkillsContainerComponent::BeginPlay() {
@@ -41,6 +45,20 @@ void UNewSkillsContainerComponent::BeginPlay() {
         auto skill = NewObject<UNewAbstractSkill>(this, skillClass);
         skill->SetCaster(caster);
         _skills.Emplace(MoveTemp(skill));
+    }
+}
+
+void UNewSkillsContainerComponent::_setNewSkillInExecution(const int32 index, const ESkillCastResult castResultValue) {
+    /* If we don't get inside the following statement, it means that either:
+     * 1. The result was ESkillCastResult::Success_IntoExecutionEnd. In such case, the skill was instantaneous, we don't to cache it and bind to its delegates.
+     * 2. The cast was a failure, so we don't want to set the skill as "in execution". */
+    if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
+        _currentlyExecutedSkill = _skills[index];
+
+        if (castResultValue == ESkillCastResult::Deferred) {
+            _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
+        }
+        _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
     }
 }
 

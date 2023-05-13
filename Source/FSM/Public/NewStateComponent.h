@@ -15,6 +15,7 @@ class FSM_API UNewStateComponent : public UActorComponent {
 
 public:
     void TryCastSkillAtIndex(uint32 index);
+    void TryAbortSkillInExecution();
 
 protected:
     void BeginPlay() override;

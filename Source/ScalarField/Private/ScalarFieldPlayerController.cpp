@@ -47,7 +47,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
     InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
     InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
     InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
-    InputComponent->BindAction("AbortCast", IE_Pressed, _stateC.Get(), &UStateComponent::PerformAbortBehavior);
+    InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkillAbort);
     InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
     InputComponent->BindAction("Interact", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInteractionBehavior);
@@ -176,6 +176,17 @@ void AScalarFieldPlayerController::_onSkill5Cast() {
         }
 
         _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    }
+}
+
+void AScalarFieldPlayerController::_onSkillAbort() {
+    if (!_bNewSkillSystem) {
+        _stateC->PerformAbortBehavior();
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryAbortSkillInExecution();
     }
 }
 

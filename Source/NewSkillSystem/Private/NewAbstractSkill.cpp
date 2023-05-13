@@ -19,7 +19,7 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
 
     // In case we're in cast or channeling phase, i.e. in case we're ticking, abort the old execution before starting the new one.
     if (_isTickAllowed) {
-        Abort();
+        return FSkillCastResult::CastFail_InExecution();
     }
 
     if (FMath::IsNearlyZero(_castSeconds)) {
@@ -94,7 +94,7 @@ void UNewAbstractSkill::Tick(const float deltaTime) {
     } else if (_elapsedExecutionSeconds < _castSeconds + _channelingSeconds) {
         _channelingTick(deltaTime);
     } else {
-        // You should've stopped tick, some reset hasn't gone well.
+        // You should've stopped ticking, some reset hasn't gone well.
         checkNoEntry();
     }
 }
@@ -110,10 +110,8 @@ bool UNewAbstractSkill::IsAllowedToTick() const {
 void UNewAbstractSkill::_castTick(const float deltaTime) {
     // Cast conditions must be verified during the entire cast phase.
     if (!_areCastConditionsVerified()) {
-        _isTickAllowed = false;
-        _setMovementModeIfPossible(EMovementModeToSet::Default);
         _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_CastConditionsViolated());
-        _onCastPhaseEnd.Clear();
+        Abort();
         return;
     }
 
@@ -123,10 +121,9 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
             const auto currentMana = _casterManaC->GetCurrentMana();
             if (currentMana < _castManaLeftToPay) {
                 _casterManaC->SetCurrentMana(0.0f);
-                _isTickAllowed = false;
-                _setMovementModeIfPossible(EMovementModeToSet::Default);
+                
                 _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
-                _onCastPhaseEnd.Clear();
+                Abort();
                 return;
             }
             _casterManaC->SetCurrentMana(currentMana - _castManaLeftToPay);
@@ -150,10 +147,9 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
 
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
-            _isTickAllowed = false;
-            _setMovementModeIfPossible(EMovementModeToSet::Default);
+            
             _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
-            _onCastPhaseEnd.Clear();
+            Abort();
             return;
         }
 
@@ -179,14 +175,9 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
 
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
-            
-            _setMovementModeIfPossible(EMovementModeToSet::Default);
-            
+
             _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingFail_InsufficientMana());
-            _onChannelingPhaseEnd.Clear();
-            
-            _isTickAllowed = false;
-            _skillAbort();
+            Abort();
             return;
         }
 
@@ -197,13 +188,8 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
     _elapsedExecutionSeconds += deltaTime;
 
     if (FMath::IsNearlyEqual(_elapsedExecutionSeconds, executionSeconds)) {
-        _setMovementModeIfPossible(EMovementModeToSet::Default);
-        
         _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingSuccess());
-        _onChannelingPhaseEnd.Clear();
-
-        _isTickAllowed = false;
-        _skillAbort();
+        Abort();
     }
 }
 

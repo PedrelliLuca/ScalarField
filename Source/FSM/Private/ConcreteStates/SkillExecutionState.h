@@ -22,6 +22,7 @@ public:
     void OnLeave() override;
 
     TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) override;
+    TScriptInterface<IFSMState> TryAbortSkillInExecution() override;
 
 private:
     TWeakObjectPtr<APawn> _subjectPawn = nullptr;

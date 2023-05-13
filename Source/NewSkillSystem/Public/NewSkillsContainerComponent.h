@@ -19,6 +19,10 @@ public:
 
     FSkillCastResult TryCastSkillAtIndex(int32 index);
 
+    /** \brief If a skill is being executed, its execution is aborted and true is returned. If no skill is being executed, nothing occurs and false is returned.
+     */
+    bool AbortSkillInExecution();
+
     TWeakObjectPtr<UNewAbstractSkill> GetCurrentlyExecutedSkill() const { return _currentlyExecutedSkill; }
 
 protected:
@@ -28,6 +32,7 @@ protected:
     TArray<TSubclassOf<UNewAbstractSkill>> _skillClasses{};
 
 private:
+    void _setNewSkillInExecution(int32 index, ESkillCastResult castResultValue);
     void _onCurrentlyExecutedSkillCastPhaseEnd(FSkillCastResult skillCastResult);
     void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
 
