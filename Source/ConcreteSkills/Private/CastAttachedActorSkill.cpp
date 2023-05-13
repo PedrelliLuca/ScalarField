@@ -7,24 +7,25 @@
 void UCastAttachedActorSkill::_skillCast() {
     const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(_getCaster().Get(), TEXT("SkillSpringArm"));
     spawnSpringArm->bDoCollisionTest = false;
+    spawnSpringArm->SetVisibility(true);
     spawnSpringArm->SetupAttachment(_getCaster()->GetRootComponent());
 
     // The point where we have to spawn the globe relative to the target, it's also the point where the 2nd end of the arm lies
     const auto location = _actorToTarget.GetLocation();
 
-    // The spring sits on the vector that goes from the target's root to the globeLocation.
-    // About the minus sign:
-    // In the spring's reference frame, the spring elongates in the -x direction. Therefore, we need to make the spring point to
-    // the location that is the opposite of the want we want the second end to be in.
-    spawnSpringArm->SetRelativeRotation((-location).Rotation());
+    // We want the spring arm to represent the vector that goes from the target's root to the location.
+    /* A spring arm elongates along the direction opposite to its reference frame x axis. So, to make the spring arm elongate in the
+     * (+location).Rotation() direction, we must rotate it so that its x axis is equivalent to (-location).Rotation(). */
+    const auto relativeRotation = (-location).Rotation();
+    spawnSpringArm->SetRelativeRotation(relativeRotation);
     spawnSpringArm->TargetArmLength = location.Length();
 
     spawnSpringArm->RegisterComponent();
     _spawnSpringArm = spawnSpringArm;
 
     // Actor deferred spawn to set the caster >>>>>>>>>>
-    const auto socketTransform = spawnSpringArm->GetSocketTransform(spawnSpringArm->SocketName, ERelativeTransformSpace::RTS_World);
-    const auto spawnActor = GetWorld()->SpawnActorDeferred<AActor>(_actorClass, socketTransform);
+    const auto spawnedEntityWorldTransform = _actorToTarget * _getCaster()->GetTransform();
+    const auto spawnActor = GetWorld()->SpawnActorDeferred<AActor>(_actorClass, spawnedEntityWorldTransform);
 
     // A simple cast like the following will return null if the interface is implemented in BP instead of C++. This is because the C++ side has no idea the
     // actor implements the interface in such cases, as explained here https://forums.unrealengine.com/t/c-interface-implemented-in-bp-is-null/491758.
@@ -37,7 +38,7 @@ void UCastAttachedActorSkill::_skillCast() {
         skillSpawnedEntity->SetCaster(_getCaster());
     }
 
-    spawnActor->FinishSpawning(socketTransform);
+    spawnActor->FinishSpawning(spawnedEntityWorldTransform);
     _spawnActor = spawnActor;
     // <<<<<<<<<<
 
