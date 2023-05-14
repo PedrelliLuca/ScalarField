@@ -45,6 +45,11 @@
 			"LoadingPhase": "PreDefault"
 		},
 		{
+			"Name": "SkillTargeting",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
 			"Name": "ConcreteSkills",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault"

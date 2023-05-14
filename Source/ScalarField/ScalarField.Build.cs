@@ -44,6 +44,7 @@ public class ScalarField : ModuleRules
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
+            "SkillTargeting"
         });
     }
 }
