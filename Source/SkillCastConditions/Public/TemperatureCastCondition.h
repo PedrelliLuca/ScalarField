@@ -26,7 +26,7 @@ class SKILLCASTCONDITIONS_API UTemperatureCastCondition : public USkillCastCondi
 public:
     bool IsVerified() const override;
 
-    void SetConditionSubject(TObjectPtr<AActor> subject) override;
+    void SetSkillCaster(TObjectPtr<AActor> skillCaster) override;
 
 protected:
     /** \brief The temperature for which we want to create a cast condition */

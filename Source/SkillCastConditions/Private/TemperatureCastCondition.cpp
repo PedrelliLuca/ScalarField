@@ -23,11 +23,11 @@ bool UTemperatureCastCondition::IsVerified() const {
     return isVerified;
 }
 
-void UTemperatureCastCondition::SetConditionSubject(TObjectPtr<AActor> subject) {
+void UTemperatureCastCondition::SetSkillCaster(TObjectPtr<AActor> skillCaster) {
     // Make sure that the subject is not valid before setting it.
     if (ensureMsgf(!_conditionSubject.IsValid(), TEXT("Condition Subject can be set only once and has already been set."))) {
-        check(IsValid(subject));
-        _conditionSubject = MoveTemp(subject);
+        check(IsValid(skillCaster));
+        _conditionSubject = MoveTemp(skillCaster);
 
         _subjectThermoC = _conditionSubject->FindComponentByClass<UThermodynamicComponent>();
         check(_subjectThermoC.IsValid());

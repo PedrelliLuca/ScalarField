@@ -66,7 +66,7 @@ void UNewAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
         _casterManaC = _caster->FindComponentByClass<UManaComponent>();
 
         for (const auto castCondition : _castConditions) {
-            castCondition->SetConditionSubject(caster);
+            castCondition->SetSkillCaster(caster);
         }
 
         if (const auto casterAsPawn = Cast<APawn>(caster); IsValid(casterAsPawn)) {
