@@ -2,9 +2,29 @@
 
 #include "SkillTargetingConditions/IgnitableTargetingCondition.h"
 
-bool UIgnitableTargetingCondition::IsVerifiedForTarget(TScriptInterface<ISkillTarget> skillTarget) const {
-    return false;
-}
+#include "MaterialsContainerComponent.h"
+#include "SkillTargets/ActorSkillTarget.h"
 
-void UIgnitableTargetingCondition::SetSkillCaster(TObjectPtr<AActor> skillCaster) {
+bool UIgnitableTargetingCondition::IsVerifiedForTarget(const TScriptInterface<ISkillTarget> skillTarget) const {
+    const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget.GetObject());
+    if (!IsValid(actorSkillTarget)) {
+        return false;
+    }
+
+    const auto materialsC = actorSkillTarget->GetActor()->FindComponentByClass<UMaterialsContainerComponent>();
+
+    bool isVerified = false;
+
+    switch (_flammability) {
+        case EFlammability::F_Ignitable:
+            isVerified = IsValid(materialsC) && materialsC->HasMaterial(EMaterial::M_Carbon);
+            break;
+        case EFlammability::F_NotIgnitable:
+            isVerified = !IsValid(materialsC) || !materialsC->HasMaterial(EMaterial::M_Carbon);
+            break;
+        default:
+            checkNoEntry();
+    }
+
+    return isVerified;
 }
