@@ -27,4 +27,16 @@ public:
     bool IsVerifiedForTarget(TScriptInterface<ISkillTarget> skillTarget) const override;
 
     void SetSkillCaster(TObjectPtr<AActor> skillCaster) override;
+
+protected:
+    /** \brief The distance in cm for which we want to create a targeting condition. */
+    UPROPERTY(EditAnywhere)
+    float _targetingConditionDistance = 100.0f;
+
+    /** \brief Determines how the target's distance will be compared with _targetingConditionDistance */
+    UPROPERTY(EditAnywhere)
+    EDistanceComparisonStyle _distanceComparison = EDistanceComparisonStyle::DCS_None;
+
+private:
+    TWeakObjectPtr<AActor> _caster = nullptr;
 };
