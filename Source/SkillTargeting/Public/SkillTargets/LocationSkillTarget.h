@@ -15,4 +15,9 @@ class SKILLTARGETING_API ULocationSkillTarget : public UObject, public ISkillTar
 public:
     FVector GetTargetLocation() const override;
 
+    void SetLocation(const FVector& location);
+
+private:
+    FVector _location{};
+    bool _hasBeenSet = false;
 };

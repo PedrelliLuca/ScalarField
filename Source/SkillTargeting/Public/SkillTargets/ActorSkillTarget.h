@@ -15,6 +15,7 @@ class SKILLTARGETING_API UActorSkillTarget : public UObject, public ISkillTarget
 public:
     FVector GetTargetLocation() const override;
 
+    void SetActor(TObjectPtr<AActor> actor);
     TObjectPtr<AActor> GetActor() const { return _actor.Get(); }
 
 private:
