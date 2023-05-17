@@ -1,11 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SkillTargetingConditions/IgnitableTargetingCondition.h"
+#include "SkillTargetingConditions/FlammabilityTargetingCondition.h"
 
 #include "MaterialsContainerComponent.h"
 #include "SkillTargets/ActorSkillTarget.h"
 
-bool UIgnitableTargetingCondition::IsVerifiedForTarget(const TScriptInterface<ISkillTarget> skillTarget) const {
+bool UFlammabilityTargetingCondition::IsVerifiedForTarget(const TScriptInterface<ISkillTarget> skillTarget) const {
     const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget.GetObject());
     if (!IsValid(actorSkillTarget)) {
         return false;

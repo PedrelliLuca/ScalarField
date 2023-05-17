@@ -6,10 +6,10 @@
 
 #include "SkillTargetingCondition.h"
 
-#include "IgnitableTargetingCondition.generated.h"
+#include "FlammabilityTargetingCondition.generated.h"
 
-/** \brief Ways to compare the distance between the caster and the target. E.g., "Less Than" means that the condition is verified if the distance between the
- * two is less than this condition's distance value. */
+/** \brief Ways to check for flammability. "Ignitable" means that the condition is verified if the target can be ignited, "Not Ignitable" is the target is
+ * fire-proof. */
 UENUM(BlueprintType)
 enum class EFlammability : uint8
 {
@@ -19,7 +19,7 @@ enum class EFlammability : uint8
 };
 
 UCLASS(Blueprintable, EditInlineNew, DefaultToInstanced)
-class SKILLTARGETING_API UIgnitableTargetingCondition : public USkillTargetingCondition {
+class SKILLTARGETING_API UFlammabilityTargetingCondition : public USkillTargetingCondition {
     GENERATED_BODY()
 
 public:
