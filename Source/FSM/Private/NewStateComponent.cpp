@@ -14,6 +14,11 @@ void UNewStateComponent::TryAbortSkillInExecution() {
     _performStateTransition(MoveTemp(newState));
 }
 
+void UNewStateComponent::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+    auto newState = _state->TrySetSkillTarget(targetPacket);
+    _performStateTransition(MoveTemp(newState));
+}
+
 void UNewStateComponent::BeginPlay() {
     Super::BeginPlay();
 

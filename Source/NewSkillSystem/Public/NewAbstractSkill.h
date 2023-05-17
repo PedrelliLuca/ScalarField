@@ -10,6 +10,7 @@
 #include "SkillCastCondition.h"
 #include "SkillCastResult.h"
 #include "SkillChannelingResult.h"
+#include "SkillTargetingCondition.h"
 #include "TacticalPauseWorldSubsystem.h"
 #include "UObject/WeakInterfacePtr.h"
 
@@ -77,7 +78,7 @@ protected:
     float _channelingManaCost = 50.0f;
 
     // UPROPERTY(EditAnywhere, Category = "Movement Modes")
-    // EMovementCommandMode _targetingMovementMode;
+    // EMovementCommandMode _targetingMovementMode; // TODO?: Could be added in the future, seems excessive for the time being.
     UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
     EMovementCommandMode _castMovementMode;
     UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
@@ -112,9 +113,24 @@ private:
     };
     void _setMovementModeIfPossible(EMovementModeToSet movementModeToSet) const;
 
-    /** \brief Conditions that must be verified to cast the skill. */
+    /** \brief Conditions that must be verified by the caster to cast the skill. */
     UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
     TArray<TObjectPtr<USkillCastCondition>> _castConditions{};
+
+    /** \brief Conditions that must be verified by each target required by this skill. */
+    UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
+    TArray<TObjectPtr<USkillTargetingCondition>> _targetingConditions{};
+
+    /** \brief Kind of target needed by the skill to execute its logic. */
+    UPROPERTY(EditDefaultsOnly, Category = "Targeting", meta = (MustImplement = "SkillTarget"))
+    TSubclassOf<UObject> _targetKind = nullptr;
+
+    /** \brief Num of targets the skill needs to execute its logic. */
+    UPROPERTY(EditDefaultsOnly, Category = "Targeting")
+    int32 _nTargets = 0;
+
+    UPROPERTY()
+    TArray<TScriptInterface<ISkillTarget>> _targets{};
 
     TWeakObjectPtr<AActor> _caster = nullptr;
     TWeakObjectPtr<UManaComponent> _casterManaC = nullptr;

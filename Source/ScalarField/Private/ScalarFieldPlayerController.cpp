@@ -84,7 +84,19 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
 void AScalarFieldPlayerController::_onSetTargetPressed() {
     FHitResult hit;
     GetHitResultUnderCursor(ECC_Visibility, true, hit);
-    _stateC->PerformTargetingBehavior(hit.GetActor());
+    if (!_bNewSkillSystem) {
+        _stateC->PerformTargetingBehavior(hit.GetActor());
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        // We don't know what the skill we want to cast is going to need, so we'll provide it with everything we have.
+        FSkillTargetPacket targetPacket;
+        targetPacket.TargetActor = hit.GetActor();
+        targetPacket.TargetLocation = hit.Location;
+
+        stateC->TrySetSkillTarget(targetPacket);
+    }
 }
 
 void AScalarFieldPlayerController::_onSkill1Cast() {

@@ -41,3 +41,8 @@ TScriptInterface<IFSMState> USkillExecutionState::TryAbortSkillInExecution() {
     _subjectSkillsContainerC->AbortSkillInExecution();
     return _keepCurrentState();
 }
+
+TScriptInterface<IFSMState> USkillExecutionState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+    // _subjectSkillsContainerC->TrySetSkillTarget()
+    return nullptr;
+}

@@ -13,9 +13,9 @@ class SKILLTARGETING_API ULocationSkillTarget : public UObject, public ISkillTar
     GENERATED_BODY()
 
 public:
+    void Init(const FSkillTargetPacket& targetPacket) override;
+    
     FVector GetTargetLocation() const override;
-
-    void SetLocation(const FVector& location);
 
 private:
     FVector _location{};

@@ -23,6 +23,7 @@ public:
 
     TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) override;
     TScriptInterface<IFSMState> TryAbortSkillInExecution() override;
+    TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) override;
 
 private:
     TWeakObjectPtr<APawn> _subjectPawn = nullptr;

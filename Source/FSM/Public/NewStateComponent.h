@@ -6,6 +6,7 @@
 
 #include "Components/ActorComponent.h"
 #include "FSMState.h"
+#include "SkillTarget.h"
 
 #include "NewStateComponent.generated.h"
 
@@ -16,6 +17,7 @@ class FSM_API UNewStateComponent : public UActorComponent {
 public:
     void TryCastSkillAtIndex(uint32 index);
     void TryAbortSkillInExecution();
+    void TrySetSkillTarget(const FSkillTargetPacket& targetPacket);
 
 protected:
     void BeginPlay() override;
