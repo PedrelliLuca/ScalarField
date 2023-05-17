@@ -11,6 +11,11 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
     }
 
     // TODO: if targets are required by this skill, check if all of them are available and return a specific FSkillCastResult kind.
+    if (_targets.Num() != _nTargets) {
+        // If we have more targets then we can handle, something went horribly wrong.
+        check(_targets.Num() < _nTargets);
+        return FSkillCastResult::CastFail_MissingTarget();
+    }
 
     if (!_areCastConditionsVerified()) {
         _setMovementModeIfPossible(EMovementModeToSet::Default);
@@ -48,12 +53,17 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
 }
 
 void UNewAbstractSkill::Abort() {
-    // TODO: empty the targets' array here once you'll implement it.
     _isTickAllowed = false;
     _onCastPhaseEnd.Clear();
     _onChannelingPhaseEnd.Clear();
+    _targets.Empty();
     _setMovementModeIfPossible(EMovementModeToSet::Default);
     _skillAbort();
+}
+
+FSkillTargetingResult UNewAbstractSkill::TryAddTarget(const FSkillTargetPacket& targetPacket) {
+    // TODO
+    return FSkillTargetingResult::TargetingFail_InvalidTarget();
 }
 
 void UNewAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {

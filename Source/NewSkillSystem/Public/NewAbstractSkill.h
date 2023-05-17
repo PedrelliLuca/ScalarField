@@ -11,6 +11,7 @@
 #include "SkillCastResult.h"
 #include "SkillChannelingResult.h"
 #include "SkillTargetingCondition.h"
+#include "SkillTargetingResult.h"
 #include "TacticalPauseWorldSubsystem.h"
 #include "UObject/WeakInterfacePtr.h"
 
@@ -31,6 +32,10 @@ public:
 
     /** \brief Aborts the skill execution: clears the delegates, clears the targets, and stops tick. */
     void Abort();
+
+    /** \brief Adds a target to the skill. This function can have many outcomes, you can see all of them in ESkillTargetingResult. Calling this function before
+     * SetCaster() will trigger a check. */
+    FSkillTargetingResult TryAddTarget(const FSkillTargetPacket& targetPacket);
 
     void SetCaster(TObjectPtr<AActor> caster);
 
