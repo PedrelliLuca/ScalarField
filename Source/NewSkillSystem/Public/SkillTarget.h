@@ -20,7 +20,7 @@ class ISkillTarget {
 
 public:
     virtual void Init(const FSkillTargetPacket& targetPacket) = 0;
-    
+
     /** \brief Returns the location of the target in the world. */
     virtual FVector GetTargetLocation() const = 0;
 };
