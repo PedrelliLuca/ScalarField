@@ -69,7 +69,7 @@ void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const F
     if (skillCastResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
     }
-    
+
     if (castResultValue != ESkillCastResult::Success_IntoChanneling) {
         _currentlyExecutedSkill = nullptr;
     }

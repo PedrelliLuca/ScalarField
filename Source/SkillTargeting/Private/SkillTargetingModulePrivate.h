@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogSkillTargeting, Log, All);
 
 class FSkillTargetingModule : public ISkillTargetingModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };
