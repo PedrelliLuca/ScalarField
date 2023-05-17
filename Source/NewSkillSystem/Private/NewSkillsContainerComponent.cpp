@@ -12,19 +12,15 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
     checkf(index < _skills.Num(), TEXT("There is no skill at index %i"), index);
     check(IsValid(_skills[index]));
 
-    const auto skillCastResult = _skills[index]->TryCast();
-    if (skillCastResult.IsFailure()) {
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
-        return skillCastResult;
+    return _tryCastSkill(_skills[index]);
+}
+
+TOptional<FSkillCastResult> UNewSkillsContainerComponent::TryCastWaitingSkill() {
+    if (!_skillWaitingForTargets.IsValid()) {
+        return TOptional<FSkillCastResult>{};
     }
 
-    // The cast didn't result in a failure. In case some skill was being executed, we abort it.
-    AbortSkillInExecution();
-
-    // Update the skill being executed with the new one
-    _setNewSkillInExecution(index, skillCastResult.GetCastResult());
-
-    return skillCastResult;
+    return _tryCastSkill(_skillWaitingForTargets.Get());
 }
 
 bool UNewSkillsContainerComponent::AbortSkillInExecution() {
@@ -34,6 +30,25 @@ bool UNewSkillsContainerComponent::AbortSkillInExecution() {
         return true;
     }
     return false;
+}
+
+TOptional<FSkillTargetingResult> UNewSkillsContainerComponent::TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket) {
+    if (!_skillWaitingForTargets.IsValid()) {
+        // No skill is waiting for targets
+        return TOptional<FSkillTargetingResult>{};
+    }
+
+    auto skillTargetingResult = _skillWaitingForTargets->TryAddTarget(targetPacket);
+
+    if (skillTargetingResult.IsFailure()) {
+        // If every target has already been provided to the skill we expect _skillWaitingForTargets top be nullptr.
+        check(skillTargetingResult.GetTargetingResult() != ESkillTargetingResult::Fail_AlreadyAvailableTargets);
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillTargetingResult.GetErrorText().ToString());
+    } else {
+        _skillWaitingForTargets = nullptr;
+    }
+
+    return MoveTemp(skillTargetingResult);
 }
 
 void UNewSkillsContainerComponent::BeginPlay() {
@@ -48,12 +63,27 @@ void UNewSkillsContainerComponent::BeginPlay() {
     }
 }
 
-void UNewSkillsContainerComponent::_setNewSkillInExecution(const int32 index, const ESkillCastResult castResultValue) {
+FSkillCastResult UNewSkillsContainerComponent::_tryCastSkill(TObjectPtr<UNewAbstractSkill> skill) {
+    const auto skillCastResult = skill->TryCast();
+    if (skillCastResult.IsFailure()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
+        return skillCastResult;
+    }
+
+    // The cast didn't result in a failure. In case some skill was being executed, we abort it.
+    AbortSkillInExecution();
+
+    // Update the skill being executed with the new one
+    _setNewSkillInExecution(skill, skillCastResult.GetCastResult());
+    return skillCastResult;
+}
+
+void UNewSkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UNewAbstractSkill> skill, const ESkillCastResult castResultValue) {
     /* If we don't get inside the following statement, it means that either:
      * 1. The result was ESkillCastResult::Success_IntoExecutionEnd. In such case, the skill was instantaneous, we don't to cache it and bind to its delegates.
      * 2. The cast was a failure, so we don't want to set the skill as "in execution". */
     if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
-        _currentlyExecutedSkill = _skills[index];
+        _currentlyExecutedSkill = skill;
 
         if (castResultValue == ESkillCastResult::Deferred) {
             _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
