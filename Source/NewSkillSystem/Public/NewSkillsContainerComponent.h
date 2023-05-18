@@ -45,6 +45,8 @@ private:
     void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
 
     bool _resetSkillInExecution(bool resetMovement);
+    void _resetWaitingSkill();
+
     UPROPERTY()
     TArray<TObjectPtr<UNewAbstractSkill>> _skills{};
 

@@ -12,31 +12,51 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
     checkf(index < _skills.Num(), TEXT("There is no skill at index %i"), index);
     check(IsValid(_skills[index]));
 
-    auto skillCastResult = _skills[index]->TryCast();
+    const auto skillCastResult = _skills[index]->TryCast();
     if (skillCastResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
+
+        if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_MissingTarget) {
+            _resetWaitingSkill();
+            _skillWaitingForTargets = _skills[index];
+        }
+
         return skillCastResult;
     }
 
     // The cast didn't result in a failure. In case some skill was being executed, we abort it. If some skill was waiting, we reset its targets.
     _resetSkillInExecution(false);
-    // _resetWaitingSkill();
+    _resetWaitingSkill();
 
     // Update the skill being executed with the new one
     _setNewSkillInExecution(_skills[index], skillCastResult.GetCastResult());
 
-    return MoveTemp(skillCastResult);
+    return skillCastResult;
 }
 
 TOptional<FSkillCastResult> UNewSkillsContainerComponent::TryCastWaitingSkill() {
-    if (!_skillWaitingForTargets.IsValid()) {
+    if (!ensureAlwaysMsgf(_skillWaitingForTargets.IsValid(), TEXT("No Waiting Skill to be cast."))) {
         return TOptional<FSkillCastResult>{};
     }
 
-    return TOptional<FSkillCastResult>{};
+    auto skillCastResult = _skillWaitingForTargets->TryCast();
+    if (skillCastResult.IsFailure()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
+
+        // We do not reset the targets we already acquired, that can only happen by succeeding in casting
+        return MoveTemp(skillCastResult);
+    }
+
+    _resetSkillInExecution(false);
+    _setNewSkillInExecution(_skillWaitingForTargets.Get(), skillCastResult.GetCastResult());
+    _skillWaitingForTargets = nullptr;
+
+    return MoveTemp(skillCastResult);
 }
 
 bool UNewSkillsContainerComponent::AbortSkillInExecution() {
+    // TODO: also abort waiting skill? If not, how do we abort waiting skill?
+    // _resetWaitingSkill();
     return _resetSkillInExecution(true);
 }
 
@@ -112,4 +132,11 @@ bool UNewSkillsContainerComponent::_resetSkillInExecution(const bool resetMoveme
         return true;
     }
     return false;
+}
+
+void UNewSkillsContainerComponent::_resetWaitingSkill() {
+    if (_skillWaitingForTargets.IsValid()) {
+        _skillWaitingForTargets->Abort(false); // Targets' cleanup.
+        _skillWaitingForTargets = nullptr;
+    }
 }
