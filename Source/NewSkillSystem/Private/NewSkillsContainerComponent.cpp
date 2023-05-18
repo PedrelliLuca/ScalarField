@@ -12,7 +12,20 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
     checkf(index < _skills.Num(), TEXT("There is no skill at index %i"), index);
     check(IsValid(_skills[index]));
 
-    return _tryCastSkill(_skills[index]);
+    auto skillCastResult = _skills[index]->TryCast();
+    if (skillCastResult.IsFailure()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
+        return skillCastResult;
+    }
+
+    // The cast didn't result in a failure. In case some skill was being executed, we abort it. If some skill was waiting, we reset its targets.
+    _resetSkillInExecution(false);
+    // _resetWaitingSkill();
+
+    // Update the skill being executed with the new one
+    _setNewSkillInExecution(_skills[index], skillCastResult.GetCastResult());
+
+    return MoveTemp(skillCastResult);
 }
 
 TOptional<FSkillCastResult> UNewSkillsContainerComponent::TryCastWaitingSkill() {
@@ -20,16 +33,11 @@ TOptional<FSkillCastResult> UNewSkillsContainerComponent::TryCastWaitingSkill() 
         return TOptional<FSkillCastResult>{};
     }
 
-    return _tryCastSkill(_skillWaitingForTargets.Get());
+    return TOptional<FSkillCastResult>{};
 }
 
 bool UNewSkillsContainerComponent::AbortSkillInExecution() {
-    if (_currentlyExecutedSkill.IsValid()) {
-        _currentlyExecutedSkill->Abort();
-        _currentlyExecutedSkill = nullptr;
-        return true;
-    }
-    return false;
+    return _resetSkillInExecution(true);
 }
 
 TOptional<FSkillTargetingResult> UNewSkillsContainerComponent::TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket) {
@@ -61,21 +69,6 @@ void UNewSkillsContainerComponent::BeginPlay() {
         skill->SetCaster(caster);
         _skills.Emplace(MoveTemp(skill));
     }
-}
-
-FSkillCastResult UNewSkillsContainerComponent::_tryCastSkill(TObjectPtr<UNewAbstractSkill> skill) {
-    const auto skillCastResult = skill->TryCast();
-    if (skillCastResult.IsFailure()) {
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
-        return skillCastResult;
-    }
-
-    // The cast didn't result in a failure. In case some skill was being executed, we abort it.
-    AbortSkillInExecution();
-
-    // Update the skill being executed with the new one
-    _setNewSkillInExecution(skill, skillCastResult.GetCastResult());
-    return skillCastResult;
 }
 
 void UNewSkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UNewAbstractSkill> skill, const ESkillCastResult castResultValue) {
@@ -110,4 +103,13 @@ void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(c
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
     }
     _currentlyExecutedSkill = nullptr;
+}
+
+bool UNewSkillsContainerComponent::_resetSkillInExecution(const bool resetMovement) {
+    if (_currentlyExecutedSkill.IsValid()) {
+        _currentlyExecutedSkill->Abort(resetMovement);
+        _currentlyExecutedSkill = nullptr;
+        return true;
+    }
+    return false;
 }

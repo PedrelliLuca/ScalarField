@@ -40,11 +40,11 @@ protected:
     TArray<TSubclassOf<UNewAbstractSkill>> _skillClasses{};
 
 private:
-    FSkillCastResult _tryCastSkill(TObjectPtr<UNewAbstractSkill> skill);
     void _setNewSkillInExecution(TObjectPtr<UNewAbstractSkill> skill, ESkillCastResult castResultValue);
     void _onCurrentlyExecutedSkillCastPhaseEnd(FSkillCastResult skillCastResult);
     void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
 
+    bool _resetSkillInExecution(bool resetMovement);
     UPROPERTY()
     TArray<TObjectPtr<UNewAbstractSkill>> _skills{};
 

@@ -30,8 +30,9 @@ public:
      * SetCaster() will trigger a check. */
     FSkillCastResult TryCast();
 
-    /** \brief Aborts the skill execution: clears the delegates, clears the targets, and stops tick. */
-    void Abort();
+    /** \brief Aborts the skill execution: clears the delegates, clears the targets, stops ticking. If shouldResetMovement is set to true, the movement mode
+     * will be set to the default one. */
+    void Abort(bool shouldResetMovement);
 
     /** \brief Adds a target to the skill. This function can have many outcomes, you can see all of them in ESkillTargetingResult. Calling this function before
      * SetCaster() will trigger a check. */

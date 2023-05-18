@@ -52,12 +52,15 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
     return FSkillCastResult::CastDeferred();
 }
 
-void UNewAbstractSkill::Abort() {
+void UNewAbstractSkill::Abort(const bool shouldResetMovement) {
+    if (shouldResetMovement) {
+        _setMovementModeIfPossible(EMovementModeToSet::Default);
+    }
+
     _isTickAllowed = false;
     _onCastPhaseEnd.Clear();
     _onChannelingPhaseEnd.Clear();
     _targets.Empty();
-    _setMovementModeIfPossible(EMovementModeToSet::Default);
     _skillAbort();
 }
 
@@ -123,7 +126,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
     // Cast conditions must be verified during the entire cast phase.
     if (!_areCastConditionsVerified()) {
         _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_CastConditionsViolated());
-        Abort();
+        Abort(true);
         return;
     }
 
@@ -135,7 +138,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
                 _casterManaC->SetCurrentMana(0.0f);
 
                 _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
-                Abort();
+                Abort(true);
                 return;
             }
             _casterManaC->SetCurrentMana(currentMana - _castManaLeftToPay);
@@ -158,7 +161,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
             _casterManaC->SetCurrentMana(0.0f);
 
             _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
-            Abort();
+            Abort(true);
             return;
         }
 
@@ -186,7 +189,7 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
             _casterManaC->SetCurrentMana(0.0f);
 
             _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingFail_InsufficientMana());
-            Abort();
+            Abort(true);
             return;
         }
 
@@ -198,7 +201,7 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
 
     if (FMath::IsNearlyEqual(_elapsedExecutionSeconds, executionSeconds)) {
         _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingSuccess());
-        Abort();
+        Abort(true);
     }
 }
 
@@ -220,7 +223,7 @@ FSkillCastResult UNewAbstractSkill::_endCast() {
     // This skill does not require channeling => it's over!
     auto toExecutionEndResult = FSkillCastResult::CastSuccess_IntoExecutionEnd();
     _onCastPhaseEnd.Broadcast(toExecutionEndResult);
-    Abort();
+    Abort(true);
     return toExecutionEndResult;
 }
 
