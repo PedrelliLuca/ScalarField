@@ -45,7 +45,8 @@ TOptional<FSkillCastResult> UNewSkillsContainerComponent::TryCastWaitingSkill() 
     if (skillCastResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
 
-        // We do not reset the targets we already acquired, that can only happen by succeeding in casting
+        // Reset every target
+        _resetWaitingSkill();
         return MoveTemp(skillCastResult);
     }
 
