@@ -16,6 +16,7 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
     if (skillCastResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
 
+        // In case of failure, do not override the waiting skill unless the skill that just failed requires targets.
         if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_MissingTarget) {
             _resetWaitingSkill();
             _skillWaitingForTargets = _skills[index];
@@ -24,7 +25,8 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
         return skillCastResult;
     }
 
-    // The cast didn't result in a failure. In case some skill was being executed, we abort it. If some skill was waiting, we reset its targets.
+    // Successful cast.
+    // In case some skill was being executed, we abort it. If some skill was waiting, we reset its targets.
     _resetSkillInExecution(false);
     _resetWaitingSkill();
 
@@ -47,6 +49,8 @@ TOptional<FSkillCastResult> UNewSkillsContainerComponent::TryCastWaitingSkill() 
         return MoveTemp(skillCastResult);
     }
 
+    // Successful cast.
+    // In case some skill was being executed, we abort it. Then, we replace the exeucting skill with the waiting skill and invalidate this latter.
     _resetSkillInExecution(false);
     _setNewSkillInExecution(_skillWaitingForTargets.Get(), skillCastResult.GetCastResult());
     _skillWaitingForTargets = nullptr;
