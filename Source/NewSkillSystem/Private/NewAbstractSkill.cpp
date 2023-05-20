@@ -69,7 +69,7 @@ FSkillTargetingResult UNewAbstractSkill::TryAddTarget(const FSkillTargetPacket& 
         return FSkillTargetingResult::TargetingFail_AlreadyAvailableTargets();
     }
 
-    TScriptInterface<ISkillTarget> target = NewObject<USkillTarget>(this, _targetKind);
+    TScriptInterface<ISkillTarget> target = NewObject<UObject>(this, _targetKind);
     target->Init(targetPacket);
 
     if (_areTargetingConditionsVerifiedForTarget(target)) {
