@@ -125,11 +125,11 @@ private:
     void _setMovementModeIfPossible(EMovementModeToSet movementModeToSet) const;
 
     /** \brief Conditions that must be verified by the caster to cast the skill. */
-    UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
+    UPROPERTY(EditDefaultsOnly, Instanced, Category = "Casting")
     TArray<TObjectPtr<USkillCastCondition>> _castConditions{};
 
     /** \brief Conditions that must be verified by each target required by this skill. */
-    UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
+    UPROPERTY(EditDefaultsOnly, Instanced, Category = "Targeting")
     TArray<TObjectPtr<USkillTargetingCondition>> _targetingConditions{};
 
     /** \brief Kind of target needed by the skill to execute its logic. */
@@ -137,7 +137,7 @@ private:
     TSubclassOf<UObject> _targetKind = nullptr;
 
     /** \brief Num of targets the skill needs to execute its logic. */
-    UPROPERTY(EditDefaultsOnly, Category = "Targeting")
+    UPROPERTY(EditDefaultsOnly, Category = "Targeting", meta = (ClampMin = "0"))
     int32 _nTargets = 0;
 
     UPROPERTY()
