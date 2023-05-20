@@ -65,7 +65,24 @@ void UNewAbstractSkill::Abort(const bool shouldResetMovement) {
 }
 
 FSkillTargetingResult UNewAbstractSkill::TryAddTarget(const FSkillTargetPacket& targetPacket) {
-    // TODO
+    if (_targets.Num() == _nTargets) {
+        return FSkillTargetingResult::TargetingFail_AlreadyAvailableTargets();
+    }
+
+    TScriptInterface<ISkillTarget> target = NewObject<USkillTarget>(this, _targetKind);
+    target->Init(targetPacket);
+
+    if (_areTargetingConditionsVerifiedForTarget(target)) {
+        _targets.Emplace(MoveTemp(target));
+
+        check(_targets.Num() <= _nTargets);
+        if (_targets.Num() == _nTargets) {
+            return FSkillTargetingResult::TargetingSuccess_IntoCast();
+        }
+
+        return FSkillTargetingResult::TargetingSuccess_KeepTargeting();
+    }
+
     return FSkillTargetingResult::TargetingFail_InvalidTarget();
 }
 
@@ -77,6 +94,10 @@ void UNewAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
 
         // We don't check(_casterManaC.IsValid()), casters are allowed to not have a mana component. In such case, they're special casters that do not pay mana.
         _casterManaC = _caster->FindComponentByClass<UManaComponent>();
+
+        for (const auto targetingCondition : _targetingConditions) {
+            targetingCondition->SetSkillCaster(caster);
+        }
 
         for (const auto castCondition : _castConditions) {
             castCondition->SetSkillCaster(caster);
@@ -123,6 +144,15 @@ bool UNewAbstractSkill::IsAllowedToTick() const {
 }
 
 void UNewAbstractSkill::_castTick(const float deltaTime) {
+    // Targeting conditions must be verified during the entire cast phase.
+    for (const auto& target : _targets) {
+        if (!_areTargetingConditionsVerifiedForTarget(target)) {
+            _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_TargetingConditionsViolated());
+            Abort(true);
+            return;
+        }
+    }
+
     // Cast conditions must be verified during the entire cast phase.
     if (!_areCastConditionsVerified()) {
         _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_CastConditionsViolated());
@@ -172,6 +202,17 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
 }
 
 void UNewAbstractSkill::_channelingTick(float deltaTime) {
+    if (_checkTargetingConditionsWhenChanneling) {
+        // Targeting conditions must be verified during the entire cast phase.
+        for (const auto& target : _targets) {
+            if (!_areTargetingConditionsVerifiedForTarget(target)) {
+                _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingFail_TargetingConditionsViolated());
+                Abort(true);
+                return;
+            }
+        }
+    }
+
     // TODO: implement channeling conditions
 
     const auto executionSeconds = _castSeconds + _channelingSeconds;
@@ -225,6 +266,16 @@ FSkillCastResult UNewAbstractSkill::_endCast() {
     _onCastPhaseEnd.Broadcast(toExecutionEndResult);
     Abort(true);
     return toExecutionEndResult;
+}
+
+bool UNewAbstractSkill::_areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const {
+    // TODO: When you'll have a proper error management system, this function will have to collect and return all errors thrown by the cast conditions.
+    for (const auto targetingCondition : _targetingConditions) {
+        if (!targetingCondition->IsVerifiedForTarget(target)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool UNewAbstractSkill::_areCastConditionsVerified() const {

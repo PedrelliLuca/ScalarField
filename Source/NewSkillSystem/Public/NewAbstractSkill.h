@@ -83,6 +83,10 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
     float _channelingManaCost = 50.0f;
 
+    /** \brief If true, targeting conditions are checked while channeling. This implies that, if one of them fails, the skill is aborted. */
+    UPROPERTY(EditDefaultsOnly, Category = "Chanelling")
+    bool _checkTargetingConditionsWhenChanneling = false;
+
     // UPROPERTY(EditAnywhere, Category = "Movement Modes")
     // EMovementCommandMode _targetingMovementMode; // TODO?: Could be added in the future, seems excessive for the time being.
     UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
@@ -107,6 +111,7 @@ private:
      * - Channeling not required: Abort() is called. */
     FSkillCastResult _endCast();
 
+    bool _areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const;
     bool _areCastConditionsVerified() const;
 
     void _onCooldownEnded();
