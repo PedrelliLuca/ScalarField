@@ -8,6 +8,7 @@
 enum class ESkillChannelingResult : uint8
 {
     None,
+    Fail_TargetingConditionsViolated,
     Fail_InsufficientMana,
     Success
 };
@@ -17,6 +18,7 @@ enum class ESkillChannelingResult : uint8
 class FSkillChannelingResult {
 public:
     // Functions to standardize instances of this class
+    static FSkillChannelingResult ChannelingFail_TargetingConditionsViolated();
     static FSkillChannelingResult ChannelingFail_InsufficientMana();
     static FSkillChannelingResult ChannelingSuccess();
 
@@ -38,10 +40,16 @@ private:
 
 #define LOCTEXT_NAMESPACE "SkillChannelingResult"
 
+FORCEINLINE FSkillChannelingResult FSkillChannelingResult::ChannelingFail_TargetingConditionsViolated() {
+    constexpr auto result = ESkillChannelingResult::Fail_TargetingConditionsViolated;
+    auto errorText = LOCTEXT("SkillChannelingResult_TargetingConditionsViolatedText", "Skill channeling interrupted, some condition on a target is vioalted.");
+    return FSkillChannelingResult(result, MoveTemp(errorText));
+}
+
 // TODO: in the future take skill name as string parameter and use it to build better error text
 FORCEINLINE FSkillChannelingResult FSkillChannelingResult::ChannelingFail_InsufficientMana() {
     constexpr auto result = ESkillChannelingResult::Fail_InsufficientMana;
-    auto errorText = LOCTEXT("SkillChanneling_InsufficientManaText", "Skill channeling interrupted, insufficient mana.");
+    auto errorText = LOCTEXT("SkillChannelingResult_InsufficientManaText", "Skill channeling interrupted, insufficient mana.");
     return FSkillChannelingResult(result, MoveTemp(errorText));
 }
 

@@ -10,6 +10,7 @@ enum class ESkillCastResult : uint8
     None,
     Fail_OnCooldown,
     Fail_MissingTarget,
+    Fail_TargetingConditionsViolated,
     Fail_CastConditionsViolated,
     Fail_InExecution,
     Fail_InsufficientMana,
@@ -25,6 +26,7 @@ public:
     // Functions to standardize instances of this class
     static FSkillCastResult CastFail_Cooldown();
     static FSkillCastResult CastFail_MissingTarget();
+    static FSkillCastResult CastFail_TargetingConditionsViolated();
     static FSkillCastResult CastFail_CastConditionsViolated();
     static FSkillCastResult CastFail_InExecution();
     static FSkillCastResult CastFail_InsufficientMana();
@@ -66,9 +68,16 @@ FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_MissingTarget() {
 }
 
 // TODO: in the future, this will take an array of errors coming from the violated cast conditions, so that the message can be more meaningful.
+FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_TargetingConditionsViolated() {
+    constexpr auto result = ESkillCastResult::Fail_TargetingConditionsViolated;
+    auto errorText = LOCTEXT("SkillCastResult_TargetingConditionsViolatedText", "Couldn't cast skill, some condition on a target is vioalted.");
+    return FSkillCastResult(result, MoveTemp(errorText));
+}
+
+// TODO: in the future, this will take an array of errors coming from the violated cast conditions, so that the message can be more meaningful.
 FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_CastConditionsViolated() {
     constexpr auto result = ESkillCastResult::Fail_CastConditionsViolated;
-    auto errorText = LOCTEXT("SkillCastResult_ConditionsViolatedText", "Couldn't cast skill, some condition on caster is vioalted.");
+    auto errorText = LOCTEXT("SkillCastResult_CastConditionsViolatedText", "Couldn't cast skill, some condition on caster is vioalted.");
     return FSkillCastResult(result, MoveTemp(errorText));
 }
 
