@@ -14,15 +14,15 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
-					"NewSkillSystem"
+					"NewSkillSystem",
 				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"SkillSpawnedEntities"
-					// ... add private dependencies that you statically link with here ...
+					"SkillSpawnedEntities",
+					"SkillTargeting",
 				}
 				);
 

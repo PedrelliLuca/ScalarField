@@ -3,12 +3,27 @@
 #include "CastAttachedActorSkill.h"
 
 #include "SkillSpawnedEntityInterface.h"
+#include "SkillTargets/ActorSkillTarget.h"
 
 void UCastAttachedActorSkill::_skillCast() {
-    const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(_getCaster().Get(), TEXT("SkillSpringArm"));
+    const auto& targets = _getTargets();
+
+    // TODO: generalize this in the future.
+    check(targets.Num() <= 1);
+
+    TWeakObjectPtr<AActor> target = _getCaster();
+    if (targets.Num() == 1) {
+        const auto abstractTarget = targets[0];
+        auto skillTarget = Cast<UActorSkillTarget>(abstractTarget.GetObject());
+        check(IsValid(skillTarget));
+        target = skillTarget->GetActor();
+    }
+
+    const TObjectPtr<USpringArmComponent> spawnSpringArm = NewObject<USpringArmComponent>(target.Get(), TEXT("SkillSpringArm"));
     spawnSpringArm->bDoCollisionTest = false;
     spawnSpringArm->SetVisibility(true);
-    spawnSpringArm->SetupAttachment(_getCaster()->GetRootComponent());
+
+    spawnSpringArm->SetupAttachment(target->GetRootComponent());
 
     // The point where we have to spawn the globe relative to the target, it's also the point where the 2nd end of the arm lies
     const auto location = _actorToTarget.GetLocation();
@@ -24,7 +39,7 @@ void UCastAttachedActorSkill::_skillCast() {
     _spawnSpringArm = spawnSpringArm;
 
     // Actor deferred spawn to set the caster >>>>>>>>>>
-    const auto spawnedEntityWorldTransform = _actorToTarget * _getCaster()->GetTransform();
+    const auto spawnedEntityWorldTransform = _actorToTarget * target->GetTransform();
     const auto spawnActor = GetWorld()->SpawnActorDeferred<AActor>(_actorClass, spawnedEntityWorldTransform);
 
     // A simple cast like the following will return null if the interface is implemented in BP instead of C++. This is because the C++ side has no idea the

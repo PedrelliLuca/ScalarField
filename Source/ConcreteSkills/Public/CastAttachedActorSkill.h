@@ -10,8 +10,7 @@
 #include "CastAttachedActorSkill.generated.h"
 
 /**
- * TODO: make this work even with a target != from the caster.
- * \brief A cast-only skill that spawns an actor attached to the caster. The attachment lasts for the entire channeling phase.
+ * \brief A cast-only skill that spawns an actor attached to the target. The attachment lasts for the entire channeling phase.
  */
 UCLASS(Blueprintable)
 class CONCRETESKILLS_API UCastAttachedActorSkill : public UNewAbstractSkill {

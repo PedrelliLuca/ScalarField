@@ -63,6 +63,8 @@ public:
 
 protected:
     const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
+    const TArray<TScriptInterface<ISkillTarget>>& _getTargets() const { return _targets; }
+
     float _getChannelingSeconds() const { return _channelingSeconds; }
 
     /** \brief The time it takes for the skill to be castable again. The countdown starts from the moment the cast is complete. */
@@ -87,8 +89,6 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Chanelling")
     bool _checkTargetingConditionsWhenChanneling = false;
 
-    // UPROPERTY(EditAnywhere, Category = "Movement Modes")
-    // EMovementCommandMode _targetingMovementMode; // TODO?: Could be added in the future, seems excessive for the time being.
     UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
     EMovementCommandMode _castMovementMode;
     UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
