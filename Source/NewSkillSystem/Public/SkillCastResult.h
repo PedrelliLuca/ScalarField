@@ -61,7 +61,7 @@ FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_Cooldown() {
 
 // TODO: in the future, this could take an integer representing the number of missing targets, so that the message can be more meaningful.
 FORCEINLINE FSkillCastResult FSkillCastResult::CastFail_MissingTarget() {
-    constexpr auto result = ESkillCastResult::Fail_OnCooldown;
+    constexpr auto result = ESkillCastResult::Fail_MissingTarget;
     auto errorText = LOCTEXT("SkillCastResult_MissingTargetText", "Couldn't cast skill, targets are missing.");
 
     return FSkillCastResult{result, MoveTemp(errorText)};
