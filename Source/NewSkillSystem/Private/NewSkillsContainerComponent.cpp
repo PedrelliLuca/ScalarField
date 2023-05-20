@@ -67,13 +67,12 @@ TOptional<FSkillTargetingResult> UNewSkillsContainerComponent::TryAddTargetToWai
     }
 
     auto skillTargetingResult = _skillWaitingForTargets->TryAddTarget(targetPacket);
+    const auto targetingResult = skillTargetingResult.GetTargetingResult();
 
     if (skillTargetingResult.IsFailure()) {
-        // If every target has already been provided to the skill we expect _skillWaitingForTargets top be nullptr.
-        check(skillTargetingResult.GetTargetingResult() != ESkillTargetingResult::Fail_AlreadyAvailableTargets);
+        // If every target has already been provided to the skill we expect _skillWaitingForTargets to be nullptr.
+        check(targetingResult != ESkillTargetingResult::Fail_AlreadyAvailableTargets);
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillTargetingResult.GetErrorText().ToString());
-    } else {
-        _skillWaitingForTargets = nullptr;
     }
 
     return MoveTemp(skillTargetingResult);
