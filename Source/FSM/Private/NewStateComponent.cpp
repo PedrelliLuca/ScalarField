@@ -19,6 +19,11 @@ void UNewStateComponent::TrySetSkillTarget(const FSkillTargetPacket& targetPacke
     _performStateTransition(MoveTemp(newState));
 }
 
+void UNewStateComponent::TryToggleInventory() {
+    auto newState = _state->TryToggleInventory();
+    _performStateTransition(MoveTemp(newState));
+}
+
 void UNewStateComponent::BeginPlay() {
     Super::BeginPlay();
 

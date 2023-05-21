@@ -19,6 +19,8 @@ public:
     void TryAbortSkillInExecution();
     void TrySetSkillTarget(const FSkillTargetPacket& targetPacket);
 
+    void TryToggleInventory();
+
 protected:
     void BeginPlay() override;
 
