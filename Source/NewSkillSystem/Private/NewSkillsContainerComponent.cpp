@@ -65,6 +65,10 @@ bool UNewSkillsContainerComponent::AbortSkillInExecution() {
     return _resetSkillInExecution(true);
 }
 
+bool UNewSkillsContainerComponent::AbortWaitingSkill() {
+    return _resetWaitingSkill();
+}
+
 TOptional<FSkillTargetingResult> UNewSkillsContainerComponent::TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket) {
     if (!_skillWaitingForTargets.IsValid()) {
         // No skill is waiting for targets
@@ -138,9 +142,12 @@ bool UNewSkillsContainerComponent::_resetSkillInExecution(const bool resetMoveme
     return false;
 }
 
-void UNewSkillsContainerComponent::_resetWaitingSkill() {
+bool UNewSkillsContainerComponent::_resetWaitingSkill() {
     if (_skillWaitingForTargets.IsValid()) {
         _skillWaitingForTargets->Abort(false); // Targets' cleanup.
         _skillWaitingForTargets = nullptr;
+        return true;
     }
+
+    return false;
 }

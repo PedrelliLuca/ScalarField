@@ -2,7 +2,7 @@
 
 #include "SkillExecutionState.h"
 
-#include "NewSkillsContainerComponent.h"
+#include "InventoryOpenState.h"
 
 void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
     // Make sure that the pawn is not valid before setting it.
@@ -19,6 +19,7 @@ void USkillExecutionState::OnEnter() {
 }
 
 void USkillExecutionState::OnLeave() {
+    _subjectSkillsContainerC->AbortWaitingSkill();
 }
 
 TScriptInterface<IFSMState> USkillExecutionState::TryCastSkillAtIndex(const int32 index) {
@@ -63,4 +64,10 @@ TScriptInterface<IFSMState> USkillExecutionState::TrySetSkillTarget(const FSkill
     }
 
     return _keepCurrentState();
+}
+
+TScriptInterface<IFSMState> USkillExecutionState::TryToggleInventory() {
+    TScriptInterface<IFSMState> inventoryOpenState = NewObject<UInventoryOpenState>(this, UInventoryOpenState::StaticClass());
+    inventoryOpenState->SetPawn(_subjectPawn.Get());
+    return MoveTemp(inventoryOpenState);
 }

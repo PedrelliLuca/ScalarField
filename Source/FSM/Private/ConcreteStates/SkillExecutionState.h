@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "FSMState.h"
 #include "NewSkillsContainerComponent.h"
 
 #include "SkillExecutionState.generated.h"
 
 /**
- * \brief State representing a skill user that is not executing any skill.
+ * \brief In this state we are controlling a pawn that can execute skills.
  */
 UCLASS()
 class FSM_API USkillExecutionState : public UObject, public IFSMState {
@@ -24,6 +25,8 @@ public:
     TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) override;
     TScriptInterface<IFSMState> TryAbortSkillInExecution() override;
     TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) override;
+
+    TScriptInterface<IFSMState> TryToggleInventory() override;
 
 private:
     TWeakObjectPtr<APawn> _subjectPawn = nullptr;
