@@ -7,7 +7,7 @@
 
 bool UFlammabilityTargetingCondition::IsVerifiedForTarget(const TScriptInterface<ISkillTarget> skillTarget) const {
     const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget.GetObject());
-    if (!IsValid(actorSkillTarget)) {
+    if (!ensureMsgf(IsValid(actorSkillTarget), TEXT("This condition should only be applied to targets of type UActorSkillTarget!"))) {
         return false;
     }
 
