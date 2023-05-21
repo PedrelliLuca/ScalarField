@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "FSMState.h"
+#include "NewStateComponent.h"
 
 #include "InventoryOpenState.generated.h"
 
@@ -29,4 +30,7 @@ public:
 
 private:
     TWeakObjectPtr<APawn> _subjectPawn = nullptr;
+    TWeakObjectPtr<UNewStateComponent> _subjectStateC = nullptr;
+
+    FDelegateHandle _inventoryWidgetCloseHandle{};
 };
