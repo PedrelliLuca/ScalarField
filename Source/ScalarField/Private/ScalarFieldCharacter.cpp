@@ -50,7 +50,10 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
     _healthC = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
     // Create a skills container component...
-    _skillsContainer = CreateDefaultSubobject<USkillsContainerComponent>(TEXT("Skills Container Component"));
+    _skillsContainerC = CreateDefaultSubobject<USkillsContainerComponent>(TEXT("Skills Container Component"));
+    _newSkillsContainerC = CreateDefaultSubobject<UNewSkillsContainerComponent>(TEXT("NewSkillsContainerComponent"));
+
+    _stateC = CreateDefaultSubobject<UNewStateComponent>(TEXT("StateComponent"));
 
     // Create the component that handles temperature damage...
     _temperatureDmgHandlerC = CreateDefaultSubobject<UTemperatureDamageHandlerComponent>(TEXT("Temperature Damage Handler Component"));

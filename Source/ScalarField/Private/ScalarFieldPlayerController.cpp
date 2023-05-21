@@ -4,6 +4,7 @@
 
 #include "InventoryManipulationSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "NewStateComponent.h"
 #include "SkillsContainerComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
 
@@ -20,10 +21,12 @@ AScalarFieldPlayerController::AScalarFieldPlayerController() {
 void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
     Super::PlayerTick(deltaTime);
 
-    // Generally speaking, the tick of the states should stop if the tactical pause is active. However, some states
-    // are special and are not affected by it.
-    if (!_bIsTacticalPauseOn || !_stateC->IsCurrentStateAffectedByPause()) {
-        _stateC->PerformTickBehavior(deltaTime);
+    if (!_bNewSkillSystem) {
+        // Generally speaking, the tick of the states should stop if the tactical pause is active. However, some states
+        // are special and are not affected by it.
+        if (!_bIsTacticalPauseOn || !_stateC->IsCurrentStateAffectedByPause()) {
+            _stateC->PerformTickBehavior(deltaTime);
+        }
     }
 
     // Tick of movement commands never occurs during the tactical pause.
@@ -44,7 +47,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
     InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
     InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
     InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
-    InputComponent->BindAction("AbortCast", IE_Pressed, _stateC.Get(), &UStateComponent::PerformAbortBehavior);
+    InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkillAbort);
     InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
     InputComponent->BindAction("Interact", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInteractionBehavior);
@@ -65,8 +68,9 @@ void AScalarFieldPlayerController::BeginPlay() {
     inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
     inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
 
-    // const auto pickupSubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UPickupSubsystem>();
-    // pickupSubsys->RegisterItemDropper(_widgetsPresenterC->GetInventoryPresenterWidget()->GetInventoryWidget().Get());
+    if (_bNewSkillSystem) {
+        _movementCommandC->SetDefaultMovementMode();
+    }
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
@@ -80,77 +84,140 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
 void AScalarFieldPlayerController::_onSetTargetPressed() {
     FHitResult hit;
     GetHitResultUnderCursor(ECC_Visibility, true, hit);
-    _stateC->PerformTargetingBehavior(hit.GetActor());
+    if (!_bNewSkillSystem) {
+        _stateC->PerformTargetingBehavior(hit.GetActor());
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        // We don't know what the skill we want to cast is going to need, so we'll provide it with everything we have.
+        FSkillTargetPacket targetPacket;
+        targetPacket.TargetActor = hit.GetActor();
+        targetPacket.TargetLocation = hit.Location;
+
+        stateC->TrySetSkillTarget(targetPacket);
+    }
 }
 
 void AScalarFieldPlayerController::_onSkill1Cast() {
-    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-    check(IsValid(skillsContainer));
+    constexpr int32 skillKey = 1;
 
-    constexpr uint32 skillKey = 1;
-    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-    if (!IsValid(skill)) {
-        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
-        return;
+    if (!_bNewSkillSystem) {
+        const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        check(IsValid(skillsContainer));
+
+        auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (!IsValid(skill)) {
+            UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+            return;
+        }
+
+        _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     }
-
-    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill2Cast() {
-    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-    check(IsValid(skillsContainer));
+    constexpr int32 skillKey = 2;
 
-    constexpr uint32 skillKey = 2;
-    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-    if (!IsValid(skill)) {
-        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
-        return;
+    if (!_bNewSkillSystem) {
+        const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        check(IsValid(skillsContainer));
+
+        auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (!IsValid(skill)) {
+            UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+            return;
+        }
+
+        _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     }
-
-    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill3Cast() {
-    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-    check(IsValid(skillsContainer));
+    constexpr int32 skillKey = 3;
 
-    constexpr uint32 skillKey = 3;
-    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-    if (!IsValid(skill)) {
-        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
-        return;
+    if (!_bNewSkillSystem) {
+        const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        check(IsValid(skillsContainer));
+
+        auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (!IsValid(skill)) {
+            UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+            return;
+        }
+
+        _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     }
-
-    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill4Cast() {
-    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-    check(IsValid(skillsContainer));
+    constexpr int32 skillKey = 4;
 
-    constexpr uint32 skillKey = 4;
-    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-    if (!IsValid(skill)) {
-        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
-        return;
+    if (!_bNewSkillSystem) {
+        const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        check(IsValid(skillsContainer));
+
+        auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (!IsValid(skill)) {
+            UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+            return;
+        }
+
+        _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     }
-
-    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
 }
 
 void AScalarFieldPlayerController::_onSkill5Cast() {
-    const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-    check(IsValid(skillsContainer));
+    constexpr int32 skillKey = 5;
 
-    constexpr uint32 skillKey = 5;
-    auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
-    if (!IsValid(skill)) {
-        UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
-        return;
+    if (!_bNewSkillSystem) {
+        const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        check(IsValid(skillsContainer));
+
+        auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (!IsValid(skill)) {
+            UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+            return;
+        }
+
+        _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     }
+}
 
-    _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+void AScalarFieldPlayerController::_onSkillAbort() {
+    if (!_bNewSkillSystem) {
+        _stateC->PerformAbortBehavior();
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryAbortSkillInExecution();
+    }
 }
 
 void AScalarFieldPlayerController::_onTacticalPauseToggled() {
@@ -166,7 +233,7 @@ void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTact
     _bIsTacticalPauseOn = bIsTacticalPauseOn;
 }
 
-constexpr uint32 AScalarFieldPlayerController::_getSkillIdxFromKey(const uint32 key) {
+constexpr int32 AScalarFieldPlayerController::_getSkillIdxFromKey(const int32 key) {
     // keys [1, 2, ..., 9, 0] => indices [0, 1, ..., 8, 9]
     return key != 0 ? key - 1 : KEY_ASSIGNABLE_SKILLS - 1;
 }

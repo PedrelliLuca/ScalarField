@@ -37,10 +37,14 @@ public class ScalarField : ModuleRules
             "FactionSystem",
             "AIControllers",
             "AIBuildingBlocks",
-            "SkillCastConditions"
+            "SkillCastConditions",
+            "NewSkillSystem",
+            "FSM",
+            "ConcreteSkills",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
+            "SkillTargeting"
         });
     }
 }

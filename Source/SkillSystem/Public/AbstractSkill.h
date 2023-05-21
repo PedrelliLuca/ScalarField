@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Parameters/SkillParameters.h"
-#include "SkillCastCondition.h"
 
 #include "AbstractSkill.generated.h"
 
@@ -25,8 +24,6 @@ public:
 
     /** \brief Casts the skill. The function check()s for the skill's caster, so make sure you set it before calling this. */
     virtual void ExecuteCast() PURE_VIRTUAL(UAbstractSkill::Execute, return;);
-
-    bool CanBeCast() const;
 
     /** \brief Executes a tick of the skill's channeling process. The function check()s for the skill's caster, so make sure you set it before calling this. */
     virtual void ExecuteChannelingTick(float deltaTime, const TObjectPtr<AActor> caster) {}
@@ -65,10 +62,6 @@ protected:
     void _endCooldown();
 
     const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
-
-    // Set conditions that must be verified to cast the skill
-    UPROPERTY(EditDefaultsOnly, Instanced, Category = "Conditions")
-    TArray<USkillCastCondition*> _castConditions;
 
 private:
     bool _bIsOnCooldown = false;

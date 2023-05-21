@@ -42,7 +42,7 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
         return EBTNodeResult::Failed;
     }
 
-    if (skill->CanBeCast() && !_needsManaAvailabilityToCast || _isManaAvailableForSkill(aiController, skill)) {
+    if (!_needsManaAvailabilityToCast || _isManaAvailableForSkill(aiController, skill)) {
         // The spell execution can fail, for example:
         // - In case the skill is on cooldown
         // - In case the skill is already being executed

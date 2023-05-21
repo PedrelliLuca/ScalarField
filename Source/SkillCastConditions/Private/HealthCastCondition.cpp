@@ -20,11 +20,11 @@ bool UHealthCastCondition::IsVerified() const {
     return isVerified;
 }
 
-void UHealthCastCondition::SetConditionSubject(TObjectPtr<AActor> subject) {
+void UHealthCastCondition::SetSkillCaster(TObjectPtr<AActor> skillCaster) {
     // Make sure that the subject is not valid before setting it, this setter is only for initialization.
     if (ensureMsgf(!_conditionSubject.IsValid(), TEXT("Condition Subject can be set only once and has already been set."))) {
-        check(IsValid(subject));
-        _conditionSubject = MoveTemp(subject);
+        check(IsValid(skillCaster));
+        _conditionSubject = MoveTemp(skillCaster);
 
         _subjectHealthC = _conditionSubject->FindComponentByClass<UHealthComponent>();
         check(_subjectHealthC.IsValid());

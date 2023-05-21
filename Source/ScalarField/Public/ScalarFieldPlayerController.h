@@ -26,6 +26,9 @@ protected:
 
     void BeginPlay() override;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
+    bool _bNewSkillSystem = false;
+
 private:
     /** Input handlers for SetDestination action. */
     void _onSetDestinationPressed();
@@ -37,11 +40,12 @@ private:
     void _onSkill3Cast();
     void _onSkill4Cast();
     void _onSkill5Cast();
+    void _onSkillAbort();
 
     void _onTacticalPauseToggled();
     void _answerTacticalPauseToggle(bool bIsTacticalPauseOn, double currentWorldTimeDilation);
 
-    constexpr uint32 _getSkillIdxFromKey(uint32 key);
+    constexpr int32 _getSkillIdxFromKey(int32 key);
 
     UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
     TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
