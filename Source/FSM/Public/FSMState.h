@@ -26,6 +26,8 @@ public:
     virtual TScriptInterface<IFSMState> TryAbortSkillInExecution() = 0;
     virtual TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) = 0;
 
+    virtual TScriptInterface<IFSMState> TryToggleInventory() = 0;
+
 protected:
     TScriptInterface<IFSMState> _keepCurrentState() const { return nullptr; }
 };
