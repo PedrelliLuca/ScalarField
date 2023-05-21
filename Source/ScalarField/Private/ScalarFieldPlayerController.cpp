@@ -52,7 +52,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 
     InputComponent->BindAction("Interact", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInteractionBehavior);
 
-    InputComponent->BindAction("ToggleInventory", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInventoryToggleBehavior);
+    InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AScalarFieldPlayerController::_onInventoryToggle);
 
     InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
@@ -217,6 +217,17 @@ void AScalarFieldPlayerController::_onSkillAbort() {
         check(IsValid(stateC));
 
         stateC->TryAbortSkillInExecution();
+    }
+}
+
+void AScalarFieldPlayerController::_onInventoryToggle() {
+    if (!_bNewSkillSystem) {
+        _stateC->PerformInventoryToggleBehavior();
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryToggleInventory();
     }
 }
 
