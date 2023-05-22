@@ -23,6 +23,10 @@ public:
     void SetMovementMode(EMovementCommandMode mode) override;
     void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
+    void SetDestination(const FVector& destination) override;
+    void StopMovement() override;
+    void MovementTick(float deltaTime) override;
+
     void SetMovementParameters(const FMovementParameters& params);
 
     bool IsMoving() const {
@@ -53,7 +57,7 @@ private:
 
     EMovementCommandMode _activeMovementMode = EMovementCommandMode::MCM_None;
 
-    TWeakObjectPtr<AAIController> _ownerAIController = nullptr;
+    TWeakObjectPtr<AAIController> _ownerAIC = nullptr;
 
     FDelegateHandle _handleToCmdMovementStateChanged;
 

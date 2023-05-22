@@ -12,7 +12,7 @@ void UAIMovementCommandComponent::SetMovementMode(EMovementCommandMode mode) {
     // We should always enter except for the first call to SetMovementMode(), when the commands' cache is empty
     if (const auto activeCmdPtr = _modesToCommands.Find(_activeMovementMode)) {
         const auto activeCmd = *activeCmdPtr;
-        activeCmd->OnStopMovement(_ownerAIController.Get());
+        activeCmd->OnStopMovement(_ownerAIC.Get());
         activeCmd->OnMovementStateChanged().Remove(_handleToCmdMovementStateChanged);
     }
 
@@ -28,6 +28,18 @@ void UAIMovementCommandComponent::SetMovementMode(EMovementCommandMode mode) {
         _modesToCommands[_activeMovementMode]->OnMovementStateChanged().AddUObject(this, &UAIMovementCommandComponent::_onActiveMovementCmdStatusChange);
 }
 
+void UAIMovementCommandComponent::SetDestination(const FVector& destination) {
+    _getMovementCommand()->OnSetDestination(_ownerAIC.Get(), destination);
+}
+
+void UAIMovementCommandComponent::StopMovement() {
+    _getMovementCommand()->OnStopMovement(_ownerAIC.Get());
+}
+
+void UAIMovementCommandComponent::MovementTick(const float deltaTime) {
+    _getMovementCommand()->OnMovementTick(_ownerAIC.Get(), deltaTime);
+}
+
 void UAIMovementCommandComponent::SetMovementParameters(const FMovementParameters& params) {
     for (const auto& modeToCommand : _modesToCommands) {
         modeToCommand.Value->SetMovementParameters(params);
@@ -37,8 +49,8 @@ void UAIMovementCommandComponent::SetMovementParameters(const FMovementParameter
 void UAIMovementCommandComponent::BeginPlay() {
     Super::BeginPlay();
 
-    _ownerAIController = Cast<AAIController>(GetOwner());
-    check(_ownerAIController.IsValid());
+    _ownerAIC = Cast<AAIController>(GetOwner());
+    ensureMsgf(_ownerAIC.IsValid(), TEXT("Error, owner is not an AI Controller!"));
 }
 
 TObjectPtr<UAIMovementCommand> UAIMovementCommandComponent::_getMovementCommand() {
