@@ -27,11 +27,11 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
         if (!_bIsTacticalPauseOn || !_stateC->IsCurrentStateAffectedByPause()) {
             _stateC->PerformTickBehavior(deltaTime);
         }
-    }
 
-    // Tick of movement commands never occurs during the tactical pause.
-    if (!_bIsTacticalPauseOn) {
-        _movementCommandC->MovementTick(deltaTime);
+        // Tick of movement commands never occurs during the tactical pause.
+        if (!_bIsTacticalPauseOn) {
+            _movementCommandC->MovementTick(deltaTime);
+        }
     }
 }
 
@@ -74,14 +74,29 @@ void AScalarFieldPlayerController::BeginPlay() {
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
-    _movementCommandC->StopMovement();
+    if (!_bNewSkillSystem) {
+        _movementCommandC->StopMovement();
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryStopMovement();
+    }
 }
 
 void AScalarFieldPlayerController::_onSetDestinationReleased() {
     // We look for the location in the world where the player has pressed the input
     FHitResult hit;
     GetHitResultUnderCursor(ECC_Visibility, true, hit);
-    _movementCommandC->SetDestination(hit.Location);
+
+    if (!_bNewSkillSystem) {
+        _movementCommandC->SetDestination(hit.Location);
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TrySetMovementDestination(hit.Location);
+    }
 }
 
 void AScalarFieldPlayerController::_onSetTargetPressed() {
