@@ -31,7 +31,7 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
 
     // Tick of movement commands never occurs during the tactical pause.
     if (!_bIsTacticalPauseOn) {
-        _movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
+        _movementCommandC->MovementTick(deltaTime);
     }
 }
 
@@ -74,11 +74,14 @@ void AScalarFieldPlayerController::BeginPlay() {
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
-    _movementCommandC->GetMovementCommand()->OnStopMovement(this);
+    _movementCommandC->StopMovement();
 }
 
 void AScalarFieldPlayerController::_onSetDestinationReleased() {
-    _movementCommandC->GetMovementCommand()->OnSetDestination(this);
+    // We look for the location in the world where the player has pressed the input
+    FHitResult hit;
+    GetHitResultUnderCursor(ECC_Visibility, true, hit);
+    _movementCommandC->SetDestination(hit.Location);
 }
 
 void AScalarFieldPlayerController::_onSetTargetPressed() {

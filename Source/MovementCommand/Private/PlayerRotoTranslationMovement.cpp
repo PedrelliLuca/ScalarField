@@ -11,11 +11,6 @@ void UPlayerRotoTranslationMovement::OnSetDestination(const TObjectPtr<APlayerCo
 
     // If it was a short press
     if (_followTime <= _shortPressThreshold) {
-        // We look for the location in the world where the player has pressed the input
-        // FHitResult hit;
-        // playerController->GetHitResultUnderCursor(ECC_Visibility, true, hit);
-        // const FVector hitLocation = hit.Location;
-
         // We move there and spawn some particles
         UAIBlueprintHelperLibrary::SimpleMoveToLocation(playerController, destination);
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(
