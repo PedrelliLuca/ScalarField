@@ -17,7 +17,7 @@ void UPlayerMovementCommandComponent::SetMovementMode(EMovementCommandMode mode)
 
 void UPlayerMovementCommandComponent::SetDestination(const FVector& destination) {
     check(_ownerPC.IsValid());
-    _getMovementCommand()->OnSetDestination(_ownerPC, destination);
+    _getMovementCommand()->OnSetDestination(_ownerPC.Get(), destination);
 }
 
 void UPlayerMovementCommandComponent::StopMovement() {
