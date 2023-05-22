@@ -18,6 +18,13 @@ public:
     void SetMovementMode(EMovementCommandMode mode) override;
     void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
+    void SetDestination(const FVector& destination) override;
+    void StopMovement() override;
+    void MovementTick(float deltaTime) override;
+
+protected:
+    void BeginPlay() override;
+    
 private:
     TObjectPtr<UPlayerMovementCommand> _getMovementCommand();
     
@@ -27,8 +34,10 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
     EMovementCommandMode _defaultMovementMode;
 
-    EMovementCommandMode _activeMovementMode;
-
     UPROPERTY()
     TObjectPtr<UPlayerMovementCommand> _activeMovementCommand;
+
+    EMovementCommandMode _activeMovementMode;
+
+    TWeakObjectPtr<APlayerController> _ownerPC = nullptr;    
 };
