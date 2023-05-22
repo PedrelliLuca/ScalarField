@@ -22,6 +22,11 @@ public:
     void OnEnter() override;
     void OnLeave() override;
 
+    TScriptInterface<IFSMState> Tick(float deltaTime) override;
+
+    TScriptInterface<IFSMState> TrySetMovementDestination(const FVector& movementDestination) override;
+    TScriptInterface<IFSMState> TryStopMovement() override;
+
     TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) override;
     TScriptInterface<IFSMState> TryAbortSkillInExecution() override;
     TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) override;

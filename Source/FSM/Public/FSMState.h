@@ -22,6 +22,11 @@ public:
     virtual void OnEnter() = 0;
     virtual void OnLeave() = 0;
 
+    virtual TScriptInterface<IFSMState> Tick(float deltaTime) = 0;
+
+    virtual TScriptInterface<IFSMState> TrySetMovementDestination(const FVector& movementDestination) = 0;
+    virtual TScriptInterface<IFSMState> TryStopMovement() = 0;
+
     virtual TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) = 0;
     virtual TScriptInterface<IFSMState> TryAbortSkillInExecution() = 0;
     virtual TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) = 0;

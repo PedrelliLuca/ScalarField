@@ -15,6 +15,13 @@ class FSM_API UNewStateComponent : public UActorComponent {
     GENERATED_BODY()
 
 public:
+    UNewStateComponent();
+
+    void TickComponent(float deltaTime, enum ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
+
+    void TrySetMovementDestination(const FVector& movementDestination);
+    void TryStopMovement();
+
     void TryCastSkillAtIndex(uint32 index);
     void TryAbortSkillInExecution();
     void TrySetSkillTarget(const FSkillTargetPacket& targetPacket);

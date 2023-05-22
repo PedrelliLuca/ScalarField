@@ -32,6 +32,18 @@ void UInventoryOpenState::OnLeave() {
     inventorySubsys->OnInventoryClosedFromUI().Remove(_inventoryWidgetCloseHandle);
 }
 
+TScriptInterface<IFSMState> UInventoryOpenState::Tick(const float deltaTime) {
+    return _keepCurrentState();
+}
+
+TScriptInterface<IFSMState> UInventoryOpenState::TrySetMovementDestination(const FVector& movementDestination) {
+    return _keepCurrentState();
+}
+
+TScriptInterface<IFSMState> UInventoryOpenState::TryStopMovement() {
+    return _keepCurrentState();
+}
+
 TScriptInterface<IFSMState> UInventoryOpenState::TryCastSkillAtIndex(int32 index) {
     return _keepCurrentState();
 }
