@@ -31,19 +31,14 @@ public:
         return (*activeCmd)->IsMoving();
     }
 
-    TObjectPtr<UAIMovementCommand> GetMovementCommand() {
-        const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
-        // Did you set the movement mode before calling this?
-        check(activeCmd != nullptr);
-        return *activeCmd;
-    }
-
     FOnActiveMovementCmdStateChanged& OnActiveMovementCmdStateChanged() { return _onActiveMovementCmdStateChanged; }
 
 protected:
     void BeginPlay() override;
 
 private:
+    TObjectPtr<UAIMovementCommand> _getMovementCommand();
+    
     void _onActiveMovementCmdStatusChange(bool newIsMoving);
 
     UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")

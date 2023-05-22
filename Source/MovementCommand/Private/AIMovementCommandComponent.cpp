@@ -41,6 +41,13 @@ void UAIMovementCommandComponent::BeginPlay() {
     check(_ownerAIController.IsValid());
 }
 
+TObjectPtr<UAIMovementCommand> UAIMovementCommandComponent::_getMovementCommand() {
+    const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
+    // Did you set the movement mode before calling this?
+    check(activeCmd != nullptr);
+    return *activeCmd;
+}
+
 void UAIMovementCommandComponent::_onActiveMovementCmdStatusChange(const bool newIsMoving) {
     _onActiveMovementCmdStateChanged.Broadcast(newIsMoving);
 }

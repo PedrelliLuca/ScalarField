@@ -18,13 +18,9 @@ public:
     void SetMovementMode(EMovementCommandMode mode) override;
     void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
-    TObjectPtr<UPlayerMovementCommand> GetMovementCommand() {
-        // Did you set the movement mode before calling this?
-        check(IsValid(_activeMovementCommand));
-        return _activeMovementCommand;
-    }
-
 private:
+    TObjectPtr<UPlayerMovementCommand> _getMovementCommand();
+    
     UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
     TMap<EMovementCommandMode, TSubclassOf<UPlayerMovementCommand>> _modesToCommandClasses;
 

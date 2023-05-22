@@ -14,3 +14,9 @@ void UPlayerMovementCommandComponent::SetMovementMode(EMovementCommandMode mode)
     const auto& cmdClass = _modesToCommandClasses[_activeMovementMode];
     _activeMovementCommand = NewObject<UPlayerMovementCommand>(this, cmdClass);
 }
+
+TObjectPtr<UPlayerMovementCommand> UPlayerMovementCommandComponent::_getMovementCommand() {
+    // Did you set the movement mode before calling this?
+    check(IsValid(_activeMovementCommand));
+    return _activeMovementCommand;
+}
