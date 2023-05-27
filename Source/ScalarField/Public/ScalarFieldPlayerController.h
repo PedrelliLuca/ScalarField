@@ -42,6 +42,7 @@ private:
     void _onSkill5Cast();
     void _onSkillAbort();
 
+    void _onInteraction();
     void _onInventoryToggle();
 
     void _onTacticalPauseToggled();

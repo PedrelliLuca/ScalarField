@@ -26,6 +26,7 @@ public:
     void TryAbortSkillInExecution();
     void TrySetSkillTarget(const FSkillTargetPacket& targetPacket);
 
+    void TryInteracting();
     void TryToggleInventory();
 
 protected:
