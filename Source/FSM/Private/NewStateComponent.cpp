@@ -41,6 +41,8 @@ void UNewStateComponent::TrySetSkillTarget(const FSkillTargetPacket& targetPacke
 }
 
 void UNewStateComponent::TryInteracting() {
+    auto newState = _state->TryInteracting();
+    _performStateTransition(MoveTemp(newState));
 }
 
 void UNewStateComponent::TryToggleInventory() {

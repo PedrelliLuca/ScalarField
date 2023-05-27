@@ -56,6 +56,10 @@ TScriptInterface<IFSMState> UInventoryOpenState::TrySetSkillTarget(const FSkillT
     return _keepCurrentState();
 }
 
+TScriptInterface<IFSMState> UInventoryOpenState::TryInteracting() {
+    return _keepCurrentState();
+}
+
 TScriptInterface<IFSMState> UInventoryOpenState::TryToggleInventory() {
     TScriptInterface<IFSMState> skillExecutionState = NewObject<USkillExecutionState>(this, USkillExecutionState::StaticClass());
     skillExecutionState->SetPawn(_subjectPawn.Get());

@@ -31,6 +31,7 @@ public:
     TScriptInterface<IFSMState> TryAbortSkillInExecution() override;
     TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) override;
 
+    TScriptInterface<IFSMState> TryInteracting() override;
     TScriptInterface<IFSMState> TryToggleInventory() override;
 
 private:
