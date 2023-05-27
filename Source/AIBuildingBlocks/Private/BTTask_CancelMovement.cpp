@@ -17,7 +17,7 @@ EBTNodeResult::Type UBTTask_CancelMovement::ExecuteTask(UBehaviorTreeComponent& 
         return EBTNodeResult::Failed;
     }
 
-    aiMovementCommandC->GetMovementCommand()->OnStopMovement(aiController);
+    aiMovementCommandC->StopMovement();
 
     return EBTNodeResult::Succeeded;
 }

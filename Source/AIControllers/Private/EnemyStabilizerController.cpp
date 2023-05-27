@@ -31,7 +31,7 @@ void AEnemyStabilizerController::Tick(const float deltaTime) {
     }
 
     _stateC->PerformTickBehavior(deltaTime);
-    _movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
+    _movementCommandC->MovementTick(deltaTime);
 
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
         const auto blackBoard = GetBlackboardComponent();

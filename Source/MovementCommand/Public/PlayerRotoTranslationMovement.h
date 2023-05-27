@@ -13,7 +13,7 @@ class MOVEMENTCOMMAND_API UPlayerRotoTranslationMovement : public UPlayerMovemen
     GENERATED_BODY()
 
 public:
-    void OnSetDestination(const TObjectPtr<APlayerController>& playerController) override;
+    void OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination) override;
     void OnStopMovement(const TObjectPtr<APlayerController>& playerController) override;
     void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) override;
 

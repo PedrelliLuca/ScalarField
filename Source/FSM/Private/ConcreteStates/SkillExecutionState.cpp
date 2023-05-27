@@ -2,7 +2,7 @@
 
 #include "SkillExecutionState.h"
 
-#include "NewSkillsContainerComponent.h"
+#include "InventoryOpenState.h"
 
 void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
     // Make sure that the pawn is not valid before setting it.
@@ -12,6 +12,10 @@ void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
 
         _subjectSkillsContainerC = _subjectPawn->FindComponentByClass<UNewSkillsContainerComponent>();
         check(_subjectSkillsContainerC.IsValid());
+
+        // TODO: edit this when the movement setter will be on the pawn
+        _movementCommandSetter = Cast<IMovementCommandSetter>(_subjectPawn->GetController()->FindComponentByInterface((UMovementCommandSetter::StaticClass())));
+        check(_movementCommandSetter.IsValid());
     }
 }
 
@@ -19,6 +23,22 @@ void USkillExecutionState::OnEnter() {
 }
 
 void USkillExecutionState::OnLeave() {
+    _subjectSkillsContainerC->AbortWaitingSkill();
+}
+
+TScriptInterface<IFSMState> USkillExecutionState::Tick(const float deltaTime) {
+    _movementCommandSetter->MovementTick(deltaTime);
+    return _keepCurrentState();
+}
+
+TScriptInterface<IFSMState> USkillExecutionState::TrySetMovementDestination(const FVector& movementDestination) {
+    _movementCommandSetter->SetDestination(movementDestination);
+    return _keepCurrentState();
+}
+
+TScriptInterface<IFSMState> USkillExecutionState::TryStopMovement() {
+    _movementCommandSetter->StopMovement();
+    return _keepCurrentState();
 }
 
 TScriptInterface<IFSMState> USkillExecutionState::TryCastSkillAtIndex(const int32 index) {
@@ -63,4 +83,10 @@ TScriptInterface<IFSMState> USkillExecutionState::TrySetSkillTarget(const FSkill
     }
 
     return _keepCurrentState();
+}
+
+TScriptInterface<IFSMState> USkillExecutionState::TryToggleInventory() {
+    TScriptInterface<IFSMState> inventoryOpenState = NewObject<UInventoryOpenState>(this, UInventoryOpenState::StaticClass());
+    inventoryOpenState->SetPawn(_subjectPawn.Get());
+    return MoveTemp(inventoryOpenState);
 }

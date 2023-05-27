@@ -5,16 +5,15 @@
 #include "CoreMinimal.h"
 
 #include "FSMState.h"
-#include "NewSkillsContainerComponent.h"
-#include "MovementCommandSetter.h"
+#include "NewStateComponent.h"
 
-#include "SkillExecutionState.generated.h"
+#include "InventoryOpenState.generated.h"
 
 /**
- * \brief In this state we are controlling a pawn that can execute skills.
+ * \brief In this state, the inventory is open.
  */
 UCLASS()
-class FSM_API USkillExecutionState : public UObject, public IFSMState {
+class FSM_API UInventoryOpenState : public UObject, public IFSMState {
     GENERATED_BODY()
 
 public:
@@ -36,6 +35,7 @@ public:
 
 private:
     TWeakObjectPtr<APawn> _subjectPawn = nullptr;
-    TWeakObjectPtr<UNewSkillsContainerComponent> _subjectSkillsContainerC = nullptr;
-    TWeakInterfacePtr<IMovementCommandSetter> _movementCommandSetter = nullptr;
+    TWeakObjectPtr<UNewStateComponent> _subjectStateC = nullptr;
+
+    FDelegateHandle _inventoryWidgetCloseHandle{};
 };

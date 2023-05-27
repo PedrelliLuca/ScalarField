@@ -5,21 +5,16 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraFunctionLibrary.h"
 
-void UPlayerRotoTranslationMovement::OnSetDestination(const TObjectPtr<APlayerController>& playerController) {
+void UPlayerRotoTranslationMovement::OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination) {
     // Player is no longer pressing the input
     _bInputPressed = false;
 
     // If it was a short press
     if (_followTime <= _shortPressThreshold) {
-        // We look for the location in the world where the player has pressed the input
-        FHitResult hit;
-        playerController->GetHitResultUnderCursor(ECC_Visibility, true, hit);
-        const FVector hitLocation = hit.Location;
-
         // We move there and spawn some particles
-        UAIBlueprintHelperLibrary::SimpleMoveToLocation(playerController, hitLocation);
+        UAIBlueprintHelperLibrary::SimpleMoveToLocation(playerController, destination);
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-            this, _fxCursor, hitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+            this, _fxCursor, destination, FRotator::ZeroRotator, FVector::OneVector, true, true, ENCPoolMethod::None, true);
     }
 }
 

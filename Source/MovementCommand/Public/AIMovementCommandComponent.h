@@ -23,6 +23,10 @@ public:
     void SetMovementMode(EMovementCommandMode mode) override;
     void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
+    void SetDestination(const FVector& destination) override;
+    void StopMovement() override;
+    void MovementTick(float deltaTime) override;
+
     void SetMovementParameters(const FMovementParameters& params);
 
     bool IsMoving() const {
@@ -31,19 +35,14 @@ public:
         return (*activeCmd)->IsMoving();
     }
 
-    TObjectPtr<UAIMovementCommand> GetMovementCommand() {
-        const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
-        // Did you set the movement mode before calling this?
-        check(activeCmd != nullptr);
-        return *activeCmd;
-    }
-
     FOnActiveMovementCmdStateChanged& OnActiveMovementCmdStateChanged() { return _onActiveMovementCmdStateChanged; }
 
 protected:
     void BeginPlay() override;
 
 private:
+    TObjectPtr<UAIMovementCommand> _getMovementCommand();
+    
     void _onActiveMovementCmdStatusChange(bool newIsMoving);
 
     UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
@@ -58,7 +57,7 @@ private:
 
     EMovementCommandMode _activeMovementMode = EMovementCommandMode::MCM_None;
 
-    TWeakObjectPtr<AAIController> _ownerAIController = nullptr;
+    TWeakObjectPtr<AAIController> _ownerAIC = nullptr;
 
     FDelegateHandle _handleToCmdMovementStateChanged;
 

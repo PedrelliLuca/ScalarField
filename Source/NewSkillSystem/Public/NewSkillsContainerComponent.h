@@ -29,6 +29,10 @@ public:
      */
     bool AbortSkillInExecution();
 
+    /** \brief If a skill is waiting for targets, this makes it forget its targets and true is returned. If no skill is waiting, nothing occurs and false is
+     * returned. */
+    bool AbortWaitingSkill();
+
     /** \brief If a skill is waiting for targets, tries adding it and returns the result of the operation. If no skill is waiting for targets, the returned
      * TOptional is unset. */
     TOptional<FSkillTargetingResult> TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket);
@@ -45,7 +49,7 @@ private:
     void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
 
     bool _resetSkillInExecution(bool resetMovement);
-    void _resetWaitingSkill();
+    bool _resetWaitingSkill();
 
     UPROPERTY()
     TArray<TObjectPtr<UNewAbstractSkill>> _skills{};

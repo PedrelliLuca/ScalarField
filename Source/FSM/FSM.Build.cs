@@ -21,8 +21,8 @@ namespace UnrealBuildTool.Rules
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"MovementCommand"
-					// ... add private dependencies that you statically link with here ...
+					"MovementCommand",
+					"InventoryManipulation",
 				}
 				);
 

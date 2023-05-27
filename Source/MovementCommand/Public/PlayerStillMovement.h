@@ -12,7 +12,7 @@ class MOVEMENTCOMMAND_API UPlayerStillMovement : public UPlayerMovementCommand {
     GENERATED_BODY()
 
 public:
-    void OnSetDestination(const TObjectPtr<APlayerController>& playerController) final {}
+    void OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination) final {}
     void OnStopMovement(const TObjectPtr<APlayerController>& playerController) final {}
     void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) final {
         if (playerController->IsFollowingAPath()) {

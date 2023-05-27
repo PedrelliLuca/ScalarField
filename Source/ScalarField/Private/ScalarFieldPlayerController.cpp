@@ -27,11 +27,11 @@ void AScalarFieldPlayerController::PlayerTick(const float deltaTime) {
         if (!_bIsTacticalPauseOn || !_stateC->IsCurrentStateAffectedByPause()) {
             _stateC->PerformTickBehavior(deltaTime);
         }
-    }
 
-    // Tick of movement commands never occurs during the tactical pause.
-    if (!_bIsTacticalPauseOn) {
-        _movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
+        // Tick of movement commands never occurs during the tactical pause.
+        if (!_bIsTacticalPauseOn) {
+            _movementCommandC->MovementTick(deltaTime);
+        }
     }
 }
 
@@ -52,7 +52,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 
     InputComponent->BindAction("Interact", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInteractionBehavior);
 
-    InputComponent->BindAction("ToggleInventory", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInventoryToggleBehavior);
+    InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AScalarFieldPlayerController::_onInventoryToggle);
 
     InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
 }
@@ -74,11 +74,29 @@ void AScalarFieldPlayerController::BeginPlay() {
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
-    _movementCommandC->GetMovementCommand()->OnStopMovement(this);
+    if (!_bNewSkillSystem) {
+        _movementCommandC->StopMovement();
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryStopMovement();
+    }
 }
 
 void AScalarFieldPlayerController::_onSetDestinationReleased() {
-    _movementCommandC->GetMovementCommand()->OnSetDestination(this);
+    // We look for the location in the world where the player has pressed the input
+    FHitResult hit;
+    GetHitResultUnderCursor(ECC_Visibility, true, hit);
+
+    if (!_bNewSkillSystem) {
+        _movementCommandC->SetDestination(hit.Location);
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TrySetMovementDestination(hit.Location);
+    }
 }
 
 void AScalarFieldPlayerController::_onSetTargetPressed() {
@@ -217,6 +235,17 @@ void AScalarFieldPlayerController::_onSkillAbort() {
         check(IsValid(stateC));
 
         stateC->TryAbortSkillInExecution();
+    }
+}
+
+void AScalarFieldPlayerController::_onInventoryToggle() {
+    if (!_bNewSkillSystem) {
+        _stateC->PerformInventoryToggleBehavior();
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryToggleInventory();
     }
 }
 

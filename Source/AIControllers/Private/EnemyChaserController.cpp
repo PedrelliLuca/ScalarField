@@ -18,7 +18,7 @@ void AEnemyChaserController::Tick(const float deltaTime) {
     }
 
     _stateC->PerformTickBehavior(deltaTime);
-    _movementCommandC->GetMovementCommand()->OnMovementTick(this, deltaTime);
+    _movementCommandC->MovementTick(deltaTime);
 
     // Did we reach our current patrol objective?
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
