@@ -21,5 +21,13 @@ void UPlayerRotationOnlyMovement::OnMovementTick(const TObjectPtr<APlayerControl
     // extract the yaw rotation we need for the pawn to look at the cursor.
     const auto wrCursorLocOnPawnPlane = FMath::LinePlaneIntersection(cursorLoc, cursorLoc + cursorDir * LINE_LENGTH, pawnPlane);
     const auto prCursorLocOnPawnPlane = pawn->GetTransform().InverseTransformPosition(wrCursorLocOnPawnPlane);
-    pawn->AddActorLocalRotation(prCursorLocOnPawnPlane.Rotation());
+
+    const auto angleBetweenPawnAndCursor = prCursorLocOnPawnPlane.Rotation().Yaw;
+    const double maxAngleThisFrame = _angularVelocityInDegrees * deltaTime;
+    auto clampedAngle = FMath::Clamp(FMath::Abs(angleBetweenPawnAndCursor), 0.0, maxAngleThisFrame);
+    if (angleBetweenPawnAndCursor < 0.0) {
+        clampedAngle *= -1.0;
+    }
+
+    pawn->AddActorLocalRotation(FRotator{0.0, clampedAngle, 0.0});
 }

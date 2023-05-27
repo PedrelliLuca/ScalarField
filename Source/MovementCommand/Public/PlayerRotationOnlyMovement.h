@@ -17,5 +17,8 @@ public:
     void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) override;
 
 private:
+    UPROPERTY(EditAnywhere)
+    float _angularVelocityInDegrees = 180.0f;  
+    
     static constexpr int32 LINE_LENGTH = 10000;
 };
