@@ -22,7 +22,8 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
 					"MovementCommand",
-					"InventoryManipulation",
+					"InventoryManipulation", 
+					"InteractionSystem",
 				}
 				);
 

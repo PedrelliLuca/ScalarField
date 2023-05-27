@@ -7,6 +7,7 @@
 #include "FSMState.h"
 #include "NewSkillsContainerComponent.h"
 #include "MovementCommandSetter.h"
+#include "InteractorInterface.h"
 
 #include "SkillExecutionState.generated.h"
 
@@ -39,4 +40,5 @@ private:
     TWeakObjectPtr<APawn> _subjectPawn = nullptr;
     TWeakObjectPtr<UNewSkillsContainerComponent> _subjectSkillsContainerC = nullptr;
     TWeakInterfacePtr<IMovementCommandSetter> _movementCommandSetter = nullptr;
+    TWeakInterfacePtr<IInteractor> _interactor = nullptr;
 };

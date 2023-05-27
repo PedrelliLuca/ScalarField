@@ -2,6 +2,7 @@
 
 #include "SkillExecutionState.h"
 
+#include "InteractingState.h"
 #include "InventoryOpenState.h"
 
 void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
@@ -14,8 +15,11 @@ void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
         check(_subjectSkillsContainerC.IsValid());
 
         // TODO: edit this when the movement setter will be on the pawn
-        _movementCommandSetter = Cast<IMovementCommandSetter>(_subjectPawn->GetController()->FindComponentByInterface((UMovementCommandSetter::StaticClass())));
+        _movementCommandSetter = Cast<IMovementCommandSetter>(_subjectPawn->GetController()->FindComponentByInterface(UMovementCommandSetter::StaticClass()));
         check(_movementCommandSetter.IsValid());
+
+        _interactor = Cast<IInteractor>(_subjectPawn->FindComponentByInterface(UInteractor::StaticClass()));
+        check(_interactor.IsValid());
     }
 }
 
@@ -28,6 +32,7 @@ void USkillExecutionState::OnLeave() {
 
 TScriptInterface<IFSMState> USkillExecutionState::Tick(const float deltaTime) {
     _movementCommandSetter->MovementTick(deltaTime);
+    _interactor->PerformFocusCheck();
     return _keepCurrentState();
 }
 
@@ -86,7 +91,23 @@ TScriptInterface<IFSMState> USkillExecutionState::TrySetSkillTarget(const FSkill
 }
 
 TScriptInterface<IFSMState> USkillExecutionState::TryInteracting() {
-    return _keepCurrentState();
+    const bool interactionSuccessful = _interactor->PerformInteractionCheck();
+    if (interactionSuccessful) {
+        _subjectSkillsContainerC->AbortSkillInExecution();
+    }
+
+    /* We keep this state if one of the following is true:
+     * 1. The interaction check failed
+     * 2. The interaction check succeeded but the interactor is already non interacting, meaning that the interaction
+     *	  was instantaneous and there is no need to move to the interaction state.
+     */
+    if (!interactionSuccessful || !_interactor->IsInteracting()) {
+        return _keepCurrentState();
+    }
+
+    TScriptInterface<IFSMState> interactingState = NewObject<UInteractingState>(this, UInteractingState::StaticClass());
+    interactingState->SetPawn(_subjectPawn.Get());
+    return MoveTemp(interactingState);
 }
 
 TScriptInterface<IFSMState> USkillExecutionState::TryToggleInventory() {
