@@ -55,8 +55,6 @@ AScalarFieldCharacter::AScalarFieldCharacter() {
 
     _stateC = CreateDefaultSubobject<UNewStateComponent>(TEXT("StateComponent"));
 
-    _interactorC = CreateDefaultSubobject<UInteractorPlayerComponent>(TEXT("InteractorComponent"));
-
     // Create the component that handles temperature damage...
     _temperatureDmgHandlerC = CreateDefaultSubobject<UTemperatureDamageHandlerComponent>(TEXT("Temperature Damage Handler Component"));
 

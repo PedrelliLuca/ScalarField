@@ -9,13 +9,13 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "HealthComponent.h"
-#include "InteractorPlayerComponent.h"
 #include "InventoryComponent.h"
 #include "ManaComponent.h"
 #include "NewSkillsContainerComponent.h"
 #include "NewStateComponent.h"
 #include "PawnImpactDamageHandlerComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "PlayerMovementCommandComponent.h"
 #include "SkillsContainerComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
@@ -80,9 +80,6 @@ private:
 
     UPROPERTY(VisibleAnywhere, Category = "State Machine", meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UNewStateComponent> _stateC;
-
-    UPROPERTY(VisibleAnywhere, Category = "Interaction")
-    TObjectPtr<UInteractorPlayerComponent> _interactorC;
 
     UPROPERTY(VisibleAnywhere, Category = "Damage Handling", meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UTemperatureDamageHandlerComponent> _temperatureDmgHandlerC;
