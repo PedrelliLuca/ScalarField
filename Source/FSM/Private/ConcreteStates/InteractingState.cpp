@@ -14,11 +14,12 @@ void UInteractingState::SetPawn(TObjectPtr<APawn> subjectPawn) {
         _subjectSkillsContainerC = _subjectPawn->FindComponentByClass<UNewSkillsContainerComponent>();
         check(_subjectSkillsContainerC.IsValid());
 
-        // TODO: edit this when the movement setter will be on the pawn
+        // TODO: remove GetController() when the command setter will be on the pawn (required for group control)
         _movementCommandSetter = Cast<IMovementCommandSetter>(_subjectPawn->GetController()->FindComponentByInterface(UMovementCommandSetter::StaticClass()));
         check(_movementCommandSetter.IsValid());
 
-        _interactor = Cast<IInteractor>(_subjectPawn->FindComponentByInterface(UInteractor::StaticClass()));
+        // TODO: remove GetController() when the interactor will be on the pawn (required for group control)
+        _interactor = Cast<IInteractor>(_subjectPawn->GetController()->FindComponentByInterface(UInteractor::StaticClass()));
         check(_interactor.IsValid());
     }
 }
