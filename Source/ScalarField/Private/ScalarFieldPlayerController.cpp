@@ -80,7 +80,9 @@ void AScalarFieldPlayerController::_onSetDestinationPressed() {
         const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
         check(IsValid(stateC));
 
-        stateC->TryStopMovement();
+        FHitResult hit;
+        GetHitResultUnderCursor(ECC_Visibility, true, hit);
+        stateC->TrySetMovementDestination(hit.Location);
     }
 }
 
