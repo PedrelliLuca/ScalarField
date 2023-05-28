@@ -105,6 +105,7 @@ void UNewSkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UNew
      * 2. The cast was a failure, so we don't want to set the skill as "in execution". */
     if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
         _currentlyExecutedSkill = skill;
+        _onSkillInExecutionStatusChanged.Broadcast(true);
 
         if (castResultValue == ESkillCastResult::Deferred) {
             _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
@@ -123,6 +124,7 @@ void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const F
 
     if (castResultValue != ESkillCastResult::Success_IntoChanneling) {
         _currentlyExecutedSkill = nullptr;
+        _onSkillInExecutionStatusChanged.Broadcast(false);
     }
 }
 
@@ -131,12 +133,14 @@ void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(c
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
     }
     _currentlyExecutedSkill = nullptr;
+    _onSkillInExecutionStatusChanged.Broadcast(false);
 }
 
 bool UNewSkillsContainerComponent::_resetSkillInExecution(const bool resetMovement) {
     if (_currentlyExecutedSkill.IsValid()) {
         _currentlyExecutedSkill->Abort(resetMovement);
         _currentlyExecutedSkill = nullptr;
+        _onSkillInExecutionStatusChanged.Broadcast(false);
         return true;
     }
     return false;
