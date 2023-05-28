@@ -50,7 +50,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
     InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkillAbort);
     InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
-    InputComponent->BindAction("Interact", IE_Pressed, _stateC.Get(), &UStateComponent::PerformInteractionBehavior);
+    InputComponent->BindAction("Interact", IE_Pressed, this, &AScalarFieldPlayerController::_onInteraction);
 
     InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AScalarFieldPlayerController::_onInventoryToggle);
 
@@ -80,7 +80,9 @@ void AScalarFieldPlayerController::_onSetDestinationPressed() {
         const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
         check(IsValid(stateC));
 
-        stateC->TryStopMovement();
+        FHitResult hit;
+        GetHitResultUnderCursor(ECC_Visibility, true, hit);
+        stateC->TrySetMovementDestination(hit.Location);
     }
 }
 
@@ -235,6 +237,17 @@ void AScalarFieldPlayerController::_onSkillAbort() {
         check(IsValid(stateC));
 
         stateC->TryAbortSkillInExecution();
+    }
+}
+
+void AScalarFieldPlayerController::_onInteraction() {
+    if (!_bNewSkillSystem) {
+        _stateC->PerformInteractionBehavior();
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryInteracting();
     }
 }
 

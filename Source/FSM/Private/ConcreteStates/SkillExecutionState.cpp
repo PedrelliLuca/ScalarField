@@ -2,6 +2,7 @@
 
 #include "SkillExecutionState.h"
 
+#include "InteractingState.h"
 #include "InventoryOpenState.h"
 
 void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
@@ -13,9 +14,13 @@ void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
         _subjectSkillsContainerC = _subjectPawn->FindComponentByClass<UNewSkillsContainerComponent>();
         check(_subjectSkillsContainerC.IsValid());
 
-        // TODO: edit this when the movement setter will be on the pawn
-        _movementCommandSetter = Cast<IMovementCommandSetter>(_subjectPawn->GetController()->FindComponentByInterface((UMovementCommandSetter::StaticClass())));
+        // TODO: remove GetController() when the command setter will be on the pawn (required for group control)
+        _movementCommandSetter = Cast<IMovementCommandSetter>(_subjectPawn->GetController()->FindComponentByInterface(UMovementCommandSetter::StaticClass()));
         check(_movementCommandSetter.IsValid());
+
+        // TODO: remove GetController() when the interactor will be on the pawn (required for group control)
+        _interactor = Cast<IInteractor>(_subjectPawn->GetController()->FindComponentByInterface(UInteractor::StaticClass()));
+        check(_interactor.IsValid());
     }
 }
 
@@ -28,6 +33,7 @@ void USkillExecutionState::OnLeave() {
 
 TScriptInterface<IFSMState> USkillExecutionState::Tick(const float deltaTime) {
     _movementCommandSetter->MovementTick(deltaTime);
+    _interactor->PerformFocusCheck();
     return _keepCurrentState();
 }
 
@@ -83,6 +89,26 @@ TScriptInterface<IFSMState> USkillExecutionState::TrySetSkillTarget(const FSkill
     }
 
     return _keepCurrentState();
+}
+
+TScriptInterface<IFSMState> USkillExecutionState::TryInteracting() {
+    const bool interactionSuccessful = _interactor->PerformInteractionCheck();
+    if (interactionSuccessful) {
+        _subjectSkillsContainerC->AbortSkillInExecution();
+    }
+
+    /* We keep this state if one of the following is true:
+     * 1. The interaction check failed
+     * 2. The interaction check succeeded but the interactor is already non interacting, meaning that the interaction
+     *	  was instantaneous and there is no need to move to the interaction state.
+     */
+    if (!interactionSuccessful || !_interactor->IsInteracting()) {
+        return _keepCurrentState();
+    }
+
+    TScriptInterface<IFSMState> interactingState = NewObject<UInteractingState>(this, UInteractingState::StaticClass());
+    interactingState->SetPawn(_subjectPawn.Get());
+    return MoveTemp(interactingState);
 }
 
 TScriptInterface<IFSMState> USkillExecutionState::TryToggleInventory() {

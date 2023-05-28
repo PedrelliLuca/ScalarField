@@ -5,17 +5,18 @@
 #include "CoreMinimal.h"
 
 #include "FSMState.h"
-#include "NewSkillsContainerComponent.h"
-#include "MovementCommandSetter.h"
 #include "InteractorInterface.h"
+#include "MovementCommandSetter.h"
+#include "NewSkillsContainerComponent.h"
+#include "UObject/WeakInterfacePtr.h"
 
-#include "SkillExecutionState.generated.h"
+#include "InteractingState.generated.h"
 
 /**
- * \brief In this state we are controlling a pawn that can execute skills.
+ * \brief In this state, the inventory is open.
  */
 UCLASS()
-class FSM_API USkillExecutionState : public UObject, public IFSMState {
+class FSM_API UInteractingState : public UObject, public IFSMState {
     GENERATED_BODY()
 
 public:

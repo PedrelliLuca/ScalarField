@@ -40,6 +40,11 @@ void UNewStateComponent::TrySetSkillTarget(const FSkillTargetPacket& targetPacke
     _performStateTransition(MoveTemp(newState));
 }
 
+void UNewStateComponent::TryInteracting() {
+    auto newState = _state->TryInteracting();
+    _performStateTransition(MoveTemp(newState));
+}
+
 void UNewStateComponent::TryToggleInventory() {
     auto newState = _state->TryToggleInventory();
     _performStateTransition(MoveTemp(newState));

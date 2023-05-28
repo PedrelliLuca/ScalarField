@@ -42,6 +42,7 @@ private:
     void _onSkill5Cast();
     void _onSkillAbort();
 
+    void _onInteraction();
     void _onInventoryToggle();
 
     void _onTacticalPauseToggled();
@@ -55,6 +56,7 @@ private:
     UPROPERTY(VisibleAnywhere, Category = "State")
     TObjectPtr<UStateComponent> _stateC;
 
+    // TODO: this will have to be moved to the pawns in order to implement group control
     UPROPERTY(VisibleAnywhere, Category = "Interaction")
     TObjectPtr<UInteractorPlayerComponent> _interactorC;
 
