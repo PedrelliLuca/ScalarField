@@ -37,6 +37,8 @@ private:
     void _onSkillExecutionBegin();
     void _onSkillExecutionEnd();
 
+    void _onSkillInExecutionStatusChanged(bool isExeuctingSomeSkill);
+
     UPROPERTY(VisibleAnywhere, Category = "Chaser | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
 
@@ -69,6 +71,9 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Chaser | Behavior Tree")
     TObjectPtr<UBehaviorTree> _behaviorTree;
+
+    UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
+    bool _bNewSkillSystem = false;
 
     // The controlled Pawn has ownership of these
     TWeakObjectPtr<UFactionComponent> _pawnFactionC = nullptr;
