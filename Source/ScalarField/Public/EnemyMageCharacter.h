@@ -10,6 +10,8 @@
 #include "HealthComponent.h"
 #include "InventoryComponent.h"
 #include "ManaComponent.h"
+#include "NewSkillsContainerComponent.h"
+#include "NewStateComponent.h"
 #include "PawnImpactDamageHandlerComponent.h"
 #include "SkillsContainerComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
@@ -60,7 +62,13 @@ private:
     TObjectPtr<UHealthComponent> _healthC;
 
     UPROPERTY(VisibleAnywhere, Category = Skills, meta = (AllowPrivateAccess = "true"))
-    TObjectPtr<USkillsContainerComponent> _skillsContainer;
+    TObjectPtr<USkillsContainerComponent> _skillsContainerC;
+
+    UPROPERTY(VisibleAnywhere, Category = Skills, meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UNewSkillsContainerComponent> _newSkillsContainerC;
+
+    UPROPERTY(VisibleAnywhere, Category = "State Machine", meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UNewStateComponent> _stateC;
 
     UPROPERTY(VisibleAnywhere, Category = "Damage Handling", meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UTemperatureDamageHandlerComponent> _temperatureDmgHandlerC;
