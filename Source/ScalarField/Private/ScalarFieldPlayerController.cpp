@@ -236,7 +236,7 @@ void AScalarFieldPlayerController::_onSkillAbort() {
         const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
         check(IsValid(stateC));
 
-        stateC->TryAbortSkillInExecution();
+        stateC->TryAbort();
     }
 }
 

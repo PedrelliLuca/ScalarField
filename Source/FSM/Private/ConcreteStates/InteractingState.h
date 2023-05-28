@@ -31,7 +31,7 @@ public:
     TScriptInterface<IFSMState> TryStopMovement() override;
 
     TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) override;
-    TScriptInterface<IFSMState> TryAbortSkillInExecution() override;
+    TScriptInterface<IFSMState> TryAbort() override;
     TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) override;
 
     TScriptInterface<IFSMState> TryInteracting() override;

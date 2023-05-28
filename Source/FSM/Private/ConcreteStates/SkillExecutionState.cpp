@@ -65,7 +65,7 @@ TScriptInterface<IFSMState> USkillExecutionState::TryCastSkillAtIndex(const int3
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> USkillExecutionState::TryAbortSkillInExecution() {
+TScriptInterface<IFSMState> USkillExecutionState::TryAbort() {
     _subjectSkillsContainerC->AbortSkillInExecution();
     return _keepCurrentState();
 }

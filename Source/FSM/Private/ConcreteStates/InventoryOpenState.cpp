@@ -48,7 +48,7 @@ TScriptInterface<IFSMState> UInventoryOpenState::TryCastSkillAtIndex(int32 index
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> UInventoryOpenState::TryAbortSkillInExecution() {
+TScriptInterface<IFSMState> UInventoryOpenState::TryAbort() {
     return _keepCurrentState();
 }
 

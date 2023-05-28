@@ -28,7 +28,7 @@ public:
     virtual TScriptInterface<IFSMState> TryStopMovement() = 0;
 
     virtual TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) = 0;
-    virtual TScriptInterface<IFSMState> TryAbortSkillInExecution() = 0;
+    virtual TScriptInterface<IFSMState> TryAbort() = 0;
     virtual TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) = 0;
 
     virtual TScriptInterface<IFSMState> TryInteracting() = 0;

@@ -71,7 +71,7 @@ TScriptInterface<IFSMState> UInteractingState::TryCastSkillAtIndex(const int32 i
     return MoveTemp(executionState);
 }
 
-TScriptInterface<IFSMState> UInteractingState::TryAbortSkillInExecution() {
+TScriptInterface<IFSMState> UInteractingState::TryAbort() {
     TScriptInterface<IFSMState> executionState = NewObject<USkillExecutionState>(this, USkillExecutionState::StaticClass());
     executionState->SetPawn(_subjectPawn.Get());
     return MoveTemp(executionState);

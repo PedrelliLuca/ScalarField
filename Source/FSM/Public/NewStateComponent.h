@@ -23,7 +23,7 @@ public:
     void TryStopMovement();
 
     void TryCastSkillAtIndex(uint32 index);
-    void TryAbortSkillInExecution();
+    void TryAbort();
     void TrySetSkillTarget(const FSkillTargetPacket& targetPacket);
 
     void TryInteracting();

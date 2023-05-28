@@ -30,8 +30,8 @@ void UNewStateComponent::TryCastSkillAtIndex(const uint32 index) {
     _performStateTransition(MoveTemp(newState));
 }
 
-void UNewStateComponent::TryAbortSkillInExecution() {
-    auto newState = _state->TryAbortSkillInExecution();
+void UNewStateComponent::TryAbort() {
+    auto newState = _state->TryAbort();
     _performStateTransition(MoveTemp(newState));
 }
 
