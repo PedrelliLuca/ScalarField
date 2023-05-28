@@ -28,8 +28,9 @@ namespace UnrealBuildTool.Rules
                     "SkillSystem",
                     "SkillUserFSM",
 					"DamageHandlers",
-					"Thermodynamics"
-                }
+					"Thermodynamics", 
+					"FSM",
+				}
 				);
 
 			DynamicallyLoadedModuleNames.AddRange(
