@@ -82,19 +82,18 @@ TScriptInterface<IFSMState> UInteractingState::TrySetSkillTarget(const FSkillTar
 }
 
 TScriptInterface<IFSMState> UInteractingState::TryInteracting() {
-    const bool interactionSuccessful = _interactor->PerformInteractionCheck();
+    // This fails if either the interactable is invalid or valid but we're already interacting with it. In both cases, we don't want to interrupt the
+    // interaction in progress, so do nothing in case of failure.
+    _interactor->PerformInteractionCheck();
 
-    /* We leave this state if one of the following is true:
-     * 1. The interaction check failed
-     * 2. The interaction check succeeded but the interactor is already non interacting, meaning that the interaction
-     *	  was instantaneous and there is no need to move to the interaction state.
-     */
-    if (!interactionSuccessful || !_interactor->IsInteracting()) {
+    /* We leave this state if the interaction check succeeded but the interactor is already non interacting, meaning that the interaction was instantaneous and
+     *there is no need to move to the interaction state. */
+    if (!_interactor->IsInteracting()) {
         TScriptInterface<IFSMState> executionState = NewObject<USkillExecutionState>(this, USkillExecutionState::StaticClass());
         executionState->SetPawn(_subjectPawn.Get());
         return MoveTemp(executionState);
     }
-    
+
     return _keepCurrentState();
 }
 
