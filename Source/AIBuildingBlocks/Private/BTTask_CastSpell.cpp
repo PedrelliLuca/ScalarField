@@ -13,6 +13,10 @@ UBTTask_CastSpell::UBTTask_CastSpell() {
 }
 
 EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
+    return _bNewSkillSystem ? _executeTaskNew(ownerComp, nodeMemory) : _executeTaskLegacy(ownerComp, nodeMemory);
+}
+
+EBTNodeResult::Type UBTTask_CastSpell::_executeTaskLegacy(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
     if (!IsValid(_skillToCast)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): Skill to cast hasn't been selected"), *FString{__FUNCTION__});
         return EBTNodeResult::Failed;
@@ -50,6 +54,10 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
         return stateC->PerformSkillExecutionBehavior(MoveTemp(skill)) ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
     }
 
+    return EBTNodeResult::Failed;
+}
+
+EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
     return EBTNodeResult::Failed;
 }
 
