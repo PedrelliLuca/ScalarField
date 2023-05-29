@@ -18,6 +18,8 @@ UCLASS()
 class NEWSKILLSYSTEM_API UNewSkillsContainerComponent : public UActorComponent {
     GENERATED_BODY()
 
+    friend class FSkillsContainerInspector;
+
 public:
     UNewSkillsContainerComponent();
 
