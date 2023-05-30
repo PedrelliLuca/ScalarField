@@ -29,7 +29,7 @@ public:
     TScriptInterface<IFSMState> TrySetMovementDestination(const FVector& movementDestination) override;
     TScriptInterface<IFSMState> TryStopMovement() override;
 
-    TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) override;
+    FStateResponse_TryCastSkill TryCastSkillAtIndex(int32 index) override;
     TScriptInterface<IFSMState> TryAbort() override;
     TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) override;
 

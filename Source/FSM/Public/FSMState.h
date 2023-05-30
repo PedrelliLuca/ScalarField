@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SkillTarget.h"
+#include "StateResponses.h"
 
 #include "FSMState.generated.h"
 
@@ -27,7 +28,7 @@ public:
     virtual TScriptInterface<IFSMState> TrySetMovementDestination(const FVector& movementDestination) = 0;
     virtual TScriptInterface<IFSMState> TryStopMovement() = 0;
 
-    virtual TScriptInterface<IFSMState> TryCastSkillAtIndex(int32 index) = 0;
+    virtual FStateResponse_TryCastSkill TryCastSkillAtIndex(int32 index) = 0;
     virtual TScriptInterface<IFSMState> TryAbort() = 0;
     virtual TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) = 0;
 

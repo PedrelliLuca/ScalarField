@@ -53,22 +53,19 @@ TScriptInterface<IFSMState> UInteractingState::TryStopMovement() {
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> UInteractingState::TryCastSkillAtIndex(const int32 index) {
+FStateResponse_TryCastSkill UInteractingState::TryCastSkillAtIndex(const int32 index) {
     auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
 
-    /* In case the skill we're trying to cast is in execution, we abort it and try casting it again. There is no guarantee that the 2nd time we'll succeed BUT,
-     * since we aborted, this time we must not get ESkillCastResult::Fail_InExecution. */
-    if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_InExecution) {
-        [[maybe_unused]] const auto abortSuccessful = _subjectSkillsContainerC->AbortSkillInExecution();
-        check(abortSuccessful);
-
-        skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
+    if (skillCastResult.IsFailure()) {
+        /* It's impossible we're already executing a skill if we're in this state, something's wrong. */
         check(skillCastResult.GetCastResult() != ESkillCastResult::Fail_InExecution);
+        return FStateResponse_TryCastSkill{_keepCurrentState(), MoveTemp(skillCastResult)};
     }
 
+    // TODO?: this causes transition to execution state even if targeting is required. Maybe we want to give the chance to target while keeping the interaction?
     TScriptInterface<IFSMState> executionState = NewObject<USkillExecutionState>(this, USkillExecutionState::StaticClass());
     executionState->SetPawn(_subjectPawn.Get());
-    return MoveTemp(executionState);
+    return FStateResponse_TryCastSkill{MoveTemp(executionState), MoveTemp(skillCastResult)};
 }
 
 TScriptInterface<IFSMState> UInteractingState::TryAbort() {
