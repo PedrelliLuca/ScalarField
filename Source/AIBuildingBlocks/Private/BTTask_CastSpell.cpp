@@ -85,9 +85,13 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
     check(optionalSkillPropertiesInsp.IsSet());
 
     if (!_needsManaAvailabilityToCast || _newIsManaAvailableForSkill(pawn, optionalSkillPropertiesInsp->GetTotalManaCost())) {
-        // TODO:
-        // return stateC->TryCastSkillAtIndex(*optionalSkillIdx);
-        return EBTNodeResult::Succeeded;
+        
+        const auto optSkillCastResult = stateC->TryCastSkillAtIndex(*optionalSkillIdx);
+        if (optSkillCastResult.IsSet() && !optSkillCastResult->IsFailure()) {
+            return EBTNodeResult::Succeeded;
+        }
+
+        return EBTNodeResult::Failed;
     }
 
     return EBTNodeResult::Failed;

@@ -22,7 +22,7 @@ public:
     void TrySetMovementDestination(const FVector& movementDestination);
     void TryStopMovement();
 
-    void TryCastSkillAtIndex(uint32 index);
+    TOptional<FSkillCastResult> TryCastSkillAtIndex(uint32 index);
     void TryAbort();
     void TrySetSkillTarget(const FSkillTargetPacket& targetPacket);
 

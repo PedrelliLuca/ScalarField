@@ -25,9 +25,11 @@ void UNewStateComponent::TryStopMovement() {
     _performStateTransition(MoveTemp(newState));
 }
 
-void UNewStateComponent::TryCastSkillAtIndex(const uint32 index) {
-    auto newState = _state->TryCastSkillAtIndex(index);
-    _performStateTransition(MoveTemp(newState));
+TOptional<FSkillCastResult> UNewStateComponent::TryCastSkillAtIndex(const uint32 index) {
+    auto tryCastSkillResponse = _state->TryCastSkillAtIndex(index);
+    _performStateTransition(MoveTemp(tryCastSkillResponse.StateResponse));
+
+    return MoveTemp(tryCastSkillResponse.CastResponse);
 }
 
 void UNewStateComponent::TryAbort() {
