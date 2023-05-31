@@ -5,10 +5,10 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraFunctionLibrary.h"
 
-void UNewPlayerRotoTranslationMovement::OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination) {
-    _bInputPressed = !_bInputPressed;
+void UNewPlayerRotoTranslationMovement::OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData) {
+    _inputEvent = inputData.SetDestinationInputEvent;
 
-    if (_bInputPressed) {
+    if (_inputEvent == IE_Pressed) {
         playerController->StopMovement();
     } else if (_followTime <= _shortPressThreshold) {
         // If it was a short press we move there and spawn some particles
@@ -23,7 +23,7 @@ void UNewPlayerRotoTranslationMovement::OnStopMovement(const TObjectPtr<APlayerC
 }
 
 void UNewPlayerRotoTranslationMovement::OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) {
-    if (!_bInputPressed) {
+    if (_inputEvent == IE_Released) {
         _followTime = 0;
         return;
     }
