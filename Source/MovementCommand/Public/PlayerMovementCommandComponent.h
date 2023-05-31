@@ -22,12 +22,15 @@ public:
     void StopMovement() override;
     void MovementTick(float deltaTime) override;
 
+    /** \brief Each time SetDestination() is called, this method must be called first, otherwise a check gets triggered (point of failure). */
+    void SetPlayerInputData(FPlayerInputData&& inputData);
+
 protected:
     void BeginPlay() override;
-    
+
 private:
     TObjectPtr<UPlayerMovementCommand> _getMovementCommand();
-    
+
     UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
     TMap<EMovementCommandMode, TSubclassOf<UPlayerMovementCommand>> _modesToCommandClasses;
 
@@ -39,5 +42,7 @@ private:
 
     EMovementCommandMode _activeMovementMode;
 
-    TWeakObjectPtr<APlayerController> _ownerPC = nullptr;    
+    TWeakObjectPtr<APlayerController> _ownerPC = nullptr;
+
+    TOptional<FPlayerInputData> _inputData{};
 };
