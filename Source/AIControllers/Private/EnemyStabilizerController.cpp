@@ -2,6 +2,7 @@
 
 #include "EnemyStabilizerController.h"
 
+#include "NewSkillsContainerComponent.h"
 #include "Algo/AnyOf.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -30,8 +31,10 @@ void AEnemyStabilizerController::Tick(const float deltaTime) {
         return;
     }
 
-    _stateC->PerformTickBehavior(deltaTime);
-    _movementCommandC->MovementTick(deltaTime);
+    if (!_bNewSkillSystem) {
+        _stateC->PerformTickBehavior(deltaTime);
+        _movementCommandC->MovementTick(deltaTime);
+    }
 
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
         const auto blackBoard = GetBlackboardComponent();
@@ -111,9 +114,16 @@ void AEnemyStabilizerController::BeginPlay() {
     // Setting up the logic that lets the BT know if we're moving or not.
     _movementCommandC->OnActiveMovementCmdStateChanged().AddUObject(this, &AEnemyStabilizerController::_updateBlackboardOnMovementStatus);
 
-    // Setting up the logic that lets the BT know if we're casting or not.
-    _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionBegin);
-    _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionEnd);
+    if (!_bNewSkillSystem) {
+        // Setting up the logic that lets the BT know if we're casting or not.
+        _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionBegin);
+        _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionEnd);
+    } else {
+        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+        check(IsValid(skillsContainerC));
+
+        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
+    }
 }
 
 void AEnemyStabilizerController::_updateBlackboardOnMovementStatus(const bool newIsMoving) {
@@ -145,4 +155,9 @@ void AEnemyStabilizerController::_onSkillExecutionBegin() {
 void AEnemyStabilizerController::_onSkillExecutionEnd() {
     const auto blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, false);
+}
+
+void AEnemyStabilizerController::_onSkillInExecutionStatusChanged(bool isExecutingSomeSkill) {
+    const auto blackBoard = GetBlackboardComponent();
+    blackBoard->SetValueAsBool(_bbIsCastingKeyName, isExecutingSomeSkill);
 }

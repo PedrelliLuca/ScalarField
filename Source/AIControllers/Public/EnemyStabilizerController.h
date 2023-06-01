@@ -41,6 +41,8 @@ private:
     void _onSkillExecutionBegin();
     void _onSkillExecutionEnd();
 
+    void _onSkillInExecutionStatusChanged(bool isExecutingSomeSkill);
+
     UPROPERTY(VisibleAnywhere, Category = "Stabilizer | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
 
@@ -87,6 +89,9 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Behavior Tree")
     TObjectPtr<UBehaviorTree> _behaviorTree;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
+    bool _bNewSkillSystem = false;
+    
     float _timeSinceInfluencerCheck = 0.0f;
 
     // The controlled Pawn has ownership of these
