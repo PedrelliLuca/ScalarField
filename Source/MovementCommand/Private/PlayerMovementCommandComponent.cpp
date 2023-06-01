@@ -17,7 +17,11 @@ void UPlayerMovementCommandComponent::SetMovementMode(EMovementCommandMode mode)
 
 void UPlayerMovementCommandComponent::SetDestination(const FVector& destination) {
     check(_ownerPC.IsValid());
-    _getMovementCommand()->OnSetDestination(_ownerPC.Get(), destination);
+    check(_inputData.IsSet());
+
+    // Point of failure: don't forget to call Reset() on _inputData, it must be set again before calling SetDestination()
+    _getMovementCommand()->OnSetDestination(_ownerPC.Get(), destination, _inputData.GetValue());
+    _inputData.Reset();
 }
 
 void UPlayerMovementCommandComponent::StopMovement() {
@@ -28,6 +32,10 @@ void UPlayerMovementCommandComponent::StopMovement() {
 void UPlayerMovementCommandComponent::MovementTick(const float deltaTime) {
     check(_ownerPC.IsValid());
     _getMovementCommand()->OnMovementTick(_ownerPC.Get(), deltaTime);
+}
+
+void UPlayerMovementCommandComponent::SetPlayerInputData(FPlayerInputData&& inputData) {
+    _inputData = MoveTemp(inputData);
 }
 
 void UPlayerMovementCommandComponent::BeginPlay() {

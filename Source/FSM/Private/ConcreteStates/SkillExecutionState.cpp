@@ -19,8 +19,8 @@ void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
         check(_movementCommandSetter.IsValid());
 
         // TODO: remove GetController() when the interactor will be on the pawn (required for group control)
+        // This component is not mandatory, AI might not have it
         _interactor = Cast<IInteractor>(_subjectPawn->GetController()->FindComponentByInterface(UInteractor::StaticClass()));
-        check(_interactor.IsValid());
     }
 }
 
@@ -33,7 +33,9 @@ void USkillExecutionState::OnLeave() {
 
 TScriptInterface<IFSMState> USkillExecutionState::Tick(const float deltaTime) {
     _movementCommandSetter->MovementTick(deltaTime);
-    _interactor->PerformFocusCheck();
+    if (_interactor.IsValid()) {
+        _interactor->PerformFocusCheck();
+    }
     return _keepCurrentState();
 }
 
@@ -47,7 +49,7 @@ TScriptInterface<IFSMState> USkillExecutionState::TryStopMovement() {
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> USkillExecutionState::TryCastSkillAtIndex(const int32 index) {
+FStateResponse_TryCastSkill USkillExecutionState::TryCastSkillAtIndex(const int32 index) {
     auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
 
     /* In case the skill we're trying to cast is in execution, we abort it and try casting it again. There is no guarantee that the 2nd time we'll succeed BUT,
@@ -60,10 +62,10 @@ TScriptInterface<IFSMState> USkillExecutionState::TryCastSkillAtIndex(const int3
         check(skillCastResult.GetCastResult() != ESkillCastResult::Fail_InExecution);
     }
 
-    return _keepCurrentState();
+    return FStateResponse_TryCastSkill{_keepCurrentState(), MoveTemp(skillCastResult)};
 }
 
-TScriptInterface<IFSMState> USkillExecutionState::TryAbortSkillInExecution() {
+TScriptInterface<IFSMState> USkillExecutionState::TryAbort() {
     _subjectSkillsContainerC->AbortSkillInExecution();
     return _keepCurrentState();
 }
@@ -92,6 +94,9 @@ TScriptInterface<IFSMState> USkillExecutionState::TrySetSkillTarget(const FSkill
 }
 
 TScriptInterface<IFSMState> USkillExecutionState::TryInteracting() {
+    // Not all pawns might have an _interactor. However, if they don't, they shouldn't be calling this function!!
+    check(_interactor.IsValid());
+    
     const bool interactionSuccessful = _interactor->PerformInteractionCheck();
     if (interactionSuccessful) {
         _subjectSkillsContainerC->AbortSkillInExecution();

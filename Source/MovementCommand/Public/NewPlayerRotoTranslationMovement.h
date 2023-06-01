@@ -13,12 +13,12 @@ class MOVEMENTCOMMAND_API UNewPlayerRotoTranslationMovement : public UPlayerMove
     GENERATED_BODY()
 
 public:
-    void OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination) override;
+    void OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData) override;
     void OnStopMovement(const TObjectPtr<APlayerController>& playerController) override;
     void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) override;
 
 private:
-    bool _bInputPressed = false; // Input is being pressed
+    EInputEvent _inputEvent = IE_Released;
     double _followTime = 0.0;  // For how long it has been pressed
 
     /** True if the controlled character should navigate to the mouse cursor. */

@@ -5,6 +5,7 @@
 #include "InventoryManipulationSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "NewStateComponent.h"
+#include "PlayerInputData.h"
 #include "SkillsContainerComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
 
@@ -77,6 +78,9 @@ void AScalarFieldPlayerController::_onSetDestinationPressed() {
     if (!_bNewSkillSystem) {
         _movementCommandC->StopMovement();
     } else {
+        // Very important: this must be called before each TrySetMovementDestination() call, point of failure.
+        _movementCommandC->SetPlayerInputData(FPlayerInputData{IE_Pressed});
+
         const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
         check(IsValid(stateC));
 
@@ -94,6 +98,9 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
     if (!_bNewSkillSystem) {
         _movementCommandC->SetDestination(hit.Location);
     } else {
+        // Very important: this must be called before each TrySetMovementDestination() call, point of failure.
+        _movementCommandC->SetPlayerInputData(FPlayerInputData{IE_Released});
+
         const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
         check(IsValid(stateC));
 
@@ -236,7 +243,7 @@ void AScalarFieldPlayerController::_onSkillAbort() {
         const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
         check(IsValid(stateC));
 
-        stateC->TryAbortSkillInExecution();
+        stateC->TryAbort();
     }
 }
 

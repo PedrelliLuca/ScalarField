@@ -25,6 +25,8 @@ UCLASS(NotBlueprintable, Abstract)
 class NEWSKILLSYSTEM_API UNewAbstractSkill : public UObject, public FTickableGameObject {
     GENERATED_BODY()
 
+    friend class FSkillPropertiesInspector;
+
 public:
     /** \brief Starts the skill casting process. This function can have many outcomes, you can see all of them in ESkillCastResult. Calling this function before
      * SetCaster() will trigger a check. */

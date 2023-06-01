@@ -2,6 +2,7 @@
 
 #include "EnemyChaserController.h"
 
+#include "NewSkillsContainerComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
 AEnemyChaserController::AEnemyChaserController() {
@@ -17,8 +18,10 @@ void AEnemyChaserController::Tick(const float deltaTime) {
         return;
     }
 
-    _stateC->PerformTickBehavior(deltaTime);
-    _movementCommandC->MovementTick(deltaTime);
+    if (!_bNewSkillSystem) {
+        _stateC->PerformTickBehavior(deltaTime);
+        _movementCommandC->MovementTick(deltaTime);
+    }
 
     // Did we reach our current patrol objective?
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
@@ -67,12 +70,24 @@ void AEnemyChaserController::BeginPlay() {
         UE_LOG(LogTemp, Error, TEXT("%s(): Invald value for _bbTargetEnemyKeyName"), *FString{__FUNCTION__});
     }
 
+    if (_bNewSkillSystem) {
+        _movementCommandC->SetDefaultMovementMode();
+    }
+
     // Setting up the logic that lets the BT know if we're moving or not.
     _movementCommandC->OnActiveMovementCmdStateChanged().AddUObject(this, &AEnemyChaserController::_updateBlackboardOnMovementStatus);
 
-    // Setting up the logic that lets the BT know if we're casting or not.
-    _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyChaserController::_onSkillExecutionBegin);
-    _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyChaserController::_onSkillExecutionEnd);
+    if (!_bNewSkillSystem) {
+        // Setting up the logic that lets the BT know if we're casting or not.
+        _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyChaserController::_onSkillExecutionBegin);
+        _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyChaserController::_onSkillExecutionEnd);    
+    } else {
+        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+        check(IsValid(skillsContainerC));
+
+        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyChaserController::_onSkillInExecutionStatusChanged);   
+    }
+    
 }
 
 void AEnemyChaserController::_updateBlackboardOnMovementStatus(const bool newIsMoving) {
@@ -102,4 +117,9 @@ void AEnemyChaserController::_onSkillExecutionBegin() {
 void AEnemyChaserController::_onSkillExecutionEnd() {
     const auto blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, false);
+}
+
+void AEnemyChaserController::_onSkillInExecutionStatusChanged(const bool isExecutingSomeSkill) {
+    const auto blackBoard = GetBlackboardComponent();
+    blackBoard->SetValueAsBool(_bbIsCastingKeyName, isExecutingSomeSkill);
 }

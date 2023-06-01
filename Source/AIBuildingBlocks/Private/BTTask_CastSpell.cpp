@@ -5,7 +5,11 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "ManaComponent.h"
+#include "NewSkillsContainerComponent.h"
+#include "NewStateComponent.h"
+#include "SkillPropertiesInspector.h"
 #include "SkillsContainerComponent.h"
+#include "SkillsContainerInspector.h"
 #include "StateComponent.h"
 
 UBTTask_CastSpell::UBTTask_CastSpell() {
@@ -13,6 +17,10 @@ UBTTask_CastSpell::UBTTask_CastSpell() {
 }
 
 EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
+    return _bNewSkillSystem ? _executeTaskNew(ownerComp, nodeMemory) : _executeTaskLegacy(ownerComp, nodeMemory);
+}
+
+EBTNodeResult::Type UBTTask_CastSpell::_executeTaskLegacy(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
     if (!IsValid(_skillToCast)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): Skill to cast hasn't been selected"), *FString{__FUNCTION__});
         return EBTNodeResult::Failed;
@@ -53,6 +61,42 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
     return EBTNodeResult::Failed;
 }
 
+EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
+    const auto pawn = ownerComp.GetAIOwner()->GetPawn();
+    check(IsValid(pawn));
+
+    const auto stateC = pawn->FindComponentByClass<UNewStateComponent>();
+    if (!ensureAlwaysMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
+        return EBTNodeResult::Failed;
+    }
+
+    const auto skillsContainerC = TObjectPtr<UNewSkillsContainerComponent>{pawn->FindComponentByClass<UNewSkillsContainerComponent>()};
+    if (!ensureAlwaysMsgf(IsValid(skillsContainerC), TEXT("AI-controlled Pawn does not have a Skills Container Component"))) {
+        return EBTNodeResult::Failed;
+    }
+
+    const auto skillsContainerInsp = FSkillsContainerInspector{skillsContainerC};
+    const auto optionalSkillIdx = FSkillsContainerInspector{skillsContainerC}.GetIndexOfSkill(_newSkillToCast);
+    if (!ensureAlwaysMsgf(optionalSkillIdx.IsSet(), TEXT("AI-controlled Pawn does not have the selected Skill"))) {
+        return EBTNodeResult::Failed;
+    }
+
+    const auto optionalSkillPropertiesInsp = skillsContainerInsp.GetSkillPropertiesByIndex(*optionalSkillIdx);
+    check(optionalSkillPropertiesInsp.IsSet());
+
+    if (!_needsManaAvailabilityToCast || _newIsManaAvailableForSkill(pawn, optionalSkillPropertiesInsp->GetTotalManaCost())) {
+        
+        const auto optSkillCastResult = stateC->TryCastSkillAtIndex(*optionalSkillIdx);
+        if (optSkillCastResult.IsSet() && !optSkillCastResult->IsFailure()) {
+            return EBTNodeResult::Succeeded;
+        }
+
+        return EBTNodeResult::Failed;
+    }
+
+    return EBTNodeResult::Failed;
+}
+
 FString UBTTask_CastSpell::GetStaticDescription() const {
     FString skillDesc{"invalid"};
     if (IsValid(_skillToCast)) {
@@ -62,7 +106,7 @@ FString UBTTask_CastSpell::GetStaticDescription() const {
     return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *skillDesc);
 }
 
-bool UBTTask_CastSpell::_isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill) {
+bool UBTTask_CastSpell::_isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill) const {
     if (const auto pawn = aiController->GetPawn(); IsValid(pawn)) {
         if (const auto manaC = pawn->FindComponentByClass<UManaComponent>(); IsValid(manaC)) {
             return manaC->GetCurrentMana() >= skill->GetCastManaCost() + skill->GetChannelingManaCost();
@@ -70,4 +114,13 @@ bool UBTTask_CastSpell::_isManaAvailableForSkill(const TObjectPtr<AAIController>
     }
 
     return false;
+}
+
+bool UBTTask_CastSpell::_newIsManaAvailableForSkill(const TObjectPtr<APawn>& pawn, float skillManaCost) const {
+    if (const auto manaC = pawn->FindComponentByClass<UManaComponent>(); IsValid(manaC)) {
+        return manaC->GetCurrentMana() >= skillManaCost;
+    }
+
+    // Pawns without a mana component can cast for free!
+    return true;
 }

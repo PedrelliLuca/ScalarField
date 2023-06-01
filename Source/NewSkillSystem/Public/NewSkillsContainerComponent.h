@@ -12,9 +12,13 @@
 
 #include "NewSkillsContainerComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillExecutionStatusChanged, bool);
+
 UCLASS()
 class NEWSKILLSYSTEM_API UNewSkillsContainerComponent : public UActorComponent {
     GENERATED_BODY()
+
+    friend class FSkillsContainerInspector;
 
 public:
     UNewSkillsContainerComponent();
@@ -37,6 +41,8 @@ public:
      * TOptional is unset. */
     TOptional<FSkillTargetingResult> TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket);
 
+    FOnSkillExecutionStatusChanged& OnSkillInExecutionStatusChanged() { return _onSkillInExecutionStatusChanged; }
+
 protected:
     void BeginPlay() override;
 
@@ -56,4 +62,6 @@ private:
 
     TWeakObjectPtr<UNewAbstractSkill> _skillWaitingForTargets = nullptr;
     TWeakObjectPtr<UNewAbstractSkill> _currentlyExecutedSkill = nullptr;
+
+    FOnSkillExecutionStatusChanged _onSkillInExecutionStatusChanged;
 };

@@ -18,7 +18,8 @@ namespace UnrealBuildTool.Rules
 					"FactionSystem",
 					"GameplayTasks",
 					"MovementCommand",
-					"GameplayAttributes"
+					"GameplayAttributes",
+					"NewSkillSystem",
                 }
 				);
 
@@ -28,8 +29,9 @@ namespace UnrealBuildTool.Rules
                     "SkillSystem",
                     "SkillUserFSM",
 					"DamageHandlers",
-					"Thermodynamics"
-                }
+					"Thermodynamics", 
+					"FSM",
+				}
 				);
 
 			DynamicallyLoadedModuleNames.AddRange(

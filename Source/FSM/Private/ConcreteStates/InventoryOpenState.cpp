@@ -44,11 +44,11 @@ TScriptInterface<IFSMState> UInventoryOpenState::TryStopMovement() {
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> UInventoryOpenState::TryCastSkillAtIndex(int32 index) {
-    return _keepCurrentState();
+FStateResponse_TryCastSkill UInventoryOpenState::TryCastSkillAtIndex(int32 index) {
+    return FStateResponse_TryCastSkill{_keepCurrentState(), TOptional<FSkillCastResult>{}};
 }
 
-TScriptInterface<IFSMState> UInventoryOpenState::TryAbortSkillInExecution() {
+TScriptInterface<IFSMState> UInventoryOpenState::TryAbort() {
     return _keepCurrentState();
 }
 
