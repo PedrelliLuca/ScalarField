@@ -30,7 +30,9 @@ namespace UnrealBuildTool.Rules
                     "SkillUserFSM",
 					"DamageHandlers",
 					"Thermodynamics", 
-					"FSM",
+					"FSM", 
+					"AIControllers", 
+					"SkillTargeting",
 				}
 				);
 

@@ -8,7 +8,7 @@
 
 /** \brief This class is friend of UNewAbstractSkill. Files who have visibility of this class are allowed to peek at UNewAbstractSkill's properties. The reasons
  * this class exists are:
-* 1. To provide AI with skill-related data, so that it can take decisions on whether to cast a certain skill or not.
+ * 1. To provide AI with skill-related data, so that it can take decisions on whether to cast a certain skill or not.
  * 2. To provide UI with skill-related data, so that the player can take decisions on whether to cast a certain skill or not.
  *
  *
@@ -22,6 +22,8 @@ public:
         : _skill(skill) {}
 
     float GetTotalManaCost() const { return _skill->_castManaCost + _skill->_channelingManaCost; }
+
+    TSubclassOf<UObject> GetTargetKind() const { return _skill->_targetKind; }
 
 private:
     TWeakObjectPtr<UNewAbstractSkill> _skill;

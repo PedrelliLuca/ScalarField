@@ -4,10 +4,13 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/RunEQSComponent.h"
 #include "ManaComponent.h"
 #include "NewSkillsContainerComponent.h"
 #include "NewStateComponent.h"
 #include "SkillPropertiesInspector.h"
+#include "SkillTargets/ActorSkillTarget.h"
+#include "SkillTargets/LocationSkillTarget.h"
 #include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
 #include "StateComponent.h"
@@ -98,6 +101,35 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
     if (!optionalSkillCastResult->IsFailure()) {
         return EBTNodeResult::Succeeded;
     }
+
+    if (optionalSkillCastResult->GetCastResult() == ESkillCastResult::Fail_MissingTarget) {
+        const auto eqsComponent = pawn->FindComponentByClass<URunEQSComponent>();
+        if (!ensureMsgf(IsValid(eqsComponent), TEXT("AI-controlled Pawn trying to cast a targeting spell without a RunEQSComponent"))) {
+            return EBTNodeResult::Failed;
+        }
+
+        auto queryItemsIterator = eqsComponent->GetQueryItemsIterator();
+        for (; !queryItemsIterator.IsDone(); ++queryItemsIterator) {
+            auto itemRawData = *queryItemsIterator;
+
+            FSkillTargetPacket targetPacket{};
+
+            const auto targetKind = optionalSkillPropertiesInsp->GetTargetKind();
+            if (targetKind == ULocationSkillTarget::StaticClass()) {
+                // TODO
+            } else if (targetKind == UActorSkillTarget::StaticClass()) {
+                FWeakObjectPtr weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
+                const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
+                targetPacket.TargetActor = rawActor;
+                targetPacket.TargetLocation = rawActor->GetActorLocation();
+            } else {
+                checkNoEntry();
+            }
+
+            stateC->TrySetSkillTarget(MoveTemp(targetPacket));
+        }
+    }
+
     return EBTNodeResult::Failed;
 }
 
