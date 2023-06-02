@@ -70,8 +70,8 @@ TScriptInterface<IFSMState> USkillExecutionState::TryAbort() {
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> USkillExecutionState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
-    const auto skillTargetingResult = _subjectSkillsContainerC->TryAddTargetToWaitingSkill(targetPacket);
+FStateResponse_TrySetSkillTarget USkillExecutionState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+    auto skillTargetingResult = _subjectSkillsContainerC->TryAddTargetToWaitingSkill(targetPacket);
 
     if (skillTargetingResult.IsSet() && skillTargetingResult.GetValue().GetTargetingResult() == ESkillTargetingResult::Success_IntoCast) {
         auto optionalSkillCastResult = _subjectSkillsContainerC->TryCastWaitingSkill();
@@ -90,13 +90,13 @@ TScriptInterface<IFSMState> USkillExecutionState::TrySetSkillTarget(const FSkill
         }
     }
 
-    return _keepCurrentState();
+    return FStateResponse_TrySetSkillTarget{_keepCurrentState(), MoveTemp(skillTargetingResult)};
 }
 
 TScriptInterface<IFSMState> USkillExecutionState::TryInteracting() {
     // Not all pawns might have an _interactor. However, if they don't, they shouldn't be calling this function!!
     check(_interactor.IsValid());
-    
+
     const bool interactionSuccessful = _interactor->PerformInteractionCheck();
     if (interactionSuccessful) {
         _subjectSkillsContainerC->AbortSkillInExecution();

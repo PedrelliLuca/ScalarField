@@ -30,7 +30,7 @@ public:
 
     virtual FStateResponse_TryCastSkill TryCastSkillAtIndex(int32 index) = 0;
     virtual TScriptInterface<IFSMState> TryAbort() = 0;
-    virtual TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) = 0;
+    virtual FStateResponse_TrySetSkillTarget TrySetSkillTarget(const FSkillTargetPacket& targetPacket) = 0;
 
     virtual TScriptInterface<IFSMState> TryInteracting() = 0;
     virtual TScriptInterface<IFSMState> TryToggleInventory() = 0;
