@@ -18,13 +18,10 @@ public:
     bool IsDone() const { return _result->Items.Num() == _currentIdx; }
 
     const uint8* Current() const { return _result->RawData.GetData() + _result->Items[_currentIdx].DataOffset; }
-
     const uint8* operator*() const { return Current(); }
 
-    // Pre-increment operator
-    void operator++() { Next(); }
-
     void Next() { ++_currentIdx; }
+    void operator++() { Next(); } // Pre-increment operator
 
 private:
     TSharedPtr<FEnvQueryResult> _result;
