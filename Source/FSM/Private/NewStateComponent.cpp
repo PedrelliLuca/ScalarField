@@ -37,9 +37,11 @@ void UNewStateComponent::TryAbort() {
     _performStateTransition(MoveTemp(newState));
 }
 
-void UNewStateComponent::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
-    auto newState = _state->TrySetSkillTarget(targetPacket);
-    _performStateTransition(MoveTemp(newState));
+TOptional<FSkillTargetingResult> UNewStateComponent::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+    auto trySetSkillTargetResponse = _state->TrySetSkillTarget(targetPacket);
+    _performStateTransition(MoveTemp(trySetSkillTargetResponse.StateResponse));
+
+    return MoveTemp(trySetSkillTargetResponse.TargetingResponse);
 }
 
 void UNewStateComponent::TryInteracting() {
