@@ -119,14 +119,13 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
 
         const auto targetKind = optionalSkillPropertiesInsp->GetTargetKind();
 
-        // The following code is taken from UEnvQueryItemType_ActorBase::StoreInBlackboard()...
+        // UBTService_RunEQS::OnQueryFinished() calls UEnvQueryItemType_ActorBase::StoreInBlackboard(). This causes...
         if (targetKind == ULocationSkillTarget::StaticClass()) {
-            // ... This Super::StoreInBlackboard() being called => UEnvQueryItemType_Point::GetItemLocation() into UEnvQueryItemType_Point::GetValue() is
-            // called.
+            // ... Super::StoreInBlackboard() to be called => UEnvQueryItemType_Point::GetItemLocation() into UEnvQueryItemType_Point::GetValue() is called.
             const auto navLocation = *reinterpret_cast<FNavLocation*>(const_cast<uint8*>(itemRawData));
             targetPacket.TargetLocation = navLocation;
         } else if (targetKind == UActorSkillTarget::StaticClass()) {
-            // ... This is the call to UEnvQueryItemType_Actor::GetActor() into UEnvQueryItemType_Actor::GetValue()
+            // ... EnvQueryItemType_Actor::GetActor() into UEnvQueryItemType_Actor::GetValue() to be called.
             auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
             const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
             targetPacket.TargetActor = rawActor;
@@ -135,9 +134,25 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
             checkNoEntry();
         }
 
-        stateC->TrySetSkillTarget(MoveTemp(targetPacket));
+        auto stateResponse = stateC->TrySetSkillTarget(MoveTemp(targetPacket));
+        /* The response is unset when:
+         * 1. The state we're in does not allow targeting. However, if a state allows casting it should also allow targeting, and we established above that the
+         * current state allows casting
+         * 2. There is no waiting skill in the skillsContainerC. However, the conditions above ensured that the skill we're trying to cast is waiting for
+         * targets, so there must be a waiting skill.
+         *
+         * The 2 listed points imply that something is going horribly wrong if the stateResponse is unset here.
+         */
+        check(stateResponse.IsSet());
+
+        if (stateResponse->IsType<FSkillCastResult>()) {
+            // We managed to provide all targets to the skill. Is the cast successful though?
+            return stateResponse->Get<FSkillCastResult>().IsFailure() ? EBTNodeResult::Failed : EBTNodeResult::Succeeded;
+        }
     }
 
+    // If we get here it means that we cycled through all the EQS Query Items and didn't manage to provide enough targets => forget the casting of the skill.
+    stateC->TryAbort();
     return EBTNodeResult::Failed;
 }
 
