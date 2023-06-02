@@ -66,34 +66,38 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
     check(IsValid(pawn));
 
     const auto stateC = pawn->FindComponentByClass<UNewStateComponent>();
-    if (!ensureAlwaysMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
+    if (!ensureMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
         return EBTNodeResult::Failed;
     }
 
     const auto skillsContainerC = TObjectPtr<UNewSkillsContainerComponent>{pawn->FindComponentByClass<UNewSkillsContainerComponent>()};
-    if (!ensureAlwaysMsgf(IsValid(skillsContainerC), TEXT("AI-controlled Pawn does not have a Skills Container Component"))) {
+    if (!ensureMsgf(IsValid(skillsContainerC), TEXT("AI-controlled Pawn does not have a Skills Container Component"))) {
         return EBTNodeResult::Failed;
     }
 
     const auto skillsContainerInsp = FSkillsContainerInspector{skillsContainerC};
     const auto optionalSkillIdx = FSkillsContainerInspector{skillsContainerC}.GetIndexOfSkill(_newSkillToCast);
-    if (!ensureAlwaysMsgf(optionalSkillIdx.IsSet(), TEXT("AI-controlled Pawn does not have the selected Skill"))) {
+    if (!ensureMsgf(optionalSkillIdx.IsSet(), TEXT("AI-controlled Pawn does not have the selected Skill"))) {
         return EBTNodeResult::Failed;
     }
 
     const auto optionalSkillPropertiesInsp = skillsContainerInsp.GetSkillPropertiesByIndex(*optionalSkillIdx);
     check(optionalSkillPropertiesInsp.IsSet());
 
-    if (!_needsManaAvailabilityToCast || _newIsManaAvailableForSkill(pawn, optionalSkillPropertiesInsp->GetTotalManaCost())) {
-        
-        const auto optSkillCastResult = stateC->TryCastSkillAtIndex(*optionalSkillIdx);
-        if (optSkillCastResult.IsSet() && !optSkillCastResult->IsFailure()) {
-            return EBTNodeResult::Succeeded;
-        }
-
+    if (_needsManaAvailabilityToCast && !_newIsManaAvailableForSkill(pawn, optionalSkillPropertiesInsp->GetTotalManaCost())) {
+        // The designer requested for all mana to be immediately available but we don't have it yet.
         return EBTNodeResult::Failed;
     }
 
+    const auto optionalSkillCastResult = stateC->TryCastSkillAtIndex(*optionalSkillIdx);
+    if (!optionalSkillIdx.IsSet()) {
+        // The AI-controlled pawn is in a state where they can't cast any skill.
+        return EBTNodeResult::Failed;
+    }
+
+    if (!optionalSkillCastResult->IsFailure()) {
+        return EBTNodeResult::Succeeded;
+    }
     return EBTNodeResult::Failed;
 }
 
