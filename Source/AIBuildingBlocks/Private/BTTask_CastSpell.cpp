@@ -102,32 +102,40 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
         return EBTNodeResult::Succeeded;
     }
 
-    if (optionalSkillCastResult->GetCastResult() == ESkillCastResult::Fail_MissingTarget) {
-        const auto eqsComponent = pawn->FindComponentByClass<URunEQSComponent>();
-        if (!ensureMsgf(IsValid(eqsComponent), TEXT("AI-controlled Pawn trying to cast a targeting spell without a RunEQSComponent"))) {
-            return EBTNodeResult::Failed;
+    if (optionalSkillCastResult->GetCastResult() != ESkillCastResult::Fail_MissingTarget) {
+        return EBTNodeResult::Failed;
+    }
+
+    const auto eqsComponent = pawn->FindComponentByClass<URunEQSComponent>();
+    if (!ensureMsgf(IsValid(eqsComponent), TEXT("AI-controlled Pawn trying to cast a targeting spell without a RunEQSComponent"))) {
+        return EBTNodeResult::Failed;
+    }
+
+    auto queryItemsIterator = eqsComponent->GetQueryItemsIterator();
+    for (; !queryItemsIterator.IsDone(); ++queryItemsIterator) {
+        auto itemRawData = *queryItemsIterator;
+
+        FSkillTargetPacket targetPacket{};
+
+        const auto targetKind = optionalSkillPropertiesInsp->GetTargetKind();
+
+        // The following code is taken from UEnvQueryItemType_ActorBase::StoreInBlackboard()...
+        if (targetKind == ULocationSkillTarget::StaticClass()) {
+            // ... This Super::StoreInBlackboard() being called => UEnvQueryItemType_Point::GetItemLocation() into UEnvQueryItemType_Point::GetValue() is
+            // called.
+            const auto navLocation = *reinterpret_cast<FNavLocation*>(const_cast<uint8*>(itemRawData));
+            targetPacket.TargetLocation = navLocation;
+        } else if (targetKind == UActorSkillTarget::StaticClass()) {
+            // ... This is the call to UEnvQueryItemType_Actor::GetActor() into UEnvQueryItemType_Actor::GetValue()
+            auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
+            const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
+            targetPacket.TargetActor = rawActor;
+            targetPacket.TargetLocation = rawActor->GetActorLocation();
+        } else {
+            checkNoEntry();
         }
 
-        auto queryItemsIterator = eqsComponent->GetQueryItemsIterator();
-        for (; !queryItemsIterator.IsDone(); ++queryItemsIterator) {
-            auto itemRawData = *queryItemsIterator;
-
-            FSkillTargetPacket targetPacket{};
-
-            const auto targetKind = optionalSkillPropertiesInsp->GetTargetKind();
-            if (targetKind == ULocationSkillTarget::StaticClass()) {
-                // TODO
-            } else if (targetKind == UActorSkillTarget::StaticClass()) {
-                FWeakObjectPtr weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
-                const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
-                targetPacket.TargetActor = rawActor;
-                targetPacket.TargetLocation = rawActor->GetActorLocation();
-            } else {
-                checkNoEntry();
-            }
-
-            stateC->TrySetSkillTarget(MoveTemp(targetPacket));
-        }
+        stateC->TrySetSkillTarget(MoveTemp(targetPacket));
     }
 
     return EBTNodeResult::Failed;
