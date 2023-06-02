@@ -25,20 +25,24 @@ void URunEQSComponent::TickComponent(const float deltaTime, const ELevelTick tic
     }
 }
 
+FQueryItemsIterator URunEQSComponent::GetQueryItemsIterator() {
+    return FQueryItemsIterator{MoveTemp(_queryResult)};
+}
+
 void URunEQSComponent::BeginPlay() {
     Super::BeginPlay();
     _eqsRequest.bInitialized = true;
 }
 
-void URunEQSComponent::_onQueryFinished(const TSharedPtr<FEnvQueryResult> result) {
+void URunEQSComponent::_onQueryFinished(TSharedPtr<FEnvQueryResult> result) {
     if (result->IsAborted()) {
         return;
     }
 
     const auto successfulQuery = result->IsSuccessful() && result->Items.Num() >= 0;
     if (successfulQuery) {
-        _items = result->Items;
+        _queryResult = MoveTemp(result);
     } else if (_updateOnFail) {
-        _items.Empty();
+        _queryResult = nullptr;
     }
 }
