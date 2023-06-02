@@ -10,6 +10,7 @@ AEnemyStabilizerController::AEnemyStabilizerController() {
     _movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
     _stateC = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
     _perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
+    _runEQSC = CreateDefaultSubobject<URunEQSComponent>(TEXT("RunEQSComponent"));
 }
 
 void AEnemyStabilizerController::_checkTargetAllyForAttachment() {

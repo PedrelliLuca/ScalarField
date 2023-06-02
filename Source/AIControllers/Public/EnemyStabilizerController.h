@@ -13,6 +13,7 @@
 #include "StateComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
+#include "Components/RunEQSComponent.h"
 
 #include "EnemyStabilizerController.generated.h"
 
@@ -51,6 +52,9 @@ private:
 
     UPROPERTY(VisibleAnywhere, Category = "Stabilizer | Perception")
     TObjectPtr<UAIPerceptionComponent> _perceptionC;
+
+    UPROPERTY(VisibleAnywhere, Category = "Stabilizer | EQS")
+    TObjectPtr<URunEQSComponent> _runEQSC;
 
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
     FName _bbTargetAllyKeyName = "TargetAlly";
