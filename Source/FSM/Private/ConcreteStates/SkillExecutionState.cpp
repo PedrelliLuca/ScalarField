@@ -72,25 +72,32 @@ TScriptInterface<IFSMState> USkillExecutionState::TryAbort() {
 
 FStateResponse_TrySetSkillTarget USkillExecutionState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
     auto skillTargetingResult = _subjectSkillsContainerC->TryAddTargetToWaitingSkill(targetPacket);
-
-    if (skillTargetingResult.IsSet() && skillTargetingResult.GetValue().GetTargetingResult() == ESkillTargetingResult::Success_IntoCast) {
-        auto optionalSkillCastResult = _subjectSkillsContainerC->TryCastWaitingSkill();
-        check(optionalSkillCastResult.IsSet());
-        const auto skillCastResult = optionalSkillCastResult.GetValue();
-
-        /* In case the skill we're trying to cast is in execution, we abort it and try casting it again. There is no guarantee that the 2nd time we'll succeed
-         * BUT, since we aborted, this time we must not get ESkillCastResult::Fail_InExecution. */
-        if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_InExecution) {
-            [[maybe_unused]] const auto abortSuccessful = _subjectSkillsContainerC->AbortSkillInExecution();
-            check(abortSuccessful);
-
-            optionalSkillCastResult = _subjectSkillsContainerC->TryCastWaitingSkill();
+    TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> optionalResultVariant{};
+    
+    if (optionalResultVariant.IsSet()) {
+        optionalResultVariant = TVariant<FSkillTargetingResult, FSkillCastResult>{TInPlaceType<FSkillTargetingResult>{}, *skillTargetingResult};
+        
+        if (skillTargetingResult.GetValue().GetTargetingResult() == ESkillTargetingResult::Success_IntoCast) {
+            auto optionalSkillCastResult = _subjectSkillsContainerC->TryCastWaitingSkill();
             check(optionalSkillCastResult.IsSet());
-            check(skillCastResult.GetCastResult() != ESkillCastResult::Fail_InExecution);
+            auto skillCastResult = optionalSkillCastResult.GetValue();
+
+            /* In case the skill we're trying to cast is in execution, we abort it and try casting it again. There is no guarantee that the 2nd time we'll succeed
+             * BUT, since we aborted, this time we must not get ESkillCastResult::Fail_InExecution. */
+            if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_InExecution) {
+                [[maybe_unused]] const auto abortSuccessful = _subjectSkillsContainerC->AbortSkillInExecution();
+                check(abortSuccessful);
+
+                optionalSkillCastResult = _subjectSkillsContainerC->TryCastWaitingSkill();
+                check(optionalSkillCastResult.IsSet());
+                check(skillCastResult.GetCastResult() != ESkillCastResult::Fail_InExecution);
+            }
+
+            optionalResultVariant = TVariant<FSkillTargetingResult, FSkillCastResult>{TInPlaceType<FSkillCastResult>{}, MoveTemp(skillCastResult)};
         }
     }
 
-    return FStateResponse_TrySetSkillTarget{_keepCurrentState(), MoveTemp(skillTargetingResult)};
+    return FStateResponse_TrySetSkillTarget{_keepCurrentState(), MoveTemp(optionalResultVariant)};
 }
 
 TScriptInterface<IFSMState> USkillExecutionState::TryInteracting() {

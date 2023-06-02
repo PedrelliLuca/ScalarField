@@ -20,5 +20,5 @@ struct FStateResponse_TryCastSkill {
  * targeting. */
 struct FStateResponse_TrySetSkillTarget {
     TScriptInterface<IFSMState> StateResponse;
-    TOptional<FSkillTargetingResult> TargetingResponse;
+    TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> TargetingResponse;
 };

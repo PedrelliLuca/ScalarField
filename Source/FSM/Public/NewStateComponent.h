@@ -24,7 +24,7 @@ public:
 
     TOptional<FSkillCastResult> TryCastSkillAtIndex(uint32 index);
     void TryAbort();
-    TOptional<FSkillTargetingResult> TrySetSkillTarget(const FSkillTargetPacket& targetPacket);
+    TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> TrySetSkillTarget(const FSkillTargetPacket& targetPacket);
 
     void TryInteracting();
     void TryToggleInventory();

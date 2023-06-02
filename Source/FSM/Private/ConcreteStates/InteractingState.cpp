@@ -75,7 +75,7 @@ TScriptInterface<IFSMState> UInteractingState::TryAbort() {
 }
 
 FStateResponse_TrySetSkillTarget UInteractingState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
-    return FStateResponse_TrySetSkillTarget{_keepCurrentState(), TOptional<FSkillTargetingResult>{}};
+    return FStateResponse_TrySetSkillTarget{_keepCurrentState(), TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>>{}};
 }
 
 TScriptInterface<IFSMState> UInteractingState::TryInteracting() {
