@@ -25,6 +25,8 @@ public:
 
     TSubclassOf<UObject> GetTargetKind() const { return _skill->_targetKind; }
 
+    const TArray<TObjectPtr<USkillTargetingCondition>>& GetTargetingConditions() const { return _skill->_targetingConditions; }
+
 private:
     TWeakObjectPtr<UNewAbstractSkill> _skill;
 };

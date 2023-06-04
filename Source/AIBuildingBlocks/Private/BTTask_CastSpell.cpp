@@ -106,7 +106,7 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
         return EBTNodeResult::Failed;
     }
 
-    const auto eqsComponent = pawn->FindComponentByClass<URunEQSComponent>();
+    const auto eqsComponent = ownerComp.GetAIOwner()->FindComponentByClass<URunEQSComponent>();
     if (!ensureMsgf(IsValid(eqsComponent), TEXT("AI-controlled Pawn trying to cast a targeting spell without a RunEQSComponent"))) {
         return EBTNodeResult::Failed;
     }

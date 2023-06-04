@@ -74,7 +74,7 @@ FStateResponse_TrySetSkillTarget USkillExecutionState::TrySetSkillTarget(const F
     auto skillTargetingResult = _subjectSkillsContainerC->TryAddTargetToWaitingSkill(targetPacket);
     TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> optionalResultVariant{};
     
-    if (optionalResultVariant.IsSet()) {
+    if (skillTargetingResult.IsSet()) {
         optionalResultVariant = TVariant<FSkillTargetingResult, FSkillCastResult>{TInPlaceType<FSkillTargetingResult>{}, *skillTargetingResult};
         
         if (skillTargetingResult.GetValue().GetTargetingResult() == ESkillTargetingResult::Success_IntoCast) {
