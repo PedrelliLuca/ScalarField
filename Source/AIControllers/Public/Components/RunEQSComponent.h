@@ -28,6 +28,8 @@ private:
     int32 _currentIdx;
 };
 
+DECLARE_MULTICAST_DELEGATE(FOnQueryResultChange);
+
 UCLASS()
 class AICONTROLLERS_API URunEQSComponent : public UActorComponent {
     GENERATED_BODY()
@@ -39,11 +41,19 @@ public:
 
     FQueryItemsIterator GetQueryItemsIterator();
 
+    bool DidQueryReturnItems(const int32 requiredItems) const;
+
+    FOnQueryResultChange& OnQueryResultChange() { return _onQueryResultChange; }
+
 protected:
     void BeginPlay() override;
 
 private:
     void _onQueryFinished(TSharedPtr<FEnvQueryResult> result);
+
+    /* Note: This only works with EQs returning actors.
+     * TODO: refactor this to also work with Environment Queries that return locations */
+    bool _didQueryItemsChange(const TSharedPtr<FEnvQueryResult>& result) const;
 
     UPROPERTY(Category = "EQS", EditAnywhere)
     FEQSParametrizedQueryExecutionRequest _eqsRequest;
@@ -51,7 +61,14 @@ private:
     UPROPERTY(Category = "EQS", EditAnywhere)
     bool _updateOnFail = false;
 
+    UPROPERTY(Category = "EQS", EditAnywhere)
+    float _secondsBetweenQueries = 1.0f;
+
     FQueryFinishedSignature _queryFinishedDelegate;
 
     TSharedPtr<FEnvQueryResult> _queryResult;
+
+    float _secondsSinceLastQuery = 0.0f;
+
+    FOnQueryResultChange _onQueryResultChange;
 };
