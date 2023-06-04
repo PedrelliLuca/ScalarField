@@ -154,7 +154,7 @@ EBlackboardNotificationResult AEnemyStabilizerController::_onTargetAllyChange(co
 }
 
 void AEnemyStabilizerController::_newOnTargetAllyChange() {
-    const auto blackboardC = GetBlackboardComponent();
+    auto blackboardC = GetBlackboardComponent();
     blackboardC->SetValueAsBool(_bbTargetRecentlyChangedKeyName, true);
 
     _checkTargetAllyForAttachment();
@@ -163,7 +163,8 @@ void AEnemyStabilizerController::_newOnTargetAllyChange() {
     timerManager.ClearTimer(_recentlyChangedHandle);
     timerManager.SetTimer(
         _recentlyChangedHandle,
-        [&blackboardC, bbTargetRecentlyChangedKeyName = _bbTargetRecentlyChangedKeyName]() {
+        [blackboardC, bbTargetRecentlyChangedKeyName = _bbTargetRecentlyChangedKeyName]() {
+            check(IsValid(blackboardC));
             blackboardC->SetValueAsBool(bbTargetRecentlyChangedKeyName, false);
         },
         _targetRecentlyChangedTimer, false);
