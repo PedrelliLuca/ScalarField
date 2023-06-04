@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "BehaviorTree/BTTaskNode.h"
+#include "BehaviorTree/Tasks/BTTask_BlackboardBase.h"
 #include "Components/RunEQSComponent.h"
 #include "CoreMinimal.h"
 #include "Parameters/MovementParameters.h"
@@ -22,7 +22,7 @@ enum class ETargetsBasedMovementStrategy : uint8
  *
  */
 UCLASS()
-class AIBUILDINGBLOCKS_API UBTTask_TargetsBasedMovement : public UBTTaskNode {
+class AIBUILDINGBLOCKS_API UBTTask_TargetsBasedMovement : public UBTTask_BlackboardBase {
     GENERATED_BODY()
 
 public:

@@ -4,10 +4,13 @@
 
 #include "AIController.h"
 #include "AIMovementCommandComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "EnvironmentQuery/Items/EnvQueryItemType_Actor.h"
 
 UBTTask_TargetsBasedMovement::UBTTask_TargetsBasedMovement() {
     NodeName = "Targets-Based Movement";
+
+    BlackboardKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_TargetsBasedMovement, BlackboardKey));
 }
 
 EBTNodeResult::Type UBTTask_TargetsBasedMovement::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
@@ -44,6 +47,9 @@ EBTNodeResult::Type UBTTask_TargetsBasedMovement::ExecuteTask(UBehaviorTreeCompo
 
     aiMovementCommandC->SetMovementParameters(_movementParameters);
     aiMovementCommandC->SetDestination(targetLocation); // TODO: use state component here
+
+    const auto blackboardC = ownerComp.GetBlackboardComponent();
+    blackboardC->SetValueAsVector(BlackboardKey.SelectedKeyName, targetLocation);
 
     return EBTNodeResult::Succeeded;
 }
