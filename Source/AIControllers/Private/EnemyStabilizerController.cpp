@@ -2,9 +2,9 @@
 
 #include "EnemyStabilizerController.h"
 
-#include "NewSkillsContainerComponent.h"
 #include "Algo/AnyOf.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "NewSkillsContainerComponent.h"
 
 AEnemyStabilizerController::AEnemyStabilizerController() {
     _movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
@@ -106,8 +106,13 @@ void AEnemyStabilizerController::BeginPlay() {
     // Setting up the logic that lets the BT know if the Target Ally has just changed or not.
     const auto targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetAllyKeyName);
     if (targetEnemyKeyId != FBlackboard::InvalidKey) {
-        blackBoard->RegisterObserver(
-            targetEnemyKeyId, this, FOnBlackboardChangeNotification::CreateUObject(this, &AEnemyStabilizerController::_onTargetAllyChange));
+        if (!_bNewSkillSystem) {
+            blackBoard->RegisterObserver(
+                targetEnemyKeyId, this, FOnBlackboardChangeNotification::CreateUObject(this, &AEnemyStabilizerController::_onTargetAllyChange));
+        } else {
+            _runEQSC->OnQueryResultChange().AddUObject(this, &AEnemyStabilizerController::_newOnTargetAllyChange);
+        }
+
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s(): Invald value for _bbTargetAllyKeyName"), *FString{__FUNCTION__});
     }
@@ -146,6 +151,22 @@ EBlackboardNotificationResult AEnemyStabilizerController::_onTargetAllyChange(co
         _targetRecentlyChangedTimer, false);
 
     return EBlackboardNotificationResult::ContinueObserving;
+}
+
+void AEnemyStabilizerController::_newOnTargetAllyChange() {
+    const auto blackboardC = GetBlackboardComponent();
+    blackboardC->SetValueAsBool(_bbTargetRecentlyChangedKeyName, true);
+
+    _checkTargetAllyForAttachment();
+
+    auto& timerManager = GetWorldTimerManager();
+    timerManager.ClearTimer(_recentlyChangedHandle);
+    timerManager.SetTimer(
+        _recentlyChangedHandle,
+        [&blackboardC, bbTargetRecentlyChangedKeyName = _bbTargetRecentlyChangedKeyName]() {
+            blackboardC->SetValueAsBool(bbTargetRecentlyChangedKeyName, false);
+        },
+        _targetRecentlyChangedTimer, false);
 }
 
 void AEnemyStabilizerController::_onSkillExecutionBegin() {

@@ -36,6 +36,7 @@ private:
     void _updateBlackboardOnMovementStatus(bool newIsMoving);
 
     EBlackboardNotificationResult _onTargetAllyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
+    void _newOnTargetAllyChange();
 
     void _checkTargetAllyForAttachment();
 
@@ -103,4 +104,6 @@ private:
     TWeakObjectPtr<UPatrolComponent> _patrolC = nullptr;
     TWeakObjectPtr<UThermodynamicComponent> _thermodynamicC = nullptr;
     TWeakObjectPtr<UTemperatureDamageHandlerComponent> _tempDmgHandlerC = nullptr;
+
+    FTimerHandle _recentlyChangedHandle;
 };
