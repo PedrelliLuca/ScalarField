@@ -23,7 +23,7 @@ class SKILLTARGETING_API UFlammabilityTargetingCondition : public USkillTargetin
     GENERATED_BODY()
 
 public:
-    bool IsVerifiedForTarget(TScriptInterface<ISkillTarget> skillTarget) const override;
+    bool IsVerifiedForTarget(ISkillTarget* skillTarget) const override;
 
     void SetSkillCaster(TObjectPtr<AActor> skillCaster) override {}
 

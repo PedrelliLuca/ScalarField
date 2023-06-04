@@ -271,7 +271,7 @@ FSkillCastResult UNewAbstractSkill::_endCast() {
 bool UNewAbstractSkill::_areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const {
     // TODO: When you'll have a proper error management system, this function will have to collect and return all errors thrown by the cast conditions.
     for (const auto targetingCondition : _targetingConditions) {
-        if (!targetingCondition->IsVerifiedForTarget(target)) {
+        if (!targetingCondition->IsVerifiedForTarget(target.GetInterface())) {
             return false;
         }
     }

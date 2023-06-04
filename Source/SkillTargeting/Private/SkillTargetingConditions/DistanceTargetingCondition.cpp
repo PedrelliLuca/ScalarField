@@ -2,7 +2,8 @@
 
 #include "SkillTargetingConditions/DistanceTargetingCondition.h"
 
-bool UDistanceTargetingCondition::IsVerifiedForTarget(TScriptInterface<ISkillTarget> skillTarget) const {
+bool UDistanceTargetingCondition::IsVerifiedForTarget(ISkillTarget* const skillTarget) const {
+    check(skillTarget != nullptr);
     check(_caster.IsValid());
 
     const auto casterLocation = _caster->GetActorLocation();

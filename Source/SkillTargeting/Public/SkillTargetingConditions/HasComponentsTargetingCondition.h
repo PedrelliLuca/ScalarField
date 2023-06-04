@@ -14,7 +14,7 @@ class SKILLTARGETING_API UHasComponentsTargetingCondition : public USkillTargeti
     GENERATED_BODY()
 
 public:
-    bool IsVerifiedForTarget(TScriptInterface<ISkillTarget> skillTarget) const override;
+    bool IsVerifiedForTarget(ISkillTarget* skillTarget) const override;
 
     void SetSkillCaster(TObjectPtr<AActor> skillCaster) override {}
 
