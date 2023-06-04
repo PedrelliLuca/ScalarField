@@ -11,7 +11,7 @@
 
 class FQueryItemsIterator {
 public:
-    FQueryItemsIterator(TSharedPtr<FEnvQueryResult>&& result)
+    FQueryItemsIterator(TSharedPtr<FEnvQueryResult> result)
         : _result(MoveTemp(result))
         , _currentIdx(0) {}
 
@@ -39,11 +39,13 @@ public:
 
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
-    FQueryItemsIterator GetQueryItemsIterator();
+    FQueryItemsIterator GetQueryItemsIterator() const { return FQueryItemsIterator{_queryResult}; }
 
     bool DidQueryReturnItems(const int32 requiredItems) const;
 
     FOnQueryResultChange& OnQueryResultChange() { return _onQueryResultChange; }
+
+    TOptional<TSubclassOf<UEnvQueryItemType>> GetQueryItemsType() const;
 
 protected:
     void BeginPlay() override;

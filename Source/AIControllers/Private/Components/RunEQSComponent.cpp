@@ -33,12 +33,18 @@ void URunEQSComponent::TickComponent(const float deltaTime, const ELevelTick tic
     _secondsSinceLastQuery = 0.0f;
 }
 
-FQueryItemsIterator URunEQSComponent::GetQueryItemsIterator() {
-    return FQueryItemsIterator{MoveTemp(_queryResult)};
-}
-
 bool URunEQSComponent::DidQueryReturnItems(const int32 requiredItems) const {
     return _queryResult.IsValid() ? _queryResult->Items.Num() >= requiredItems : requiredItems == 0;
+}
+
+TOptional<TSubclassOf<UEnvQueryItemType>> URunEQSComponent::GetQueryItemsType() const {
+    auto queryItemsType = TOptional<TSubclassOf<UEnvQueryItemType>>{};
+
+    if (!_queryResult.IsValid()) {
+        return queryItemsType;
+    }
+
+    return _queryResult->ItemType;
 }
 
 void URunEQSComponent::BeginPlay() {
@@ -56,7 +62,6 @@ void URunEQSComponent::_onQueryFinished(TSharedPtr<FEnvQueryResult> result) {
 
     const auto successfulQuery = result->IsSuccessful() && result->Items.Num() >= 0;
 
-    // result->Items != _queryResult->Items
     if (_didQueryItemsChange(result)) {
         _onQueryResultChange.Broadcast();
     }
@@ -78,6 +83,7 @@ bool URunEQSComponent::_didQueryItemsChange(const TSharedPtr<FEnvQueryResult>& r
         const auto newRawData = result->RawData.GetData() + result->Items[i].DataOffset;
         const auto oldRawData = _queryResult->RawData.GetData() + _queryResult->Items[i].DataOffset;
 
+        // TODO: refactor this to also work with vectors
         const auto newValue = *reinterpret_cast<TWeakObjectPtr<UObject>*>(newRawData);
         const auto oldValue = *reinterpret_cast<TWeakObjectPtr<UObject>*>(oldRawData);
 
