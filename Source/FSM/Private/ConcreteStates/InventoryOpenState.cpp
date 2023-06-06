@@ -52,8 +52,8 @@ TScriptInterface<IFSMState> UInventoryOpenState::TryAbort() {
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> UInventoryOpenState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
-    return _keepCurrentState();
+FStateResponse_TrySetSkillTarget UInventoryOpenState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+    return FStateResponse_TrySetSkillTarget{_keepCurrentState(), TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>>{}};
 }
 
 TScriptInterface<IFSMState> UInventoryOpenState::TryInteracting() {

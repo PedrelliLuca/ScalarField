@@ -74,8 +74,8 @@ TScriptInterface<IFSMState> UInteractingState::TryAbort() {
     return MoveTemp(executionState);
 }
 
-TScriptInterface<IFSMState> UInteractingState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
-    return _keepCurrentState();
+FStateResponse_TrySetSkillTarget UInteractingState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+    return FStateResponse_TrySetSkillTarget{_keepCurrentState(), TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>>{}};
 }
 
 TScriptInterface<IFSMState> UInteractingState::TryInteracting() {

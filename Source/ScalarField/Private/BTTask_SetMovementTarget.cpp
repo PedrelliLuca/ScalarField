@@ -54,6 +54,8 @@ FString UBTTask_SetMovementTarget::GetStaticDescription() const {
     return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *keyDesc);
 }
 
+#if WITH_EDITOR
 FName UBTTask_SetMovementTarget::GetNodeIconName() const {
     return FName("BTEditor.Graph.BTNode.Task.MoveTo.Icon");
 }
+#endif

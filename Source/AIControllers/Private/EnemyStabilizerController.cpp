@@ -4,11 +4,13 @@
 
 #include "Algo/AnyOf.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "NewSkillsContainerComponent.h"
 
 AEnemyStabilizerController::AEnemyStabilizerController() {
     _movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
     _stateC = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
     _perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
+    _runEQSC = CreateDefaultSubobject<URunEQSComponent>(TEXT("RunEQSComponent"));
 }
 
 void AEnemyStabilizerController::_checkTargetAllyForAttachment() {
@@ -30,8 +32,10 @@ void AEnemyStabilizerController::Tick(const float deltaTime) {
         return;
     }
 
-    _stateC->PerformTickBehavior(deltaTime);
-    _movementCommandC->MovementTick(deltaTime);
+    if (!_bNewSkillSystem) {
+        _stateC->PerformTickBehavior(deltaTime);
+        _movementCommandC->MovementTick(deltaTime);
+    }
 
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
         const auto blackBoard = GetBlackboardComponent();
@@ -102,8 +106,13 @@ void AEnemyStabilizerController::BeginPlay() {
     // Setting up the logic that lets the BT know if the Target Ally has just changed or not.
     const auto targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetAllyKeyName);
     if (targetEnemyKeyId != FBlackboard::InvalidKey) {
-        blackBoard->RegisterObserver(
-            targetEnemyKeyId, this, FOnBlackboardChangeNotification::CreateUObject(this, &AEnemyStabilizerController::_onTargetAllyChange));
+        if (!_bNewSkillSystem) {
+            blackBoard->RegisterObserver(
+                targetEnemyKeyId, this, FOnBlackboardChangeNotification::CreateUObject(this, &AEnemyStabilizerController::_onTargetAllyChange));
+        } else {
+            _runEQSC->OnQueryResultChange().AddUObject(this, &AEnemyStabilizerController::_newOnTargetAllyChange);
+        }
+
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s(): Invald value for _bbTargetAllyKeyName"), *FString{__FUNCTION__});
     }
@@ -111,9 +120,16 @@ void AEnemyStabilizerController::BeginPlay() {
     // Setting up the logic that lets the BT know if we're moving or not.
     _movementCommandC->OnActiveMovementCmdStateChanged().AddUObject(this, &AEnemyStabilizerController::_updateBlackboardOnMovementStatus);
 
-    // Setting up the logic that lets the BT know if we're casting or not.
-    _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionBegin);
-    _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionEnd);
+    if (!_bNewSkillSystem) {
+        // Setting up the logic that lets the BT know if we're casting or not.
+        _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionBegin);
+        _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionEnd);
+    } else {
+        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+        check(IsValid(skillsContainerC));
+
+        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
+    }
 }
 
 void AEnemyStabilizerController::_updateBlackboardOnMovementStatus(const bool newIsMoving) {
@@ -137,6 +153,23 @@ EBlackboardNotificationResult AEnemyStabilizerController::_onTargetAllyChange(co
     return EBlackboardNotificationResult::ContinueObserving;
 }
 
+void AEnemyStabilizerController::_newOnTargetAllyChange() {
+    auto blackboardC = GetBlackboardComponent();
+    blackboardC->SetValueAsBool(_bbTargetRecentlyChangedKeyName, true);
+
+    _checkTargetAllyForAttachment();
+
+    auto& timerManager = GetWorldTimerManager();
+    timerManager.ClearTimer(_recentlyChangedHandle);
+    timerManager.SetTimer(
+        _recentlyChangedHandle,
+        [blackboardC, bbTargetRecentlyChangedKeyName = _bbTargetRecentlyChangedKeyName]() {
+            check(IsValid(blackboardC));
+            blackboardC->SetValueAsBool(bbTargetRecentlyChangedKeyName, false);
+        },
+        _targetRecentlyChangedTimer, false);
+}
+
 void AEnemyStabilizerController::_onSkillExecutionBegin() {
     const auto blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, true);
@@ -145,4 +178,9 @@ void AEnemyStabilizerController::_onSkillExecutionBegin() {
 void AEnemyStabilizerController::_onSkillExecutionEnd() {
     const auto blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, false);
+}
+
+void AEnemyStabilizerController::_onSkillInExecutionStatusChanged(bool isExecutingSomeSkill) {
+    const auto blackBoard = GetBlackboardComponent();
+    blackBoard->SetValueAsBool(_bbIsCastingKeyName, isExecutingSomeSkill);
 }

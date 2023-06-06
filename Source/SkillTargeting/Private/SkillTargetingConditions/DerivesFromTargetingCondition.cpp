@@ -4,8 +4,9 @@
 
 #include "SkillTargets/ActorSkillTarget.h"
 
-bool UDerivesFromTargetingCondition::IsVerifiedForTarget(TScriptInterface<ISkillTarget> skillTarget) const {
-    const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget.GetObject());
+bool UDerivesFromTargetingCondition::IsVerifiedForTarget(ISkillTarget* const skillTarget) const {
+    check(skillTarget != nullptr);
+    const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget);
     if (!ensureMsgf(IsValid(actorSkillTarget), TEXT("This condition should only be applied to targets of type UActorSkillTarget!"))) {
         return false;
     }

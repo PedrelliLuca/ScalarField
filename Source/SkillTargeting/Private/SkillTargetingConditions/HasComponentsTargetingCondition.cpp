@@ -5,10 +5,11 @@
 #include "Algo/AllOf.h"
 #include "SkillTargets/ActorSkillTarget.h"
 
-bool UHasComponentsTargetingCondition::IsVerifiedForTarget(TScriptInterface<ISkillTarget> skillTarget) const {
+bool UHasComponentsTargetingCondition::IsVerifiedForTarget(ISkillTarget* const skillTarget) const {
+    check(skillTarget != nullptr);
     check(!_requiredComponents.IsEmpty());
 
-    const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget.GetObject());
+    const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget);
     if (!ensureMsgf(IsValid(actorSkillTarget), TEXT("This condition should only be applied to targets of type UActorSkillTarget!"))) {
         return false;
     }

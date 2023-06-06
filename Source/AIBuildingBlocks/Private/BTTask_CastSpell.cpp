@@ -4,10 +4,13 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/RunEQSComponent.h"
 #include "ManaComponent.h"
 #include "NewSkillsContainerComponent.h"
 #include "NewStateComponent.h"
 #include "SkillPropertiesInspector.h"
+#include "SkillTargets/ActorSkillTarget.h"
+#include "SkillTargets/LocationSkillTarget.h"
 #include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
 #include "StateComponent.h"
@@ -66,34 +69,90 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
     check(IsValid(pawn));
 
     const auto stateC = pawn->FindComponentByClass<UNewStateComponent>();
-    if (!ensureAlwaysMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
+    if (!ensureMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
         return EBTNodeResult::Failed;
     }
 
     const auto skillsContainerC = TObjectPtr<UNewSkillsContainerComponent>{pawn->FindComponentByClass<UNewSkillsContainerComponent>()};
-    if (!ensureAlwaysMsgf(IsValid(skillsContainerC), TEXT("AI-controlled Pawn does not have a Skills Container Component"))) {
+    if (!ensureMsgf(IsValid(skillsContainerC), TEXT("AI-controlled Pawn does not have a Skills Container Component"))) {
         return EBTNodeResult::Failed;
     }
 
     const auto skillsContainerInsp = FSkillsContainerInspector{skillsContainerC};
     const auto optionalSkillIdx = FSkillsContainerInspector{skillsContainerC}.GetIndexOfSkill(_newSkillToCast);
-    if (!ensureAlwaysMsgf(optionalSkillIdx.IsSet(), TEXT("AI-controlled Pawn does not have the selected Skill"))) {
+    if (!ensureMsgf(optionalSkillIdx.IsSet(), TEXT("AI-controlled Pawn does not have the selected Skill"))) {
         return EBTNodeResult::Failed;
     }
 
     const auto optionalSkillPropertiesInsp = skillsContainerInsp.GetSkillPropertiesByIndex(*optionalSkillIdx);
     check(optionalSkillPropertiesInsp.IsSet());
 
-    if (!_needsManaAvailabilityToCast || _newIsManaAvailableForSkill(pawn, optionalSkillPropertiesInsp->GetTotalManaCost())) {
-        
-        const auto optSkillCastResult = stateC->TryCastSkillAtIndex(*optionalSkillIdx);
-        if (optSkillCastResult.IsSet() && !optSkillCastResult->IsFailure()) {
-            return EBTNodeResult::Succeeded;
-        }
-
+    if (_needsManaAvailabilityToCast && !_newIsManaAvailableForSkill(pawn, optionalSkillPropertiesInsp->GetTotalManaCost())) {
+        // The designer requested for all mana to be immediately available but we don't have it yet.
         return EBTNodeResult::Failed;
     }
 
+    const auto optionalSkillCastResult = stateC->TryCastSkillAtIndex(*optionalSkillIdx);
+    if (!optionalSkillIdx.IsSet()) {
+        // The AI-controlled pawn is in a state where they can't cast any skill.
+        return EBTNodeResult::Failed;
+    }
+
+    if (!optionalSkillCastResult->IsFailure()) {
+        return EBTNodeResult::Succeeded;
+    }
+
+    if (optionalSkillCastResult->GetCastResult() != ESkillCastResult::Fail_MissingTarget) {
+        return EBTNodeResult::Failed;
+    }
+
+    const auto eqsComponent = ownerComp.GetAIOwner()->FindComponentByClass<URunEQSComponent>();
+    if (!ensureMsgf(IsValid(eqsComponent), TEXT("AI-controlled Pawn trying to cast a targeting spell without a RunEQSComponent"))) {
+        return EBTNodeResult::Failed;
+    }
+
+    auto queryItemsIterator = eqsComponent->GetQueryItemsIterator();
+    for (; !queryItemsIterator.IsDone(); ++queryItemsIterator) {
+        auto itemRawData = *queryItemsIterator;
+
+        FSkillTargetPacket targetPacket{};
+
+        const auto targetKind = optionalSkillPropertiesInsp->GetTargetKind();
+
+        // UBTService_RunEQS::OnQueryFinished() calls UEnvQueryItemType_ActorBase::StoreInBlackboard(). This causes...
+        if (targetKind == ULocationSkillTarget::StaticClass()) {
+            // ... Super::StoreInBlackboard() to be called => UEnvQueryItemType_Point::GetItemLocation() into UEnvQueryItemType_Point::GetValue() is called.
+            const auto navLocation = *reinterpret_cast<FNavLocation*>(const_cast<uint8*>(itemRawData));
+            targetPacket.TargetLocation = navLocation;
+        } else if (targetKind == UActorSkillTarget::StaticClass()) {
+            // ... EnvQueryItemType_Actor::GetActor() into UEnvQueryItemType_Actor::GetValue() to be called.
+            auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
+            const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
+            targetPacket.TargetActor = rawActor;
+            targetPacket.TargetLocation = rawActor->GetActorLocation();
+        } else {
+            checkNoEntry();
+        }
+
+        auto stateResponse = stateC->TrySetSkillTarget(MoveTemp(targetPacket));
+        /* The response is unset when:
+         * 1. The state we're in does not allow targeting. However, if a state allows casting it should also allow targeting, and we established above that the
+         * current state allows casting
+         * 2. There is no waiting skill in the skillsContainerC. However, the conditions above ensured that the skill we're trying to cast is waiting for
+         * targets, so there must be a waiting skill.
+         *
+         * The 2 listed points imply that something is going horribly wrong if the stateResponse is unset here.
+         */
+        check(stateResponse.IsSet());
+
+        if (stateResponse->IsType<FSkillCastResult>()) {
+            // We managed to provide all targets to the skill. Is the cast successful though?
+            return stateResponse->Get<FSkillCastResult>().IsFailure() ? EBTNodeResult::Failed : EBTNodeResult::Succeeded;
+        }
+    }
+
+    // If we get here it means that we cycled through all the EQS Query Items and didn't manage to provide enough targets => forget the casting of the skill.
+    stateC->TryAbort();
     return EBTNodeResult::Failed;
 }
 

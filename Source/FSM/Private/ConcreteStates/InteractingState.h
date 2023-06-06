@@ -32,7 +32,7 @@ public:
 
     FStateResponse_TryCastSkill TryCastSkillAtIndex(int32 index) override;
     TScriptInterface<IFSMState> TryAbort() override;
-    TScriptInterface<IFSMState> TrySetSkillTarget(const FSkillTargetPacket& targetPacket) override;
+    FStateResponse_TrySetSkillTarget TrySetSkillTarget(const FSkillTargetPacket& targetPacket) override;
 
     TScriptInterface<IFSMState> TryInteracting() override;
     TScriptInterface<IFSMState> TryToggleInventory() override;

@@ -13,6 +13,7 @@
 #include "StateComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
+#include "Components/RunEQSComponent.h"
 
 #include "EnemyStabilizerController.generated.h"
 
@@ -35,11 +36,14 @@ private:
     void _updateBlackboardOnMovementStatus(bool newIsMoving);
 
     EBlackboardNotificationResult _onTargetAllyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
+    void _newOnTargetAllyChange();
 
     void _checkTargetAllyForAttachment();
 
     void _onSkillExecutionBegin();
     void _onSkillExecutionEnd();
+
+    void _onSkillInExecutionStatusChanged(bool isExecutingSomeSkill);
 
     UPROPERTY(VisibleAnywhere, Category = "Stabilizer | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
@@ -49,6 +53,9 @@ private:
 
     UPROPERTY(VisibleAnywhere, Category = "Stabilizer | Perception")
     TObjectPtr<UAIPerceptionComponent> _perceptionC;
+
+    UPROPERTY(VisibleAnywhere, Category = "Stabilizer | EQS")
+    TObjectPtr<URunEQSComponent> _runEQSC;
 
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
     FName _bbTargetAllyKeyName = "TargetAlly";
@@ -87,6 +94,9 @@ private:
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Behavior Tree")
     TObjectPtr<UBehaviorTree> _behaviorTree;
 
+    UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
+    bool _bNewSkillSystem = false;
+    
     float _timeSinceInfluencerCheck = 0.0f;
 
     // The controlled Pawn has ownership of these
@@ -94,4 +104,6 @@ private:
     TWeakObjectPtr<UPatrolComponent> _patrolC = nullptr;
     TWeakObjectPtr<UThermodynamicComponent> _thermodynamicC = nullptr;
     TWeakObjectPtr<UTemperatureDamageHandlerComponent> _tempDmgHandlerC = nullptr;
+
+    FTimerHandle _recentlyChangedHandle;
 };
