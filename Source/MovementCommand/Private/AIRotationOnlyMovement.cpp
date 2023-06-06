@@ -4,8 +4,9 @@
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
-void UAIRotationOnlyMovement::OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) {
-    const auto aiPawn = aiController->GetPawn();
+void UAIRotationOnlyMovement::OnSetDestination(const FVector& destination) {
+    check(_aiController.IsValid());
+    const auto aiPawn = _aiController->GetPawn();
 
     // World reference (wr) frame
     const auto wrDestination = destination;
@@ -17,24 +18,25 @@ void UAIRotationOnlyMovement::OnSetDestination(const TObjectPtr<AAIController>& 
     _absDegreesToRotate = FMath::Abs(prRotation.Yaw);
     _rotationSign = FMath::Sign(prRotation.Yaw);
     _degreesSoFar = 0.0;
-
-    _setIsMoving(true);
 }
 
-void UAIRotationOnlyMovement::OnStopMovement(const TObjectPtr<AAIController>& aiController) {
-    aiController->StopMovement();
+void UAIRotationOnlyMovement::OnStopMovement() {
+    check(_aiController.IsValid());
+
+    _aiController->StopMovement();
     _absDegreesToRotate = 0.0;
     _degreesSoFar = 0.0;
-    _setIsMoving(false);
 }
 
-void UAIRotationOnlyMovement::OnMovementTick(const TObjectPtr<AAIController>& aiController, const float deltaTime) {
+void UAIRotationOnlyMovement::OnMovementTick(const float deltaTime) {
+    check(_aiController.IsValid());
+
     if (_degreesSoFar > _absDegreesToRotate - _movementParameters.AngularTolerance) {
-        if (IsMoving()) {
-            _setIsMoving(false);
-        }
+        _isRotating = false;
         return;
     }
+
+    _isRotating = true;
 
     auto degreesThisTick = _movementParameters.DegreesPerSecond * deltaTime;
 
@@ -43,11 +45,15 @@ void UAIRotationOnlyMovement::OnMovementTick(const TObjectPtr<AAIController>& ai
         degreesThisTick = _absDegreesToRotate - _degreesSoFar;
     }
 
-    aiController->GetPawn()->AddActorLocalRotation(_rotationSign* FRotator{0.0, degreesThisTick, 0.0});
+    _aiController->GetPawn()->AddActorLocalRotation(_rotationSign* FRotator{0.0, degreesThisTick, 0.0});
 
     _degreesSoFar += degreesThisTick;
 }
 
 void UAIRotationOnlyMovement::SetMovementParameters(const FMovementParameters& params) {
     _movementParameters = params.RotationOnlyMovementParameters;
+}
+
+bool UAIRotationOnlyMovement::IsMoving() const {
+    return _isRotating;
 }

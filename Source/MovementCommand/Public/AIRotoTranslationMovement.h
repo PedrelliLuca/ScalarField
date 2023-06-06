@@ -14,18 +14,15 @@ class MOVEMENTCOMMAND_API UAIRotoTranslationMovement : public UAIMovementCommand
     GENERATED_BODY()
 
 public:
-    void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) final;
-    void OnStopMovement(const TObjectPtr<AAIController>& aiController) final;
-    void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final;
+    void OnSetDestination(const FVector& destination) final;
+    void OnStopMovement() final;
+    void OnMovementTick(float deltaTime) final;
 
     void SetMovementParameters(const FMovementParameters& params) final;
 
-private:
-    void _onMovementCompleted(FAIRequestID requestId, const FPathFollowingResult& result);
+    bool IsMoving() const final;
 
+private:
     UPROPERTY(EditDefaultsOnly)
     FRotoTranslationMovementParameters _movementParameters;
-
-    TWeakObjectPtr<UPathFollowingComponent> _ownerPathFollowingC = nullptr;
-    FDelegateHandle _handleToMovementCompleted;
 };
