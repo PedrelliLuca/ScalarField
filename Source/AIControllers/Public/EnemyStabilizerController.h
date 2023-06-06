@@ -33,8 +33,6 @@ protected:
     void BeginPlay() override;
 
 private:
-    void _updateBlackboardOnMovementStatus(bool newIsMoving);
-
     EBlackboardNotificationResult _onTargetAllyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
     void _newOnTargetAllyChange();
 
@@ -63,9 +61,6 @@ private:
     /** \brief Name of the Blackboard key that gets updated when a patrol objective is reached. */
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
     FName _bbPatrolObjectiveKeyName = "PatrolObjective";
-
-    UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
-    FName _bbIsMovingKeyName = "IsMoving";
 
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Key Names")
     FName _bbIsCastingKeyName = "IsCasting";
