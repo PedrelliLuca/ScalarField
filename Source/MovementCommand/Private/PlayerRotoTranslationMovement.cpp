@@ -5,7 +5,8 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraFunctionLibrary.h"
 
-void UPlayerRotoTranslationMovement::OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData) {
+void UPlayerRotoTranslationMovement::OnSetDestination(
+    const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData) {
     // Player is no longer pressing the input
     _bInputPressed = false;
 

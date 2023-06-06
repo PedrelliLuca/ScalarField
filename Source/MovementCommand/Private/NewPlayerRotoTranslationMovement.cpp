@@ -5,7 +5,8 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NiagaraFunctionLibrary.h"
 
-void UNewPlayerRotoTranslationMovement::OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData) {
+void UNewPlayerRotoTranslationMovement::OnSetDestination(
+    const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData) {
     _inputEvent = inputData.SetDestinationInputEvent;
 
     if (_inputEvent == IE_Pressed) {

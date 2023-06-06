@@ -5,8 +5,8 @@
 #include "EnvironmentQuery/Contexts/EnvQueryContext_Querier.h"
 #include "EnvironmentQuery/Items/EnvQueryItemType_Actor.h"
 #include "NewSkillsContainerComponent.h"
-#include "SkillsContainerInspector.h"
 #include "SkillTargets/ActorSkillTarget.h"
+#include "SkillsContainerInspector.h"
 
 UEnvQueryTest_IsValidTargetForSkill::UEnvQueryTest_IsValidTargetForSkill(const FObjectInitializer& objectInitializer)
     : Super(objectInitializer) {
@@ -57,7 +57,7 @@ void UEnvQueryTest_IsValidTargetForSkill::RunTest(FEnvQueryInstance& queryInstan
 
         ISkillTarget* target = NewObject<UActorSkillTarget>(const_cast<UEnvQueryTest_IsValidTargetForSkill*>(this), UActorSkillTarget::StaticClass());
         target->Init(FSkillTargetPacket{otherActor});
-        
+
         for (const auto& targetingCondition : targetingConditions) {
             if (!targetingCondition->IsVerifiedForTarget(target)) {
                 otherVerifiesAllConditions = false;

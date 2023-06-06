@@ -38,7 +38,7 @@ EBTNodeResult::Type UBTTask_CancelSpell::_executeTaskNew(UBehaviorTreeComponent&
     check(IsValid(pawn));
 
     const auto stateC = pawn->FindComponentByClass<UNewStateComponent>();
-    if(!ensureAlwaysMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
+    if (!ensureAlwaysMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
         return EBTNodeResult::Failed;
     }
 

@@ -8,12 +8,12 @@
 #include "AIMovementCommandComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/PatrolComponent.h"
+#include "Components/RunEQSComponent.h"
 #include "FactionComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "StateComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicComponent.h"
-#include "Components/RunEQSComponent.h"
 
 #include "EnemyStabilizerController.generated.h"
 
@@ -91,7 +91,7 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
     bool _bNewSkillSystem = false;
-    
+
     float _timeSinceInfluencerCheck = 0.0f;
 
     // The controlled Pawn has ownership of these

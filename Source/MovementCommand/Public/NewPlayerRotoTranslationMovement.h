@@ -19,7 +19,7 @@ public:
 
 private:
     EInputEvent _inputEvent = IE_Released;
-    double _followTime = 0.0;  // For how long it has been pressed
+    double _followTime = 0.0; // For how long it has been pressed
 
     /** True if the controlled character should navigate to the mouse cursor. */
     uint32 _bMoveToMouseCursor : 1;
