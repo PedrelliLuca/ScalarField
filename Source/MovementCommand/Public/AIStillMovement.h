@@ -23,4 +23,6 @@ public:
     void OnMovementTick(float deltaTime) final {}
 
     void SetMovementParameters(const FMovementParameters& params) final {}
+
+    bool IsMoving() const final { return false; }
 };
