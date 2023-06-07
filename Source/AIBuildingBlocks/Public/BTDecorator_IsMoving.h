@@ -7,6 +7,13 @@
 #include "BehaviorTree/BTDecorator.h"
 #include "BTDecorator_IsMoving.generated.h"
 
+UENUM()
+enum class EMovementCheckKind : uint8
+{
+    IsMoving UMETA(DisplayName = "Is Moving"),
+    IsNotMoving UMETA(DisplayName = "Is not Moving")
+};
+
 /**
  *
  */
@@ -20,6 +27,6 @@ protected:
 private:
     FString GetStaticDescription() const override;
 
-    UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
-    int32 _requiredTargets = 1;
+    UPROPERTY(EditAnywhere)
+    EMovementCheckKind _movementCheck = EMovementCheckKind::IsMoving;
 };
