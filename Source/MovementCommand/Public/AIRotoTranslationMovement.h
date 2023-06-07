@@ -23,6 +23,12 @@ public:
     bool IsMoving() const final;
 
 private:
+    UPathFollowingComponent* _initNavigationControl(AController& Controller);
+
+    // NOTE: this function is a copy of UAIBlueprintHelperLibrary::SimpleMoveToLocation. Why not using the original then? Because I need to inject
+    // the _movementParameters such as the AcceptanceRadius
+    void _moveToLocation(AController* Controller, const FVector& GoalLocation);
+
     UPROPERTY(EditDefaultsOnly)
     FRotoTranslationMovementParameters _movementParameters;
 };
