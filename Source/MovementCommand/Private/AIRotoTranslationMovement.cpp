@@ -10,11 +10,14 @@
 void UAIRotoTranslationMovement::OnSetDestination(const FVector& destination) {
     check(_aiController.IsValid());
 
-    // TODO: revist the condition on following a path
-    if (!_aiController->IsFollowingAPath() && !_aiController->GetPathFollowingComponent()->GetPathDestination().Equals(destination)) {
-        // NOTE: this function is a copy of UAIBlueprintHelperLibrary::SimpleMoveToLocation. Why not using the original then? Because I need to inject
-        // the _movementParameters such as the AcceptanceRadius.
-        _moveToLocation(_aiController.Get(), destination);
+    // Always enter if you can't ever ignore OnSetDestination() calls. If you can, then enter only if you're not already following a path.
+    if (!_movementParameters.IgnoreNewDestinationsIfMoving || !_aiController->IsFollowingAPath()) {
+        // Enter if the location we're trying to set isn't identical to the already set one.
+        if (!_aiController->GetPathFollowingComponent()->GetPathDestination().Equals(destination)) {
+            // NOTE: this function is a copy of UAIBlueprintHelperLibrary::SimpleMoveToLocation. Why not using the original then? Because I need to inject
+            // the _movementParameters such as the AcceptanceRadius.
+            _moveToLocation(_aiController.Get(), destination);
+        }
     }
 }
 

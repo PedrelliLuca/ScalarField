@@ -16,4 +16,7 @@ public:
 
     UPROPERTY(EditAnywhere)
     bool AllowPartialPath = true;
+
+    UPROPERTY(EditAnywhere)
+    bool IgnoreNewDestinationsIfMoving = false;
 };
