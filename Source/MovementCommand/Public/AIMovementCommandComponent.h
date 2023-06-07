@@ -11,9 +11,6 @@
 
 #include "AIMovementCommandComponent.generated.h"
 
-// Forwards the broadcast of the currently active movement command
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnActiveMovementCmdStateChanged, bool);
-
 UCLASS()
 class MOVEMENTCOMMAND_API UAIMovementCommandComponent : public UActorComponent, public IMovementCommandSetter {
     GENERATED_BODY()
@@ -34,8 +31,6 @@ public:
         check(activeCmd != nullptr);
         return (*activeCmd)->IsMoving();
     }
-
-    FOnActiveMovementCmdStateChanged& OnActiveMovementCmdStateChanged() { return _onActiveMovementCmdStateChanged; }
 
 protected:
     void BeginPlay() override;
@@ -58,8 +53,4 @@ private:
     EMovementCommandMode _activeMovementMode = EMovementCommandMode::MCM_None;
 
     TWeakObjectPtr<AAIController> _ownerAIC = nullptr;
-
-    FDelegateHandle _handleToCmdMovementStateChanged;
-
-    FOnActiveMovementCmdStateChanged _onActiveMovementCmdStateChanged;
 };

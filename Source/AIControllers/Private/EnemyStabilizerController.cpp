@@ -117,9 +117,6 @@ void AEnemyStabilizerController::BeginPlay() {
         UE_LOG(LogTemp, Error, TEXT("%s(): Invald value for _bbTargetAllyKeyName"), *FString{__FUNCTION__});
     }
 
-    // Setting up the logic that lets the BT know if we're moving or not.
-    _movementCommandC->OnActiveMovementCmdStateChanged().AddUObject(this, &AEnemyStabilizerController::_updateBlackboardOnMovementStatus);
-
     if (!_bNewSkillSystem) {
         // Setting up the logic that lets the BT know if we're casting or not.
         _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionBegin);
@@ -130,11 +127,6 @@ void AEnemyStabilizerController::BeginPlay() {
 
         skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
     }
-}
-
-void AEnemyStabilizerController::_updateBlackboardOnMovementStatus(const bool newIsMoving) {
-    const auto blackBoard = GetBlackboardComponent();
-    blackBoard->SetValueAsBool(_bbIsMovingKeyName, newIsMoving);
 }
 
 EBlackboardNotificationResult AEnemyStabilizerController::_onTargetAllyChange(const UBlackboardComponent& blackboard, const FBlackboard::FKey changedKeyID) {

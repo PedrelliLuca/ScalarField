@@ -12,32 +12,30 @@ void UAIMovementCommandComponent::SetMovementMode(EMovementCommandMode mode) {
     // We should always enter except for the first call to SetMovementMode(), when the commands' cache is empty
     if (const auto activeCmdPtr = _modesToCommands.Find(_activeMovementMode)) {
         const auto activeCmd = *activeCmdPtr;
-        activeCmd->OnStopMovement(_ownerAIC.Get());
-        activeCmd->OnMovementStateChanged().Remove(_handleToCmdMovementStateChanged);
+        activeCmd->OnStopMovement();
     }
 
     // In case we never entered this movement mode before, create its command and add it to the cache
     if (_modesToCommands.Find(mode) == nullptr) {
         const auto& cmdClass = _modesToCommandClasses[mode];
         const auto newCmd = NewObject<UAIMovementCommand>(this, cmdClass);
+        newCmd->SetAIController(_ownerAIC.Get());
         _modesToCommands.Emplace(mode, newCmd);
     }
 
     _activeMovementMode = mode;
-    _handleToCmdMovementStateChanged =
-        _modesToCommands[_activeMovementMode]->OnMovementStateChanged().AddUObject(this, &UAIMovementCommandComponent::_onActiveMovementCmdStatusChange);
 }
 
 void UAIMovementCommandComponent::SetDestination(const FVector& destination) {
-    _getMovementCommand()->OnSetDestination(_ownerAIC.Get(), destination);
+    _getMovementCommand()->OnSetDestination(destination);
 }
 
 void UAIMovementCommandComponent::StopMovement() {
-    _getMovementCommand()->OnStopMovement(_ownerAIC.Get());
+    _getMovementCommand()->OnStopMovement();
 }
 
 void UAIMovementCommandComponent::MovementTick(const float deltaTime) {
-    _getMovementCommand()->OnMovementTick(_ownerAIC.Get(), deltaTime);
+    _getMovementCommand()->OnMovementTick(deltaTime);
 }
 
 void UAIMovementCommandComponent::SetMovementParameters(const FMovementParameters& params) {
@@ -58,8 +56,4 @@ TObjectPtr<UAIMovementCommand> UAIMovementCommandComponent::_getMovementCommand(
     // Did you set the movement mode before calling this?
     check(activeCmd != nullptr);
     return *activeCmd;
-}
-
-void UAIMovementCommandComponent::_onActiveMovementCmdStatusChange(const bool newIsMoving) {
-    _onActiveMovementCmdStateChanged.Broadcast(newIsMoving);
 }

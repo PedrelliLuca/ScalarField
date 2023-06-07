@@ -5,98 +5,113 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "NavigationSystem.h"
 
-void UAIRotoTranslationMovement::OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) {
-    // TODO: this shouldn't be here OR, at the very least, we should check that the destination of the path being followed is not the same we have as input.
-    // This can be done via UPathFollowingComponent::GetPathDestination()
-    if (aiController->IsFollowingAPath()) {
-        return;
-    }
+#define LOCTEXT_NAMESPACE "AIRotoTranslationMovement"
 
-    // The following code is an edit of UAIBlueprintHelperLibrary::SimpleMoveToLocation().
+void UAIRotoTranslationMovement::OnSetDestination(const FVector& destination) {
+    check(_aiController.IsValid());
 
-    UNavigationSystemV1* navSys = aiController ? FNavigationSystem::GetCurrent<UNavigationSystemV1>(aiController->GetWorld()) : nullptr;
-    if (navSys == nullptr || aiController == nullptr || aiController->GetPawn() == nullptr) {
-        UE_LOG(LogNavigation, Warning,
-            TEXT("UNavigationSystemV1::SimpleMoveToActor called for NavSys:%s Controller:%s controlling Pawn:%s (if any of these is None then there's your "
-                 "problem"),
-            *GetNameSafe(navSys), *GetNameSafe(aiController), aiController ? *GetNameSafe(aiController->GetPawn()) : TEXT("NULL"));
-        _setIsMoving(false);
-        return;
-    }
-
-    _ownerPathFollowingC = aiController->GetPathFollowingComponent();
-    check(_ownerPathFollowingC.IsValid());
-
-    if (!_ownerPathFollowingC->IsPathFollowingAllowed()) {
-        _setIsMoving(false);
-        return;
-    }
-
-    const bool bAlreadyAtGoal = _ownerPathFollowingC->HasReached(destination, EPathFollowingReachMode::OverlapAgent);
-
-    // script source, keep only one move request at time
-    if (_ownerPathFollowingC->GetStatus() != EPathFollowingStatus::Idle) {
-        _ownerPathFollowingC->AbortMove(*navSys, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest, FAIRequestID::AnyRequest,
-            bAlreadyAtGoal ? EPathFollowingVelocityMode::Reset : EPathFollowingVelocityMode::Keep);
-    }
-    // script source, keep only one move request at time
-    if (_ownerPathFollowingC->GetStatus() != EPathFollowingStatus::Idle) {
-        _ownerPathFollowingC->AbortMove(*navSys, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest);
-    }
-
-    if (bAlreadyAtGoal) {
-        _ownerPathFollowingC->RequestMoveWithImmediateFinish(EPathFollowingResult::Success);
-        _setIsMoving(false);
-        return;
-    }
-
-    const FVector agentNavLocation = aiController->GetNavAgentLocation();
-    const ANavigationData* navData = navSys->GetNavDataForProps(aiController->GetNavAgentPropertiesRef(), agentNavLocation);
-    if (navData) {
-        FPathFindingQuery query(aiController, *navData, agentNavLocation, destination);
-        FPathFindingResult result = navSys->FindPathSync(query);
-        if (result.IsSuccessful()) {
-            // See UBTTask_MoveTo for a complete customization.
-            FAIMoveRequest moveReq;
-            moveReq.SetGoalLocation(destination);
-            moveReq.SetAllowPartialPath(_movementParameters.AllowPartialPath);
-            moveReq.SetAcceptanceRadius(_movementParameters.AcceptanceRadius);
-
-            // Found a path
-            _ownerPathFollowingC->RequestMove(moveReq, result.Path);
-            _setIsMoving(true);
-
-            _handleToMovementCompleted = _ownerPathFollowingC->OnRequestFinished.AddUObject(this, &UAIRotoTranslationMovement::_onMovementCompleted);
-        } else {
-            // Didn't find a path
-            if (_ownerPathFollowingC->GetStatus() != EPathFollowingStatus::Idle) {
-                _ownerPathFollowingC->RequestMoveWithImmediateFinish(EPathFollowingResult::Invalid);
-            }
-            _setIsMoving(false);
+    // Always enter if you can't ever ignore OnSetDestination() calls. If you can, then enter only if you're not already following a path.
+    if (!_movementParameters.IgnoreNewDestinationsIfMoving || !_aiController->IsFollowingAPath()) {
+        // Enter if the location we're trying to set isn't identical to the already set one.
+        if (!_aiController->GetPathFollowingComponent()->GetPathDestination().Equals(destination)) {
+            // NOTE: this function is a copy of UAIBlueprintHelperLibrary::SimpleMoveToLocation. Why not using the original then? Because I need to inject
+            // the _movementParameters such as the AcceptanceRadius.
+            _moveToLocation(_aiController.Get(), destination);
         }
-    } else {
-        // I think that a null navData means that it's impossible to retrieve the nav mesh / nav graph
-        _setIsMoving(false);
-    };
+    }
 }
 
-void UAIRotoTranslationMovement::OnStopMovement(const TObjectPtr<AAIController>& aiController) {
-    aiController->StopMovement();
-    _setIsMoving(false);
+void UAIRotoTranslationMovement::OnStopMovement() {
+    check(_aiController.IsValid());
+    _aiController->StopMovement();
 }
 
-void UAIRotoTranslationMovement::OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) {
-    // Do we even need this for AI?
+void UAIRotoTranslationMovement::OnMovementTick(float deltaTime) {
 }
 
 void UAIRotoTranslationMovement::SetMovementParameters(const FMovementParameters& params) {
     _movementParameters = params.RotoTranslationMovementParameters;
 }
 
-void UAIRotoTranslationMovement::_onMovementCompleted(FAIRequestID requestId, const FPathFollowingResult& result) {
-    if (_ownerPathFollowingC.IsValid()) {
-        _ownerPathFollowingC->OnRequestFinished.Remove(_handleToMovementCompleted);
-        _ownerPathFollowingC = nullptr;
-    }
-    _setIsMoving(false);
+bool UAIRotoTranslationMovement::IsMoving() const {
+    return IsValid(_aiController->GetPathFollowingComponent()) && _aiController->IsFollowingAPath();
 }
+
+UPathFollowingComponent* UAIRotoTranslationMovement::_initNavigationControl(AController& Controller) {
+    AAIController* AsAIController = Cast<AAIController>(&Controller);
+    UPathFollowingComponent* PathFollowingComp = nullptr;
+
+    if (AsAIController) {
+        PathFollowingComp = AsAIController->GetPathFollowingComponent();
+    } else {
+        PathFollowingComp = Controller.FindComponentByClass<UPathFollowingComponent>();
+        if (PathFollowingComp == nullptr) {
+            PathFollowingComp = NewObject<UPathFollowingComponent>(&Controller);
+            PathFollowingComp->RegisterComponentWithWorld(Controller.GetWorld());
+            PathFollowingComp->Initialize();
+        }
+    }
+
+    return PathFollowingComp;
+}
+
+void UAIRotoTranslationMovement::_moveToLocation(AController* Controller, const FVector& GoalLocation) {
+    UNavigationSystemV1* NavSys = Controller ? FNavigationSystem::GetCurrent<UNavigationSystemV1>(Controller->GetWorld()) : nullptr;
+    if (NavSys == nullptr || Controller == nullptr || Controller->GetPawn() == nullptr) {
+        UE_LOG(LogNavigation, Warning,
+            TEXT("UNavigationSystemV1::SimpleMoveToActor called for NavSys:%s Controller:%s controlling Pawn:%s (if any of these is None then there's your "
+                 "problem"),
+            *GetNameSafe(NavSys), *GetNameSafe(Controller), Controller ? *GetNameSafe(Controller->GetPawn()) : TEXT("NULL"));
+        return;
+    }
+
+    UPathFollowingComponent* PFollowComp = _initNavigationControl(*Controller);
+
+    if (PFollowComp == nullptr) {
+        FMessageLog("PIE").Warning(
+            FText::Format(LOCTEXT("SimpleMoveErrorNoComp", "SimpleMove failed for {0}: missing components"), FText::FromName(Controller->GetFName())));
+        return;
+    }
+
+    if (!PFollowComp->IsPathFollowingAllowed()) {
+        FMessageLog("PIE").Warning(
+            FText::Format(LOCTEXT("SimpleMoveErrorMovement", "SimpleMove failed for {0}: movement not allowed"), FText::FromName(Controller->GetFName())));
+        return;
+    }
+
+    const bool bAlreadyAtGoal = PFollowComp->HasReached(
+        GoalLocation, EPathFollowingReachMode::OverlapAgent, _movementParameters.AcceptanceRadius); // My addition: injection of acceptance radius
+
+    // script source, keep only one move request at time
+    if (PFollowComp->GetStatus() != EPathFollowingStatus::Idle) {
+        PFollowComp->AbortMove(*NavSys, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest, FAIRequestID::AnyRequest,
+            bAlreadyAtGoal ? EPathFollowingVelocityMode::Reset : EPathFollowingVelocityMode::Keep);
+    }
+
+    // script source, keep only one move request at time
+    if (PFollowComp->GetStatus() != EPathFollowingStatus::Idle) {
+        PFollowComp->AbortMove(*NavSys, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest);
+    }
+
+    if (bAlreadyAtGoal) {
+        PFollowComp->RequestMoveWithImmediateFinish(EPathFollowingResult::Success);
+    } else {
+        const FVector AgentNavLocation = Controller->GetNavAgentLocation();
+        const ANavigationData* NavData = NavSys->GetNavDataForProps(Controller->GetNavAgentPropertiesRef(), AgentNavLocation);
+        if (NavData) {
+            FPathFindingQuery Query(Controller, *NavData, AgentNavLocation, GoalLocation);
+            FPathFindingResult Result = NavSys->FindPathSync(Query);
+            if (Result.IsSuccessful()) {
+                auto MoveReq = FAIMoveRequest(GoalLocation);
+                MoveReq.SetAcceptanceRadius(_movementParameters.AcceptanceRadius); // My addition: injection of acceptance radius
+                MoveReq.SetAllowPartialPath(_movementParameters.AllowPartialPath); // My addition: injection of allow partial path
+
+                PFollowComp->RequestMove(MoveTemp(MoveReq), Result.Path);
+            } else if (PFollowComp->GetStatus() != EPathFollowingStatus::Idle) {
+                PFollowComp->RequestMoveWithImmediateFinish(EPathFollowingResult::Invalid);
+            }
+        }
+    }
+}
+
+#undef LOCTEXT_NAMESPACE

@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 
 #include "FSMState.h"
-#include "NewSkillsContainerComponent.h"
-#include "MovementCommandSetter.h"
 #include "InteractorInterface.h"
+#include "MovementCommandSetter.h"
+#include "NewSkillsContainerComponent.h"
 
 #include "SkillExecutionState.generated.h"
 

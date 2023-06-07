@@ -2,8 +2,8 @@
 
 #include "EnemyChaserController.h"
 
-#include "NewSkillsContainerComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "NewSkillsContainerComponent.h"
 
 AEnemyChaserController::AEnemyChaserController() {
     _movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
@@ -74,25 +74,16 @@ void AEnemyChaserController::BeginPlay() {
         _movementCommandC->SetDefaultMovementMode();
     }
 
-    // Setting up the logic that lets the BT know if we're moving or not.
-    _movementCommandC->OnActiveMovementCmdStateChanged().AddUObject(this, &AEnemyChaserController::_updateBlackboardOnMovementStatus);
-
     if (!_bNewSkillSystem) {
         // Setting up the logic that lets the BT know if we're casting or not.
         _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyChaserController::_onSkillExecutionBegin);
-        _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyChaserController::_onSkillExecutionEnd);    
+        _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyChaserController::_onSkillExecutionEnd);
     } else {
         const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
         check(IsValid(skillsContainerC));
 
-        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyChaserController::_onSkillInExecutionStatusChanged);   
+        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyChaserController::_onSkillInExecutionStatusChanged);
     }
-    
-}
-
-void AEnemyChaserController::_updateBlackboardOnMovementStatus(const bool newIsMoving) {
-    const auto blackBoard = GetBlackboardComponent();
-    blackBoard->SetValueAsBool(_bbIsMovingKeyName, newIsMoving);
 }
 
 EBlackboardNotificationResult AEnemyChaserController::_onTargetEnemyChange(const UBlackboardComponent& blackboard, const FBlackboard::FKey changedKeyID) {

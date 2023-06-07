@@ -14,11 +14,13 @@ class MOVEMENTCOMMAND_API UAIRotationOnlyMovement : public UAIMovementCommand {
     GENERATED_BODY()
 
 public:
-    void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination) final;
-    void OnStopMovement(const TObjectPtr<AAIController>& aiController) final;
-    void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) final;
+    void OnSetDestination(const FVector& destination) final;
+    void OnStopMovement() final;
+    void OnMovementTick(float deltaTime) final;
 
     void SetMovementParameters(const FMovementParameters& params) final;
+
+    bool IsMoving() const final;
 
 private:
     UPROPERTY(EditDefaultsOnly)
@@ -28,4 +30,6 @@ private:
     double _rotationSign = 1.0;
 
     double _degreesSoFar = 0.0;
+
+    bool _isRotating = false;
 };

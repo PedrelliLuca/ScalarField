@@ -9,38 +9,26 @@
 
 #include "AIMovementCommand.generated.h"
 
-// Broadcasts the new value of the _isMoving boolean when it changes
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMovementStateChanged, bool);
-
 UCLASS(NotBlueprintable, Abstract)
 class UAIMovementCommand : public UObject {
     GENERATED_BODY()
 
 public:
-    virtual void OnSetDestination(const TObjectPtr<AAIController>& aiController, const FVector& destination)
-        PURE_VIRTUAL(UAIMovementCommand::OnSetDestination, return;);
-    virtual void OnStopMovement(const TObjectPtr<AAIController>& aiController) PURE_VIRTUAL(UAIMovementCommand::OnStopMovement, return;);
-    virtual void OnMovementTick(const TObjectPtr<AAIController>& aiController, float deltaTime) PURE_VIRTUAL(UAIMovementCommand::OnMovementTick, return;);
+    virtual void OnSetDestination(const FVector& destination) PURE_VIRTUAL(UAIMovementCommand::OnSetDestination, return;);
+    virtual void OnStopMovement() PURE_VIRTUAL(UAIMovementCommand::OnStopMovement, return;);
+    virtual void OnMovementTick(float deltaTime) PURE_VIRTUAL(UAIMovementCommand::OnMovementTick, return;);
 
     virtual void SetMovementParameters(const FMovementParameters& params) PURE_VIRTUAL(UAIMovementCommand::SetMovementParameters, return;);
 
-    bool IsMoving() const { return _isMoving; }
+    virtual bool IsMoving() const PURE_VIRTUAL(UAIMovementCommand::IsMoving, return false;);
 
-    /** \brief Needed to warn the Behavior Tree that we're (not) moving. This is needed because, by design, movement nodes in ScalarField do not stop the BT
-     * from flowing */
-    FOnMovementStateChanged& OnMovementStateChanged() { return _onMovementStateChanged; }
-
-protected:
-    void _setIsMoving(bool isMoving) {
-        // We want to broadcast only if the value is actually changing, not every time we call this.
-        if (isMoving != _isMoving) {
-            _isMoving = isMoving;
-            _onMovementStateChanged.Broadcast(_isMoving);
+    void SetAIController(const TObjectPtr<AAIController>& aiController) {
+        if (ensureMsgf(!_aiController.IsValid(), TEXT("AI Controller can only be set once and has already been set"))) {
+            check(IsValid(aiController));
+            _aiController = aiController;
         }
     }
 
-private:
-    FOnMovementStateChanged _onMovementStateChanged;
-
-    bool _isMoving = false;
+protected:
+    TWeakObjectPtr<AAIController> _aiController = nullptr;
 };
