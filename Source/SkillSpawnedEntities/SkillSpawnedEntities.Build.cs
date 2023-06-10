@@ -6,31 +6,31 @@ namespace UnrealBuildTool.Rules
 	{
 		public SkillSpawnedEntities(ReadOnlyTargetRules Target) : base(Target)
 		{
-            PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-            
+			PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
 			PublicDependencyModuleNames.AddRange(
 				new string[]
 				{
 					"Core",
 					"CoreUObject",
 					"Engine",
-					"DamageDealers"
+					"DamageDealers",
+					"Thermodynamics",
 				}
-				);
+			);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"Thermodynamics",
 				}
-				);
+			);
 
 			DynamicallyLoadedModuleNames.AddRange(
 				new string[]
 				{
 					// ... add any modules that your module loads dynamically here ...
 				}
-				);
+			);
 		}
 	}
 }
