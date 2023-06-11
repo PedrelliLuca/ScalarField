@@ -2,12 +2,22 @@
 
 #include "CastDetachedActorSkill.h"
 
+#include "Algo/ForEach.h"
+
 void UCastDetachedActorSkill::_skillCast() {
     const auto& caster = _getCaster();
     check(caster.IsValid());
 
     const FTransform& casterToWorld = caster->GetTransform();
-    const TWeakObjectPtr<AActor> spawnedActor = GetWorld()->SpawnActor<AActor>(_actorClass, _actorToCaster * casterToWorld);
+
+    TArray<TObjectPtr<AActor>> spawnedActors;
+
+    if (_getTargets().Num() > 0) {
+        Algo::Transform(_getTargets(), spawnedActors,
+            [this](const auto& target) { return GetWorld()->SpawnActor<AActor>(_actorClass, FTransform{target->GetTargetLocation()}); });
+    } else {
+        spawnedActors.Emplace(GetWorld()->SpawnActor<AActor>(_actorClass, _actorToCaster * casterToWorld));
+    }
 
     float actualLifetimeSeconds;
     if (FMath::IsNearlyZero(_actorLifetimeSeconds)) {
@@ -23,11 +33,13 @@ void UCastDetachedActorSkill::_skillCast() {
     FTimerHandle timerHandle;
     GetWorld()->GetTimerManager().SetTimer(
         timerHandle,
-        [spawnedActor]() {
-            // Something else might have already destroyed the actor.
-            if (spawnedActor.IsValid()) {
-                spawnedActor->Destroy();
-            }
+        [spawnedActors]() {
+            Algo::ForEach(spawnedActors, [](const auto& spawnedActor) {
+                // Something else might have already destroyed the actor.
+                if (IsValid(spawnedActor)) {
+                    spawnedActor->Destroy();
+                }
+            });
         },
         actualLifetimeSeconds, false);
 }
