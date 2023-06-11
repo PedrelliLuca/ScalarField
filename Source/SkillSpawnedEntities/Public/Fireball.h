@@ -8,6 +8,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "SkillSpawnedEntityInterface.h"
 #include "ThermodynamicComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 #include "Fireball.generated.h"
 
@@ -32,10 +33,13 @@ private:
     TObjectPtr<UThermodynamicComponent> _thermodynamicC = nullptr;
 
     UPROPERTY(VisibleAnywhere)
+    TObjectPtr<UProjectileMovementComponent> _projectileMovementC = nullptr;
+
+    UPROPERTY(VisibleAnywhere)
     TObjectPtr<UParticleSystemComponent> _particleSystem = nullptr;
 
     UPROPERTY(EditAnywhere, Category = "Fireball | Particles")
-    TObjectPtr<UParticleSystem> _fireTemplate;
+    TObjectPtr<UParticleSystem> _fireballTemplate;
 
     // If the fireball temperature reaches a value below this threshold, it destroys itself
     UPROPERTY(EditAnywhere, Category = "Fireball | Thresholds")
