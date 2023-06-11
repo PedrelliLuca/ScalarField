@@ -22,7 +22,7 @@ void USpawnProjectileSkill::_skillCast() {
         const auto casterToTargetDirection = (targetLocation - casterLocation).GetSafeNormal();
         const auto projectileSpawnLocation = casterLocation + casterToTargetDirection * _spawnDistance;
 
-        const auto projectileTransform = FTransform{casterToTargetDirection.Rotation(), projectileSpawnLocation};
+        const auto projectileTransform = FTransform{projectileSpawnLocation};
 
         const auto spawnedActor = GetWorld()->SpawnActorDeferred<AActor>(_projectileClass, projectileTransform);
         const TWeakInterfacePtr<ISkillSpawnedEntity> skillSpawnedEntity = Cast<ISkillSpawnedEntity>(spawnedActor);
