@@ -40,6 +40,7 @@ private:
     void _onSkill3Cast();
     void _onSkill4Cast();
     void _onSkill5Cast();
+    void _onSkill6Cast();
     void _onSkillAbort();
 
     void _onInteraction();
