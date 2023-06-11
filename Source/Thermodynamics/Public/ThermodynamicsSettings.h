@@ -11,7 +11,7 @@
  * \brief Allows us to set up the geometrical properties of the environment cells and how they're visualized
  */
 UCLASS(Config = "Thermodynamics", defaultconfig, meta = (DisplayName = "Thermodynamics Settings"))
-class SCALARFIELD_API UThermodynamicsSettings : public UDeveloperSettings {
+class THERMODYNAMICS_API UThermodynamicsSettings : public UDeveloperSettings {
     GENERATED_BODY()
 
 public:
