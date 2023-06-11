@@ -13,7 +13,7 @@
  *
  */
 UCLASS(Blueprintable)
-class SCALARFIELD_API AThermodynamicActor : public AActor {
+class THERMODYNAMICS_API AThermodynamicActor : public AActor {
     GENERATED_BODY()
 
 public:
