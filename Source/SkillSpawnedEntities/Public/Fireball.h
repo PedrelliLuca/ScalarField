@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 
-#include "GameFramework/Actor.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "SkillSpawnedEntityInterface.h"
+#include "ThermodynamicActor.h"
 #include "ThermodynamicComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 
 #include "Fireball.generated.h"
 
 UCLASS()
-class SKILLSPAWNEDENTITIES_API AFireball : public AActor, public ISkillSpawnedEntity {
+class SKILLSPAWNEDENTITIES_API AFireball : public AThermodynamicActor, public ISkillSpawnedEntity {
     GENERATED_BODY()
 
 public:
@@ -26,12 +26,6 @@ protected:
     void BeginPlay() override;
 
 private:
-    UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UStaticMeshComponent> _staticMeshC = nullptr;
-    
-    UPROPERTY(VisibleAnywhere)
-    TObjectPtr<UThermodynamicComponent> _thermodynamicC = nullptr;
-
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UProjectileMovementComponent> _projectileMovementC = nullptr;
 
@@ -47,6 +41,6 @@ private:
 
     UPROPERTY(EditAnywhere, Category = "Fireball | Thresholds")
     float _distanceExtinctionThreshold = 10000.0f;
-    
+
     TWeakObjectPtr<AActor> _caster = nullptr;
 };

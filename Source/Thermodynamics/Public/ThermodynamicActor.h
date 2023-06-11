@@ -25,6 +25,8 @@ public:
 protected:
     void BeginPlay() override;
 
+    TObjectPtr<const UThermodynamicComponent> _getThermodynamicComponent() const;
+
 private:
     void _setupThermodynamicCollisions();
     void _updateMaterialBasedOnTemperature(double temperature);
