@@ -114,13 +114,22 @@ void AScalarFieldPlayerController::_onSetTargetPressed() {
     if (!_bNewSkillSystem) {
         _stateC->PerformTargetingBehavior(hit.GetActor());
     } else {
+        const auto pawn = GetPawn();
         const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
         check(IsValid(stateC));
 
         // We don't know what the skill we want to cast is going to need, so we'll provide it with everything we have.
         FSkillTargetPacket targetPacket;
         targetPacket.TargetActor = hit.GetActor();
-        targetPacket.TargetLocation = hit.Location;
+
+        FVector mouseLoc;
+        FVector mouseDir;
+        DeprojectMousePositionToWorld(mouseLoc, mouseDir);
+        const auto pawnPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
+        const auto pawnPlaneLocation = FMath::LinePlaneIntersection(mouseLoc, mouseLoc + mouseDir * PROJ_LINE_LENGTH, pawnPlane);
+        targetPacket.TargetCasterPlaneLocation = pawnPlaneLocation;
+
+        // TODO: compute targetPacket.TargetGroundLocation by projecting onto the ground somehow, this will be needed for skills like "Spawn Tree"
 
         stateC->TrySetSkillTarget(targetPacket);
     }

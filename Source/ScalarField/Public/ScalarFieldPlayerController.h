@@ -66,4 +66,5 @@ private:
     bool _bIsTacticalPauseOn = false;
 
     static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
+    static constexpr int32 PROJ_LINE_LENGTH = 20000;
 };

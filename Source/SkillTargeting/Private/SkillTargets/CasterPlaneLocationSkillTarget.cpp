@@ -1,9 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SkillTargets/LocationSkillTarget.h"
+#include "SkillTargets/CasterPlaneLocationSkillTarget.h"
 
-void ULocationSkillTarget::Init(const FSkillTargetPacket& targetPacket) {
-    auto location = targetPacket.TargetLocation;
+void UCasterPlaneLocationSkillTarget::Init(const FSkillTargetPacket& targetPacket) {
+    check(targetPacket.TargetCasterPlaneLocation.IsSet());
+    auto location = *targetPacket.TargetCasterPlaneLocation;
     // Make sure that the location is not valid before setting it.
     if (ensureMsgf(!_hasBeenSet, TEXT("Condition Location can be set only once and has already been set."))) {
         _location = MoveTemp(location);
@@ -11,7 +12,7 @@ void ULocationSkillTarget::Init(const FSkillTargetPacket& targetPacket) {
     }
 }
 
-FVector ULocationSkillTarget::GetTargetLocation() const {
+FVector UCasterPlaneLocationSkillTarget::GetTargetLocation() const {
     check(_hasBeenSet);
     return _location;
 }

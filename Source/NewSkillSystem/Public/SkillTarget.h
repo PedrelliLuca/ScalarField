@@ -7,7 +7,9 @@
 /** \brief Used to initialize ISkillTargets without knowing their concrete type. */
 struct FSkillTargetPacket {
     TWeakObjectPtr<AActor> TargetActor = nullptr;
-    FVector TargetLocation = FVector::ZeroVector;
+    TOptional<FVector> TargetCasterPlaneLocation{};
+    // TODO: to be implemented in the future for skills that need a ground location, e.g. "Spawn Tree".
+    // TOptional<FVector> TargetGroundLocation{};
 };
 
 UINTERFACE(MinimalAPI, NotBlueprintable)

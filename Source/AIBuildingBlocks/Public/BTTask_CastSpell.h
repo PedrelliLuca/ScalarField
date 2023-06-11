@@ -46,4 +46,6 @@ private:
 
     UPROPERTY(EditInstanceOnly, Category = "Feature Toggles")
     bool _bNewSkillSystem = false;
+
+    static constexpr int32 PROJ_LINE_HALF_LENGTH = 10000;
 };

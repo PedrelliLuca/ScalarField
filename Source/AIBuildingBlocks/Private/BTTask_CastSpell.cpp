@@ -10,7 +10,7 @@
 #include "NewStateComponent.h"
 #include "SkillPropertiesInspector.h"
 #include "SkillTargets/ActorSkillTarget.h"
-#include "SkillTargets/LocationSkillTarget.h"
+#include "SkillTargets/CasterPlaneLocationSkillTarget.h"
 #include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
 #include "StateComponent.h"
@@ -119,17 +119,24 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
 
         const auto targetKind = optionalSkillPropertiesInsp->GetTargetKind();
 
+        // TODO: add another else if here managing UGroundLocationSkillTarget when you'll have skills using this kind of target, e.g. "Spawn Tree" or something
+
         // UBTService_RunEQS::OnQueryFinished() calls UEnvQueryItemType_ActorBase::StoreInBlackboard(). This causes...
-        if (targetKind == ULocationSkillTarget::StaticClass()) {
+        if (targetKind == UCasterPlaneLocationSkillTarget::StaticClass()) {
             // ... Super::StoreInBlackboard() to be called => UEnvQueryItemType_Point::GetItemLocation() into UEnvQueryItemType_Point::GetValue() is called.
             const auto navLocation = *reinterpret_cast<FNavLocation*>(const_cast<uint8*>(itemRawData));
-            targetPacket.TargetLocation = navLocation;
+            
+            const auto location = navLocation.Location;
+            const auto casterPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
+            const auto casterPlaneLocation = FMath::LinePlaneIntersection(
+                location + FVector::UpVector * PROJ_LINE_HALF_LENGTH, location - FVector::UpVector * PROJ_LINE_HALF_LENGTH, casterPlane);
+            
+            targetPacket.TargetCasterPlaneLocation = casterPlaneLocation;
         } else if (targetKind == UActorSkillTarget::StaticClass()) {
             // ... EnvQueryItemType_Actor::GetActor() into UEnvQueryItemType_Actor::GetValue() to be called.
             auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
             const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
             targetPacket.TargetActor = rawActor;
-            targetPacket.TargetLocation = rawActor->GetActorLocation();
         } else {
             checkNoEntry();
         }
