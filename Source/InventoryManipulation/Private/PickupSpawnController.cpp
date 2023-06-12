@@ -82,13 +82,13 @@ void UPickupSpawnController::_spawnPickup(TWeakInterfacePtr<IItem> item, const i
         check(pickup.IsValid());
 
         pickup->InitializePickup(item.GetObject()->GetClass(), droppedQuantity);
+    } else {
+        check(IsValid(_pickupSpawnCmdFactory));
+        _pickupSpawnCmdFactory->SetCommandItem(MoveTemp(item));
+        _pickupSpawnCmdFactory->SetCommandInventory(MoveTemp(inventory));
+        _pickupSpawnCmdFactory->SetCommandQuantity(quantity);
+        pauseSubsys->SetPauseOffCommand(_pickupSpawnCmdFactory->CreateCommand());
     }
-
-    check(IsValid(_pickupSpawnCmdFactory));
-    _pickupSpawnCmdFactory->SetCommandItem(MoveTemp(item));
-    _pickupSpawnCmdFactory->SetCommandInventory(MoveTemp(inventory));
-    _pickupSpawnCmdFactory->SetCommandQuantity(quantity);
-    pauseSubsys->SetPauseOffCommand(_pickupSpawnCmdFactory->CreateCommand());
 }
 
 void UPickupSpawnController::_dropPickupsOnDeath(const TObjectPtr<AActor> deadActor) {
