@@ -29,6 +29,10 @@ void AThermodynamicActor::BeginPlay() {
     }
 }
 
+TObjectPtr<const UThermodynamicComponent> AThermodynamicActor::_getThermodynamicComponent() const {
+    return _thermodynamicC;
+}
+
 void AThermodynamicActor::_setupThermodynamicCollisions() {
     const auto simpleThermalCollisions = GetComponentsByTag(UPrimitiveComponent::StaticClass(), FName{"SimpleThermalCollision"});
     check(simpleThermalCollisions.Num() == 1);

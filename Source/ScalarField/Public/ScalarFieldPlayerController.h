@@ -40,6 +40,7 @@ private:
     void _onSkill3Cast();
     void _onSkill4Cast();
     void _onSkill5Cast();
+    void _onSkill6Cast();
     void _onSkillAbort();
 
     void _onInteraction();
@@ -66,4 +67,5 @@ private:
     bool _bIsTacticalPauseOn = false;
 
     static constexpr uint32 KEY_ASSIGNABLE_SKILLS = 10;
+    static constexpr int32 PROJ_LINE_LENGTH = 20000;
 };

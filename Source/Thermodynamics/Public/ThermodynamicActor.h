@@ -13,7 +13,7 @@
  *
  */
 UCLASS(Blueprintable)
-class SCALARFIELD_API AThermodynamicActor : public AActor {
+class THERMODYNAMICS_API AThermodynamicActor : public AActor {
     GENERATED_BODY()
 
 public:
@@ -24,6 +24,8 @@ public:
 
 protected:
     void BeginPlay() override;
+
+    TObjectPtr<const UThermodynamicComponent> _getThermodynamicComponent() const;
 
 private:
     void _setupThermodynamicCollisions();

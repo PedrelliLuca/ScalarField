@@ -6,10 +6,10 @@
 
 #include "SkillTarget.h"
 
-#include "LocationSkillTarget.generated.h"
+#include "CasterPlaneLocationSkillTarget.generated.h"
 
 UCLASS()
-class SKILLTARGETING_API ULocationSkillTarget : public UObject, public ISkillTarget {
+class SKILLTARGETING_API UCasterPlaneLocationSkillTarget : public UObject, public ISkillTarget {
     GENERATED_BODY()
 
 public:

@@ -9,21 +9,27 @@ void UCastDetachedActorSkill::_skillCast() {
     const FTransform& casterToWorld = caster->GetTransform();
     const TWeakObjectPtr<AActor> spawnedActor = GetWorld()->SpawnActor<AActor>(_actorClass, _actorToCaster * casterToWorld);
 
-    if (!(_actorLifetimeSeconds < 0.0f)) {
-        const auto actualLifetimeSeconds = FMath::IsNearlyZero(_actorLifetimeSeconds) ? _getChannelingSeconds() : _actorLifetimeSeconds;
-        // TODO (maybe?): make a core "add-ons" module with an ISelfDestructing interface and an ASelfDestructing actor. Such actors handle destruction on their
-        // own by having a SetSelfDestruction(float countdown) function that sets up this timer.
-        FTimerHandle timerHandle;
-        GetWorld()->GetTimerManager().SetTimer(
-            timerHandle,
-            [spawnedActor]() {
-                // Something else might have already destroyed the actor.
-                if (spawnedActor.IsValid()) {
-                    spawnedActor->Destroy();
-                }
-            },
-            actualLifetimeSeconds, false);
+    float actualLifetimeSeconds;
+    if (FMath::IsNearlyZero(_actorLifetimeSeconds)) {
+        actualLifetimeSeconds = _getChannelingSeconds();
+    } else if (_actorLifetimeSeconds > 0.0f) {
+        actualLifetimeSeconds = _actorLifetimeSeconds;
+    } else {
+        return;
     }
+
+    // TODO (maybe?): make a core "add-ons" module with an ISelfDestructing interface and an ASelfDestructing actor. Such actors handle destruction on their
+    // own by having a SetSelfDestruction(float countdown) function that sets up this timer.
+    FTimerHandle timerHandle;
+    GetWorld()->GetTimerManager().SetTimer(
+        timerHandle,
+        [spawnedActor]() {
+            // Something else might have already destroyed the actor.
+            if (spawnedActor.IsValid()) {
+                spawnedActor->Destroy();
+            }
+        },
+        actualLifetimeSeconds, false);
 }
 
 void UCastDetachedActorSkill::_skillChannelingTick(const float deltaTime) {

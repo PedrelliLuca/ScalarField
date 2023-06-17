@@ -48,6 +48,8 @@ void AScalarFieldPlayerController::SetupInputComponent() {
     InputComponent->BindAction("Skill3Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill3Cast);
     InputComponent->BindAction("Skill4Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill4Cast);
     InputComponent->BindAction("Skill5Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill5Cast);
+    InputComponent->BindAction("Skill6Cast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkill6Cast);
+
     InputComponent->BindAction("AbortCast", IE_Pressed, this, &AScalarFieldPlayerController::_onSkillAbort);
     InputComponent->BindAction("SetTarget", IE_Released, this, &AScalarFieldPlayerController::_onSetTargetPressed);
 
@@ -114,13 +116,22 @@ void AScalarFieldPlayerController::_onSetTargetPressed() {
     if (!_bNewSkillSystem) {
         _stateC->PerformTargetingBehavior(hit.GetActor());
     } else {
+        const auto pawn = GetPawn();
         const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
         check(IsValid(stateC));
 
         // We don't know what the skill we want to cast is going to need, so we'll provide it with everything we have.
         FSkillTargetPacket targetPacket;
         targetPacket.TargetActor = hit.GetActor();
-        targetPacket.TargetLocation = hit.Location;
+
+        FVector mouseLoc;
+        FVector mouseDir;
+        DeprojectMousePositionToWorld(mouseLoc, mouseDir);
+        const auto pawnPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
+        const auto pawnPlaneLocation = FMath::LinePlaneIntersection(mouseLoc, mouseLoc + mouseDir * PROJ_LINE_LENGTH, pawnPlane);
+        targetPacket.TargetCasterPlaneLocation = pawnPlaneLocation;
+
+        // TODO: compute targetPacket.TargetGroundLocation by projecting onto the ground somehow, this will be needed for skills like "Spawn Tree"
 
         stateC->TrySetSkillTarget(targetPacket);
     }
@@ -216,6 +227,28 @@ void AScalarFieldPlayerController::_onSkill4Cast() {
 
 void AScalarFieldPlayerController::_onSkill5Cast() {
     constexpr int32 skillKey = 5;
+
+    if (!_bNewSkillSystem) {
+        const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        check(IsValid(skillsContainer));
+
+        auto skill = skillsContainer->GetSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (!IsValid(skill)) {
+            UE_LOG(LogTemp, Warning, TEXT("%s(): No skill bound"), *FString{__FUNCTION__});
+            return;
+        }
+
+        _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+    }
+}
+
+void AScalarFieldPlayerController::_onSkill6Cast() {
+    constexpr int32 skillKey = 6;
 
     if (!_bNewSkillSystem) {
         const auto skillsContainer = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
