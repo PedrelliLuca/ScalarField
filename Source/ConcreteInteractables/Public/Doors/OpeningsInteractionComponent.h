@@ -6,19 +6,30 @@
 #include "CoreMinimal.h"
 #include "OpeningsInteractionComponent.generated.h"
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+struct FOpeningInteractionParameters {
+    float TimeToRotate;
+    FRotator AmountToRotate;
+};
+
+UCLASS()
 class CONCRETEINTERACTABLES_API UOpeningsInteractionComponent : public UActorComponent {
     GENERATED_BODY()
 
 public:
-    // Sets default values for this component's properties
     UOpeningsInteractionComponent();
 
-protected:
-    // Called when the game starts
-    virtual void BeginPlay() override;
+    void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
+    void Open();
+    void SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningInteractionParameters& interactionParams);
 
-public:
-    // Called every frame
-    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+protected:
+    void BeginPlay() override;
+
+private:
+    TWeakObjectPtr<UStaticMeshComponent> _opening;
+
+    FRotator _closedRotation;
+    FRotator _openRotation;
+    float _timeToRotate;
+    float _currentRotationTime;
 };

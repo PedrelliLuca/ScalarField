@@ -2,25 +2,41 @@
 
 #include "Doors/OpeningsInteractionComponent.h"
 
-// Sets default values for this component's properties
 UOpeningsInteractionComponent::UOpeningsInteractionComponent() {
-    // Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-    // off to improve performance if you don't need them.
     PrimaryComponentTick.bCanEverTick = true;
-
-    // ...
 }
 
-// Called when the game starts
 void UOpeningsInteractionComponent::BeginPlay() {
     Super::BeginPlay();
 
-    // ...
+    SetComponentTickEnabled(false);
 }
 
-// Called every frame
-void UOpeningsInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
-    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+void UOpeningsInteractionComponent::TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) {
+    Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-    // ...
+    _currentRotationTime += deltaTime;
+    const auto timeRatio = FMath::Clamp(_currentRotationTime / _timeToRotate, 0.0f, 1.0f);
+    const auto rotationThisFrame = FMath::Lerp(_closedRotation, _openRotation, timeRatio);
+    _opening->SetWorldRotation(rotationThisFrame);
+
+    if (FMath::IsNearlyEqual(timeRatio, 1.0f)) {
+        SetComponentTickEnabled(false);
+    }
+}
+
+void UOpeningsInteractionComponent::Open() {
+    SetComponentTickEnabled(true);
+}
+
+void UOpeningsInteractionComponent::SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningInteractionParameters& interactionParams) {
+    if (!ensureMsgf(!_opening.IsValid(), TEXT("Since _opening has already been set, it won't be set again"))) {
+        return;
+    }
+
+    _opening = opening;
+    _closedRotation = opening->GetComponentRotation();
+    _openRotation = _closedRotation + interactionParams.AmountToRotate;
+    _timeToRotate = interactionParams.TimeToRotate;
+    _currentRotationTime = 0.0f;
 }

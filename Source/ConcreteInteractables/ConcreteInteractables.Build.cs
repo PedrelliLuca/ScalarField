@@ -14,14 +14,15 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
-					"InteractionSystem"
+					"InteractionSystem",
+					"InventoryCore",
 				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					// ... add private dependencies that you statically link with here ...
+					"InventoryManipulation",
 				}
 				);
 
