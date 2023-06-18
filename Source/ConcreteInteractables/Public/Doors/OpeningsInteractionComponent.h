@@ -11,6 +11,13 @@ struct FOpeningInteractionParameters {
     FRotator AmountToRotate;
 };
 
+enum EOpeningState {
+    None,
+    Closed,
+    Opening,
+    Open,
+};
+
 UCLASS()
 class CONCRETEINTERACTABLES_API UOpeningsInteractionComponent : public UActorComponent {
     GENERATED_BODY()
@@ -21,6 +28,7 @@ public:
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
     void Open();
     void SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningInteractionParameters& interactionParams);
+    
 
 protected:
     void BeginPlay() override;
@@ -32,4 +40,5 @@ private:
     FRotator _openRotation;
     float _timeToRotate;
     float _currentRotationTime;
+    EOpeningState _openingState = EOpeningState::Closed;
 };

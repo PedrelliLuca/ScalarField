@@ -22,11 +22,15 @@ void UOpeningsInteractionComponent::TickComponent(float deltaTime, ELevelTick ti
 
     if (FMath::IsNearlyEqual(timeRatio, 1.0f)) {
         SetComponentTickEnabled(false);
+        _openingState = EOpeningState::Open;
     }
 }
 
 void UOpeningsInteractionComponent::Open() {
-    SetComponentTickEnabled(true);
+    if (_openingState == EOpeningState::Closed) {
+        SetComponentTickEnabled(true);
+        _openingState = EOpeningState::Opening;
+    }
 }
 
 void UOpeningsInteractionComponent::SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningInteractionParameters& interactionParams) {
