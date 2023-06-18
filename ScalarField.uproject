@@ -55,6 +55,14 @@
 			"LoadingPhase": "PreDefault"
 		},
 		{
+			"Name": "ConcreteInteractables",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		},
+		{
 			"Name": "Thermodynamics",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
