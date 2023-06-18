@@ -26,13 +26,16 @@ private:
     UFUNCTION()
     void _onDoorInteractedBy(TScriptInterface<IInteractor> interactor);
 
-    UPROPERTY(EditAnywhere, Category = "Door Components")
-    TObjectPtr<UStaticMeshComponent> _rotatingMesh = nullptr;
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<USceneComponent> _sceneC = nullptr;
 
-    UPROPERTY(EditAnywhere, Category = "Door Components")
+    UPROPERTY(VisibleAnywhere, Category = "Door Components")
+    TObjectPtr<UStaticMeshComponent> _rotatingMeshC = nullptr;
+
+    UPROPERTY(VisibleAnywhere, Category = "Door Components")
     TObjectPtr<UInteractableComponent> _interactableC = nullptr;
 
-    UPROPERTY(EditAnywhere, Category = "Door Components")
+    UPROPERTY(VisibleAnywhere, Category = "Door Components")
     TObjectPtr<UOpeningsInteractionComponent> _openingsC = nullptr;
 
     UPROPERTY(EditAnywhere, Category = "Door Parameters")

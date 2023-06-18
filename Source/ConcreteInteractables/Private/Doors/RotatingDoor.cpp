@@ -8,9 +8,12 @@
 ARotatingDoor::ARotatingDoor() {
     PrimaryActorTick.bCanEverTick = false;
 
-    _rotatingMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RotatingMesh"));
-    SetRootComponent(_rotatingMesh);
+    _sceneC = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+    SetRootComponent(_sceneC);
 
+    _rotatingMeshC = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RotatingMesh"));
+    _rotatingMeshC->SetupAttachment(GetRootComponent());
+    
     _interactableC = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
     _interactableC->SetupAttachment(GetRootComponent());
 
@@ -21,7 +24,7 @@ void ARotatingDoor::BeginPlay() {
     Super::BeginPlay();
 
     const auto rotationParams = FOpeningInteractionParameters{_timeToOpen, FRotator{0.0f, _yawToOpen, 0.0f}};
-    _openingsC->SetOpening(_rotatingMesh, rotationParams);
+    _openingsC->SetOpening(_rotatingMeshC, rotationParams);
 
     _interactableC->OnInteraction().AddDynamic(this, &ARotatingDoor::_onDoorInteractedBy);
 }
