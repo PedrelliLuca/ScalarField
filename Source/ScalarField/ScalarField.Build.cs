@@ -41,6 +41,7 @@ public class ScalarField : ModuleRules
             "NewSkillSystem",
             "FSM",
             "ConcreteSkills",
+            "ConcreteItems",
             "ConcreteInteractables",
         });
 

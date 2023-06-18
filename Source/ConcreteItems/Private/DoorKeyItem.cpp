@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Doors/DoorKeyItem.h"
+#include "DoorKeyItem.h"
 
 #define LOCTEXT_NAMESPACE "DoorKeyItem"
 

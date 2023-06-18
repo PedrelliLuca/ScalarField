@@ -2,9 +2,9 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class ConcreteInteractables : ModuleRules
+	public class ConcreteItems : ModuleRules
 	{
-		public ConcreteInteractables(ReadOnlyTargetRules Target) : base(Target)
+		public ConcreteItems(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
@@ -14,15 +14,14 @@ namespace UnrealBuildTool.Rules
 					"Core",
 					"CoreUObject",
 					"Engine",
-					"InteractionSystem",
-					"ConcreteItems"
+					"InventoryCore"
 				}
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"InventoryManipulation",
+					// ... add private dependencies that you statically link with here ...
 				}
 				);
 
