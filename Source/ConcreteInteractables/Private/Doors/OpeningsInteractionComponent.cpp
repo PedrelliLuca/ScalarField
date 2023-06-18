@@ -16,31 +16,61 @@ void UOpeningsInteractionComponent::TickComponent(float deltaTime, ELevelTick ti
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
     _currentRotationTime += deltaTime;
-    const auto timeRatio = FMath::Clamp(_currentRotationTime / _timeToRotate, 0.0f, 1.0f);
-    const auto rotationThisFrame = FMath::Lerp(_closedRotation, _openRotation, timeRatio);
+    const auto timeRatio = FMath::Clamp(_currentRotationTime / _requiredRotationTime, 0.0f, 1.0f);
+    const auto rotationThisFrame = FMath::Lerp(_startRotation, _targetRotation, timeRatio);
     _opening->SetWorldRotation(rotationThisFrame);
 
     if (FMath::IsNearlyEqual(timeRatio, 1.0f)) {
         SetComponentTickEnabled(false);
-        _openingState = EOpeningState::Open;
+        if (_openingState == EOpeningState::Opening) {
+            _openingState = EOpeningState::Open;
+        } else if (_openingState == EOpeningState::Closing) {
+            _openingState = EOpeningState::Closed;
+        } else {
+            checkNoEntry();
+        }
     }
 }
 
-void UOpeningsInteractionComponent::Open() {
-    if (_openingState == EOpeningState::Closed) {
-        SetComponentTickEnabled(true);
-        _openingState = EOpeningState::Opening;
+void UOpeningsInteractionComponent::Toggle() {
+    SetComponentTickEnabled(true);
+
+    switch (_openingState) {
+        case EOpeningState::Closed:
+            _startRotation = _openingParameters.CloseRotation;
+            _targetRotation = _openingParameters.OpenRotation;
+            _requiredRotationTime = _openingParameters.OpenCloseTime;
+            _openingState = EOpeningState::Opening;
+            break;
+        case EOpeningState::Closing:
+            _startRotation = _opening->GetComponentRotation();
+            _targetRotation = _openingParameters.OpenRotation;
+            _requiredRotationTime = _currentRotationTime;
+            _openingState = EOpeningState::Opening;
+            break;
+        case EOpeningState::Open:
+            _startRotation = _openingParameters.OpenRotation;
+            _targetRotation = _openingParameters.CloseRotation;
+            _requiredRotationTime = _openingParameters.OpenCloseTime;
+            _openingState = EOpeningState::Closing;
+            break;
+        case EOpeningState::Opening:
+            _startRotation = _opening->GetComponentRotation();
+            _targetRotation = _openingParameters.CloseRotation;
+            _requiredRotationTime = _currentRotationTime;
+            _openingState = EOpeningState::Closing;
+            break;
+        default:
+            checkNoEntry();
     }
+    _currentRotationTime = 0.0f;
 }
 
-void UOpeningsInteractionComponent::SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningInteractionParameters& interactionParams) {
+void UOpeningsInteractionComponent::SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningParameters& openingParams) {
     if (!ensureMsgf(!_opening.IsValid(), TEXT("Since _opening has already been set, it won't be set again"))) {
         return;
     }
 
     _opening = opening;
-    _closedRotation = opening->GetComponentRotation();
-    _openRotation = _closedRotation + interactionParams.AmountToRotate;
-    _timeToRotate = interactionParams.TimeToRotate;
-    _currentRotationTime = 0.0f;
+    _openingParameters = openingParams;
 }

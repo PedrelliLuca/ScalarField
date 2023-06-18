@@ -13,7 +13,7 @@ ARotatingDoor::ARotatingDoor() {
 
     _rotatingMeshC = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("RotatingMesh"));
     _rotatingMeshC->SetupAttachment(GetRootComponent());
-    
+
     _interactableC = CreateDefaultSubobject<UInteractableComponent>(TEXT("InteractableComponent"));
     _interactableC->SetupAttachment(GetRootComponent());
 
@@ -23,7 +23,7 @@ ARotatingDoor::ARotatingDoor() {
 void ARotatingDoor::BeginPlay() {
     Super::BeginPlay();
 
-    const auto rotationParams = FOpeningInteractionParameters{_timeToOpen, FRotator{0.0f, _yawToOpen, 0.0f}};
+    const auto rotationParams = FOpeningParameters{_timeToOpen, _openRotation, _closedRotation};
     _openingsC->SetOpening(_rotatingMeshC, rotationParams);
 
     _interactableC->OnInteraction().AddDynamic(this, &ARotatingDoor::_onDoorInteractedBy);
@@ -43,7 +43,7 @@ void ARotatingDoor::_onDoorInteractedBy(TScriptInterface<IInteractor> interactor
     }
 
     if (inventoryComponent->FindItemByClass(_compatibleKey) != nullptr) {
-        _openingsC->Open();
+        _openingsC->Toggle();
     }
 
     interactor->EndInteraction();

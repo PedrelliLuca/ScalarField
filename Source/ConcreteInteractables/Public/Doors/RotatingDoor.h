@@ -42,7 +42,10 @@ private:
     float _timeToOpen = 1.0f;
 
     UPROPERTY(EditAnywhere, Category = "Door Parameters")
-    float _yawToOpen = 90.0f;
+    FRotator _closedRotation = FRotator::ZeroRotator;
+
+    UPROPERTY(EditAnywhere, Category = "Door Parameters")
+    FRotator _openRotation = FRotator::ZeroRotator;
 
     UPROPERTY(EditAnywhere, Category = "Door Parameters")
     TSubclassOf<UDoorKeyItem> _compatibleKey = nullptr;

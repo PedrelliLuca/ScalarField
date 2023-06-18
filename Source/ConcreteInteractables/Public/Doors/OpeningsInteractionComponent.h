@@ -6,16 +6,18 @@
 #include "CoreMinimal.h"
 #include "OpeningsInteractionComponent.generated.h"
 
-struct FOpeningInteractionParameters {
-    float TimeToRotate;
-    FRotator AmountToRotate;
+struct FOpeningParameters {
+    float OpenCloseTime;
+    FRotator OpenRotation;
+    FRotator CloseRotation;
 };
 
 enum EOpeningState {
     None,
     Closed,
-    Opening,
     Open,
+    Closing,
+    Opening,
 };
 
 UCLASS()
@@ -26,8 +28,8 @@ public:
     UOpeningsInteractionComponent();
 
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
-    void Open();
-    void SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningInteractionParameters& interactionParams);
+    void Toggle();
+    void SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningParameters& openingParams);
     
 
 protected:
@@ -36,9 +38,10 @@ protected:
 private:
     TWeakObjectPtr<UStaticMeshComponent> _opening;
 
-    FRotator _closedRotation;
-    FRotator _openRotation;
-    float _timeToRotate;
     float _currentRotationTime;
+    float _requiredRotationTime;
+    FRotator _startRotation;
+    FRotator _targetRotation;
     EOpeningState _openingState = EOpeningState::Closed;
+    FOpeningParameters _openingParameters;
 };
