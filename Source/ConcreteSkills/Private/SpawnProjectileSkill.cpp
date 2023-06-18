@@ -35,7 +35,7 @@ void USpawnProjectileSkill::_skillCast() {
             return;
         }
         projectileMovementC->Velocity = projectileMovementC->InitialSpeed * casterToTargetDirection;
-        
+
         spawnedActor->FinishSpawning(projectileTransform);
     }
 }

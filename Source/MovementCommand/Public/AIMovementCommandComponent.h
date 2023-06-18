@@ -37,7 +37,7 @@ protected:
 
 private:
     TObjectPtr<UAIMovementCommand> _getMovementCommand();
-    
+
     void _onActiveMovementCmdStatusChange(bool newIsMoving);
 
     UPROPERTY(EditDefaultsOnly, Category = "Movement modalities")
