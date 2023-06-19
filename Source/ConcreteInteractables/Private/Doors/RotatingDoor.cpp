@@ -25,6 +25,7 @@ void ARotatingDoor::BeginPlay() {
 
     const auto rotationParams = FOpeningParameters{_timeToOpen, _openRotation, _closedRotation};
     _openingsC->SetOpening(_rotatingMeshC, rotationParams);
+    _openingsC->OnOpeningStateChange().AddUObject(this, &ARotatingDoor::_onOpeningStateChange);
 
     _interactableC->OnInteraction().AddDynamic(this, &ARotatingDoor::_onDoorInteractedBy);
 }
@@ -47,4 +48,23 @@ void ARotatingDoor::_onDoorInteractedBy(TScriptInterface<IInteractor> interactor
     }
 
     interactor->EndInteraction();
+}
+
+void ARotatingDoor::_onOpeningStateChange(const EOpeningState newOpeningState) {
+    auto actionText = FText{};
+
+    switch (newOpeningState) {
+        case EOpeningState::Closed:
+        case EOpeningState::Closing:
+            actionText = FText::FromString(FString{"Open"});
+            break;
+        case EOpeningState::Open:
+        case EOpeningState::Opening:
+            actionText = FText::FromString(FString{"Close"});
+            break;
+        default:
+            checkNoEntry();
+    }
+
+    _interactableC->SetInteractableActionText(actionText);
 }

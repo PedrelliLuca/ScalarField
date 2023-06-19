@@ -26,6 +26,8 @@ private:
     UFUNCTION()
     void _onDoorInteractedBy(TScriptInterface<IInteractor> interactor);
 
+    void _onOpeningStateChange(EOpeningState newOpeningState);
+
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<USceneComponent> _sceneC = nullptr;
 

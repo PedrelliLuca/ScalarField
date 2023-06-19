@@ -29,6 +29,7 @@ void UOpeningsInteractionComponent::TickComponent(float deltaTime, ELevelTick ti
         } else {
             checkNoEntry();
         }
+        _onOpeningStateChange.Broadcast(_openingState);
     }
 }
 
@@ -60,6 +61,8 @@ void UOpeningsInteractionComponent::Toggle() {
         default:
             checkNoEntry();
     }
+
+    _onOpeningStateChange.Broadcast(_openingState);
     _currentRotationTime = 0.0f;
 }
 

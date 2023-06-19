@@ -12,13 +12,16 @@ struct FOpeningParameters {
     FRotator CloseRotation;
 };
 
-enum EOpeningState {
+enum EOpeningState
+{
     None,
     Closed,
     Open,
     Closing,
     Opening,
 };
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnOpeningStateChange, EOpeningState);
 
 UCLASS()
 class CONCRETEINTERACTABLES_API UOpeningsInteractionComponent : public UActorComponent {
@@ -30,7 +33,7 @@ public:
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
     void Toggle();
     void SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningParameters& openingParams);
-    
+    FOnOpeningStateChange& OnOpeningStateChange() { return _onOpeningStateChange; }
 
 protected:
     void BeginPlay() override;
@@ -44,4 +47,5 @@ private:
     FRotator _targetRotation;
     EOpeningState _openingState = EOpeningState::Closed;
     FOpeningParameters _openingParameters;
+    FOnOpeningStateChange _onOpeningStateChange;
 };
