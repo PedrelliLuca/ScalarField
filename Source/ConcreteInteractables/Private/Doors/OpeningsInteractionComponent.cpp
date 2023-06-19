@@ -35,27 +35,24 @@ void UOpeningsInteractionComponent::TickComponent(float deltaTime, ELevelTick ti
 void UOpeningsInteractionComponent::Toggle() {
     SetComponentTickEnabled(true);
 
+    _startRotation = _opening->GetComponentRotation();
     switch (_openingState) {
         case EOpeningState::Closed:
-            _startRotation = _openingParameters.CloseRotation;
             _targetRotation = _openingParameters.OpenRotation;
             _requiredRotationTime = _openingParameters.OpenCloseTime;
             _openingState = EOpeningState::Opening;
             break;
         case EOpeningState::Closing:
-            _startRotation = _opening->GetComponentRotation();
             _targetRotation = _openingParameters.OpenRotation;
             _requiredRotationTime = _currentRotationTime;
             _openingState = EOpeningState::Opening;
             break;
         case EOpeningState::Open:
-            _startRotation = _openingParameters.OpenRotation;
             _targetRotation = _openingParameters.CloseRotation;
             _requiredRotationTime = _openingParameters.OpenCloseTime;
             _openingState = EOpeningState::Closing;
             break;
         case EOpeningState::Opening:
-            _startRotation = _opening->GetComponentRotation();
             _targetRotation = _openingParameters.CloseRotation;
             _requiredRotationTime = _currentRotationTime;
             _openingState = EOpeningState::Closing;
