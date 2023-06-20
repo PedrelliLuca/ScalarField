@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogConcreteItems, Log, All);
 
 class FConcreteItemsModule : public IConcreteItemsModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

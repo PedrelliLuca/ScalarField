@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 
+#include "DoorKeyItem.h"
 #include "GameFramework/Actor.h"
 #include "InteractableComponent.h"
 #include "InteractorInterface.h"
 #include "OpeningsInteractionComponent.h"
-#include "DoorKeyItem.h"
 
 #include "RotatingDoor.generated.h"
 
