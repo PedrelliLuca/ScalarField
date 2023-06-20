@@ -7,12 +7,12 @@
 #include "OpeningsInteractionComponent.generated.h"
 
 struct FOpeningParameters {
-    float OpenCloseTime;
-    FRotator OpenRotation;
-    FRotator CloseRotation;
+    float OpenCloseTime = 0.0f;
+    FRotator OpenRotation = FRotator::ZeroRotator;
+    FRotator CloseRotation = FRotator::ZeroRotator;
 };
 
-enum EOpeningState
+enum EOpeningPhase
 {
     None,
     Closed,
@@ -21,7 +21,7 @@ enum EOpeningState
     Opening,
 };
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnOpeningStateChange, EOpeningState);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnOpeningPhaseChange, EOpeningPhase);
 
 UCLASS()
 class CONCRETEINTERACTABLES_API UOpeningsInteractionComponent : public UActorComponent {
@@ -33,19 +33,23 @@ public:
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
     void Toggle();
     void SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningParameters& openingParams);
-    FOnOpeningStateChange& OnOpeningStateChange() { return _onOpeningStateChange; }
+    FOnOpeningPhaseChange& OnOpeningStateChange() { return _onOpeningPhaseChange; }
 
 protected:
     void BeginPlay() override;
 
 private:
-    TWeakObjectPtr<UStaticMeshComponent> _opening;
+    struct FOpeningState {
+        float CurrentRotationTime = 0.0f;
+        float RequiredRotationTime = 0.0f;
+        FRotator StartRotation = FRotator::ZeroRotator;
+        FRotator TargetRotation = FRotator::ZeroRotator;
+        EOpeningPhase Phase = EOpeningPhase::Closed;
+        FOpeningParameters Parameters;
+    };
 
-    float _currentRotationTime;
-    float _requiredRotationTime;
-    FRotator _startRotation;
-    FRotator _targetRotation;
-    EOpeningState _openingState = EOpeningState::Closed;
-    FOpeningParameters _openingParameters;
-    FOnOpeningStateChange _onOpeningStateChange;
+    TMap<TWeakObjectPtr<UStaticMeshComponent>, FOpeningState> _openingToState;
+    EOpeningPhase _overallOpeningPhase = EOpeningPhase::Closed;
+    FOnOpeningPhaseChange _onOpeningPhaseChange;
+    int32 _numOpeningsThatEndedTransition = 0;
 };

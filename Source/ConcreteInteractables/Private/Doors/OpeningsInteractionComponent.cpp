@@ -2,6 +2,8 @@
 
 #include "Doors/OpeningsInteractionComponent.h"
 
+#include "Algo/ForEach.h"
+
 UOpeningsInteractionComponent::UOpeningsInteractionComponent() {
     PrimaryComponentTick.bCanEverTick = true;
 }
@@ -15,62 +17,107 @@ void UOpeningsInteractionComponent::BeginPlay() {
 void UOpeningsInteractionComponent::TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-    _currentRotationTime += deltaTime;
-    const auto timeRatio = FMath::Clamp(_currentRotationTime / _requiredRotationTime, 0.0f, 1.0f);
-    const auto rotationThisFrame = FMath::Lerp(_startRotation, _targetRotation, timeRatio);
-    _opening->SetWorldRotation(rotationThisFrame);
+    Algo::ForEach(_openingToState, [this, deltaTime](auto& openingToState) {
+        auto& opening = openingToState.Key;
+        auto& openingState = openingToState.Value;
 
-    if (FMath::IsNearlyEqual(timeRatio, 1.0f)) {
-        SetComponentTickEnabled(false);
-        if (_openingState == EOpeningState::Opening) {
-            _openingState = EOpeningState::Open;
-        } else if (_openingState == EOpeningState::Closing) {
-            _openingState = EOpeningState::Closed;
-        } else {
-            checkNoEntry();
+        if (openingState.Phase != EOpeningPhase::Opening && openingState.Phase != EOpeningPhase::Closing) {
+            return;
         }
-        _onOpeningStateChange.Broadcast(_openingState);
-    }
+
+        openingState.CurrentRotationTime += deltaTime;
+        const auto timeRatio = FMath::Clamp(openingState.CurrentRotationTime / openingState.RequiredRotationTime, 0.0f, 1.0f);
+        const auto rotationThisFrame = FMath::Lerp(openingState.StartRotation, openingState.TargetRotation, timeRatio);
+        opening->SetWorldRotation(rotationThisFrame);
+
+        if (FMath::IsNearlyEqual(timeRatio, 1.0f)) {
+            switch (openingState.Phase) {
+                case EOpeningPhase::Opening:
+                    openingState.Phase = EOpeningPhase::Open;
+                    break;
+                case EOpeningPhase::Closing:
+                    openingState.Phase = EOpeningPhase::Closed;
+                    break;
+                default:
+                    checkNoEntry();
+            }
+
+            if (++_numOpeningsThatEndedTransition == _openingToState.Num()) {
+                switch (_overallOpeningPhase) {
+                    case EOpeningPhase::Opening:
+                        _overallOpeningPhase = EOpeningPhase::Open;
+                        break;
+                    case EOpeningPhase::Closing:
+                        _overallOpeningPhase = EOpeningPhase::Closed;
+                        break;
+                    default:
+                        checkNoEntry();
+                }
+                _onOpeningPhaseChange.Broadcast(_overallOpeningPhase);
+                SetComponentTickEnabled(false);
+            }
+        }
+    });
 }
 
 void UOpeningsInteractionComponent::Toggle() {
     SetComponentTickEnabled(true);
 
-    _startRotation = _opening->GetComponentRotation();
-    switch (_openingState) {
-        case EOpeningState::Closed:
-            _targetRotation = _openingParameters.OpenRotation;
-            _requiredRotationTime = _openingParameters.OpenCloseTime;
-            _openingState = EOpeningState::Opening;
+    Algo::ForEach(_openingToState, [](auto& openingToState) {
+        auto& opening = openingToState.Key;
+        auto& openingState = openingToState.Value;
+
+        openingState.StartRotation = opening->GetComponentRotation();
+        switch (openingState.Phase) {
+            case EOpeningPhase::Closed:
+                openingState.TargetRotation = openingState.Parameters.OpenRotation;
+                openingState.RequiredRotationTime = openingState.Parameters.OpenCloseTime;
+                openingState.Phase = EOpeningPhase::Opening;
+                break;
+            case EOpeningPhase::Closing:
+                openingState.TargetRotation = openingState.Parameters.OpenRotation;
+                openingState.RequiredRotationTime = openingState.CurrentRotationTime;
+                openingState.Phase = EOpeningPhase::Opening;
+                break;
+            case EOpeningPhase::Open:
+                openingState.TargetRotation = openingState.Parameters.CloseRotation;
+                openingState.RequiredRotationTime = openingState.Parameters.OpenCloseTime;
+                openingState.Phase = EOpeningPhase::Closing;
+                break;
+            case EOpeningPhase::Opening:
+                openingState.TargetRotation = openingState.Parameters.CloseRotation;
+                openingState.RequiredRotationTime = openingState.CurrentRotationTime;
+                openingState.Phase = EOpeningPhase::Closing;
+                break;
+            default:
+                checkNoEntry();
+        }
+
+        openingState.CurrentRotationTime = 0.0f;
+    });
+
+    switch (_overallOpeningPhase) {
+        case EOpeningPhase::Closed:
+        case EOpeningPhase::Closing:
+            _overallOpeningPhase = EOpeningPhase::Opening;
             break;
-        case EOpeningState::Closing:
-            _targetRotation = _openingParameters.OpenRotation;
-            _requiredRotationTime = _currentRotationTime;
-            _openingState = EOpeningState::Opening;
-            break;
-        case EOpeningState::Open:
-            _targetRotation = _openingParameters.CloseRotation;
-            _requiredRotationTime = _openingParameters.OpenCloseTime;
-            _openingState = EOpeningState::Closing;
-            break;
-        case EOpeningState::Opening:
-            _targetRotation = _openingParameters.CloseRotation;
-            _requiredRotationTime = _currentRotationTime;
-            _openingState = EOpeningState::Closing;
+        case EOpeningPhase::Open:
+        case EOpeningPhase::Opening:
+            _overallOpeningPhase = EOpeningPhase::Closing;
             break;
         default:
             checkNoEntry();
     }
-
-    _onOpeningStateChange.Broadcast(_openingState);
-    _currentRotationTime = 0.0f;
+    _onOpeningPhaseChange.Broadcast(_overallOpeningPhase);
+    _numOpeningsThatEndedTransition = 0;
 }
 
 void UOpeningsInteractionComponent::SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningParameters& openingParams) {
-    if (!ensureMsgf(!_opening.IsValid(), TEXT("Since _opening has already been set, it won't be set again"))) {
+    if (!ensureMsgf(!_openingToState.Contains(opening), TEXT("Since _opening has already been set, it won't be set again"))) {
         return;
     }
 
-    _opening = opening;
-    _openingParameters = openingParams;
+    FOpeningState openingState;
+    openingState.Parameters = openingParams;
+    _openingToState.Emplace(opening, MoveTemp(openingState));
 }
