@@ -6,6 +6,7 @@
 
 UOpeningsInteractionComponent::UOpeningsInteractionComponent() {
     PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.bStartWithTickEnabled = false;
 }
 
 void UOpeningsInteractionComponent::BeginPlay() {

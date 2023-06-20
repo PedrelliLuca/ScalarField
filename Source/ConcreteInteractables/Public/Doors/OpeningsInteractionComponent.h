@@ -6,9 +6,19 @@
 #include "CoreMinimal.h"
 #include "OpeningsInteractionComponent.generated.h"
 
+// TODO: in the future, handle sliding elements too, not just rotating ones!
+USTRUCT()
 struct FOpeningParameters {
+    GENERATED_BODY()
+
+public:
+    UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0"))
     float OpenCloseTime = 0.0f;
+
+    UPROPERTY(EditAnywhere)
     FRotator OpenRotation = FRotator::ZeroRotator;
+
+    UPROPERTY(EditAnywhere)
     FRotator CloseRotation = FRotator::ZeroRotator;
 };
 
