@@ -156,8 +156,10 @@ void AEnemyStabilizerController::_newOnTargetAllyChange() {
     timerManager.SetTimer(
         _recentlyChangedHandle,
         [blackboardC, bbTargetRecentlyChangedKeyName = _bbTargetRecentlyChangedKeyName]() {
-            check(IsValid(blackboardC));
-            blackboardC->SetValueAsBool(bbTargetRecentlyChangedKeyName, false);
+            // The caster might be dead when the timer has expired.
+            if (IsValid(blackboardC)) {
+                blackboardC->SetValueAsBool(bbTargetRecentlyChangedKeyName, false);
+            }
         },
         _targetRecentlyChangedTimer, false);
 }
