@@ -15,6 +15,8 @@ class SKILLTARGETING_API UCasterPlaneLocationSkillTarget : public UObject, publi
 public:
     void Init(const FSkillTargetPacket& targetPacket) override;
 
+    bool IsValidTarget() const override { return true; }
+
     FVector GetTargetLocation() const override;
 
 private:

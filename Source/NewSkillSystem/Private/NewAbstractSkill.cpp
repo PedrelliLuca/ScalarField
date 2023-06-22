@@ -205,7 +205,7 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
     if (_checkTargetingConditionsWhenChanneling) {
         // Targeting conditions must be verified during the entire cast phase.
         for (const auto& target : _targets) {
-            if (!_areTargetingConditionsVerifiedForTarget(target)) {
+            if (!target->IsValidTarget() || !_areTargetingConditionsVerifiedForTarget(target)) {
                 _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingFail_TargetingConditionsViolated());
                 Abort(true);
                 return;
