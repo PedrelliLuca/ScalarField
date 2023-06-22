@@ -109,6 +109,7 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 
     const auto thisCollision = _getMostComplexCollision();
 
+    int32 nActualHeatExchangers = 0;
     // Here this component performs the heat-checks on the other components.
     for (const auto& otherThermoC : _possibleHeatExchangers) {
         check(otherThermoC.IsValid());
@@ -119,6 +120,8 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
          * UPrimitiveComponent::bGenerateOverlapEvents attributes is set to false. This can easily happen with skeletal
          * meshes on characters for example.*/
         if (thisCollision->IsOverlappingComponent(otherCollison.Get())) {
+            ++nActualHeatExchangers;
+
             /* When this is hotter than other, the delta is negative since we emit heat.
              * When this is colder than other, the delta is positive since we absorb heat. */
             deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
@@ -128,7 +131,11 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
         otherThermoC->_updateCounterOfChecksThisFrame();
     }
 
-    deltaTemperature /= _possibleHeatExchangers.Num();
+    if (nActualHeatExchangers == 0) {
+        return deltaTemperature;
+    }
+
+    deltaTemperature /= nActualHeatExchangers;
     deltaTemperature *= ROD_CONSTANT * deltaTime / _heatCapacity;
     return deltaTemperature;
 }
