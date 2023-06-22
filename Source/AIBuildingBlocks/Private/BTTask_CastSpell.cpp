@@ -125,12 +125,12 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
         if (targetKind == UCasterPlaneLocationSkillTarget::StaticClass()) {
             // ... Super::StoreInBlackboard() to be called => UEnvQueryItemType_Point::GetItemLocation() into UEnvQueryItemType_Point::GetValue() is called.
             const auto navLocation = *reinterpret_cast<FNavLocation*>(const_cast<uint8*>(itemRawData));
-            
+
             const auto location = navLocation.Location;
             const auto casterPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
             const auto casterPlaneLocation = FMath::LinePlaneIntersection(
                 location + FVector::UpVector * PROJ_LINE_HALF_LENGTH, location - FVector::UpVector * PROJ_LINE_HALF_LENGTH, casterPlane);
-            
+
             targetPacket.TargetCasterPlaneLocation = casterPlaneLocation;
         } else if (targetKind == UActorSkillTarget::StaticClass()) {
             // ... EnvQueryItemType_Actor::GetActor() into UEnvQueryItemType_Actor::GetValue() to be called.

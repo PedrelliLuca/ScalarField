@@ -1,0 +1,54 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+#include "DoorKeyItem.h"
+#include "GameFramework/Actor.h"
+#include "InteractableComponent.h"
+#include "InteractorInterface.h"
+#include "OpeningsInteractionComponent.h"
+
+#include "RotatingDoor.generated.h"
+
+UCLASS()
+class CONCRETEINTERACTABLES_API ARotatingDoor : public AActor {
+    GENERATED_BODY()
+
+public:
+    ARotatingDoor();
+
+protected:
+    void BeginPlay() override;
+
+private:
+    UFUNCTION()
+    void _onDoorInteractedBy(TScriptInterface<IInteractor> interactor);
+
+    void _onOpeningPhaseChange(EOpeningPhase newOpeningState);
+
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<USceneComponent> _sceneC = nullptr;
+
+    UPROPERTY(VisibleAnywhere, Category = "Door Components")
+    TObjectPtr<UStaticMeshComponent> _rotatingMeshC = nullptr;
+
+    UPROPERTY(VisibleAnywhere, Category = "Door Components")
+    TObjectPtr<UInteractableComponent> _interactableC = nullptr;
+
+    UPROPERTY(VisibleAnywhere, Category = "Door Components")
+    TObjectPtr<UOpeningsInteractionComponent> _openingsC = nullptr;
+
+    UPROPERTY(EditAnywhere, Category = "Door Parameters")
+    float _timeToOpen = 1.0f;
+
+    UPROPERTY(EditAnywhere, Category = "Door Parameters")
+    FRotator _closedRotation = FRotator::ZeroRotator;
+
+    UPROPERTY(EditAnywhere, Category = "Door Parameters")
+    FRotator _openRotation = FRotator::ZeroRotator;
+
+    UPROPERTY(EditAnywhere, Category = "Door Parameters")
+    TSubclassOf<UDoorKeyItem> _compatibleKey = nullptr;
+};

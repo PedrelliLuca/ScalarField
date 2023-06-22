@@ -41,6 +41,8 @@ public class ScalarField : ModuleRules
             "NewSkillSystem",
             "FSM",
             "ConcreteSkills",
+            "ConcreteItems",
+            "ConcreteInteractables",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {
