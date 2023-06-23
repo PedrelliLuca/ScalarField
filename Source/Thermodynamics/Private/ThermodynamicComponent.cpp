@@ -12,6 +12,11 @@ UThermodynamicComponent::UThermodynamicComponent(const FObjectInitializer& Objec
 void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
+    if (_bFirstTick) {
+        _bFirstTick = false;
+        return;
+    }
+
     if (_bCollisionChangedSinceLastTick) {
         if (GetOwner()->GetActorLabel() == FString{"BP_ConeOfCold0"}) {
             UE_LOG(LogTemp, Warning, TEXT("Set initial exchangers call"));
