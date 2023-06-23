@@ -13,6 +13,9 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
     if (_bCollisionChangedSinceLastTick) {
+        if (GetOwner()->GetActorLabel() == FString{"BP_ConeOfCold0"}) {
+            UE_LOG(LogTemp, Warning, TEXT("Set initial exchangers call"));
+        }
         // UPrimitiveComponent::OnComponentBeginOverlap does not fire before the first tick. We need this call to get the collisions we're already
         // overlapping with.
         _setInitialExchangers();
@@ -33,6 +36,11 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
     _nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
+        if (const auto ownerPawn = Cast<const APawn>(GetOwner())) {
+            if (auto playerController = Cast<const APlayerController>(ownerPawn->GetController())) {
+                UE_LOG(LogTemp, Warning, TEXT("FROM SELF:"));
+            }
+        }
         _setCurrentTempAsNext();
     }
 }
@@ -138,6 +146,9 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
         if (const auto otherPawn = Cast<const APawn>(otherThermoC->GetOwner())) {
             if (auto otherPlayerController = Cast<const APlayerController>(otherPawn->GetController())) {
                 UE_LOG(LogTemp, Warning, TEXT("%s is increasing player counter"), *(GetOwner()->GetActorLabel()));
+                if (GetOwner()->GetActorLabel() == FString{"BP_ConeOfCold0"}) {
+                    UE_LOG(LogTemp, Warning, TEXT("YOU FUCKING BITCH!"))
+                }
             }
         }
 
@@ -157,6 +168,12 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 void UThermodynamicComponent::_updateCounterOfChecksThisFrame() {
     ++_counterOfChecksThisFrame;
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
+        if (const auto ownerPawn = Cast<const APawn>(GetOwner())) {
+            if (auto playerController = Cast<const APlayerController>(ownerPawn->GetController())) {
+                UE_LOG(LogTemp, Warning, TEXT("FROM OTHER:"));
+            }
+        }
+
         _setCurrentTempAsNext();
     }
 }
@@ -207,6 +224,14 @@ void UThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlap
     int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
     const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicComponent>();
     check(IsValid(otherThermoC));
+
+    if (const auto pawn = Cast<const APawn>(GetOwner())) {
+        if (auto otherPlayerController = Cast<const APlayerController>(pawn->GetController())) {
+            if (otherActor->GetActorLabel() == FString{"BP_ConeOfCold0"}) {
+                UE_LOG(LogTemp, Warning, TEXT("COLLISION!"))
+            }
+        }
+    }
 
     // Filtering out every collision that's not simple VS simple
     if (otherThermoC->_simpleCollisionC.Get() != otherComp) {
