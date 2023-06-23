@@ -22,6 +22,14 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
     // We'll get checked for each potential heat exchanger.
     _timesToBeCheckedThisFrame = _possibleHeatExchangers.Num();
 
+    if (const auto ownerPawn = Cast<const APawn>(GetOwner())) {
+        if (auto playerController = Cast<const APlayerController>(ownerPawn->GetController())) {
+            if (_timesToBeCheckedThisFrame < _counterOfChecksThisFrame) {
+                UE_LOG(LogTemp, Warning, TEXT("Something"));
+            }
+        }
+    }
+
     _nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
@@ -127,6 +135,12 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
             deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
         }
 
+        if (const auto otherPawn = Cast<const APawn>(otherThermoC->GetOwner())) {
+            if (auto otherPlayerController = Cast<const APlayerController>(otherPawn->GetController())) {
+                UE_LOG(LogTemp, Warning, TEXT("%s is increasing player counter"), *(GetOwner()->GetActorLabel()));
+            }
+        }
+
         // We heat-checked otherThermoC, so it must increase its counter
         otherThermoC->_updateCounterOfChecksThisFrame();
     }
@@ -153,6 +167,12 @@ void UThermodynamicComponent::_setCurrentTempAsNext() {
 
     _counterOfChecksThisFrame = 0;
     _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
+
+    if (const auto ownerPawn = Cast<const APawn>(GetOwner())) {
+        if (auto playerController = Cast<const APlayerController>(ownerPawn->GetController())) {
+            UE_LOG(LogTemp, Warning, TEXT("--------- RESET ---------"));
+        }
+    }
 }
 
 void UThermodynamicComponent::_setInitialExchangers() {
