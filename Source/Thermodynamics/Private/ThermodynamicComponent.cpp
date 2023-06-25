@@ -18,9 +18,6 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
     }
 
     if (_bCollisionChangedSinceLastTick) {
-        if (GetOwner()->GetActorLabel() == FString{"BP_ConeOfCold0"}) {
-            UE_LOG(LogTemp, Warning, TEXT("Set initial exchangers call"));
-        }
         // UPrimitiveComponent::OnComponentBeginOverlap does not fire before the first tick. We need this call to get the collisions we're already
         // overlapping with.
         _setInitialExchangers();
@@ -29,24 +26,13 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
 
     // We'll get checked for each potential heat exchanger.
     _timesToBeCheckedThisFrame = _possibleHeatExchangers.Num();
-
-    if (const auto ownerPawn = Cast<const APawn>(GetOwner())) {
-        if (auto playerController = Cast<const APlayerController>(ownerPawn->GetController())) {
-            if (_timesToBeCheckedThisFrame < _counterOfChecksThisFrame) {
-                UE_LOG(LogTemp, Warning, TEXT("Something"));
-            }
-        }
-    }
-
     _nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
-        if (const auto ownerPawn = Cast<const APawn>(GetOwner())) {
-            if (auto playerController = Cast<const APlayerController>(ownerPawn->GetController())) {
-                UE_LOG(LogTemp, Warning, TEXT("FROM SELF:"));
-            }
-        }
         _setCurrentTempAsNext();
+    } else {
+        // If the _counter overshoots the limit thermodyanmics is going to cease for this actor, big problem.
+        // check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
     }
 }
 
@@ -148,15 +134,6 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
             deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
         }
 
-        if (const auto otherPawn = Cast<const APawn>(otherThermoC->GetOwner())) {
-            if (auto otherPlayerController = Cast<const APlayerController>(otherPawn->GetController())) {
-                UE_LOG(LogTemp, Warning, TEXT("%s is increasing player counter"), *(GetOwner()->GetActorLabel()));
-                if (GetOwner()->GetActorLabel() == FString{"BP_ConeOfCold0"}) {
-                    UE_LOG(LogTemp, Warning, TEXT("YOU FUCKING BITCH!"))
-                }
-            }
-        }
-
         // We heat-checked otherThermoC, so it must increase its counter
         otherThermoC->_updateCounterOfChecksThisFrame();
     }
@@ -173,12 +150,6 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 void UThermodynamicComponent::_updateCounterOfChecksThisFrame() {
     ++_counterOfChecksThisFrame;
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
-        if (const auto ownerPawn = Cast<const APawn>(GetOwner())) {
-            if (auto playerController = Cast<const APlayerController>(ownerPawn->GetController())) {
-                UE_LOG(LogTemp, Warning, TEXT("FROM OTHER:"));
-            }
-        }
-
         _setCurrentTempAsNext();
     }
 }
@@ -189,12 +160,6 @@ void UThermodynamicComponent::_setCurrentTempAsNext() {
 
     _counterOfChecksThisFrame = 0;
     _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
-
-    if (const auto ownerPawn = Cast<const APawn>(GetOwner())) {
-        if (auto playerController = Cast<const APlayerController>(ownerPawn->GetController())) {
-            UE_LOG(LogTemp, Warning, TEXT("--------- RESET ---------"));
-        }
-    }
 }
 
 void UThermodynamicComponent::_setInitialExchangers() {
@@ -229,14 +194,6 @@ void UThermodynamicComponent::_onSimpleBeginOverlap(UPrimitiveComponent* overlap
     int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
     const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicComponent>();
     check(IsValid(otherThermoC));
-
-    if (const auto pawn = Cast<const APawn>(GetOwner())) {
-        if (auto otherPlayerController = Cast<const APlayerController>(pawn->GetController())) {
-            if (otherActor->GetActorLabel() == FString{"BP_ConeOfCold0"}) {
-                UE_LOG(LogTemp, Warning, TEXT("COLLISION!"))
-            }
-        }
-    }
 
     // Filtering out every collision that's not simple VS simple
     if (otherThermoC->_simpleCollisionC.Get() != otherComp) {
