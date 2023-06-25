@@ -136,6 +136,9 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
             // ... EnvQueryItemType_Actor::GetActor() into UEnvQueryItemType_Actor::GetValue() to be called.
             auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
             const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
+            if (!IsValid(rawActor)) {
+                continue;
+            }
             targetPacket.TargetActor = rawActor;
         } else {
             checkNoEntry();

@@ -78,11 +78,14 @@ FVector UBTTask_TargetsBasedMovement::_getLocation_MidPointStrategy(FQueryItemsI
     int32 i = 0;
     /* NOTE: TARGETS != ITEMS! You could have your EQ returning more items than the needed ones (i.e. the targets). This component is just a draft, it should be
      * reworked to take only the needed items into account */
-    for (; !itemsIter.IsDone(); ++itemsIter, ++i) {
+    for (; !itemsIter.IsDone(); ++itemsIter) {
         auto itemRawData = *itemsIter;
         auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
         const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
-        location += rawActor->GetActorLocation();
+        if (IsValid(rawActor)) { // Necessary, the raw actor might be dead by the time you get here
+            location += rawActor->GetActorLocation();
+            ++i;
+        }
     }
     return location / i;
 }

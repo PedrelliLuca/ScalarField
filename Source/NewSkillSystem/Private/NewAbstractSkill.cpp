@@ -146,7 +146,7 @@ bool UNewAbstractSkill::IsAllowedToTick() const {
 void UNewAbstractSkill::_castTick(const float deltaTime) {
     // Targeting conditions must be verified during the entire cast phase.
     for (const auto& target : _targets) {
-        if (!_areTargetingConditionsVerifiedForTarget(target)) {
+        if (!target->IsValidTarget() || !_areTargetingConditionsVerifiedForTarget(target)) {
             _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_TargetingConditionsViolated());
             Abort(true);
             return;
