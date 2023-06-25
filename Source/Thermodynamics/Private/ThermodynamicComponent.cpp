@@ -12,6 +12,11 @@ UThermodynamicComponent::UThermodynamicComponent(const FObjectInitializer& Objec
 void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
+    if (_bFirstTick) {
+        _bFirstTick = false;
+        return;
+    }
+
     if (_bCollisionChangedSinceLastTick) {
         // UPrimitiveComponent::OnComponentBeginOverlap does not fire before the first tick. We need this call to get the collisions we're already
         // overlapping with.
@@ -21,11 +26,13 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
 
     // We'll get checked for each potential heat exchanger.
     _timesToBeCheckedThisFrame = _possibleHeatExchangers.Num();
-
     _nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
         _setCurrentTempAsNext();
+    } else {
+        // If the _counter overshoots the limit thermodyanmics is going to cease for this actor, big problem.
+        // check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
     }
 }
 
@@ -109,6 +116,7 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 
     const auto thisCollision = _getMostComplexCollision();
 
+    int32 nActualHeatExchangers = 0;
     // Here this component performs the heat-checks on the other components.
     for (const auto& otherThermoC : _possibleHeatExchangers) {
         check(otherThermoC.IsValid());
@@ -119,6 +127,8 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
          * UPrimitiveComponent::bGenerateOverlapEvents attributes is set to false. This can easily happen with skeletal
          * meshes on characters for example.*/
         if (thisCollision->IsOverlappingComponent(otherCollison.Get())) {
+            ++nActualHeatExchangers;
+
             /* When this is hotter than other, the delta is negative since we emit heat.
              * When this is colder than other, the delta is positive since we absorb heat. */
             deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
@@ -128,7 +138,11 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
         otherThermoC->_updateCounterOfChecksThisFrame();
     }
 
-    deltaTemperature /= _possibleHeatExchangers.Num();
+    if (nActualHeatExchangers == 0) {
+        return deltaTemperature;
+    }
+
+    deltaTemperature /= nActualHeatExchangers;
     deltaTemperature *= ROD_CONSTANT * deltaTime / _heatCapacity;
     return deltaTemperature;
 }

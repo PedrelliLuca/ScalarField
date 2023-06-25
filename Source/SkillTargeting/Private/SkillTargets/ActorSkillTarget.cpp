@@ -11,7 +11,15 @@ void UActorSkillTarget::Init(const FSkillTargetPacket& targetPacket) {
     }
 }
 
+bool UActorSkillTarget::IsValidTarget() const {
+    return _actor.IsValid();
+}
+
 FVector UActorSkillTarget::GetTargetLocation() const {
-    check(_actor.IsValid());
+    check(IsValidTarget());
     return _actor->GetActorLocation();
+}
+
+TObjectPtr<AActor> UActorSkillTarget::GetActor() const {
+    return _actor.Get();
 }

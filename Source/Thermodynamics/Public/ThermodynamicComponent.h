@@ -87,4 +87,5 @@ private:
     TSet<TWeakObjectPtr<UThermodynamicComponent>> _possibleHeatExchangers{};
 
     bool _bCollisionChangedSinceLastTick = false;
+    bool _bFirstTick = true;
 };
