@@ -4,6 +4,7 @@
 
 UThermodynamicComponent::UThermodynamicComponent(const FObjectInitializer& ObjectInitializer) {
     PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.TickGroup = ETickingGroup::TG_PostUpdateWork;
 
     _currentTemperature = _initialTemperature;
     _nextTemperature = _initialTemperature;
@@ -12,9 +13,14 @@ UThermodynamicComponent::UThermodynamicComponent(const FObjectInitializer& Objec
 void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-    if (_bFirstTick) {
-        _bFirstTick = false;
+    if (PrimaryComponentTick.TickGroup == ETickingGroup::TG_PostUpdateWork) {
+        SetTickGroup(ETickingGroup::TG_DuringPhysics);
+        _bHasNeverTicked = false;
         return;
+    }
+
+    if (GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
+        UE_LOG(LogTemp, Warning, TEXT("Ice shard tick!"));
     }
 
     if (_bCollisionChangedSinceLastTick) {
@@ -29,10 +35,13 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
     _nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
+        if (GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
+            UE_LOG(LogTemp, Warning, TEXT("FROM SELF:"));
+        }
         _setCurrentTempAsNext();
     } else {
         // If the _counter overshoots the limit thermodyanmics is going to cease for this actor, big problem.
-        // check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
+        check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
     }
 }
 
@@ -120,6 +129,10 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
     // Here this component performs the heat-checks on the other components.
     for (const auto& otherThermoC : _possibleHeatExchangers) {
         check(otherThermoC.IsValid());
+        if (otherThermoC->_bHasNeverTicked) {
+            continue;
+        }
+        
         const auto otherCollison = otherThermoC->_getMostComplexCollision();
 
         /* If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC.
@@ -132,6 +145,10 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
             /* When this is hotter than other, the delta is negative since we emit heat.
              * When this is colder than other, the delta is positive since we absorb heat. */
             deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
+        }
+
+        if (otherThermoC->GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
+            UE_LOG(LogTemp, Warning, TEXT("%s is increasing the IceShard player counter"), *(GetOwner()->GetActorLabel()));
         }
 
         // We heat-checked otherThermoC, so it must increase its counter
@@ -150,6 +167,10 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 void UThermodynamicComponent::_updateCounterOfChecksThisFrame() {
     ++_counterOfChecksThisFrame;
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
+        if (GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
+            UE_LOG(LogTemp, Warning, TEXT("FROM OTHER:"));
+        }
+
         _setCurrentTempAsNext();
     }
 }
@@ -160,6 +181,10 @@ void UThermodynamicComponent::_setCurrentTempAsNext() {
 
     _counterOfChecksThisFrame = 0;
     _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
+
+    if (GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
+        UE_LOG(LogTemp, Warning, TEXT("--------- RESET ---------"));
+    }
 }
 
 void UThermodynamicComponent::_setInitialExchangers() {
