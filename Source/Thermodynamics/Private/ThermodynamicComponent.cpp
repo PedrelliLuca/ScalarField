@@ -19,10 +19,6 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
         return;
     }
 
-    if (GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
-        UE_LOG(LogTemp, Warning, TEXT("Ice shard tick!"));
-    }
-
     if (_bCollisionChangedSinceLastTick) {
         // UPrimitiveComponent::OnComponentBeginOverlap does not fire before the first tick. We need this call to get the collisions we're already
         // overlapping with.
@@ -35,9 +31,6 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
     _nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
-        if (GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
-            UE_LOG(LogTemp, Warning, TEXT("FROM SELF:"));
-        }
         _setCurrentTempAsNext();
     } else {
         // If the _counter overshoots the limit thermodyanmics is going to cease for this actor, big problem.
@@ -147,10 +140,6 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
             deltaTemperature += (otherThermoC->_currentTemperature - _currentTemperature);
         }
 
-        if (otherThermoC->GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
-            UE_LOG(LogTemp, Warning, TEXT("%s is increasing the IceShard player counter"), *(GetOwner()->GetActorLabel()));
-        }
-
         // We heat-checked otherThermoC, so it must increase its counter
         otherThermoC->_updateCounterOfChecksThisFrame();
     }
@@ -167,10 +156,6 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
 void UThermodynamicComponent::_updateCounterOfChecksThisFrame() {
     ++_counterOfChecksThisFrame;
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
-        if (GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
-            UE_LOG(LogTemp, Warning, TEXT("FROM OTHER:"));
-        }
-
         _setCurrentTempAsNext();
     }
 }
@@ -181,10 +166,6 @@ void UThermodynamicComponent::_setCurrentTempAsNext() {
 
     _counterOfChecksThisFrame = 0;
     _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
-
-    if (GetOwner()->GetActorLabel() == FString{"BP_IceShard0"}) {
-        UE_LOG(LogTemp, Warning, TEXT("--------- RESET ---------"));
-    }
 }
 
 void UThermodynamicComponent::_setInitialExchangers() {
