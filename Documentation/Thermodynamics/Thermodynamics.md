@@ -101,3 +101,35 @@ Below is what happens at Tick, where the variables `_numInteractorsThisFrame` an
 ![v4Flow](./version4.png)
 
 One last question remains open: what if we don't want a complex collision? What if we have very simple `AActor`s for which having just a simple collision would be perfectly fine? This is exactly the case of our "air molecules", they just need a simple spherical collision. To account for actors like this, we simply need to slightly edit the flow diagram above to be using "the most complex collision" of `this` and `otherThermoC` instead of the `_complexCollisionC`.
+
+## [Version 5.0 - The 1 Frame Off Problem](https://github.com/PedrelliLuca/ScalarField/pull/81)
+
+The system above works fine until no new `UThermodynamicComponent` spawns in the scene. As soon an `AActor` with this component spawns, things will get pretty weird. This is because **spawning an actor means that the actor and all of its components will be ticked in the group it spawned, regardless of the tick group**. The very next frame, the newly spawned actor will be ticked in the correct tick group.
+
+The first problem of this kind that I noticed was the following: when a Character A cast [Cone of Cold](https://www.youtube.com/watch?v=M9UciOo9rT8&ab_channel=LucaPedrelli), if the spawned cone immediately overlapped a second Character B, this latter's `UThermodynamicComponent` stopped updating its temperature. Since the cone itself is an `AActor` with thermodynamics, the following could happen:
+- Character B ticks, B has already interacted with every overlapping thermodynamic component => Reset: `_counterOfChecksThisFrame = 0` and `_timesToBeCheckedThisFrame = +inf`
+- Later on the same frame the Cone of Cold spawns, overlapped to Character B. It ticks, interacting with B => B's counter is increased
+- A new frame begins. 
+- Let's assume the cone ticks before Character B. This can happen since both Thermodynamic Components belong to the same Tick group. The result would be that B's counter would be increased again before its `_counterOfChecksThisFrame == _timesToBeCheckedThisFrame` check.
+- `_timesToBeCheckedThisFrame` is computed at B's tick and it's based on the size of `_possibleHeatExchangers`, which is a `TSet` (unique elements) => the cone is accounted only once by the counter cap, even though it incresed the true counter 2 times
+- We end up overshooting `_timesToBeCheckedThisFrame` and, in turn, never calling `_setCurrentTemperatureAsNext()` => Character B's temperature won't be updated anymore.
+
+ [This commit](https://github.com/PedrelliLuca/ScalarField/pull/79/commits/567387f2443e978e92815a316034568e2fda1426) shows a first tentative fix, i.e. making every `UThermodynamicComponent` do nothing on its 1st frame thanks to a boolean:
+ 
+ ![v5-1Flow](./version5-1.png)
+ 
+ This solved the Cone Of Cold bug I just described, but it's only a part of the whole 1 Frame Off bug.
+
+ Suppose that Character A casts the Ice Shard or Fire Globe skill on a moving target, Character B. We already applied the fix described above hence, during its first frame, the shard (which is a thermodynamic actor) doesn't tick. However, if it's not the last ticking actor of the tick, the shard's `_counterOfChecksThisFrame` will be updated by any other component ticking after it! And if any one of these components tick before the shard on the next frame, they will be still accounted twice!
+
+ The second part of the fix is, therefore, to have each thermodynamic component stop ticking with every other component that hasn't ticked at least once. Here is the diagram:
+
+  ![v5-2Flow](./version5-2.png)
+
+  Is this all? Nope. We still have a problem. On the frame it spawns, the shard will still interact with any overlapped components that ticks after it. It's not all of them though, and there's a very high chance that one of these components will tick before it on the following frame.
+
+  Components, by default, tick in the `TG_DuringPhysics` group, and the thermodynamic component is no exception. To solve this 3rd bug, the fix is to force thermodynamic components to tick in `TG_PostUpdateWork` on their first frame, so that there cannot be other thermodynamic components interacting with them and they can reach their 2nd frame of life with the counter still at zero.
+
+  ![v5-3Flow](./version5-3.png)
+
+  One last problematic scenario is left. Suppose that an actor component moving really fast is interacted by 6 components. Then, when their turn comes, since the tick is `TG_DuringPhysics` and they're moving fast, we're not guaranteed that all 6 of the actors that updated the counter are still interacting, `_possibleHeatExchangers` could be smaller. In this case, we'd still overshoot. This will be fixed in the future by not making thermodynamics tick every frame.

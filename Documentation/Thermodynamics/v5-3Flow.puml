@@ -1,0 +1,35 @@
+@startuml
+title UThermodynamicComponent::Tick()
+
+start
+if (PrimaryComponentTick.TickGroup == ETickingGroup::TG_PostUpdateWork) then (true)
+    :SetTickGroup(ETickingGroup::TG_DuringPhysics);
+    :_bHasNeverTicked = false;
+    stop
+endif
+: _timesToBeCheckedThisFrame = _possibleHeatExchangers.Num();
+
+while (for otherThermoC in _possibleHeatExchangers)
+    if(otherThermoC->_bHasNeverTicked) then (false)
+        if (this->_complexCollisionC->IsOverlapping(otherThermoC->_complexCollisionC)) then (true)
+            :update this component's temperatureVariation;
+        endif
+        :update <color:red>other's</color> _counterOfChecksThisFrame;
+        if (otherThermoC->_counterOfChecksThisFrame == otherThermoC->_timesToBeCheckedThisFrame) then (true)
+            :otherThermoC->_setCurrentTemperatureAsNext();
+        endif
+    endif
+
+    
+endwhile
+
+: thisNextTemperature = thisCurrentTemperature + temperatureVariation;
+
+
+if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame ) then (true)
+    :_setCurrentTemperatureAsNext();
+endif
+
+stop
+
+@enduml
