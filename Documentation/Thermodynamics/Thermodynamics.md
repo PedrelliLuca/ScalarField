@@ -132,4 +132,4 @@ The first problem of this kind that I noticed was the following: when a Characte
 
   ![v5-3Flow](./version5-3.png)
 
-  One last problematic scenario is left. Suppose that an actor component moving really fast is interacted by 6 components. Then, when their turn comes, since the tick is `TG_DuringPhysics` and they're moving fast, we're not guaranteed that all 6 of the actors that updated the counter are still interacting, `_possibleHeatExchangers` could be smaller. In this case, we'd still overshoot.
+  One last problematic scenario is left. Suppose that an actor component moving really fast is interacted by 6 components. Then, when their turn comes, since the tick is `TG_DuringPhysics` and they're moving fast, we're not guaranteed that all 6 of the actors that updated the counter are still interacting, `_possibleHeatExchangers` could be smaller. In this case, we'd still overshoot. This will be fixed in the future by not making thermodynamics tick every frame.
