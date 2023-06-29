@@ -4,6 +4,7 @@
 
 UThermodynamicComponent::UThermodynamicComponent(const FObjectInitializer& ObjectInitializer) {
     PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.TickGroup = ETickingGroup::TG_PostUpdateWork;
 
     _currentTemperature = _initialTemperature;
     _nextTemperature = _initialTemperature;
@@ -12,8 +13,9 @@ UThermodynamicComponent::UThermodynamicComponent(const FObjectInitializer& Objec
 void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-    if (_bFirstTick) {
-        _bFirstTick = false;
+    if (PrimaryComponentTick.TickGroup == ETickingGroup::TG_PostUpdateWork) {
+        SetTickGroup(ETickingGroup::TG_DuringPhysics);
+        _bHasNeverTicked = false;
         return;
     }
 
@@ -32,7 +34,7 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
         _setCurrentTempAsNext();
     } else {
         // If the _counter overshoots the limit thermodyanmics is going to cease for this actor, big problem.
-        // check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
+        check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
     }
 }
 
@@ -120,6 +122,10 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
     // Here this component performs the heat-checks on the other components.
     for (const auto& otherThermoC : _possibleHeatExchangers) {
         check(otherThermoC.IsValid());
+        if (otherThermoC->_bHasNeverTicked) {
+            continue;
+        }
+        
         const auto otherCollison = otherThermoC->_getMostComplexCollision();
 
         /* If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC.
