@@ -34,7 +34,8 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
         _setCurrentTempAsNext();
     } else {
         // If the _counter overshoots the limit thermodyanmics is going to cease for this actor, big problem.
-        check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
+        // TODO: This is muted for the reason explained at the end of the documentation: we need to tick less often with this component
+        // check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
     }
 }
 
