@@ -79,10 +79,11 @@ void AEnemyChaserController::BeginPlay() {
         _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyChaserController::_onSkillExecutionBegin);
         _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyChaserController::_onSkillExecutionEnd);
     } else {
-        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
-        check(IsValid(skillsContainerC));
-
-        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyChaserController::_onSkillInExecutionStatusChanged);
+        if (IsValid(GetPawn())) {
+            const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+            check(IsValid(skillsContainerC));
+            skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyChaserController::_onSkillInExecutionStatusChanged);
+        }
     }
 }
 

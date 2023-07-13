@@ -122,10 +122,11 @@ void AEnemyStabilizerController::BeginPlay() {
         _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionBegin);
         _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionEnd);
     } else {
-        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
-        check(IsValid(skillsContainerC));
-
-        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
+        if (IsValid(GetPawn())) {
+            const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+            check(IsValid(skillsContainerC));
+            skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
+        }
     }
 }
 
