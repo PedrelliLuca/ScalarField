@@ -65,8 +65,8 @@ void AEnemyStabilizerController::Tick(const float deltaTime) {
     }
 }
 
-void AEnemyStabilizerController::BeginPlay() {
-    Super::BeginPlay();
+void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
+    Super::OnPossess(inPawn);
 
     if (!IsValid(_behaviorTree)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): missing Behavior Tree Class"), *FString{__FUNCTION__});

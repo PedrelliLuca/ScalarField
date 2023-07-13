@@ -27,7 +27,7 @@ public:
     void Tick(float deltaTime) override;
 
 protected:
-    void BeginPlay() override;
+    void OnPossess(APawn* inPawn) override;
 
 private:
     EBlackboardNotificationResult _onTargetEnemyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);

@@ -37,8 +37,8 @@ void AEnemyChaserController::Tick(const float deltaTime) {
     }
 }
 
-void AEnemyChaserController::BeginPlay() {
-    Super::BeginPlay();
+void AEnemyChaserController::OnPossess(APawn* const inPawn) {
+    Super::OnPossess(inPawn);
 
     if (!IsValid(_behaviorTree)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): missing Behavior Tree Class"), *FString{__FUNCTION__});

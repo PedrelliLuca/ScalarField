@@ -17,10 +17,13 @@ void UAIMovementCommandComponent::SetMovementMode(EMovementCommandMode mode) {
 
     // In case we never entered this movement mode before, create its command and add it to the cache
     if (_modesToCommands.Find(mode) == nullptr) {
-        const auto& cmdClass = _modesToCommandClasses[mode];
-        const auto newCmd = NewObject<UAIMovementCommand>(this, cmdClass);
-        newCmd->SetAIController(_ownerAIC.Get());
-        _modesToCommands.Emplace(mode, newCmd);
+        const auto ownerAIC = Cast<AAIController>(GetOwner());
+        if (ensureMsgf(IsValid(ownerAIC), TEXT("Error, owner is not an AI Controller!"))) {
+            const auto& cmdClass = _modesToCommandClasses[mode];
+            const auto newCmd = NewObject<UAIMovementCommand>(this, cmdClass);
+            newCmd->SetAIController(ownerAIC);
+            _modesToCommands.Emplace(mode, newCmd);
+        }
     }
 
     _activeMovementMode = mode;
@@ -42,13 +45,6 @@ void UAIMovementCommandComponent::SetMovementParameters(const FMovementParameter
     for (const auto& modeToCommand : _modesToCommands) {
         modeToCommand.Value->SetMovementParameters(params);
     }
-}
-
-void UAIMovementCommandComponent::BeginPlay() {
-    Super::BeginPlay();
-
-    _ownerAIC = Cast<AAIController>(GetOwner());
-    ensureMsgf(_ownerAIC.IsValid(), TEXT("Error, owner is not an AI Controller!"));
 }
 
 TObjectPtr<UAIMovementCommand> UAIMovementCommandComponent::_getMovementCommand() {
