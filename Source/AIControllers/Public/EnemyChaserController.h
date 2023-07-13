@@ -37,6 +37,8 @@ private:
 
     void _onSkillInExecutionStatusChanged(bool isExeuctingSomeSkill);
 
+    void _onControlledPawnDeath(const TObjectPtr<AActor> deadActor);
+
     UPROPERTY(VisibleAnywhere, Category = "Chaser | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
 

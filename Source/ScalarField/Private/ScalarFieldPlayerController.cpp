@@ -71,6 +71,12 @@ void AScalarFieldPlayerController::BeginPlay() {
     inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
     inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
 
+    if (const auto pawn = GetPawn(); IsValid(pawn)) {
+        if (const auto healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
+            healthC->OnDeath().AddUObject(this, &AScalarFieldPlayerController::_onControlledPawnDeath);
+        }
+    }
+
     if (_bNewSkillSystem) {
         _movementCommandC->SetDefaultMovementMode();
     }
@@ -313,6 +319,10 @@ void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTact
     CustomTimeDilation = 1. / currentWorldTimeDilation;
 
     _bIsTacticalPauseOn = bIsTacticalPauseOn;
+}
+
+void AScalarFieldPlayerController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
+    _onSkillAbort();
 }
 
 constexpr int32 AScalarFieldPlayerController::_getSkillIdxFromKey(const int32 key) {
