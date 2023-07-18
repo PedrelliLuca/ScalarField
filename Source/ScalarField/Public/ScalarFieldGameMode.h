@@ -9,7 +9,4 @@
 UCLASS(minimalapi)
 class AScalarFieldGameMode : public AGameModeBase {
     GENERATED_BODY()
-
-public:
-    AScalarFieldGameMode();
 };

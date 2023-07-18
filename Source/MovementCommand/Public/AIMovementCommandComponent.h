@@ -32,9 +32,6 @@ public:
         return (*activeCmd)->IsMoving();
     }
 
-protected:
-    void BeginPlay() override;
-
 private:
     TObjectPtr<UAIMovementCommand> _getMovementCommand();
 
@@ -51,6 +48,4 @@ private:
     EMovementCommandMode _defaultMovementMode;
 
     EMovementCommandMode _activeMovementMode = EMovementCommandMode::MCM_None;
-
-    TWeakObjectPtr<AAIController> _ownerAIC = nullptr;
 };

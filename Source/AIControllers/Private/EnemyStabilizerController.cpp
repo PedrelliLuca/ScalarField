@@ -4,7 +4,9 @@
 
 #include "Algo/AnyOf.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "HealthComponent.h"
 #include "NewSkillsContainerComponent.h"
+#include "NewStateComponent.h"
 
 AEnemyStabilizerController::AEnemyStabilizerController() {
     _movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
@@ -63,8 +65,8 @@ void AEnemyStabilizerController::Tick(const float deltaTime) {
     }
 }
 
-void AEnemyStabilizerController::BeginPlay() {
-    Super::BeginPlay();
+void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
+    Super::OnPossess(inPawn);
 
     if (!IsValid(_behaviorTree)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): missing Behavior Tree Class"), *FString{__FUNCTION__});
@@ -81,6 +83,10 @@ void AEnemyStabilizerController::BeginPlay() {
 
     // Making sure the controlled pawn has a patrolC and setting the first objective for the BB.
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
+        if (const auto healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
+            healthC->OnDeath().AddUObject(this, &AEnemyStabilizerController::_onControlledPawnDeath);
+        }
+
         _patrolC = pawn->FindComponentByClass<UPatrolComponent>();
         if (_patrolC.IsValid()) {
             _patrolC->StartPatrol();
@@ -122,10 +128,11 @@ void AEnemyStabilizerController::BeginPlay() {
         _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionBegin);
         _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionEnd);
     } else {
-        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
-        check(IsValid(skillsContainerC));
-
-        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
+        if (IsValid(GetPawn())) {
+            const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+            check(IsValid(skillsContainerC));
+            skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
+        }
     }
 }
 
@@ -177,4 +184,15 @@ void AEnemyStabilizerController::_onSkillExecutionEnd() {
 void AEnemyStabilizerController::_onSkillInExecutionStatusChanged(bool isExecutingSomeSkill) {
     const auto blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, isExecutingSomeSkill);
+}
+
+void AEnemyStabilizerController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
+    if (!_bNewSkillSystem) {
+        _stateC->PerformAbortBehavior();
+    } else {
+        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+        check(IsValid(stateC));
+
+        stateC->TryAbort();
+    }
 }

@@ -9,7 +9,11 @@ UNewSkillsContainerComponent::UNewSkillsContainerComponent() {
 }
 
 FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 index) {
-    checkf(index < _skills.Num(), TEXT("There is no skill at index %i"), index);
+    if (index >= _skills.Num()) {
+        // TODO: this is a random thing, we should return a proper error in here!
+        return FSkillCastResult::CastFail_CastConditionsViolated();
+    }
+
     check(IsValid(_skills[index]));
 
     const auto skillCastResult = _skills[index]->TryCast();

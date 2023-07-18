@@ -27,7 +27,7 @@ public:
     void Tick(float deltaTime) override;
 
 protected:
-    void BeginPlay() override;
+    void OnPossess(APawn* inPawn) override;
 
 private:
     EBlackboardNotificationResult _onTargetEnemyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
@@ -36,6 +36,8 @@ private:
     void _onSkillExecutionEnd();
 
     void _onSkillInExecutionStatusChanged(bool isExeuctingSomeSkill);
+
+    void _onControlledPawnDeath(const TObjectPtr<AActor> deadActor);
 
     UPROPERTY(VisibleAnywhere, Category = "Chaser | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;

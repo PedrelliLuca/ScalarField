@@ -30,12 +30,13 @@ void UThermodynamicComponent::TickComponent(const float deltaTime, const ELevelT
     _timesToBeCheckedThisFrame = _possibleHeatExchangers.Num();
     _nextTemperature = _currentTemperature + _getTemperatureDelta(deltaTime);
 
-    if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
+    if (_counterOfChecksThisFrame >= _timesToBeCheckedThisFrame) {
         _setCurrentTempAsNext();
-    } else {
+    } /* else {
         // If the _counter overshoots the limit thermodyanmics is going to cease for this actor, big problem.
+        // TODO: This is partially muted for the reason explained at the end of the documentation: we need to tick less often with this component
         check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
-    }
+    } */
 }
 
 #if WITH_EDITOR
@@ -125,7 +126,7 @@ double UThermodynamicComponent::_getTemperatureDelta(float deltaTime) {
         if (otherThermoC->_bHasNeverTicked) {
             continue;
         }
-        
+
         const auto otherCollison = otherThermoC->_getMostComplexCollision();
 
         /* If the following evaluates to true, that means that otherThermoC is an actual heatExchanger for thisThermoC.

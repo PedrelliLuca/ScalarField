@@ -18,7 +18,7 @@ namespace UnrealBuildTool.Rules
 					"MovementCommand",
 					"SkillUserFSM",
 					"DamageHandlers",
-					"Thermodynamics"
+					"Thermodynamics",
 				}
 				);
 
@@ -27,6 +27,8 @@ namespace UnrealBuildTool.Rules
 				{
 					"FactionSystem", 
 					"NewSkillSystem", 
+					"FSM",
+					"GameplayAttributes",
 					// ... add private dependencies that you statically link with here ...
 				}
 				);

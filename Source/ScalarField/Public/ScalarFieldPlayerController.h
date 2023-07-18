@@ -49,6 +49,8 @@ private:
     void _onTacticalPauseToggled();
     void _answerTacticalPauseToggle(bool bIsTacticalPauseOn, double currentWorldTimeDilation);
 
+    void _onControlledPawnDeath(const TObjectPtr<AActor> deadActor);
+
     constexpr int32 _getSkillIdxFromKey(int32 key);
 
     UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
