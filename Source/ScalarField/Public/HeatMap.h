@@ -16,4 +16,29 @@ class AHeatMap : public AActor {
 
 public:
     AHeatMap();
+
+    void Tick(const float deltaTime) override;
+
+protected:
+    void BeginPlay() override;
+
+private:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UStaticMeshComponent> _staticMeshC;
+
+    UPROPERTY(EditDefaultsOnly)
+    TObjectPtr<UMaterialInterface> _material;
+
+    TWeakObjectPtr<UMaterialInstanceDynamic> _materialInstance;
+
+    UPROPERTY(EditAnywhere, Category = "Wave Parameters")
+    float _frequencyPI = 0.0f;
+    UPROPERTY(EditAnywhere, Category = "Wave Parameters")
+    float _phasePI = 0.0f;
+    UPROPERTY(EditAnywhere, Category = "Wave Parameters")
+    float _amplitude = 0.0f;
+    UPROPERTY(EditAnywhere, Category = "Wave Parameters")
+    float _offset = 0.0f;
+
+    float _timer;
 };
