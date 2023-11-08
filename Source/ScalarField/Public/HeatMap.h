@@ -30,6 +30,11 @@ private:
     TObjectPtr<UMaterialInterface> _material;
 
     TWeakObjectPtr<UMaterialInstanceDynamic> _materialInstance;
+    
+    UPROPERTY(EditAnywhere, Category = "Cells Parameters")
+    int32 _width = 100;
+    UPROPERTY(EditAnywhere, Category = "Cells Parameters")
+    int32 _height = 100;
 
     UPROPERTY(EditAnywhere, Category = "Wave Parameters")
     float _frequencyPI = 0.0f;
@@ -40,5 +45,5 @@ private:
     UPROPERTY(EditAnywhere, Category = "Wave Parameters")
     float _offset = 0.0f;
 
-    float _timer;
+    float _timer = 0.0f;
 };
