@@ -14,17 +14,44 @@ AHeatMap::AHeatMap() {
 void AHeatMap::Tick(const float deltaTime) {
     Super::Tick(deltaTime);
 
-    if (_materialInstance.IsValid()) {
-        const float frequency = _frequencyPI * PI;
-        const float phase = _phasePI * PI;
-        const float topWaveValue = _offset + _amplitude * FMath::Sin(phase + frequency * _timer);
-        _materialInstance->SetScalarParameterValue(FName("TopAlpha"), topWaveValue);
-
-        const float bottomWaveValue = _offset + _amplitude * FMath::Cos(phase + frequency * _timer);
-        _materialInstance->SetScalarParameterValue(FName("BottomAlpha"), bottomWaveValue);
-
-        _timer += deltaTime;
+    if (!_materialInstance.IsValid() || !_materialTextureParam.IsValid()) {
+        return;
     }
+
+    const float frequency = _frequencyPI * PI;
+    const float phase = _phasePI * PI;
+    const float sinWaveValue = _offset + _amplitude * FMath::Sin(phase + frequency * _timer);
+    const float cosWaveValue = _offset + _amplitude * FMath::Cos(phase + frequency * _timer);
+    const FColor sinColor = _generateColorFromValue(sinWaveValue);
+    const FColor cosColor = _generateColorFromValue(cosWaveValue);
+
+    FTexture2DMipMap* const mipMap = &_materialTextureParam->PlatformData->Mips[0];
+    FByteBulkData* const bulkData = &mipMap->BulkData;
+    uint8* const rawImageData = static_cast<uint8*>(bulkData->Lock(LOCK_READ_WRITE));
+
+    // [Pixel1 B][Pixel1 G][Pixel1 R][Pixel1 A][Pixel2 B][Pixel2 G][Pixel2 R][Pixel2 A]
+    const int32 nPixels = _width * _height;
+    constexpr int32 STEP = 4;
+    constexpr int32 BLUE_OFFSET = 0;
+    constexpr int32 GREEN_OFFSET = 1;
+    constexpr int32 RED_OFFSET = 2;
+    constexpr int32 ALPHA_OFFSET = 3;
+    for (int32 i = 0; i < nPixels; ++i) {
+        const bool isOdd = i & 1;
+        const FColor pixelColor = isOdd ? cosColor : sinColor;
+
+        const int32 pixelStart = STEP * i;
+        rawImageData[pixelStart + BLUE_OFFSET] = static_cast<uint8>(pixelColor.B);
+        rawImageData[pixelStart + GREEN_OFFSET] = static_cast<uint8>(pixelColor.G);
+        rawImageData[pixelStart + RED_OFFSET] = static_cast<uint8>(pixelColor.R);
+        rawImageData[pixelStart + ALPHA_OFFSET] = static_cast<uint8>(pixelColor.A);
+    }
+
+    bulkData->Unlock();
+    _materialTextureParam->UpdateResource();
+    _materialInstance->SetTextureParameterValue(FName("GridTexture"), _materialTextureParam.Get());
+
+    _timer += deltaTime;
 }
 
 void AHeatMap::BeginPlay() {
@@ -33,78 +60,53 @@ void AHeatMap::BeginPlay() {
     _materialInstance = _staticMeshC->CreateDynamicMaterialInstance(0, _material, FName(""));
     _staticMeshC->SetMaterial(0, _materialInstance.Get());
 
-    /*const FBox boundingBox = _staticMeshC->GetStaticMesh()->GetBoundingBox();
-    const FVector scale = _staticMeshC->GetRelativeTransform().GetScale3D();
-    const int32 _width = static_cast<int32>(boundingBox.Max.X - boundingBox.Min.X) * scale.X;
-    const int32 _height = static_cast<int32>(boundingBox.Max.Y - boundingBox.Min.Y) * scale.Y;
-    const int32 nPixels = _width * _height;*/
+    _materialTextureParam = UTexture2D::CreateTransient(_width, _height);
+    _materialTextureParam->Filter = TextureFilter::TF_Nearest;
+}
 
-    const int32 nPixels = _width * _height;
-    const int32 firstHalf = nPixels / 2;
+FColor AHeatMap::_generateColorFromValue(const float val) {
+    const float intervalMax = _offset + _amplitude;
+    const float intervalMin = _offset - _amplitude;
 
-    // This texture has B = 1 for the first half. We don't give a shit about the other values, this is just to mask the color for a given region.
-    UTexture2D* const topTexture = UTexture2D::CreateTransient(_width, _height);
+    const float oneQuarter = intervalMin + 0.25f * (intervalMax - intervalMin);
+    const float half = intervalMin + 0.5f * (intervalMax - intervalMin);
+    const float threeQuarters = intervalMin + 0.75f * (intervalMax - intervalMin);
 
-    // topTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
-    // topTexture->GetTextureGroupString useless?
-    topTexture->Filter = TextureFilter::TF_Nearest;
+    FColor outColor;
 
-    FTexture2DMipMap* const topMipMap = &topTexture->PlatformData->Mips[0];
-    FByteBulkData* const topImageData = &topMipMap->BulkData;
-    const int64 topSize = topImageData->GetBulkDataSize();
+    if (val < intervalMin || val > intervalMax) {
+        outColor = FColor::Black;
+    } else {
+        FColor maxColor;
+        FColor minColor;
+        float subMax;
+        float subMin;
+        if (val <= oneQuarter) {
+            subMax = oneQuarter;
+            subMin = intervalMin;
+            maxColor = FColor::Cyan;
+            minColor = FColor::Blue;
+        } else if (val <= half) {
+            subMax = half;
+            subMin = oneQuarter;
+            maxColor = FColor::Green;
+            minColor = FColor::Cyan;
+        } else if (val <= threeQuarters) {
+            subMax = threeQuarters;
+            subMin = half;
+            maxColor = FColor::Yellow;
+            minColor = FColor::Green;
+        } else {
+            subMax = intervalMax;
+            subMin = threeQuarters;
+            maxColor = FColor::Red;
+            minColor = FColor::Yellow;
+        }
 
-    // RawImageData is formatted as such:
-    // [Pixel1 B][Pixel1 G][Pixel1 R][Pixel1 A][Pixel2 B][Pixel2 G][Pixel2 R][Pixel2 A] …
-    uint8* const topRawImageData = static_cast<uint8*>(topImageData->Lock(LOCK_READ_WRITE));
-    const int32 step = 4;
-    for (int32 i = 0; i < firstHalf; ++i) {
-        const int32 blue = step * i;
-        topRawImageData[blue] = 255u;
-        topRawImageData[blue + 1] = 0u;
-        topRawImageData[blue + 2] = 0u;
-        topRawImageData[blue + 3] = 255u;
-    }
-    for (int32 i = firstHalf; i < nPixels; ++i) {
-        const int32 blue = step * i;
-        topRawImageData[blue] = 0u;
-        topRawImageData[blue + 1] = 0u;
-        topRawImageData[blue + 2] = 0u;
-        topRawImageData[blue + 3] = 0u;
-    }
-
-    topImageData->Unlock();
-    topTexture->UpdateResource();
-    _materialInstance->SetTextureParameterValue(FName("TopTexture"), topTexture);
-
-    // This texture has B = 1 for the second half. We don't give a shit about the other values, this is just to mask the color for a given region.
-    UTexture2D* const bottomTexture = UTexture2D::CreateTransient(_width, _height);
-
-    // bottomTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
-    // bottomTexture->GetTextureGroupString useless?
-    bottomTexture->Filter = TextureFilter::TF_Nearest;
-
-    FTexture2DMipMap* const bottomMipMap = &bottomTexture->PlatformData->Mips[0];
-    FByteBulkData* const bottomImageData = &bottomMipMap->BulkData;
-    const int64 bottomSize = bottomImageData->GetBulkDataSize();
-    // RawImageData is formatted as such:
-    // [Pixel1 B][Pixel1 G][Pixel1 R][Pixel1 A][Pixel2 B][Pixel2 G][Pixel2 R][Pixel2 A] …
-    uint8* const bottomRawImageData = static_cast<uint8*>(bottomImageData->Lock(LOCK_READ_WRITE));
-    for (int32 i = 0; i < firstHalf; ++i) {
-        const int32 blue = step * i;
-        bottomRawImageData[blue] = 0u;
-        bottomRawImageData[blue + 1] = 0u;
-        bottomRawImageData[blue + 2] = 0u;
-        bottomRawImageData[blue + 3] = 0u;
-    }
-    for (int32 i = firstHalf; i < nPixels; ++i) {
-        const int32 blue = step * i;
-        bottomRawImageData[blue] = 255u;
-        bottomRawImageData[blue + 1] = 0u;
-        bottomRawImageData[blue + 2] = 0u;
-        bottomRawImageData[blue + 3] = 255u;
+        const float alpha = (val - subMin) / (subMax - subMin);
+        
+        outColor = FMath::Lerp(minColor.ReinterpretAsLinear(), maxColor.ReinterpretAsLinear(), alpha).ToFColor(false);
     }
 
-    bottomImageData->Unlock();
-    bottomTexture->UpdateResource();
-    _materialInstance->SetTextureParameterValue(FName("BottomTexture"), bottomTexture);
+    return outColor;
 }

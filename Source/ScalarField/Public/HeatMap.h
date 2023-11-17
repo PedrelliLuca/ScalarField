@@ -23,6 +23,8 @@ protected:
     void BeginPlay() override;
 
 private:
+    FColor _generateColorFromValue(float val);
+
     UPROPERTY(EditAnywhere)
     TObjectPtr<UStaticMeshComponent> _staticMeshC;
 
@@ -30,6 +32,7 @@ private:
     TObjectPtr<UMaterialInterface> _material;
 
     TWeakObjectPtr<UMaterialInstanceDynamic> _materialInstance;
+    TWeakObjectPtr<UTexture2D> _materialTextureParam;
     
     UPROPERTY(EditAnywhere, Category = "Cells Parameters")
     int32 _width = 100;
