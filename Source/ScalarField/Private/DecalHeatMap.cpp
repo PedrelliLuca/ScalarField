@@ -1,17 +1,16 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "HeatMap.h"
+#include "DecalHeatMap.h"
 
-AHeatMap::AHeatMap() {
-    _staticMeshC = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh"));
-    SetRootComponent(_staticMeshC);
+#include "Components/DecalComponent.h"
 
+ADecalHeatMap::ADecalHeatMap() {
     // Activate ticking in order to update the cursor every frame.
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-void AHeatMap::Tick(const float deltaTime) {
+void ADecalHeatMap::Tick(const float deltaTime) {
     Super::Tick(deltaTime);
 
     if (!_materialInstance.IsValid() || !_materialTextureParam.IsValid()) {
@@ -53,11 +52,10 @@ void AHeatMap::Tick(const float deltaTime) {
     _timer += deltaTime;
 }
 
-void AHeatMap::BeginPlay() {
+void ADecalHeatMap::BeginPlay() {
     Super::BeginPlay();
 
-    _materialInstance = _staticMeshC->CreateDynamicMaterialInstance(0, _material, FName(""));
-    _staticMeshC->SetMaterial(0, _materialInstance.Get());
+    _materialInstance = CreateDynamicMaterialInstance();
 
     _materialTextureParam = UTexture2D::CreateTransient(_width, _height);
     _materialTextureParam->Filter = TextureFilter::TF_Nearest;
@@ -65,7 +63,7 @@ void AHeatMap::BeginPlay() {
     _materialInstance->SetTextureParameterValue(FName("GridTexture"), _materialTextureParam.Get());
 }
 
-FColor AHeatMap::_generateColorFromValue(const float val) {
+FColor ADecalHeatMap::_generateColorFromValue(const float val) const {
     const float intervalMax = _offset + _amplitude;
     const float intervalMin = _offset - _amplitude;
 
