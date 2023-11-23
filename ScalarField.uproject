@@ -64,11 +64,16 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		},
-		{
-			"Name": "Thermodynamics",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		}
+    {
+      "Name": "Thermodynamics",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "ThermodynamicsPresenter",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
 	],
 	"Plugins": [
 		{
