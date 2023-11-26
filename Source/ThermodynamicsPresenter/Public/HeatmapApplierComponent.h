@@ -10,7 +10,7 @@
 /**
  * \brief TODO
  */
-UCLASS()
+UCLASS(ClassGroup = (Thermodynamics), meta = (BlueprintSpawnableComponent))
 class THERMODYNAMICSPRESENTER_API UHeatmapApplierComponent : public UActorComponent {
     GENERATED_BODY()
 
@@ -21,4 +21,7 @@ protected:
     void BeginPlay() override;
 
 private:
+    void _applyToStaticMesh(TWeakObjectPtr<UMaterialInstanceDynamic> heatmapMID);
+
+    FDelegateHandle _handle_OnHeatmapMIDSet;
 };

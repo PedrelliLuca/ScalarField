@@ -2,8 +2,8 @@
 
 #include "HeatmapApplierComponent.h"
 
-#include "Engine/LevelScriptActor.h"
 #include "HeatmapPresenterComponent.h"
+#include "ThermodynamicsSubsystem.h"
 
 UHeatmapApplierComponent::UHeatmapApplierComponent() {
     PrimaryComponentTick.bCanEverTick = false;
@@ -12,11 +12,19 @@ UHeatmapApplierComponent::UHeatmapApplierComponent() {
 void UHeatmapApplierComponent::BeginPlay() {
     Super::BeginPlay();
 
-    ALevelScriptActor* const levelScript = GetWorld()->GetLevelScriptActor();
-    if (UHeatmapPresenterComponent* const heatmapPresenter = levelScript->FindComponentByClass<UHeatmapPresenterComponent>(); heatmapPresenter) {
-
-
+    UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
+    const TWeakObjectPtr<UMaterialInstanceDynamic> heatmapMID = thermoSubsys->GetHeatmapMaterialInstance();
+    if (heatmapMID.IsValid()) {
+        _applyToStaticMesh(heatmapMID);
     } else {
-        UE_LOG(LogTemp, Error, TEXT("No UHeatmapPresenterComponent found on Level Script"));
+        _handle_OnHeatmapMIDSet = thermoSubsys->OnHeatmapMIDSet.AddUObject(this, &UHeatmapApplierComponent::_applyToStaticMesh);
     }
+}
+
+void UHeatmapApplierComponent::_applyToStaticMesh(const TWeakObjectPtr<UMaterialInstanceDynamic> heatmapMID) {
+    UStaticMeshComponent* const staticMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
+    staticMesh->SetMaterial(0, heatmapMID.Get());
+
+    UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
+    thermoSubsys->OnHeatmapMIDSet.Remove(_handle_OnHeatmapMIDSet);
 }

@@ -10,7 +10,7 @@
 /**
  * \brief TODO
  */
-UCLASS(ClassGroup = (Thermodynamics))
+UCLASS(ClassGroup = (Thermodynamics), meta = (BlueprintSpawnableComponent))
 class THERMODYNAMICSPRESENTER_API UHeatmapPresenterComponent : public UActorComponent {
     GENERATED_BODY()
 

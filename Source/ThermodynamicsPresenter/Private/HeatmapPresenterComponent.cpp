@@ -3,6 +3,7 @@
 #include "HeatmapPresenterComponent.h"
 
 #include "GameFramework/Actor.h"
+#include "ThermodynamicsSubsystem.h"
 
 UHeatmapPresenterComponent::UHeatmapPresenterComponent() {
     PrimaryComponentTick.bCanEverTick = true;
@@ -55,6 +56,9 @@ void UHeatmapPresenterComponent::BeginPlay() {
     _heatmapTexture->Filter = TextureFilter::TF_Nearest;
 
     _heatmapMID->SetTextureParameterValue(FName("GridTexture"), _heatmapTexture);
+
+    UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
+    thermoSubsys->SetHeatmapMaterialInstance(_heatmapMID);
 }
 
 FColor UHeatmapPresenterComponent::_generateColorFromValue(float val) {
