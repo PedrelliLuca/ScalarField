@@ -5,17 +5,17 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
-#include "HeatmapToggleComponent.generated.h"
+#include "HeatmapApplierComponent.generated.h"
 
 /**
- * \brief Component that manages how the widgets behave with respect to each other
+ * \brief TODO
  */
 UCLASS()
-class THERMODYNAMICSPRESENTER_API UHeatmapToggleComponent : public UActorComponent {
+class THERMODYNAMICSPRESENTER_API UHeatmapApplierComponent : public UActorComponent {
     GENERATED_BODY()
 
 public:
-    UHeatmapToggleComponent();
+    UHeatmapApplierComponent();
 
 protected:
     void BeginPlay() override;
