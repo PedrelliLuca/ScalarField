@@ -2,6 +2,7 @@
 
 #include "HeatmapPresenterComponent.h"
 
+#include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "ThermodynamicsSubsystem.h"
 
@@ -56,6 +57,16 @@ void UHeatmapPresenterComponent::BeginPlay() {
     _heatmapTexture->Filter = TextureFilter::TF_Nearest;
 
     _heatmapMID->SetTextureParameterValue(FName("GridTexture"), _heatmapTexture);
+
+    if (UBoxComponent* const boxC = GetOwner()->FindComponentByClass<UBoxComponent>(); boxC) {
+        const FVector boxExtent = boxC->GetUnscaledBoxExtent();
+        _heatmapMID->SetVectorParameterValue(FName("TextureDimensions"), 2.0 * boxExtent);
+
+        const FVector boxWorldLocation = boxC->GetComponentTransform().GetLocation();
+        _heatmapMID->SetVectorParameterValue(FName("TextureOffset"), boxWorldLocation - boxExtent);
+    } else {
+        UE_LOG(LogTemp, Error, TEXT("No UBoxComponent, Heatmap texture dimensions cannot be set without it!"));
+    }
 
     UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
     thermoSubsys->SetHeatmapMaterialInstance(_heatmapMID);
