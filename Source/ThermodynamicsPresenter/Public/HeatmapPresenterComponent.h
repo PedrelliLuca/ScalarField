@@ -7,6 +7,9 @@
 #include "Components/ActorComponent.h"
 #include "HeatmapPresenterComponent.generated.h"
 
+class UMaterialParameterCollection;
+class UMaterialParameterCollectionInstance;
+
 /**
  * \brief TODO
  */
@@ -23,7 +26,11 @@ protected:
     void BeginPlay() override;
 
 private:
+    void _updateHeatmap();
+
     FColor _generateColorFromValue(float val);
+
+    void _onHeatmapVisualizationToggle();
 
     UPROPERTY(EditAnywhere, Category = "Heatmap Parameters")
     int32 _numCellsX;
@@ -39,8 +46,14 @@ private:
     UPROPERTY(EditAnywhere, Category = "Wave Parameters")
     float _offset = 0.0f;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = "Material")
     TObjectPtr<UMaterialInterface> _heatmapMaterial;
+
+    UPROPERTY(EditAnywhere, Category = "Material Parameter Collection")
+    TObjectPtr<UMaterialParameterCollection> _heatmapMPC;
+
+    UPROPERTY(EditAnywhere, Category = "Material Parameter Collection")
+    FName _toggleParameterName = "";
 
     UPROPERTY()
     TObjectPtr<UMaterialInstanceDynamic> _heatmapMID;
@@ -48,5 +61,8 @@ private:
     UPROPERTY()
     TObjectPtr<UTexture2D> _heatmapTexture;
 
+    TWeakObjectPtr<UMaterialParameterCollectionInstance> _heatmapMPCI;
+
     float _timer = 0.0f;
+    bool _isHeatmapVisible = true;
 };

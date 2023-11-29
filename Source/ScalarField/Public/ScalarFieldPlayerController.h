@@ -49,6 +49,8 @@ private:
     void _onTacticalPauseToggled();
     void _answerTacticalPauseToggle(bool bIsTacticalPauseOn, double currentWorldTimeDilation);
 
+    void _onHeatmapVisualizationToggled();
+
     void _onControlledPawnDeath(const TObjectPtr<AActor> deadActor);
 
     constexpr int32 _getSkillIdxFromKey(int32 key);

@@ -4,6 +4,7 @@
 
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
+#include "Materials/MaterialParameterCollectionInstance.h"
 #include "ThermodynamicsSubsystem.h"
 
 UHeatmapPresenterComponent::UHeatmapPresenterComponent() {
@@ -13,6 +14,53 @@ UHeatmapPresenterComponent::UHeatmapPresenterComponent() {
 void UHeatmapPresenterComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
+    if (!_heatmapTexture) {
+        return;
+    }
+
+    if (_isHeatmapVisible) {
+        _updateHeatmap();
+    }
+
+    _timer += deltaTime;
+}
+
+void UHeatmapPresenterComponent::BeginPlay() {
+    Super::BeginPlay();
+
+    if (_heatmapMaterial) {
+        _heatmapMID = UMaterialInstanceDynamic::Create(_heatmapMaterial, this, FName(""));
+
+        _heatmapTexture = UTexture2D::CreateTransient(_numCellsX, _numCellsY);
+        _heatmapTexture->Filter = TextureFilter::TF_Nearest;
+
+        _heatmapMID->SetTextureParameterValue(FName("GridTexture"), _heatmapTexture);
+
+        if (UBoxComponent* const boxC = GetOwner()->FindComponentByClass<UBoxComponent>(); boxC) {
+            const FVector boxExtent = boxC->GetUnscaledBoxExtent();
+            _heatmapMID->SetVectorParameterValue(FName("TextureDimensions"), 2.0 * boxExtent);
+
+            const FVector boxWorldLocation = boxC->GetComponentTransform().GetLocation();
+            _heatmapMID->SetVectorParameterValue(FName("TextureOffset"), boxWorldLocation - boxExtent);
+
+            UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
+            thermoSubsys->SetHeatmapMaterialInstance(_heatmapMID);
+
+            if (_heatmapMPC) {
+                thermoSubsys->OnHeatmapVisualizationToggle.AddUObject(this, &UHeatmapPresenterComponent::_onHeatmapVisualizationToggle);
+                _heatmapMPCI = GetWorld()->GetParameterCollectionInstance(_heatmapMPC);
+            } else {
+                UE_LOG(LogTemp, Error, TEXT("No UMaterialParameterCollection specified, Heatmap visualization cannot be toggled!"));
+            }
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("No UBoxComponent on owner actor, Heatmap cannot be prepared!"));
+        }
+    } else {
+        UE_LOG(LogTemp, Error, TEXT("No UMaterialInterface specified, Heatmap cannot be prepared!"));
+    }
+}
+
+void UHeatmapPresenterComponent::_updateHeatmap() {
     const float frequency = _frequencyPI * PI;
     const float phase = _phasePI * PI;
     const float sinWaveValue = _offset + _amplitude * FMath::Sin(phase + frequency * _timer);
@@ -44,32 +92,6 @@ void UHeatmapPresenterComponent::TickComponent(const float deltaTime, const ELev
 
     bulkData->Unlock();
     _heatmapTexture->UpdateResource();
-
-    _timer += deltaTime;
-}
-
-void UHeatmapPresenterComponent::BeginPlay() {
-    Super::BeginPlay();
-
-    _heatmapMID = UMaterialInstanceDynamic::Create(_heatmapMaterial, this, FName(""));
-
-    _heatmapTexture = UTexture2D::CreateTransient(_numCellsX, _numCellsY);
-    _heatmapTexture->Filter = TextureFilter::TF_Nearest;
-
-    _heatmapMID->SetTextureParameterValue(FName("GridTexture"), _heatmapTexture);
-
-    if (UBoxComponent* const boxC = GetOwner()->FindComponentByClass<UBoxComponent>(); boxC) {
-        const FVector boxExtent = boxC->GetUnscaledBoxExtent();
-        _heatmapMID->SetVectorParameterValue(FName("TextureDimensions"), 2.0 * boxExtent);
-
-        const FVector boxWorldLocation = boxC->GetComponentTransform().GetLocation();
-        _heatmapMID->SetVectorParameterValue(FName("TextureOffset"), boxWorldLocation - boxExtent);
-    } else {
-        UE_LOG(LogTemp, Error, TEXT("No UBoxComponent, Heatmap texture dimensions cannot be set without it!"));
-    }
-
-    UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
-    thermoSubsys->SetHeatmapMaterialInstance(_heatmapMID);
 }
 
 FColor UHeatmapPresenterComponent::_generateColorFromValue(float val) {
@@ -117,4 +139,28 @@ FColor UHeatmapPresenterComponent::_generateColorFromValue(float val) {
     }
 
     return outColor;
+}
+
+void UHeatmapPresenterComponent::_onHeatmapVisualizationToggle() {
+    check(_heatmapMPCI.IsValid());
+    _isHeatmapVisible = !_isHeatmapVisible;
+
+    float heatmapVisibilityValue = 0.0f;
+    if (_isHeatmapVisible) {
+        heatmapVisibilityValue = 1.0f;
+    }
+
+    _heatmapMPCI->SetScalarParameterValue(_toggleParameterName, heatmapVisibilityValue);
+
+    /*TArray<FCollectionScalarParameter>& scalarParameters = _heatmapMPC->ScalarParameters;
+    for (auto& parameter : scalarParameters) {
+        const FName& parameterName = parameter.ParameterName;
+        if (parameterName.IsEqual(_toggleParameterName)) {
+            if (_isHeatmapVisible) {
+                parameter.DefaultValue
+            } else {
+
+            }
+        }
+    }*/
 }

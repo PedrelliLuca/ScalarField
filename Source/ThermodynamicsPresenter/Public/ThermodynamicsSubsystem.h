@@ -8,6 +8,7 @@
 #include "ThermodynamicsSubsystem.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHeatmapMIDSet, TWeakObjectPtr<UMaterialInstanceDynamic>);
+DECLARE_MULTICAST_DELEGATE(FOnHeatmapVisualizationToggle);
 
 /*!
  * \brief TODO
@@ -21,6 +22,7 @@ public:
     TWeakObjectPtr<UMaterialInstanceDynamic> GetHeatmapMaterialInstance() const;
 
     FOnHeatmapMIDSet OnHeatmapMIDSet;
+    FOnHeatmapVisualizationToggle OnHeatmapVisualizationToggle;
 
 private:
     TWeakObjectPtr<UMaterialInstanceDynamic> _heatmapMID;
