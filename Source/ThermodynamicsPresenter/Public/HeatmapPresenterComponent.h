@@ -32,11 +32,6 @@ private:
 
     void _onHeatmapVisualizationToggle();
 
-    UPROPERTY(EditAnywhere, Category = "Heatmap Parameters")
-    int32 _numCellsX;
-    UPROPERTY(EditAnywhere, Category = "Heatmap Parameters")
-    int32 _numCellsY;
-
     UPROPERTY(EditAnywhere, Category = "Wave Parameters")
     float _frequencyPI = 0.0f;
     UPROPERTY(EditAnywhere, Category = "Wave Parameters")
@@ -64,5 +59,6 @@ private:
     TWeakObjectPtr<UMaterialParameterCollectionInstance> _heatmapMPCI;
 
     float _timer = 0.0f;
+    int32 _nPixels;
     bool _isHeatmapVisible = true;
 };
