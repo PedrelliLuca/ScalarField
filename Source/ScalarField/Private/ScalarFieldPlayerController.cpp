@@ -8,6 +8,7 @@
 #include "PlayerInputData.h"
 #include "SkillsContainerComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
+#include "ThermodynamicsSubsystem.h"
 
 AScalarFieldPlayerController::AScalarFieldPlayerController() {
     bShowMouseCursor = true;
@@ -58,6 +59,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
     InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AScalarFieldPlayerController::_onInventoryToggle);
 
     InputComponent->BindAction("ToggleTacticalPause", IE_Released, this, &AScalarFieldPlayerController::_onTacticalPauseToggled);
+    InputComponent->BindAction("ToggleHeatmapVisualization", IE_Released, this, &AScalarFieldPlayerController::_onHeatmapVisualizationToggled);
 }
 
 void AScalarFieldPlayerController::BeginPlay() {
@@ -319,6 +321,11 @@ void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTact
     CustomTimeDilation = 1. / currentWorldTimeDilation;
 
     _bIsTacticalPauseOn = bIsTacticalPauseOn;
+}
+
+void AScalarFieldPlayerController::_onHeatmapVisualizationToggled() {
+    UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
+    thermoSubsys->OnHeatmapVisualizationToggle.Broadcast();
 }
 
 void AScalarFieldPlayerController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
