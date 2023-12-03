@@ -151,16 +151,4 @@ void UHeatmapPresenterComponent::_onHeatmapVisualizationToggle() {
     }
 
     _heatmapMPCI->SetScalarParameterValue(_toggleParameterName, heatmapVisibilityValue);
-
-    /*TArray<FCollectionScalarParameter>& scalarParameters = _heatmapMPC->ScalarParameters;
-    for (auto& parameter : scalarParameters) {
-        const FName& parameterName = parameter.ParameterName;
-        if (parameterName.IsEqual(_toggleParameterName)) {
-            if (_isHeatmapVisible) {
-                parameter.DefaultValue
-            } else {
-
-            }
-        }
-    }*/
 }

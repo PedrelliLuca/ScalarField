@@ -43,7 +43,7 @@ public class ScalarField : ModuleRules
             "ConcreteSkills",
             "ConcreteItems",
             "ConcreteInteractables",
-            "ThermodynamicsPresenter",
+            "ThermodynamicsCore",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {

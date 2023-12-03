@@ -14,7 +14,7 @@ DECLARE_MULTICAST_DELEGATE(FOnHeatmapVisualizationToggle);
  * \brief TODO
  */
 UCLASS()
-class THERMODYNAMICSPRESENTER_API UThermodynamicsSubsystem : public UWorldSubsystem {
+class THERMODYNAMICSCORE_API UThermodynamicsSubsystem : public UWorldSubsystem {
     GENERATED_BODY()
 
 public:
