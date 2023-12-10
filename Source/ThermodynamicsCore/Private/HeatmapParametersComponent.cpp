@@ -22,19 +22,19 @@ void UHeatmapParametersComponent::BeginPlay() {
     Super::BeginPlay();
 
     if (UBoxComponent* const boxC = GetOwner()->FindComponentByClass<UBoxComponent>(); boxC) {
-        const FVector boxSize = boxC->GetUnscaledBoxExtent() * 2.0;
+        const FVector boxExtent = boxC->GetUnscaledBoxExtent();
 
-        const double sizeCellsX = boxSize.X / _numCellsX;
-        const double sizeCellsY = boxSize.Y / _numCellsY;
+        const auto extentCellsX = static_cast<float>(boxExtent.X / _numCellsX);
+        const auto extentCellsY = static_cast<float>(boxExtent.Y / _numCellsY);
 
         HeatmapGrid::FHeatmapParameters heatmapParameters;
+        heatmapParameters.LocationGrid = FVector2D(boxC->GetComponentTransform().GetLocation());
+        heatmapParameters.ExtentCells = FVector2D(extentCellsX, extentCellsY);
+        heatmapParameters.NumberCells = FIntVector2(_numCellsX, _numCellsY);
         heatmapParameters.InitialTemperature = _initialTemperature;
-        heatmapParameters.NCellsX = _numCellsX;
-        heatmapParameters.NCellsY = _numCellsY;
-        heatmapParameters.SizeCellsX = sizeCellsX;
-        heatmapParameters.SizeCellsY = sizeCellsY;
 
         HeatmapGrid::Initialize(MoveTemp(heatmapParameters));
+        HeatmapGrid::DrawDebugHeatmap(GetWorld(), 1000.0f);
     } else {
         UE_LOG(LogTemp, Error, TEXT("No UBoxComponent on owner actor, cells' size cannot be set!"));
     }

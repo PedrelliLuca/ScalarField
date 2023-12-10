@@ -6,12 +6,13 @@
 
 namespace HeatmapGrid {
 struct FHeatmapParameters {
-    int32 NCellsX = 0;
-    int32 NCellsY = 0;
-    float SizeCellsX = 0.0f;
-    float SizeCellsY = 0.0f;
+    FVector2D LocationGrid = FVector2D::ZeroVector;
+    FVector2D ExtentCells = FVector2D::ZeroVector;
+    FIntVector2 NumberCells = FIntVector2(0, 0);
     float InitialTemperature = 273.0f;
 };
 
 void Initialize(FHeatmapParameters&& heatmapParams);
+
+void DrawDebugHeatmap(const UWorld* world, float height);
 } // namespace HeatmapGrid
