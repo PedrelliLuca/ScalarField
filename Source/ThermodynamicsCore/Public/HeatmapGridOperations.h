@@ -14,5 +14,9 @@ struct FHeatmapParameters {
 
 void Initialize(FHeatmapParameters&& heatmapParams);
 
+void Interact(FVector2D interactorWorldLocation, float interactionRange);
+
+THERMODYNAMICSCORE_API const TArray<float>& GetTemperatures();
+
 void DrawDebugHeatmap(const UWorld* world, float height);
 } // namespace HeatmapGrid

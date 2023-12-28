@@ -5,7 +5,6 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/Actor.h"
 #include "HeatmapGridOperations.h"
-#include "HeatmapParametersComponent.h"
 
 UHeatmapParametersComponent::UHeatmapParametersComponent()
     : _numCellsX(0)
