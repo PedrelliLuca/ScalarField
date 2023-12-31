@@ -33,7 +33,6 @@ void UHeatmapParametersComponent::BeginPlay() {
         heatmapParameters.InitialTemperature = _initialTemperature;
 
         HeatmapGrid::Initialize(MoveTemp(heatmapParameters));
-        HeatmapGrid::DrawDebugHeatmap(GetWorld(), 1000.0f);
     } else {
         UE_LOG(LogTemp, Error, TEXT("No UBoxComponent on owner actor, cells' size cannot be set!"));
     }

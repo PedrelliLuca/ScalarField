@@ -50,7 +50,10 @@ bool _rectangleCircleIntersection(const FVector2D rectangleLocation, const FVect
         return true;
     }
 
-    const float cornerDistanceSquared = FMath::Pow(distance.X - rectangleExtension.X, 2.0) + FMath::Pow(distance.Y - rectangleExtension.Y, 2.0);
+    // If you're here it means that:
+    // rectangleExtension.X < distance.X < rectangleExtension.X + radius
+    // rectangleExtension.Y < distance.Y < rectangleExtension.Y + radius
+    const double cornerDistanceSquared = FMath::Pow(distance.X - rectangleExtension.X, 2.0) + FMath::Pow(distance.Y - rectangleExtension.Y, 2.0);
     return cornerDistanceSquared <= radius * radius;
 }
 
@@ -94,7 +97,7 @@ const TArray<float>& GetTemperatures() {
 }
 
 void DrawDebugHeatmap(const UWorld* const world, const float height) {
-    const auto extent3D = FVector(_grid.Attributes->CellsExtent, 10.0f);
+    const auto extent3D = FVector(_grid.Attributes->CellsExtent, 100.0f);
 
     const int32 nCells = _grid.Locations.Num();
     const float colorStep = 255.0f / nCells;
