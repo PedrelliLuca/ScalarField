@@ -19,6 +19,8 @@ public:
 
     FIntVector2 GetNumberOfCellsXY() const;
 
+    void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
+
 protected:
     void BeginPlay() override;
 
@@ -29,4 +31,6 @@ private:
     int32 _numCellsY;
     UPROPERTY(EditAnywhere, Category = "Heatmap Parameters")
     float _initialTemperature;
+    UPROPERTY(EditAnywhere, Category = "Heatmap Parameters")
+    float _heatCapacity;
 };

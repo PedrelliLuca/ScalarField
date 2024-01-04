@@ -6,11 +6,11 @@
 
 namespace HeatmapGrid {
 
-// Collects all heatmap cold data, i.e. data that should NOT be used while looping.
 struct FHeatmapGridAttributes {
     FVector2D CellsExtent;
     FIntVector2 NumbersOfCells;
     FVector2D BottomLeftCorner;
+    float HeatCapacity;
 };
 
 //  1D Grid Representation
@@ -43,8 +43,13 @@ struct FHeatmapGridAttributes {
 //
 // Example (1,2) => I = 2 * 3 + 1 = 7
 struct FHeatmapGrid {
-    TArray<float> Temperatures;
+    // Collection of "cold" data, i.e. data that isn't looped on.
+    FHeatmapGridAttributes Attributes;
+
     TArray<FVector2D> Locations;
-    TUniquePtr<FHeatmapGridAttributes> Attributes;
+
+    // Double Buffer pattern to ensure the entire heatmap gets updated at once.
+    TArray<float> CurrentTemperatures;
+    TArray<float> NextTemperatures;
 };
 } // namespace HeatmapGrid

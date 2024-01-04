@@ -17,9 +17,27 @@ class THERMODYNAMICSCORE_API UThermodynamicsInteractorComponent : public UActorC
 public:
     UThermodynamicsInteractorComponent();
 
+    float GetTemperature() const;
+
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
+#if WITH_EDITOR
+    void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
+#endif
+
+protected:
+    void BeginPlay() override;
+
 private:
-    UPROPERTY(EditAnywhere, Category = "Interaction Range")
+    UPROPERTY(EditAnywhere, Category = "Thermodynamic Parameters")
+    float _initialTemperature;
+    UPROPERTY(EditAnywhere, Category = "Thermodynamic Parameters")
+    float _heatCapacity;
+
+    UPROPERTY(EditAnywhere, Category = "Interaction Parameters")
     float _interactionRange;
+
+    UPROPERTY(VisibleAnywhere, Category = "Thermodynamic Parameters")
+    float _currentTemperature;
+    float _nextTemperature;
 };

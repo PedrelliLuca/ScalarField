@@ -24,6 +24,10 @@ public:
     FOnHeatmapMIDSet OnHeatmapMIDSet;
     FOnHeatmapVisualizationToggle OnHeatmapVisualizationToggle;
 
+    // This is the factor (k*A)/L in the heat exchange formulas (4) and (5). Tune this if you want to change the speed of all thermodyamic interactions in the
+    // game.
+    static constexpr float ROD_CONSTANT = 1.0f;
+
 private:
     TWeakObjectPtr<UMaterialInstanceDynamic> _heatmapMID;
 };

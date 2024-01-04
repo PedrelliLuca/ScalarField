@@ -10,11 +10,17 @@ struct FHeatmapParameters {
     FVector2D ExtentCells = FVector2D::ZeroVector;
     FIntVector2 NumberCells = FIntVector2(0, 0);
     float InitialTemperature = 273.0f;
+    float HeatCapacity = 1.0f;
 };
 
 void Initialize(FHeatmapParameters&& heatmapParams);
 
-void Interact(FVector2D interactorWorldLocation, float interactionRange);
+// Realizes a thermodynamic interaction between the given interactor (location, range, temperature) and the grid in the time deltaTime.
+// Returns the grid-normalized currDeltaT, i.e. the sum of all the currDeltaTs with the interacting cells divided by the number of interacting cells.
+float Interact(FVector2D interactorWorldLocation, float interactorRange, float interactorTemperature, float deltaTime);
+
+// Realizes thermodynamic interactions between each cell and its orthogonal neighbors.
+void SelfInteract(float deltaTime);
 
 THERMODYNAMICSCORE_API const TArray<float>& GetTemperatures();
 
