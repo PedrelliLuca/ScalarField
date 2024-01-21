@@ -7,6 +7,8 @@
 #include "Components/ActorComponent.h"
 #include "ThermodynamicsInteractorComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTemperatureChanged, float);
+
 /**
  * \brief TODO
  */
@@ -24,6 +26,8 @@ public:
 #if WITH_EDITOR
     void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
+
+    FOnTemperatureChanged OnTemperatureChanged;
 
 protected:
     void BeginPlay() override;

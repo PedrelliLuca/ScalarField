@@ -28,9 +28,7 @@ protected:
 private:
     void _updateHeatmap();
 
-    FColor _generateColorFromValue(float val);
-
-    void _onHeatmapVisualizationToggle();
+    void _toggleHeatmapVisualization();
 
     UPROPERTY(EditAnywhere, Category = "Wave Parameters")
     float _frequencyPI = 0.0f;

@@ -10,7 +10,7 @@
 UThermodynamicsInteractorComponent::UThermodynamicsInteractorComponent()
     : _initialTemperature(273.15f) // 0 Celsius degrees.
     , _heatCapacity(1.0f)
-    , _interactionRange(0.0f)
+    , _interactionRange(100.0f)
     , _currentTemperature(0.0f)
     , _nextTemperature(0.0f) {
     PrimaryComponentTick.bCanEverTick = true;
@@ -39,7 +39,10 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
 
     // TODO: Delete this. This is ok only because we're not handling body to body exchanges for the time being! A body can't update its own current temperature
     // because we have no guarantees that the other bodies in the same tick group already interacted with it.
-    _currentTemperature = _nextTemperature;
+    if (_nextTemperature != _currentTemperature) {
+        _currentTemperature = _nextTemperature;
+        OnTemperatureChanged.Broadcast(_currentTemperature);
+    }
 }
 
 #if WITH_EDITOR
