@@ -43,5 +43,6 @@ private:
     TWeakObjectPtr<UMaterialParameterCollectionInstance> _toggleVisibilityMPCI;
     bool _isHeatmapVisible = true;
 
+    // TODO: this should be read via UDeveloperSettings
     inline static const char* THERMODYNAMICS_MESH_TAG = "ThermodynamicsMesh";
 };

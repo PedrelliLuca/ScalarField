@@ -9,6 +9,8 @@
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTemperatureChanged, float);
 
+class USphereComponent;
+
 /**
  * \brief TODO
  */
@@ -33,15 +35,45 @@ protected:
     void BeginPlay() override;
 
 private:
+    float _interactWithOtherComponents(float deltaTime);
+
+    void _updateNumberOfInteractionsThisFrame();
+
+    void _setCurrentTemperatureAsNext();
+
+    void _retrieveThermodynamicCollision();
+
+    void _setInitialInteractors();
+
+    UFUNCTION()
+    void _registerInteractor(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex,
+        bool bFromSweep, const FHitResult& sweepResult);
+    UFUNCTION()
+    void _unregisterInteractor(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
+
     UPROPERTY(EditAnywhere, Category = "Thermodynamic Parameters")
     float _initialTemperature;
     UPROPERTY(EditAnywhere, Category = "Thermodynamic Parameters")
     float _heatCapacity;
 
-    UPROPERTY(EditAnywhere, Category = "Interaction Parameters")
-    float _interactionRange;
-
     UPROPERTY(VisibleAnywhere, Category = "Thermodynamic Parameters")
     float _currentTemperature;
     float _nextTemperature;
+
+    TWeakObjectPtr<USphereComponent> _sphereCollisionC;
+    // The number of times this component will be checked this frame by other thermodynamic interactors
+    uint32 _counterOfChecksThisFrame;
+    // Count of how many times this component got checked by other thermodynamic component this frame. When the counter reaches _timesToBeCheckedThisFrame, we
+    // know for sure we won't be checked again, meaning that we can finally set _currentTemperature = _nextTemperature
+    uint32 _timesToBeCheckedThisFrame;
+
+    // To make thermodynamics ignore this on the frame it spawns, avoiding 1 frame-off bugs. See explanation in ctor and TickComponent() functions.
+    bool _hasNeverTicked;
+
+    // Thermodynamic interactors whose collision is colliding with this component's.
+    TSet<TWeakObjectPtr<UThermodynamicsInteractorComponent>> _heatExchangers;
+
+    // TODO: this should be read via UDeveloperSettings
+    inline static const char* THERMODYNAMICS_COLLISION_TAG = "ThermodynamicsCollision";
+    inline static const char* THERMODYNAMICS_COLLISION_PROFILE_NAME = "HeatExchanger";
 };

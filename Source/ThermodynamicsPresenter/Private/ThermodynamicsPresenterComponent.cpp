@@ -9,6 +9,7 @@
 
 UThermodynamicsPresenterComponent::UThermodynamicsPresenterComponent() {
     PrimaryComponentTick.bCanEverTick = false;
+    PrimaryComponentTick.TickGroup = ETickingGroup::TG_PostUpdateWork;
 }
 
 void UThermodynamicsPresenterComponent::BeginPlay() {
@@ -35,10 +36,10 @@ void UThermodynamicsPresenterComponent::BeginPlay() {
                     }
                 } else {
                     UE_LOG(
-                        LogTemp, Error, TEXT("Tag %s found on a non-UMeshComponent. No thermodynamics presentation on this actor!"), THERMODYNAMICS_MESH_TAG);
+                        LogTemp, Error, TEXT("Tag %s found on a non-UMeshComponent. No thermodynamics presentation on this actor!"), *FString(THERMODYNAMICS_MESH_TAG));
                 }
             } else {
-                UE_LOG(LogTemp, Error, TEXT("No component with tag %s was found. No thermodynamics presentation on this actor!"), THERMODYNAMICS_MESH_TAG);
+                UE_LOG(LogTemp, Error, TEXT("No component with tag %s was found. No thermodynamics presentation on this actor!"), *FString(THERMODYNAMICS_MESH_TAG));
             }
         } else {
             UE_LOG(LogTemp, Error, TEXT("No UThermodynamicsInteractorComponent was found. No thermodynamics presentation on this actor!"));
