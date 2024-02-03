@@ -14,6 +14,7 @@ struct FHeatmapParameters {
 };
 
 void Initialize(FHeatmapParameters&& heatmapParams);
+void Deinitialize();
 
 // Realizes a thermodynamic interaction between the given interactor (location, range, temperature) and the grid in the time deltaTime.
 // Returns the grid-normalized currDeltaT, i.e. the sum of all the currDeltaTs with the interacting cells divided by the number of interacting cells.

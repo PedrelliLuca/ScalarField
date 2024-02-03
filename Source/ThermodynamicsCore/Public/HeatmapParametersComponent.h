@@ -20,6 +20,7 @@ public:
     FIntVector2 GetNumberOfCellsXY() const;
 
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
+    void BeginDestroy() override;
 
 protected:
     void BeginPlay() override;

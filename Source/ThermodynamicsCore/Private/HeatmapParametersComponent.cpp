@@ -25,6 +25,12 @@ void UHeatmapParametersComponent::TickComponent(const float deltaTime, const ELe
     HeatmapGrid::SelfInteract(deltaTime);
 }
 
+void UHeatmapParametersComponent::BeginDestroy() {
+    Super::BeginDestroy();
+
+    HeatmapGrid::Deinitialize();
+}
+
 void UHeatmapParametersComponent::BeginPlay() {
     Super::BeginPlay();
 

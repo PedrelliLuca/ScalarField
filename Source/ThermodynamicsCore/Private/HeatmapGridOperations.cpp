@@ -7,7 +7,7 @@
 #include "ThermodynamicsSubsystem.h"
 
 namespace HeatmapGrid {
-FHeatmapGrid _grid;
+TOptional<FHeatmapGrid> _grid;
 
 void Initialize(FHeatmapParameters&& params) {
     FHeatmapGrid grid;
@@ -43,6 +43,10 @@ void Initialize(FHeatmapParameters&& params) {
     _grid = MoveTemp(grid);
 }
 
+void Deinitialize() {
+    _grid.Reset();
+}
+
 bool _rectangleCircleIntersection(const FVector2D rectangleLocation, const FVector2D rectangleExtension, const FVector2D circleLocation, const float radius) {
     const auto distance = FVector2D(FMath::Abs(circleLocation.X - rectangleLocation.X), FMath::Abs(circleLocation.Y - rectangleLocation.Y));
 
@@ -62,130 +66,144 @@ bool _rectangleCircleIntersection(const FVector2D rectangleLocation, const FVect
 }
 
 float Interact(const FVector2D interactorWorldLocation, const float interactorRange, const float interactorTemperature, const float deltaTime) {
-    const FVector2D& cellsExtent = _grid.Attributes.CellsExtent;
-    const auto cellsSize = cellsExtent * 2.0;
-    const FIntVector2& numbersOfCells = _grid.Attributes.NumbersOfCells;
+    float interactorCurrDeltaT_Normalized = 0.0f;
+    if (_grid.IsSet()) {
+        FHeatmapGrid& grid = _grid.GetValue();
 
-    // From World Space to Grid Space
-    const FVector2D interactorGridLocation = interactorWorldLocation - _grid.Attributes.BottomLeftCorner;
+        const FVector2D& cellsExtent = grid.Attributes.CellsExtent;
+        const auto cellsSize = cellsExtent * 2.0;
+        const FIntVector2& numbersOfCells = grid.Attributes.NumbersOfCells;
 
-    // The cell (i, j) containing the bottom-left corner of the square enclosing the interaction circle
-    const FVector2D bottomLeftLocation = interactorGridLocation - interactorRange * FVector2D::UnitVector;
-    auto bottomLeftCoordinates = FIntVector2(bottomLeftLocation.X / cellsSize.X, bottomLeftLocation.Y / cellsSize.Y);
-    bottomLeftCoordinates = FIntVector2(FMath::Max(bottomLeftCoordinates.X, 0), FMath::Max(bottomLeftCoordinates.Y, 0));
+        // From World Space to Grid Space
+        const FVector2D interactorGridLocation = interactorWorldLocation - grid.Attributes.BottomLeftCorner;
 
-    // The cell (i, j) containing the top-right corner of the square enclosing the interaction circle
-    const FVector2D topRightLocation = interactorGridLocation + interactorRange * FVector2D::UnitVector;
-    auto topRightCoordinates = FIntVector2(topRightLocation.X / cellsSize.X, topRightLocation.Y / cellsSize.Y);
-    topRightCoordinates = FIntVector2(FMath::Min(topRightCoordinates.X, numbersOfCells.X - 1), FMath::Min(topRightCoordinates.Y, numbersOfCells.Y - 1));
+        // The cell (i, j) containing the bottom-left corner of the square enclosing the interaction circle
+        const FVector2D bottomLeftLocation = interactorGridLocation - interactorRange * FVector2D::UnitVector;
+        auto bottomLeftCoordinates = FIntVector2(bottomLeftLocation.X / cellsSize.X, bottomLeftLocation.Y / cellsSize.Y);
+        bottomLeftCoordinates = FIntVector2(FMath::Max(bottomLeftCoordinates.X, 0), FMath::Max(bottomLeftCoordinates.Y, 0));
 
-    check(bottomLeftCoordinates.X <= topRightCoordinates.X && bottomLeftCoordinates.Y <= topRightCoordinates.Y);
+        // The cell (i, j) containing the top-right corner of the square enclosing the interaction circle
+        const FVector2D topRightLocation = interactorGridLocation + interactorRange * FVector2D::UnitVector;
+        auto topRightCoordinates = FIntVector2(topRightLocation.X / cellsSize.X, topRightLocation.Y / cellsSize.Y);
+        topRightCoordinates = FIntVector2(FMath::Min(topRightCoordinates.X, numbersOfCells.X - 1), FMath::Min(topRightCoordinates.Y, numbersOfCells.Y - 1));
 
-    const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
-    // The currDeltaT of the interactor takes all the interacting cells into account
-    float interactorCurrDeltaT = 0.0f;
-    int32 numberOfInteractingCells = 0;
+        check(bottomLeftCoordinates.X <= topRightCoordinates.X && bottomLeftCoordinates.Y <= topRightCoordinates.Y);
 
-    TArray<float>& currentTemperatures = _grid.CurrentTemperatures;
-    TArray<float>& nextTemperatures = _grid.NextTemperatures;
+        const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
+        // The currDeltaT of the interactor takes all the interacting cells into account
+        float interactorCurrDeltaT = 0.0f;
+        int32 numberOfInteractingCells = 0;
 
-    // Looping over cells intersecting the interactor's enclosing square (only these can intersect the interactor's circle)
-    for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
-        for (int32 i = bottomLeftCoordinates.X; i <= topRightCoordinates.X; ++i) {
-            const int32 k = convert2DTo1D(i, j);
-            if (_rectangleCircleIntersection(_grid.Locations[k], cellsExtent, interactorWorldLocation, interactorRange)) {
-                ++numberOfInteractingCells;
-                // This currDeltaT is from the interactor's POV, which is why the interactorTemperature is on the right hand side.
-                // If the interactor's T is greater than the cell's, currDeltaT < 0 => the interactor emits heat (interactorCurrDeltaT decreases)
-                // and the cell absorbs heat (nextTemperatures[k] increases).
-                // If the interactor's T is smaller than the cell's, currDeltaT > 0 => the interactor absorbs heat (interactorCurrDeltaT increases)
-                // and the cell emits heat (nextTemperatures[k] decreases).
-                const float currDeltaT = currentTemperatures[k] - interactorTemperature;
+        TArray<float>& currentTemperatures = grid.CurrentTemperatures;
+        TArray<float>& nextTemperatures = grid.NextTemperatures;
 
-                interactorCurrDeltaT += currDeltaT;
-                nextTemperatures[k] -= (UThermodynamicsSubsystem::ROD_CONSTANT * currDeltaT * deltaTime / _grid.Attributes.HeatCapacity);
+        // Looping over cells intersecting the interactor's enclosing square (only these can intersect the interactor's circle)
+        for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
+            for (int32 i = bottomLeftCoordinates.X; i <= topRightCoordinates.X; ++i) {
+                const int32 k = convert2DTo1D(i, j);
+                if (_rectangleCircleIntersection(grid.Locations[k], cellsExtent, interactorWorldLocation, interactorRange)) {
+                    ++numberOfInteractingCells;
+                    // This currDeltaT is from the interactor's POV, which is why the interactorTemperature is on the right hand side.
+                    // If the interactor's T is greater than the cell's, currDeltaT < 0 => the interactor emits heat (interactorCurrDeltaT decreases)
+                    // and the cell absorbs heat (nextTemperatures[k] increases).
+                    // If the interactor's T is smaller than the cell's, currDeltaT > 0 => the interactor absorbs heat (interactorCurrDeltaT increases)
+                    // and the cell emits heat (nextTemperatures[k] decreases).
+                    const float currDeltaT = currentTemperatures[k] - interactorTemperature;
+
+                    interactorCurrDeltaT += currDeltaT;
+                    nextTemperatures[k] -= (UThermodynamicsSubsystem::ROD_CONSTANT * currDeltaT * deltaTime / grid.Attributes.HeatCapacity);
+                }
             }
         }
+
+        // The normalized version of the interactor's currDeltaT is an average of the interactions with the cells. This is important to avoid having the grid
+        // weight way more than other bodies. This is realistic: sure, we are using a grid to represent the air of our map, but in the end, air is a single
+        // body.
+        interactorCurrDeltaT_Normalized = interactorCurrDeltaT / numberOfInteractingCells;
     }
 
-    // The normalized version of the interactor's currDeltaT is an average of the interactions with the cells. This is important to avoid having the grid weight
-    // way more than other bodies. This is realistic: sure, we are using a grid to represent the air of our map, but in the end, air is a single body.
-    const float interactorCurrDeltaT_Normalized = interactorCurrDeltaT / numberOfInteractingCells;
     return interactorCurrDeltaT_Normalized;
 }
 
 void SelfInteract(const float deltaTime) {
-    const FIntVector2& numbersOfCells = _grid.Attributes.NumbersOfCells;
-    const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
+    if (_grid.IsSet()) {
+        FHeatmapGrid& grid = _grid.GetValue();
+        const FIntVector2& numbersOfCells = grid.Attributes.NumbersOfCells;
+        const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
 
-    TArray<float>& currentTemperatures = _grid.CurrentTemperatures;
-    TArray<float>& nextTemperatures = _grid.NextTemperatures;
-    for (int32 j = 0; j < numbersOfCells.Y; ++j) {
-        for (int32 i = 0; i < numbersOfCells.X; ++i) {
-            const int32 k = convert2DTo1D(i, j);
+        TArray<float>& currentTemperatures = grid.CurrentTemperatures;
+        TArray<float>& nextTemperatures = grid.NextTemperatures;
+        for (int32 j = 0; j < numbersOfCells.Y; ++j) {
+            for (int32 i = 0; i < numbersOfCells.X; ++i) {
+                const int32 k = convert2DTo1D(i, j);
 
-            // The cell k interacts with its neighbors
-            float totalCurrDeltaT = 0.0;
-            if (i != 0) {
-                const int32 bottomK = convert2DTo1D(i - 1, j);
-                // This currDeltaT is from the cell k's POV, which is why currentTemperatures[k] is on the right hand side:
-                // If bottomK's T is greater than the k's, then k's totalCurrDeltaT increases (k absorbs heat from bottomK). Viceversa, totalCurrDeltaT
-                // decreases (heat flows from k to bottomK). bottomK.
-                totalCurrDeltaT += currentTemperatures[bottomK] - currentTemperatures[k];
-            }
-            if (j != 0) {
-                const int32 leftK = convert2DTo1D(i, j - 1);
-                // This currDeltaT is from the cell k's POV, which is why currentTemperatures[k] is on the right hand side:
-                // If leftK's T is greater than the k's, then k's totalCurrDeltaT increases (k absorbs heat from leftK). Viceversa, totalCurrDeltaT
-                // decreases (heat flows from k to leftK). leftK.
-                totalCurrDeltaT += currentTemperatures[leftK] - currentTemperatures[k];
-            }
-            if (i != numbersOfCells.X - 1) {
-                const int32 topK = convert2DTo1D(i + 1, j);
-                // This currDeltaT is from the cell k's POV, which is why currentTemperatures[k] is on the right hand side:
-                // If topK's T is greater than the k's, then k's totalCurrDeltaT increases (k absorbs heat from topK). Viceversa, totalCurrDeltaT
-                // decreases (heat flows from k to topK). topK.
-                totalCurrDeltaT += currentTemperatures[topK] - currentTemperatures[k];
-            }
-            if (j != numbersOfCells.Y - 1) {
-                const int32 rightK = convert2DTo1D(i, j + 1);
-                // This currDeltaT is from the cell k's POV, which is why currentTemperatures[k] is on the right hand side:
-                // If rightK's T is greater than the k's, then k's totalCurrDeltaT increases (k absorbs heat from rightK). Viceversa, totalCurrDeltaT
-                // decreases (heat flows from k to rightK). rightK.
-                totalCurrDeltaT += currentTemperatures[rightK] - currentTemperatures[k];
-            }
+                // The cell k interacts with its neighbors
+                float totalCurrDeltaT = 0.0;
+                if (i != 0) {
+                    const int32 bottomK = convert2DTo1D(i - 1, j);
+                    // This currDeltaT is from the cell k's POV, which is why currentTemperatures[k] is on the right hand side:
+                    // If bottomK's T is greater than the k's, then k's totalCurrDeltaT increases (k absorbs heat from bottomK). Viceversa, totalCurrDeltaT
+                    // decreases (heat flows from k to bottomK). bottomK.
+                    totalCurrDeltaT += currentTemperatures[bottomK] - currentTemperatures[k];
+                }
+                if (j != 0) {
+                    const int32 leftK = convert2DTo1D(i, j - 1);
+                    // This currDeltaT is from the cell k's POV, which is why currentTemperatures[k] is on the right hand side:
+                    // If leftK's T is greater than the k's, then k's totalCurrDeltaT increases (k absorbs heat from leftK). Viceversa, totalCurrDeltaT
+                    // decreases (heat flows from k to leftK). leftK.
+                    totalCurrDeltaT += currentTemperatures[leftK] - currentTemperatures[k];
+                }
+                if (i != numbersOfCells.X - 1) {
+                    const int32 topK = convert2DTo1D(i + 1, j);
+                    // This currDeltaT is from the cell k's POV, which is why currentTemperatures[k] is on the right hand side:
+                    // If topK's T is greater than the k's, then k's totalCurrDeltaT increases (k absorbs heat from topK). Viceversa, totalCurrDeltaT
+                    // decreases (heat flows from k to topK). topK.
+                    totalCurrDeltaT += currentTemperatures[topK] - currentTemperatures[k];
+                }
+                if (j != numbersOfCells.Y - 1) {
+                    const int32 rightK = convert2DTo1D(i, j + 1);
+                    // This currDeltaT is from the cell k's POV, which is why currentTemperatures[k] is on the right hand side:
+                    // If rightK's T is greater than the k's, then k's totalCurrDeltaT increases (k absorbs heat from rightK). Viceversa, totalCurrDeltaT
+                    // decreases (heat flows from k to rightK). rightK.
+                    totalCurrDeltaT += currentTemperatures[rightK] - currentTemperatures[k];
+                }
 
-            const float totalDeltaT = (UThermodynamicsSubsystem::ROD_CONSTANT * totalCurrDeltaT * deltaTime) / _grid.Attributes.HeatCapacity;
-            nextTemperatures[k] += totalDeltaT;
+                const float totalDeltaT = (UThermodynamicsSubsystem::ROD_CONSTANT * totalCurrDeltaT * deltaTime) / grid.Attributes.HeatCapacity;
+                nextTemperatures[k] += totalDeltaT;
+            }
         }
-    }
 
-    // Now that we finished updating the nextTemperatures, we can say they are the current ones
-    for (int i = 0; i < nextTemperatures.Num(); ++i) {
-        currentTemperatures[i] = nextTemperatures[i];
+        // Now that we finished updating the nextTemperatures, we can say they are the current ones
+        for (int i = 0; i < nextTemperatures.Num(); ++i) {
+            currentTemperatures[i] = nextTemperatures[i];
+        }
     }
 }
 
 const TArray<float>& GetTemperatures() {
-    return _grid.CurrentTemperatures;
+    check(_grid.IsSet());
+    return _grid->CurrentTemperatures;
 }
 
 void DrawDebugHeatmap(const UWorld* const world, const float height) {
-    const auto extent3D = FVector(_grid.Attributes.CellsExtent, 100.0f);
+    if (_grid.IsSet()) {
+        FHeatmapGrid& grid = _grid.GetValue();
+        const auto extent3D = FVector(grid.Attributes.CellsExtent, 100.0f);
 
-    const int32 nCells = _grid.Locations.Num();
-    const float colorStep = 255.0f / nCells;
-    auto color = FColor::Red;
+        const int32 nCells = grid.Locations.Num();
+        const float colorStep = 255.0f / nCells;
+        auto color = FColor::Red;
 
-    for (const FVector2D& location : _grid.Locations) {
-        const auto location3D = FVector(location, height);
-        DrawDebugBox(world, location3D, extent3D, color, false, 2.0f);
+        for (const FVector2D& location : grid.Locations) {
+            const auto location3D = FVector(location, height);
+            DrawDebugBox(world, location3D, extent3D, color, false, 2.0f);
 
-        // TODO: this is broken, as increments < 1 cannot be appreciated. You should use a color map
-        // similar to the one in HeatmapPresenterComponent.cpp. This function should be in a new debug
-        // component in ThermodynamicsPresenter or, at the very least, within HeatmapPresenterComponent.
-        color.R -= colorStep;
-        color.B += colorStep;
+            // TODO: this is broken, as increments < 1 cannot be appreciated. You should use a color map
+            // similar to the one in HeatmapPresenterComponent.cpp. This function should be in a new debug
+            // component in ThermodynamicsPresenter or, at the very least, within HeatmapPresenterComponent.
+            color.R -= colorStep;
+            color.B += colorStep;
+        }
     }
 }
 
