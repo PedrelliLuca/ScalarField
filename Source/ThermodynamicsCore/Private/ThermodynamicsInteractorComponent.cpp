@@ -36,6 +36,7 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
     if (_hasNeverTicked) {
         _hasNeverTicked = false; // Ensures that, next frame, others won't overshoot because of this.
         SetTickGroup(ETickingGroup::TG_PrePhysics); // Ensures that, next frame, this won't overshoot because of others.
+        return;
     }
 
     // 1) Interact with other UThermodynamicsInteractorComponents you're colliding with
@@ -174,6 +175,10 @@ void UThermodynamicsInteractorComponent::_retrieveThermodynamicCollision() {
 void UThermodynamicsInteractorComponent::_setInitialInteractors() {
     // Do not call this function if _sphereCollisionC hasn't been set.
     check(_sphereCollisionC.IsValid());
+
+    // Overlaps are messed up without this call.
+    // I think this might be due to this component ticking on TG_PostUpdateWork the 1st frame.
+    _sphereCollisionC->UpdateOverlaps();
 
     TArray<TObjectPtr<UPrimitiveComponent>> overlappingCollisions;
     _sphereCollisionC->GetOverlappingComponents(overlappingCollisions);
