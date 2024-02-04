@@ -21,7 +21,7 @@ struct FPlayerInteractionData {
     double TimestampOfLastFocusCheck = 0.0;
 };
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Interaction), meta = (BlueprintSpawnableComponent))
 class INTERACTIONSYSTEM_API UInteractorPlayerComponent : public UActorComponent, public IInteractor {
     GENERATED_BODY()
 

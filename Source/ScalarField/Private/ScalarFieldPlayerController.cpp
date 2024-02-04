@@ -91,12 +91,13 @@ void AScalarFieldPlayerController::_onSetDestinationPressed() {
         // Very important: this must be called before each TrySetMovementDestination() call, point of failure.
         _movementCommandC->SetPlayerInputData(FPlayerInputData{IE_Pressed});
 
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        FHitResult hit;
-        GetHitResultUnderCursor(ECC_Visibility, true, hit);
-        stateC->TrySetMovementDestination(hit.Location);
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            FHitResult hit;
+            GetHitResultUnderCursor(ECC_Visibility, true, hit);
+            stateC->TrySetMovementDestination(hit.Location);
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -111,10 +112,11 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
         // Very important: this must be called before each TrySetMovementDestination() call, point of failure.
         _movementCommandC->SetPlayerInputData(FPlayerInputData{IE_Released});
 
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TrySetMovementDestination(hit.Location);
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TrySetMovementDestination(hit.Location);
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -125,23 +127,24 @@ void AScalarFieldPlayerController::_onSetTargetPressed() {
         _stateC->PerformTargetingBehavior(hit.GetActor());
     } else {
         const auto pawn = GetPawn();
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
+        if (const auto stateC = pawn->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            // We don't know what the skill we want to cast is going to need, so we'll provide it with everything we have.
+            FSkillTargetPacket targetPacket;
+            targetPacket.TargetActor = hit.GetActor();
 
-        // We don't know what the skill we want to cast is going to need, so we'll provide it with everything we have.
-        FSkillTargetPacket targetPacket;
-        targetPacket.TargetActor = hit.GetActor();
+            FVector mouseLoc;
+            FVector mouseDir;
+            DeprojectMousePositionToWorld(mouseLoc, mouseDir);
+            const auto pawnPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
+            const auto pawnPlaneLocation = FMath::LinePlaneIntersection(mouseLoc, mouseLoc + mouseDir * PROJ_LINE_LENGTH, pawnPlane);
+            targetPacket.TargetCasterPlaneLocation = pawnPlaneLocation;
 
-        FVector mouseLoc;
-        FVector mouseDir;
-        DeprojectMousePositionToWorld(mouseLoc, mouseDir);
-        const auto pawnPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
-        const auto pawnPlaneLocation = FMath::LinePlaneIntersection(mouseLoc, mouseLoc + mouseDir * PROJ_LINE_LENGTH, pawnPlane);
-        targetPacket.TargetCasterPlaneLocation = pawnPlaneLocation;
+            // TODO: compute targetPacket.TargetGroundLocation by projecting onto the ground somehow, this will be needed for skills like "Spawn Tree"
 
-        // TODO: compute targetPacket.TargetGroundLocation by projecting onto the ground somehow, this will be needed for skills like "Spawn Tree"
-
-        stateC->TrySetSkillTarget(targetPacket);
+            stateC->TrySetSkillTarget(targetPacket);
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -160,10 +163,11 @@ void AScalarFieldPlayerController::_onSkill1Cast() {
 
         _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -182,10 +186,11 @@ void AScalarFieldPlayerController::_onSkill2Cast() {
 
         _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -204,10 +209,11 @@ void AScalarFieldPlayerController::_onSkill3Cast() {
 
         _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -226,10 +232,11 @@ void AScalarFieldPlayerController::_onSkill4Cast() {
 
         _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -248,10 +255,11 @@ void AScalarFieldPlayerController::_onSkill5Cast() {
 
         _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -270,10 +278,11 @@ void AScalarFieldPlayerController::_onSkill6Cast() {
 
         _stateC->PerformSkillExecutionBehavior(MoveTemp(skill));
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -281,10 +290,11 @@ void AScalarFieldPlayerController::_onSkillAbort() {
     if (!_bNewSkillSystem) {
         _stateC->PerformAbortBehavior();
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryAbort();
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryAbort();
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -292,10 +302,11 @@ void AScalarFieldPlayerController::_onInteraction() {
     if (!_bNewSkillSystem) {
         _stateC->PerformInteractionBehavior();
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryInteracting();
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryInteracting();
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 
@@ -303,10 +314,11 @@ void AScalarFieldPlayerController::_onInventoryToggle() {
     if (!_bNewSkillSystem) {
         _stateC->PerformInventoryToggleBehavior();
     } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
-
-        stateC->TryToggleInventory();
+        if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+            stateC->TryToggleInventory();
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        }
     }
 }
 

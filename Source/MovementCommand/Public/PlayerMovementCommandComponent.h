@@ -9,7 +9,7 @@
 
 #include "PlayerMovementCommandComponent.generated.h"
 
-UCLASS()
+UCLASS(ClassGroup = (MovementComands), meta = (BlueprintSpawnableComponent))
 class MOVEMENTCOMMAND_API UPlayerMovementCommandComponent : public UActorComponent, public IMovementCommandSetter {
     GENERATED_BODY()
 

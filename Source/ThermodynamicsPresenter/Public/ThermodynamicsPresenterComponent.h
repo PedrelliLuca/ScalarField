@@ -17,6 +17,8 @@ class THERMODYNAMICSPRESENTER_API UThermodynamicsPresenterComponent : public UAc
 public:
     UThermodynamicsPresenterComponent();
 
+    FLinearColor GetTemperatureColor() const;
+
 protected:
     void BeginPlay() override;
 
@@ -41,7 +43,9 @@ private:
     TObjectPtr<UMaterialInstanceDynamic> _thermodynamicsMaterialInstance;
 
     TWeakObjectPtr<UMaterialParameterCollectionInstance> _toggleVisibilityMPCI;
-    bool _isHeatmapVisible = true;
+    bool _isThermodynamicsVisible = true;
+
+    FLinearColor _thermodynamicsColor = FLinearColor::Black;
 
     // TODO: this should be read via UDeveloperSettings
     inline static const char* THERMODYNAMICS_MESH_TAG = "ThermodynamicsMesh";

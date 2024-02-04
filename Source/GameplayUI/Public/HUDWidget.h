@@ -10,7 +10,8 @@
 
 class UHealthComponent;
 class UManaComponent;
-class UThermodynamicComponent;
+class UThermodynamicsInteractorComponent;
+class UThermodynamicsPresenterComponent;
 
 /**
  *
@@ -61,7 +62,7 @@ private:
     void _setMaxMana(double newMaxMana);
     void _setCurrentMana(double newCurrentMana);
 
-    void _onTemperatureChange(double newTemperture);
+    void _onTemperatureChange(float newTemperture);
 
     void _onTacticalPauseToggle(bool bIsTacticalPauseOn, double);
 
@@ -76,5 +77,6 @@ private:
 
     TWeakObjectPtr<UHealthComponent> _healthC = nullptr;
     TWeakObjectPtr<UManaComponent> _manaC = nullptr;
-    TWeakObjectPtr<UThermodynamicComponent> _thermoC = nullptr;
+    TWeakObjectPtr<UThermodynamicsInteractorComponent> _thermoIntC = nullptr;
+    TWeakObjectPtr<UThermodynamicsPresenterComponent> _thermoPresC = nullptr;
 };

@@ -76,50 +76,53 @@ float Interact(const FVector2D interactorWorldLocation, const float interactorRa
 
         // From World Space to Grid Space
         const FVector2D interactorGridLocation = interactorWorldLocation - grid.Attributes.BottomLeftCorner;
+        const bool interactorWithinGridBounds =
+            (interactorGridLocation.X <= numbersOfCells.X * cellsSize.X) && (interactorGridLocation.Y <= numbersOfCells.Y * cellsSize.Y);
+        if (interactorWithinGridBounds) {
+            // The cell (i, j) containing the bottom-left corner of the square enclosing the interaction circle
+            const FVector2D bottomLeftLocation = interactorGridLocation - interactorRange * FVector2D::UnitVector;
+            auto bottomLeftCoordinates = FIntVector2(bottomLeftLocation.X / cellsSize.X, bottomLeftLocation.Y / cellsSize.Y);
+            bottomLeftCoordinates = FIntVector2(FMath::Max(bottomLeftCoordinates.X, 0), FMath::Max(bottomLeftCoordinates.Y, 0));
 
-        // The cell (i, j) containing the bottom-left corner of the square enclosing the interaction circle
-        const FVector2D bottomLeftLocation = interactorGridLocation - interactorRange * FVector2D::UnitVector;
-        auto bottomLeftCoordinates = FIntVector2(bottomLeftLocation.X / cellsSize.X, bottomLeftLocation.Y / cellsSize.Y);
-        bottomLeftCoordinates = FIntVector2(FMath::Max(bottomLeftCoordinates.X, 0), FMath::Max(bottomLeftCoordinates.Y, 0));
+            // The cell (i, j) containing the top-right corner of the square enclosing the interaction circle
+            const FVector2D topRightLocation = interactorGridLocation + interactorRange * FVector2D::UnitVector;
+            auto topRightCoordinates = FIntVector2(topRightLocation.X / cellsSize.X, topRightLocation.Y / cellsSize.Y);
+            topRightCoordinates = FIntVector2(FMath::Min(topRightCoordinates.X, numbersOfCells.X - 1), FMath::Min(topRightCoordinates.Y, numbersOfCells.Y - 1));
 
-        // The cell (i, j) containing the top-right corner of the square enclosing the interaction circle
-        const FVector2D topRightLocation = interactorGridLocation + interactorRange * FVector2D::UnitVector;
-        auto topRightCoordinates = FIntVector2(topRightLocation.X / cellsSize.X, topRightLocation.Y / cellsSize.Y);
-        topRightCoordinates = FIntVector2(FMath::Min(topRightCoordinates.X, numbersOfCells.X - 1), FMath::Min(topRightCoordinates.Y, numbersOfCells.Y - 1));
+            check(bottomLeftCoordinates.X <= topRightCoordinates.X && bottomLeftCoordinates.Y <= topRightCoordinates.Y);
 
-        check(bottomLeftCoordinates.X <= topRightCoordinates.X && bottomLeftCoordinates.Y <= topRightCoordinates.Y);
+            const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
+            // The currDeltaT of the interactor takes all the interacting cells into account
+            float interactorCurrDeltaT = 0.0f;
+            int32 numberOfInteractingCells = 0;
 
-        const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
-        // The currDeltaT of the interactor takes all the interacting cells into account
-        float interactorCurrDeltaT = 0.0f;
-        int32 numberOfInteractingCells = 0;
+            TArray<float>& currentTemperatures = grid.CurrentTemperatures;
+            TArray<float>& nextTemperatures = grid.NextTemperatures;
 
-        TArray<float>& currentTemperatures = grid.CurrentTemperatures;
-        TArray<float>& nextTemperatures = grid.NextTemperatures;
+            // Looping over cells intersecting the interactor's enclosing square (only these can intersect the interactor's circle)
+            for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
+                for (int32 i = bottomLeftCoordinates.X; i <= topRightCoordinates.X; ++i) {
+                    const int32 k = convert2DTo1D(i, j);
+                    if (_rectangleCircleIntersection(grid.Locations[k], cellsExtent, interactorWorldLocation, interactorRange)) {
+                        ++numberOfInteractingCells;
+                        // This currDeltaT is from the interactor's POV, which is why the interactorTemperature is on the right hand side.
+                        // If the interactor's T is greater than the cell's, currDeltaT < 0 => the interactor emits heat (interactorCurrDeltaT decreases)
+                        // and the cell absorbs heat (nextTemperatures[k] increases).
+                        // If the interactor's T is smaller than the cell's, currDeltaT > 0 => the interactor absorbs heat (interactorCurrDeltaT increases)
+                        // and the cell emits heat (nextTemperatures[k] decreases).
+                        const float currDeltaT = currentTemperatures[k] - interactorTemperature;
 
-        // Looping over cells intersecting the interactor's enclosing square (only these can intersect the interactor's circle)
-        for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
-            for (int32 i = bottomLeftCoordinates.X; i <= topRightCoordinates.X; ++i) {
-                const int32 k = convert2DTo1D(i, j);
-                if (_rectangleCircleIntersection(grid.Locations[k], cellsExtent, interactorWorldLocation, interactorRange)) {
-                    ++numberOfInteractingCells;
-                    // This currDeltaT is from the interactor's POV, which is why the interactorTemperature is on the right hand side.
-                    // If the interactor's T is greater than the cell's, currDeltaT < 0 => the interactor emits heat (interactorCurrDeltaT decreases)
-                    // and the cell absorbs heat (nextTemperatures[k] increases).
-                    // If the interactor's T is smaller than the cell's, currDeltaT > 0 => the interactor absorbs heat (interactorCurrDeltaT increases)
-                    // and the cell emits heat (nextTemperatures[k] decreases).
-                    const float currDeltaT = currentTemperatures[k] - interactorTemperature;
-
-                    interactorCurrDeltaT += currDeltaT;
-                    nextTemperatures[k] -= (UThermodynamicsSubsystem::ROD_CONSTANT * currDeltaT * deltaTime / grid.Attributes.HeatCapacity);
+                        interactorCurrDeltaT += currDeltaT;
+                        nextTemperatures[k] -= (UThermodynamicsSubsystem::ROD_CONSTANT * currDeltaT * deltaTime / grid.Attributes.HeatCapacity);
+                    }
                 }
             }
-        }
 
-        // The normalized version of the interactor's currDeltaT is an average of the interactions with the cells. This is important to avoid having the grid
-        // weight way more than other bodies. This is realistic: sure, we are using a grid to represent the air of our map, but in the end, air is a single
-        // body.
-        interactorCurrDeltaT_Normalized = interactorCurrDeltaT / numberOfInteractingCells;
+            // The normalized version of the interactor's currDeltaT is an average of the interactions with the cells. This is important to avoid having the
+            // grid weight way more than other bodies. This is realistic: sure, we are using a grid to represent the air of our map, but in the end, air is a
+            // single body.
+            interactorCurrDeltaT_Normalized = interactorCurrDeltaT / numberOfInteractingCells;
+        }
     }
 
     return interactorCurrDeltaT_Normalized;

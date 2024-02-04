@@ -12,6 +12,10 @@ UThermodynamicsPresenterComponent::UThermodynamicsPresenterComponent() {
     PrimaryComponentTick.TickGroup = ETickingGroup::TG_PostUpdateWork;
 }
 
+FLinearColor UThermodynamicsPresenterComponent::GetTemperatureColor() const {
+    return _thermodynamicsColor;
+}
+
 void UThermodynamicsPresenterComponent::BeginPlay() {
     Super::BeginPlay();
 
@@ -50,16 +54,16 @@ void UThermodynamicsPresenterComponent::BeginPlay() {
 void UThermodynamicsPresenterComponent::_updateThermodynamicsPresentation(const float temperature) {
     check(IsValid(_thermodynamicsMaterialInstance));
 
-    const FLinearColor color = FTemperatureColorConverter::TemperatureToColor(temperature);
-    _thermodynamicsMaterialInstance->SetVectorParameterValue(_parameterName, color);
+    _thermodynamicsColor = FTemperatureColorConverter::TemperatureToColor(temperature);
+    _thermodynamicsMaterialInstance->SetVectorParameterValue(_parameterName, _thermodynamicsColor);
 }
 
 void UThermodynamicsPresenterComponent::_toggleThermodynamicsPresentation() {
     check(_toggleVisibilityMPCI.IsValid());
-    _isHeatmapVisible = !_isHeatmapVisible;
+    _isThermodynamicsVisible = !_isThermodynamicsVisible;
 
      float visibiltyValue = 0.0f;
-     if (_isHeatmapVisible) {
+     if (_isThermodynamicsVisible) {
          visibiltyValue = 1.0f;
      }
 

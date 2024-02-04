@@ -22,6 +22,7 @@ public:
     UThermodynamicsInteractorComponent();
 
     float GetTemperature() const;
+    void SetTemperature(float newTemperature);
 
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 

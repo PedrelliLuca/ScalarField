@@ -28,6 +28,11 @@ float UThermodynamicsInteractorComponent::GetTemperature() const {
     return _currentTemperature;
 }
 
+void UThermodynamicsInteractorComponent::SetTemperature(const float newTemperature) {
+    _currentTemperature = newTemperature;
+    _nextTemperature = newTemperature;
+}
+
 void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
@@ -83,9 +88,7 @@ void UThermodynamicsInteractorComponent::PostEditChangeProperty(FPropertyChanged
 void UThermodynamicsInteractorComponent::BeginPlay() {
     Super::BeginPlay();
 
-    _currentTemperature = _initialTemperature;
-    _nextTemperature = _initialTemperature;
-
+    SetTemperature(_initialTemperature);
     _retrieveThermodynamicCollision();
 }
 
@@ -115,8 +118,6 @@ void UThermodynamicsInteractorComponent::_updateNumberOfInteractionsThisFrame() 
 }
 
 void UThermodynamicsInteractorComponent::_setCurrentTemperatureAsNext() {
-    // TODO: Delete this. This is ok only because we're not handling body to body exchanges for the time being! A body can't update its own current temperature
-    // because we have no guarantees that the other bodies in the same tick group already interacted with it.
     if (_nextTemperature != _currentTemperature) {
         _currentTemperature = _nextTemperature;
         OnTemperatureChanged.Broadcast(_currentTemperature);
