@@ -76,9 +76,10 @@ float Interact(const FVector2D interactorWorldLocation, const float interactorRa
 
         // From World Space to Grid Space
         const FVector2D interactorGridLocation = interactorWorldLocation - grid.Attributes.BottomLeftCorner;
-        const bool interactorWithinGridBounds =
-            (interactorGridLocation.X <= numbersOfCells.X * cellsSize.X) && (interactorGridLocation.Y <= numbersOfCells.Y * cellsSize.Y);
-        if (interactorWithinGridBounds) {
+        const bool interactorWithinXBounds = 0.0f <= interactorGridLocation.X && interactorGridLocation.X <= numbersOfCells.X * cellsSize.X;
+        const bool interactorWithinYBounds = 0.0f <= interactorGridLocation.Y && interactorGridLocation.Y <= numbersOfCells.Y * cellsSize.Y;
+        // Is the interactor within the grid bounds?
+        if (interactorWithinXBounds && interactorWithinYBounds) {
             // The cell (i, j) containing the bottom-left corner of the square enclosing the interaction circle
             const FVector2D bottomLeftLocation = interactorGridLocation - interactorRange * FVector2D::UnitVector;
             auto bottomLeftCoordinates = FIntVector2(bottomLeftLocation.X / cellsSize.X, bottomLeftLocation.Y / cellsSize.Y);
