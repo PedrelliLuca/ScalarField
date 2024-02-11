@@ -18,8 +18,8 @@ public:
 
     void OnTemperatureUpdate(double newTemperature);
 
-    void OnHealthUpdate(double newHealth);
-    void OnMaxHealthUpdate(double newMaxHealth);
+    void OnHealthUpdate(float newHealth);
+    void OnMaxHealthUpdate(float newMaxHealth);
 
     void OnManaUpdate(double newMana);
     void OnMaxManaUpdate(double newMaxMana);

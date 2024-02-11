@@ -32,7 +32,7 @@ protected:
     UFUNCTION(BlueprintImplementableEvent)
     void _setHealth();
     UFUNCTION(BlueprintImplementableEvent)
-    void _setHealthRegen(double newHealthRegen);
+    void _setHealthRegen(float newHealthRegen);
 
     UFUNCTION(BlueprintImplementableEvent)
     void _setMana();
@@ -46,9 +46,9 @@ protected:
     void _setPauseStatus(bool bIsGamePaused);
 
     UPROPERTY(BlueprintReadOnly, Category = "Health")
-    double _currentHealth = 0.;
+    float _currentHealth = 0.;
     UPROPERTY(BlueprintReadOnly, Category = "Health")
-    double _maxHealth = 0.;
+    float _maxHealth = 0.;
 
     UPROPERTY(BlueprintReadOnly, Category = "Mana")
     double _currentMana = 0.;
@@ -56,8 +56,8 @@ protected:
     double _maxMana = 0.;
 
 private:
-    void _setMaxHealth(double newMaxHealth);
-    void _setCurrentHealth(double newCurrentHealth);
+    void _setMaxHealth(float newMaxHealth);
+    void _setCurrentHealth(float newCurrentHealth);
 
     void _setMaxMana(double newMaxMana);
     void _setCurrentMana(double newCurrentMana);

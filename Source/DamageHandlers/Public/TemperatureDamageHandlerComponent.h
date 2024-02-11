@@ -7,14 +7,15 @@
 
 #include "TemperatureDamageHandlerComponent.generated.h"
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class UHealthComponent;
+class UThermodynamicsInteractorComponent;
+
+UCLASS(ClassGroup = (DamageHandlers), meta = (BlueprintSpawnableComponent))
 class DAMAGEHANDLERS_API UTemperatureDamageHandlerComponent : public UActorComponent {
     GENERATED_BODY()
 
 public:
     UTemperatureDamageHandlerComponent();
-
-    void HandleDamage(double temperature);
 
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
@@ -24,15 +25,18 @@ public:
     double GetMinComfortTemperature() const { return _minComfortTemperature; }
     double GetMaxComfortTemperature() const { return _maxComfortTemperature; }
 
-    bool IsTemperatureComfortable(const double temperature) const { return temperature >= _minComfortTemperature && temperature <= _maxComfortTemperature; }
-
 #if WITH_EDITOR
     void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
 
+protected:
+    void BeginPlay() override;
+
 private:
+    bool _isTemperatureCausingDamage() const;
+
     // TODO: in the future this might become a strategy object so that designers can set the damage function they want!
-    double _computeDamageFromTemperature(double temperature);
+    float _computeDamageForTemperature(float temperature) const;
 
     UPROPERTY(EditAnywhere, Category = "Temperature Comfort Interval", meta = (ClampMin = "0"))
     double _minComfortTemperature = 0.;
@@ -43,5 +47,8 @@ private:
     UPROPERTY(EditAnywhere, Category = "Temperature Damage Interval", meta = (ClampMin = "0"))
     double _damageInterval = 1.;
 
-    double _currentInteralTime = 0.;
+    FTimerHandle _damageCooldownTimerHandle;
+
+    TWeakObjectPtr<UHealthComponent> _healthC;
+    TWeakObjectPtr<UThermodynamicsInteractorComponent> _thermoInteractorC;
 };

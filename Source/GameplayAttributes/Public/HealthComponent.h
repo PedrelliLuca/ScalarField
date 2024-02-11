@@ -6,9 +6,9 @@
 #include "CoreMinimal.h"
 #include "HealthComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, double);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChanged, double);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthRegenChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxHealthChanged, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthRegenChanged, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeath, TObjectPtr<AActor>);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -24,16 +24,16 @@ public:
     void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-    double GetCurrentHealth() const { return _currentHealth; }
-    double GetMaxHealth() const { return _maxHealth; }
-    double GetHealthRegen() const { return _healthRegenPerSecond; }
+    float GetCurrentHealth() const { return _currentHealth; }
+    float GetMaxHealth() const { return _maxHealth; }
+    float GetHealthRegen() const { return _healthRegenPerSecond; }
 
-    void SetCurrentHealth(double health);
-    void SetMaxHealth(double maxHealth, bool bUpdateHealth = true);
-    void SetHealthRegen(double healthRegenPerSecond);
+    void SetCurrentHealth(float health);
+    void SetMaxHealth(float maxHealth, bool bUpdateHealth = true);
+    void SetHealthRegen(float healthRegenPerSecond);
 
-    void TakeDamage(double damage) { SetCurrentHealth(GetCurrentHealth() - damage); }
-    void Heal(double healthToAdd) { SetCurrentHealth(GetCurrentHealth() + healthToAdd); }
+    void TakeDamage(float damage) { SetCurrentHealth(GetCurrentHealth() - damage); }
+    void Heal(float healthToAdd) { SetCurrentHealth(GetCurrentHealth() + healthToAdd); }
 
     UFUNCTION(BlueprintPure)
     bool IsDead() const { return _currentHealth <= DBL_EPSILON; }
@@ -48,14 +48,14 @@ protected:
 
 private:
     UPROPERTY(EditAnywhere, Category = "Health", meta = (ClampMin = "0"))
-    double _maxHealth = 0.;
+    float _maxHealth = 0.;
 
     // How much health we regenerate in 1 second
     UPROPERTY(EditAnywhere, Category = "Health", meta = (ClampMin = "0"))
-    double _healthRegenPerSecond = 0.;
+    float _healthRegenPerSecond = 0.;
 
     UPROPERTY(VisibleAnywhere, Category = "Health")
-    double _currentHealth = 0.;
+    float _currentHealth = 0.;
 
     FOnHealthChanged _onHealthChanged;
     FOnMaxHealthChanged _onMaxHealthChanged;

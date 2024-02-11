@@ -8,7 +8,7 @@
 
 #include "PawnImpactDamageHandlerComponent.generated.h"
 
-UCLASS()
+UCLASS(ClassGroup = (DamageHandlers), meta = (BlueprintSpawnableComponent))
 class DAMAGEHANDLERS_API UPawnImpactDamageHandlerComponent : public UActorComponent, public IImpactDamageHandler {
     GENERATED_BODY()
 

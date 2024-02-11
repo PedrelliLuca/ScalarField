@@ -104,12 +104,12 @@ void UHUDWidget::Hide() {
     RemoveFromParent();
 }
 
-void UHUDWidget::_setMaxHealth(double newMaxHealth) {
+void UHUDWidget::_setMaxHealth(float newMaxHealth) {
     _maxHealth = newMaxHealth;
     _setHealth();
 }
 
-void UHUDWidget::_setCurrentHealth(double newCurrentHealth) {
+void UHUDWidget::_setCurrentHealth(float newCurrentHealth) {
     _currentHealth = newCurrentHealth;
     _setHealth();
 }

@@ -11,12 +11,12 @@ void UAIStatusWidget::OnTemperatureUpdate(const double newTemperature) {
     _updateThermometer(newTemperature);
 }
 
-void UAIStatusWidget::OnHealthUpdate(const double newHealth) {
+void UAIStatusWidget::OnHealthUpdate(const float newHealth) {
     _currentHealth = newHealth;
     _updateHealth();
 }
 
-void UAIStatusWidget::OnMaxHealthUpdate(const double newMaxHealth) {
+void UAIStatusWidget::OnMaxHealthUpdate(const float newMaxHealth) {
     _maxHealth = newMaxHealth;
     _updateHealth();
 }
