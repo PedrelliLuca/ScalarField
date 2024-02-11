@@ -2,6 +2,7 @@
 
 #include "ScalarFieldPlayerController.h"
 
+#include "GameFramework/PawnMovementComponent.h"
 #include "InventoryManipulationSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "NewStateComponent.h"
@@ -341,7 +342,12 @@ void AScalarFieldPlayerController::_onHeatmapVisualizationToggled() {
 }
 
 void AScalarFieldPlayerController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
+    // This stuff shouldn't be in the Player Controller!! It should be on a component located on the pawn.
+    // Thing is, you'd have to port both the state machine and the movement system to the pawn for the above to happen.
     _onSkillAbort();
+    DisableInput(this);
+    _movementCommandC->SetMovementMode(EMovementCommandMode::MCM_Still);
+    GetPawn()->GetMovementComponent()->StopMovementImmediately();
 }
 
 constexpr int32 AScalarFieldPlayerController::_getSkillIdxFromKey(const int32 key) {

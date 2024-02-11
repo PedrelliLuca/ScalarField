@@ -58,6 +58,7 @@ protected:
 private:
     void _setMaxHealth(float newMaxHealth);
     void _setCurrentHealth(float newCurrentHealth);
+    void _onDeath(TObjectPtr<AActor> _);
 
     void _setMaxMana(double newMaxMana);
     void _setCurrentMana(double newCurrentMana);
@@ -69,6 +70,7 @@ private:
     FDelegateHandle _healthChangedHandle;
     FDelegateHandle _maxHealthChangedHandle;
     FDelegateHandle _healthRegenChangedHandle;
+    FDelegateHandle _onDeathHandle;
     FDelegateHandle _manaChangedHandle;
     FDelegateHandle _maxManaChangedHandle;
     FDelegateHandle _manaRegenChangedHandle;

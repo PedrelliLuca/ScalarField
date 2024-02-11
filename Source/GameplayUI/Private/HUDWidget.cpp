@@ -47,15 +47,18 @@ void UHUDWidget::BindCurrentPawn() {
         _setCurrentHealth(_healthC->GetCurrentHealth());
         _setMaxHealth(_healthC->GetMaxHealth());
         _setHealthRegen(_healthC->GetHealthRegen());
+
         _healthChangedHandle = _healthC->OnHealthChanged().AddUObject(this, &UHUDWidget::_setCurrentHealth);
         _maxHealthChangedHandle = _healthC->OnMaxHealthChanged().AddUObject(this, &UHUDWidget::_setMaxHealth);
         _healthRegenChangedHandle = _healthC->OnHealthRegenChanged().AddUObject(this, &UHUDWidget::_setHealthRegen);
+        _onDeathHandle = _healthC->OnDeath().AddUObject(this, &UHUDWidget::_onDeath);
     }
 
     if (_manaC.IsValid()) {
         _setCurrentMana(_manaC->GetCurrentMana());
         _setMaxMana(_manaC->GetMaxMana());
         _setManaRegen(_manaC->GetManaRegen());
+
         _manaChangedHandle = _manaC->OnManaChanged().AddUObject(this, &UHUDWidget::_setCurrentMana);
         _maxManaChangedHandle = _manaC->OnMaxManaChanged().AddUObject(this, &UHUDWidget::_setMaxMana);
         _manaRegenChangedHandle = _manaC->OnManaRegenChanged().AddUObject(this, &UHUDWidget::_setManaRegen);
@@ -63,6 +66,7 @@ void UHUDWidget::BindCurrentPawn() {
 
     if (_thermoIntC.IsValid()) {
         _onTemperatureChange(_thermoIntC->GetTemperature());
+
         _temperatureChangedHandle = _thermoIntC->OnTemperatureChanged.AddUObject(this, &UHUDWidget::_onTemperatureChange);
     }
 
@@ -77,6 +81,7 @@ void UHUDWidget::UnbindCurrentPawn() {
         _healthC->OnHealthChanged().Remove(_healthChangedHandle);
         _healthC->OnMaxHealthChanged().Remove(_maxHealthChangedHandle);
         _healthC->OnHealthRegenChanged().Remove(_healthRegenChangedHandle);
+        _healthC->OnDeath().Remove(_onDeathHandle);
     }
 
     if (_manaC.IsValid()) {
@@ -112,6 +117,13 @@ void UHUDWidget::_setMaxHealth(float newMaxHealth) {
 void UHUDWidget::_setCurrentHealth(float newCurrentHealth) {
     _currentHealth = newCurrentHealth;
     _setHealth();
+}
+
+// The parameter of this function is useless. In fact, this entire funciton shouldn't exist, since it's simply a way to bind UnbindCurrentPawn() to
+// UHealthComponent::OnDeath(). However, due to an architectural error (see description of FOnDeath macro, UHealthComponent.h), it is necessary. I should
+// remove this one day.
+void UHUDWidget::_onDeath(TObjectPtr<AActor> _) {
+    UnbindCurrentPawn();
 }
 
 void UHUDWidget::_setMaxMana(double newMaxMana) {
