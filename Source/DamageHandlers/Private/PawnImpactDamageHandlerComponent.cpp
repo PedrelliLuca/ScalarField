@@ -3,30 +3,58 @@
 #include "PawnImpactDamageHandlerComponent.h"
 
 #include "GameFramework/PawnMovementComponent.h"
-#include "ImpactDamageType.h"
+#include "HealthComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "NavigationSystem.h"
 
-void UPawnImpactDamageHandlerComponent::HandleImpact(const FVector& velocity, const double damage, AActor* const damageCauser) {
-    const auto owner = Cast<APawn>(GetOwner());
-    // This component has the word "pawn" in its name for a reason...
-    check(IsValid(owner));
+UPawnImpactDamageHandlerComponent::UPawnImpactDamageHandlerComponent() {
+    PrimaryComponentTick.bCanEverTick = false;
+}
 
-    if (const auto controller = owner->GetController(); IsValid(controller)) {
-        if (const auto pathFollowingC = controller->FindComponentByClass<UPathFollowingComponent>();
-            IsValid(pathFollowingC) && pathFollowingC->GetStatus() != EPathFollowingStatus::Idle) {
-            if (const auto navSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(controller->GetWorld()); IsValid(navSys)) {
-                pathFollowingC->AbortMove(*navSys, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest, FAIRequestID::AnyRequest,
-                    EPathFollowingVelocityMode::Reset);
+void UPawnImpactDamageHandlerComponent::BeginPlay() {
+    Super::BeginPlay();
+
+    if (APawn* const pawn = Cast<APawn>(GetOwner()); IsValid(pawn)) {
+        if (_healthC = pawn->FindComponentByClass<UHealthComponent>(); _healthC.IsValid()) {
+            AController* const controller = pawn->GetController();
+            check(IsValid(controller));
+
+            _pathFollowingC = controller->FindComponentByClass<UPathFollowingComponent>();
+            if (!_pathFollowingC.IsValid()) {
+                UE_LOG(LogTemp, Warning, TEXT("%s: No PathFollowingComponent on owner, ImpactDamage won't abort movement. Is this intended?"),
+                    *FString(__FUNCTION__));
             }
+
+            _navSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(controller->GetWorld()); 
+            if (!_navSys.IsValid()) {
+                UE_LOG(LogTemp, Warning, TEXT("%s: No NavSysV1 on owner's controller, ImpactDamage won't change pawn's velocity. Is this intended?"),
+                    *FString(__FUNCTION__));
+            }
+
+            _pawnMovementC = controller->FindComponentByClass<UPawnMovementComponent>();
+            if (!_pawnMovementC.IsValid()) {
+                UE_LOG(LogTemp, Warning, TEXT("%s: No PawnMovementComponent on owner, ImpactDamage won't change pawn's velocity. Is this intended?"),
+                    *FString(__FUNCTION__));
+            }
+
+        } else {
+            UE_LOG(LogTemp, Error, TEXT("%s: Owner does not have a valid UHealthComponent and won't receive damage by impacts."), *FString(__FUNCTION__));
         }
+    } else {
+        UE_LOG(LogTemp, Error, TEXT("%s: Owner is not an APawn, ImpactDamage is disabled."), *FString(__FUNCTION__));
+    }
+}
+
+void UPawnImpactDamageHandlerComponent::HandleImpact(const FVector& velocity, const float damage) {
+    check(_healthC.IsValid());
+    _healthC->TakeDamage(damage);
+
+    if (_pathFollowingC.IsValid() && _navSys.IsValid() && _pathFollowingC->GetStatus() != EPathFollowingStatus::Idle) {
+        _pathFollowingC->AbortMove(*_navSys, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest, FAIRequestID::AnyRequest,
+            EPathFollowingVelocityMode::Reset);
     }
 
-    if (const auto movementC = owner->FindComponentByClass<UPawnMovementComponent>(); IsValid(movementC)) {
-        movementC->Velocity = velocity;
+    if (_pawnMovementC.IsValid()) {
+        _pawnMovementC->Velocity = velocity;
     }
-
-    const TSubclassOf<UDamageType> damageType = UImpactDamageType::StaticClass();
-    const FDamageEvent damageEvent{damageType};
-    owner->TakeDamage(damage, damageEvent, nullptr, damageCauser);
 }

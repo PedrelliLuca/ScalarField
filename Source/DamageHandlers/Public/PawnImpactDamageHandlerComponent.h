@@ -8,10 +8,27 @@
 
 #include "PawnImpactDamageHandlerComponent.generated.h"
 
+class UHealthComponent;
+class UNavigationSystemV1;
+class UPathFollowingComponent;
+class UPawnMovementComponent;
+
 UCLASS(ClassGroup = (DamageHandlers), meta = (BlueprintSpawnableComponent))
 class DAMAGEHANDLERS_API UPawnImpactDamageHandlerComponent : public UActorComponent, public IImpactDamageHandler {
     GENERATED_BODY()
 
 public:
-    void HandleImpact(const FVector& velocity, double damage, AActor* damageCauser) override;
+    UPawnImpactDamageHandlerComponent();
+
+protected:
+    void BeginPlay() override;
+
+public:
+    void HandleImpact(const FVector& velocity, float damage) override;
+
+    TWeakObjectPtr<UHealthComponent> _healthC;
+
+    TWeakObjectPtr<UPathFollowingComponent> _pathFollowingC;
+    TWeakObjectPtr<UNavigationSystemV1> _navSys;
+    TWeakObjectPtr<UPawnMovementComponent> _pawnMovementC;
 };

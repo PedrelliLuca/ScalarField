@@ -39,7 +39,7 @@ void UImpactOneHitDamageDealerComponent::_tryApplyImpulse(UPrimitiveComponent* o
 
     const auto velocity = impulseDirection * _impulseIntensity;
 
-    impactHandler->HandleImpact(velocity, _impactDamage, GetOwner());
+    impactHandler->HandleImpact(velocity, _impactDamage);
 
     _hitActors.Emplace(otherActor);
 }
