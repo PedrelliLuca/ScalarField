@@ -12,7 +12,7 @@
 /**
  *
  */
-UCLASS()
+UCLASS(ClassGroup = (GameplayUI), meta = (BlueprintSpawnableComponent))
 class SCALARFIELD_API UAIStatusWidgetComponent : public UWidgetComponent {
     GENERATED_BODY()
 
