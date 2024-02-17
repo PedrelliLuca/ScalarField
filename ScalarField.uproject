@@ -78,6 +78,11 @@
 			"Name": "ThermodynamicsPresenter",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "AnimationComponents",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [

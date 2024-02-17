@@ -41,7 +41,7 @@ public:
     void Heal(float healthToAdd) { SetCurrentHealth(GetCurrentHealth() + healthToAdd); }
 
     UFUNCTION(BlueprintPure)
-    bool IsDead() const { return _currentHealth <= DBL_EPSILON; }
+    bool IsDead() const { return _currentHealth <= FLT_EPSILON; }
 
     FOnHealthChanged& OnHealthChanged() { return _onHealthChanged; }
     FOnMaxHealthChanged& OnMaxHealthChanged() { return _onMaxHealthChanged; }

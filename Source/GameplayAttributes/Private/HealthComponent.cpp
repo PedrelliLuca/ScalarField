@@ -33,6 +33,7 @@ void UHealthComponent::SetCurrentHealth(const float health) {
     if (FMath::IsNearlyZero(_currentHealth)) {
         SetHealthRegen(0.0f);
         _onDeath.Broadcast(GetOwner());
+        SetComponentTickEnabled(false);
     }
 }
 

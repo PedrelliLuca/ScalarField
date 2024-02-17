@@ -17,8 +17,9 @@ void UTemperatureDamageHandlerComponent::TickComponent(const float deltaTime, co
         SetComponentTickEnabled(false);
 
         FTimerDelegate delegate;
-        delegate.BindLambda([weakThis = TWeakObjectPtr<UTemperatureDamageHandlerComponent>(this)]() {
-            if (weakThis.IsValid()) {
+        delegate.BindLambda([weakThis = TWeakObjectPtr<UTemperatureDamageHandlerComponent>(this), healthC = _healthC]() {
+            // Do not re-enable the tick if the owner is already dead.
+            if (weakThis.IsValid() && healthC.IsValid() && !healthC->IsDead()) {
                 weakThis->SetComponentTickEnabled(true);
             }
         });

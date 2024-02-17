@@ -119,8 +119,8 @@ void UHUDWidget::_setCurrentHealth(float newCurrentHealth) {
     _setHealth();
 }
 
-// The parameter of this function is useless. In fact, this entire funciton shouldn't exist, since it's simply a way to bind UnbindCurrentPawn() to
-// UHealthComponent::OnDeath(). However, due to an architectural error (see description of FOnDeath macro, UHealthComponent.h), it is necessary. I should
+// The parameter of this function is useless. In fact, this entire funciton shouldn't exist, UnbindCurrentPawn() should be the function bound to
+// UHealthComponent::OnDeath(). However, due to an architectural error (see description of FOnDeath macro, UHealthComponent.h), it is necessary. I shall
 // remove this one day.
 void UHUDWidget::_onDeath(TObjectPtr<AActor> _) {
     UnbindCurrentPawn();
