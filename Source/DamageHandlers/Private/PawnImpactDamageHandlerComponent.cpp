@@ -31,7 +31,7 @@ void UPawnImpactDamageHandlerComponent::BeginPlay() {
                     *FString(__FUNCTION__));
             }
 
-            _pawnMovementC = controller->FindComponentByClass<UPawnMovementComponent>();
+            _pawnMovementC = pawn->FindComponentByClass<UPawnMovementComponent>();
             if (!_pawnMovementC.IsValid()) {
                 UE_LOG(LogTemp, Warning, TEXT("%s: No PawnMovementComponent on owner, ImpactDamage won't change pawn's velocity. Is this intended?"),
                     *FString(__FUNCTION__));

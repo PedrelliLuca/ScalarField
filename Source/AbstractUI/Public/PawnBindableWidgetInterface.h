@@ -14,6 +14,7 @@ class IPawnBindableWidget {
     GENERATED_BODY()
 
 public:
+    // TODO: why did I link this interface to pawns when I created it? Why not SetActor()? Weird...
     virtual void SetPawn(TWeakObjectPtr<APawn> pawn) = 0;
     virtual void ForgetCurrentPawn() = 0;
     virtual void BindCurrentPawn() = 0;

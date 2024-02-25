@@ -28,12 +28,14 @@ void UHealthComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyCha
 #endif
 
 void UHealthComponent::SetCurrentHealth(const float health) {
-    _currentHealth = FMath::Clamp(health, 0., _maxHealth);
-    _onHealthChanged.Broadcast(_currentHealth);
-    if (FMath::IsNearlyZero(_currentHealth)) {
-        SetHealthRegen(0.0f);
-        _onDeath.Broadcast(GetOwner());
-        SetComponentTickEnabled(false);
+    if (!IsDead()) {
+        _currentHealth = FMath::Clamp(health, 0.0f, _maxHealth);
+        _onHealthChanged.Broadcast(_currentHealth);
+        if (IsDead()) {
+            SetHealthRegen(0.0f);
+            _onDeath.Broadcast(GetOwner());
+            SetComponentTickEnabled(false);
+        }
     }
 }
 

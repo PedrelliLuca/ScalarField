@@ -2,9 +2,12 @@
 
 #include "DeathAnimationComponent.h"
 
+#include "AIController.h"
 #include "Animation/AnimMontage.h"
+#include "BrainComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "HealthComponent.h"
 
 UDeathAnimationComponent::UDeathAnimationComponent() {
@@ -34,6 +37,15 @@ void UDeathAnimationComponent::BeginPlay() {
 void UDeathAnimationComponent::_playDeathMontage(TObjectPtr<AActor> _) {
     // This component should be the one responsible for destroying the owner, how can it be already invalid?
     check(_ownerCharacter.IsValid());
+
+    _ownerCharacter->GetMovementComponent()->StopMovementImmediately();
+
+    // An alternative approach to avoid depending from AAIController and UBrainComponent would be to create a custom
+    // UBrainComponent that binds to the OnDeath delegate of UHealthComponent to call StopLogic(). This custom brain could be
+    // assigned during the AIController's construction. For the time being, this is not a big deal.
+    if (AAIController* aiController = Cast<AAIController>(_ownerCharacter->GetController()); IsValid(aiController)) {
+        aiController->GetBrainComponent()->StopLogic(FString{TEXT("Death")});
+    }
 
     constexpr float playRate = 1.0f;
     const bool playedSuccessfully = _ownerCharacter->PlayAnimMontage(_deathMontage, playRate) > 0.0f;

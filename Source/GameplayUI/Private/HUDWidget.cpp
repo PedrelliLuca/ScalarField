@@ -38,6 +38,7 @@ void UHUDWidget::ForgetCurrentPawn() {
     _healthC = nullptr;
     _manaC = nullptr;
     _thermoIntC = nullptr;
+    _thermoPresC = nullptr;
 }
 
 void UHUDWidget::BindCurrentPawn() {

@@ -15,6 +15,9 @@ namespace UnrealBuildTool.Rules
                     "CoreUObject",
                     "Engine",
                     "GameplayAttributes",
+
+                    // Theoretically removable, see UDeathAnimationComponent::_playDeathMontage()
+                    "AIModule"
                 }
                 );
 

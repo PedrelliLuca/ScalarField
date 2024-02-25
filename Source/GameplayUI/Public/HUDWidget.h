@@ -21,7 +21,7 @@ class GAMEPLAYUI_API UHUDWidget : public UUserWidget, public IPawnBindableWidget
     GENERATED_BODY()
 
 public:
-    void SetPawn(TWeakObjectPtr<APawn> pawn);
+    void SetPawn(TWeakObjectPtr<APawn> pawn) override;
     void ForgetCurrentPawn() override;
     void BindCurrentPawn() override;
     void UnbindCurrentPawn() override;

@@ -21,9 +21,4 @@ public:
 
 protected:
     void BeginPlay() override;
-
-private:
-    void _bindTemperatureComponent(UAIStatusWidget* statusWidget) const;
-    void _bindHealthComponent(UAIStatusWidget* statusWidget) const;
-    void _bindManaComponent(UAIStatusWidget* statusWidget) const;
 };
