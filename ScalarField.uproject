@@ -79,11 +79,16 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		},
-		{
-			"Name": "AnimationComponents",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		}
+    {
+      "Name": "AnimationComponents",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    },
+    {
+      "Name": "GameplayUI",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
 	],
 	"Plugins": [
 		{

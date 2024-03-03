@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "AI/AIStatusWidget.h"
+#include "AIStatusWidget.h"
 #include "Components/WidgetComponent.h"
 
 #include "AIStatusWidgetComponent.generated.h"
@@ -13,7 +13,7 @@
  *
  */
 UCLASS(ClassGroup = (GameplayUI), meta = (BlueprintSpawnableComponent))
-class SCALARFIELD_API UAIStatusWidgetComponent : public UWidgetComponent {
+class GAMEPLAYUI_API UAIStatusWidgetComponent : public UWidgetComponent {
     GENERATED_BODY()
 
 public:

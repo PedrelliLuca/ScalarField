@@ -26,7 +26,8 @@ namespace UnrealBuildTool.Rules
 					"GameplayAttributes", 
 					"TacticalPauseSystem", 
 					"ThermodynamicsCore", 
-					"ThermodynamicsPresenter"
+					"ThermodynamicsPresenter",
+                    "DamageHandlers"
 				}
 				);
 

@@ -16,7 +16,7 @@ class UThermodynamicsInteractorComponent;
  *
  */
 UCLASS()
-class SCALARFIELD_API UAIStatusWidget : public UUserWidget, public IPawnBindableWidget {
+class GAMEPLAYUI_API UAIStatusWidget : public UUserWidget, public IPawnBindableWidget {
     GENERATED_BODY()
 
 public:

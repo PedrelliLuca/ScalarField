@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/AIStatusWidgetComponent.h"
+#include "Components/AIStatusWidgetComponent.h"
 
 #include "PawnBindableWidgetInterface.h"
 

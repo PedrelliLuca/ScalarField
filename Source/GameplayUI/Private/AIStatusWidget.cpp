@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "AI/AIStatusWidget.h"
+#include "AIStatusWidget.h"
 
 #include "HealthComponent.h"
 #include "ManaComponent.h"
