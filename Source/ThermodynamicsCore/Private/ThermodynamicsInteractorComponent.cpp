@@ -104,6 +104,10 @@ float UThermodynamicsInteractorComponent::_interactWithOtherComponents(const flo
 
             // We heat-checked otherThermoIntC, so it must increase its counter
             otherThermoIntC->_updateNumberOfInteractionsThisFrame();
+        } else {
+            // otherThermoIntC cannot interact with us this frame, but it's already in _heatExchangers => it takes part in _timesToBeCheckedThisFrame, so we
+            // need to pretend it interacted with us.
+            _updateNumberOfInteractionsThisFrame();
         }
     }
 
