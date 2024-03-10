@@ -9,19 +9,20 @@
 #include "HeatmapGridOperations.h"
 #include "ThermodynamicsSubsystem.h"
 
-#define LOG_THERMODYNAMICS = 1
+// #define LOG_THERMODYNAMICS
 
 UThermodynamicsInteractorComponent::UThermodynamicsInteractorComponent()
     : _initialTemperature(273.15f) // 0 Celsius degrees.
     , _heatCapacity(1.0f)
     , _currentTemperature(0.0f)
     , _nextTemperature(0.0f)
-    , _hasNeverTicked(true) {
+    , _hasNeverTicked(true)
+    , _unregisteredDeltaTemperature(0.0f) {
     PrimaryComponentTick.bCanEverTick = true;
 
     // Why a delayed tick group on spawn?
     // We want _hasNeverTicked == true for the entirity of the first frame, so that it can't become false before all components that have this one in
-    // _heatExchangers have ticked, avoiding them increasing this component's counter and cause this to overshoot next frame.
+    // _collidingInteractors have ticked, avoiding them increasing this component's counter and cause this to overshoot next frame.
     // To ensure this, we make new thermodynamic components tick as late as possible.
     PrimaryComponentTick.TickGroup = ETickingGroup::TG_PostUpdateWork;
 }
@@ -38,7 +39,7 @@ void UThermodynamicsInteractorComponent::SetTemperature(const float newTemperatu
 void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-    // Suppose this just spawned and some of the _heatExchangers have already _setCurrentTemperatureHasNext(). Updating their counters would cause them to
+    // Suppose this just spawned and some of the _collidingInteractors have already _setCurrentTemperatureAsNext(). Updating their counters would cause them to
     // overshoot the next frame. This is why, on the frame we spawn, we skip thermodynamics.
     if (_hasNeverTicked) {
         _hasNeverTicked = false;                    // Ensures that, next frame, others won't overshoot because of this.
@@ -52,7 +53,7 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
     }
 
     // 1) Interact with other UThermodynamicsInteractorComponents you're colliding with
-    _timesToBeCheckedThisFrame = _heatExchangers.Num();
+    _timesToBeCheckedThisFrame = _collidingInteractors.Num();
 #ifdef LOG_THERMODYNAMICS
     auto thisName = FString(GetOwner()->GetName());
     UE_LOG(LogTemp, Warning, TEXT("%s will be checked %i times this frame"), *thisName, _timesToBeCheckedThisFrame);
@@ -65,10 +66,11 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
     const float interactionRange = _sphereCollisionC->GetScaledSphereRadius();
     const float currDeltaT_GridNormalized = HeatmapGrid::Interact(location, interactionRange, _currentTemperature, deltaTime);
 
-    const float totalCurrDeltaT = currDeltaT_GridNormalized + currDeltaT_OtherBodies;
+    const float totalCurrDeltaT = currDeltaT_GridNormalized + currDeltaT_OtherBodies + _unregisteredDeltaTemperature;
     const float totalDeltaT = (UThermodynamicsSubsystem::ROD_CONSTANT * totalCurrDeltaT * deltaTime) / _heatCapacity;
 
     _nextTemperature += totalDeltaT;
+    _unregisteredDeltaTemperature = 0.0f;
 
     if (_counterOfChecksThisFrame == _timesToBeCheckedThisFrame) {
         _setCurrentTemperatureAsNext();
@@ -76,6 +78,8 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
         // If the _counter overshoots the limit thermodyanmics is going to cease for this actor, there is a flaw in the spawn logic
         check(_counterOfChecksThisFrame < _timesToBeCheckedThisFrame);
     }
+
+    check(_interactorsToRepay.IsEmpty());
 }
 
 #if WITH_EDITOR
@@ -112,18 +116,26 @@ void UThermodynamicsInteractorComponent::BeginPlay() {
 float UThermodynamicsInteractorComponent::_interactWithOtherComponents(const float deltaTime) {
     float deltaTemperature = 0.0f;
 
-    for (const TWeakObjectPtr<UThermodynamicsInteractorComponent>& otherThermoIntC : _heatExchangers) {
+    for (const TWeakObjectPtr<UThermodynamicsInteractorComponent>& otherThermoIntC : _collidingInteractors) {
         if (!otherThermoIntC->_hasNeverTicked) {
             // This currDeltaT is from this component'sPOV, which is why its _currentTemperature is on the right hand side.
             // If this interactor's T is greater than the other's, deltaT < 0 => this interactor emits heat (deltaTemperature decreases).
             // If this interactor's T is smaller than the other's, deltaT > 0 => this interactor absorbs heat (deltaTemperature increases).
             deltaTemperature += otherThermoIntC->_currentTemperature - _currentTemperature;
 
+            if (_interactorsToRepay.Contains(otherThermoIntC)) {
+                // Our debt with otherThermoIntC this frame has been repaid
+                _interactorsToRepay.Remove(otherThermoIntC);
+            } else {
+                // otherThermoC owes us an interaction this frame. It will have to repay during its tick or while unregistering us.
+                otherThermoIntC->_interactorsToRepay.Emplace(this);
+            }
+
             // We heat-checked otherThermoIntC, so it must increase its counter
             otherThermoIntC->_updateNumberOfInteractionsThisFrame();
         } else {
-            // otherThermoIntC cannot interact with us this frame, but it's already in _heatExchangers => it takes part in _timesToBeCheckedThisFrame, so we
-            // need to pretend it interacted with us.
+            // otherThermoIntC cannot interact with us this frame, but it's already in _collidingInteractors => it takes part in _timesToBeCheckedThisFrame, so
+            // we need to pretend it interacted with us.
             _updateNumberOfInteractionsThisFrame();
         }
     }
@@ -169,7 +181,7 @@ void UThermodynamicsInteractorComponent::_retrieveThermodynamicCollision() {
                     // Setup the simultaneity mechanism.
                     _counterOfChecksThisFrame = 0;
                     _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
-                    _heatExchangers.Empty();
+                    _collidingInteractors.Empty();
 
                     // When a UPrimitiveComponent spawns, even if it's already colliding with something, OnComponentBeginOverlap doesn't Broadcast().
                     // We need this to detect if some other AActor is already interacting with us thermodynamically.
@@ -215,7 +227,7 @@ void UThermodynamicsInteractorComponent::_setInitialInteractors() {
     UE_LOG(LogTemp, Warning, TEXT("%s initial interactors:"), *thisName);
 #endif
 
-    Algo::ForEach(overlappingCollisions, [&heatExchangers = _heatExchangers](const TObjectPtr<const UPrimitiveComponent> otherCollision) {
+    Algo::ForEach(overlappingCollisions, [&heatExchangers = _collidingInteractors](const TObjectPtr<const UPrimitiveComponent> otherCollision) {
         const auto otherOwner = otherCollision->GetOwner();
         const auto otherThermoIntC = otherOwner->FindComponentByClass<UThermodynamicsInteractorComponent>();
         // If I have a thermodynamic collision I must have a thermodynamic component
@@ -234,7 +246,7 @@ void UThermodynamicsInteractorComponent::_registerInteractor(UPrimitiveComponent
     const auto otherThermoIntC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
     check(IsValid(otherThermoIntC));
 
-    _heatExchangers.Emplace(otherThermoIntC);
+    _collidingInteractors.Emplace(otherThermoIntC);
 
 #ifdef LOG_THERMODYNAMICS
     auto thisName = FString(GetOwner()->GetName());
@@ -245,20 +257,36 @@ void UThermodynamicsInteractorComponent::_registerInteractor(UPrimitiveComponent
 
 void UThermodynamicsInteractorComponent::_unregisterInteractor(
     UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
-    TWeakObjectPtr<UThermodynamicsInteractorComponent>* thermoIntToRemove = Algo::FindByPredicate(_heatExchangers,
+    TWeakObjectPtr<UThermodynamicsInteractorComponent>* found = Algo::FindByPredicate(_collidingInteractors,
         [otherComp](const TWeakObjectPtr<UThermodynamicsInteractorComponent>& thermoIntC) { return thermoIntC->_sphereCollisionC == otherComp; });
 
     // If this is nullptr, either:
     // 1. otherComp's UThermodynamicsInteractorC was never registered => there is a problem in the registration logic.
     // OR
     // 2. otherComp is not a THERMODYNAMICS_COLLISION_PROFILE_NAME => there is a problem on the collision channels.
-    check(thermoIntToRemove != nullptr);
+    check(found != nullptr);
+
+    auto thermoIntToRemove = *found;
+
+    // During this frame, did thermoIntToRemove interact with us without us interacting with it? If so, we need to repay him right now, because we won't
+    // see it anymore during tick! 
+    // This can happen is because, while UThermodynamicsInteractorComponents are ticking, AActors are still moving.
+    if (_interactorsToRepay.Find(thermoIntToRemove)) {
+        _interactorsToRepay.Remove(thermoIntToRemove);
+
+        // _timesToBeCheckedThisFrame is evaluated at tick and thermoIntToRemove increased the counter before, so we must decrease it to avoid overshooting.
+        --_counterOfChecksThisFrame;
+        check(_counterOfChecksThisFrame >= 0);
+
+        _unregisteredDeltaTemperature += thermoIntToRemove->_currentTemperature - _currentTemperature;
+        thermoIntToRemove->_updateNumberOfInteractionsThisFrame();
+    }
 
 #ifdef LOG_THERMODYNAMICS
     auto thisName = FString(GetOwner()->GetName());
-    auto otherName = FString((*thermoIntToRemove)->GetOwner()->GetName());
+    auto otherName = FString(thermoIntToRemove->GetOwner()->GetName());
     UE_LOG(LogTemp, Warning, TEXT("%s lost an interactor: %s"), *thisName, *otherName);
 #endif
 
-    _heatExchangers.Remove(*thermoIntToRemove);
+    _collidingInteractors.Remove(thermoIntToRemove);
 }

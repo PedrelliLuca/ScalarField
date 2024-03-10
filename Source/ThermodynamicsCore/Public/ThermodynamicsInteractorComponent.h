@@ -71,8 +71,13 @@ private:
     // To make thermodynamics ignore this on the frame it spawns, avoiding 1 frame-off bugs. See explanation in ctor and TickComponent() functions.
     bool _hasNeverTicked;
 
-    // Thermodynamic interactors whose collision is colliding with this component's.
-    TSet<TWeakObjectPtr<UThermodynamicsInteractorComponent>> _heatExchangers;
+    // Thermodynamic interactors whose collision is colliding with this component's. We're gonna exchange heat with them this frame.
+    TSet<TWeakObjectPtr<UThermodynamicsInteractorComponent>> _collidingInteractors;
+
+    // Thermodynamic interactors that interacted with us without us interacting with them yet.
+    TSet<TWeakObjectPtr<UThermodynamicsInteractorComponent>> _interactorsToRepay;
+
+    float _unregisteredDeltaTemperature;
 
     // TODO: this should be read via UDeveloperSettings
     inline static const char* THERMODYNAMICS_COLLISION_TAG = "ThermodynamicsCollision";
