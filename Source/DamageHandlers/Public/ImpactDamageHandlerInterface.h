@@ -14,5 +14,5 @@ class IImpactDamageHandler {
     GENERATED_BODY()
 
 public:
-    virtual void HandleImpact(const FVector& velocity, double damage, AActor* damageCauser) = 0;
+    virtual void HandleImpact(const FVector& velocity, float damage) = 0;
 };

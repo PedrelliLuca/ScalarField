@@ -23,7 +23,7 @@ namespace UnrealBuildTool.Rules
 				{
 					"SkillSpawnedEntities",
 					"SkillTargeting",
-					"Thermodynamics",
+					"ThermodynamicsCore",
 				}
 				);
 

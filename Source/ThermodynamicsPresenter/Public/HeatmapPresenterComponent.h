@@ -28,14 +28,7 @@ protected:
 private:
     void _updateHeatmap();
 
-    FColor _generateColorFromValue(float val);
-
-    void _onHeatmapVisualizationToggle();
-
-    UPROPERTY(EditAnywhere, Category = "Heatmap Parameters")
-    int32 _numCellsX;
-    UPROPERTY(EditAnywhere, Category = "Heatmap Parameters")
-    int32 _numCellsY;
+    void _toggleHeatmapVisualization();
 
     UPROPERTY(EditAnywhere, Category = "Wave Parameters")
     float _frequencyPI = 0.0f;
@@ -64,5 +57,6 @@ private:
     TWeakObjectPtr<UMaterialParameterCollectionInstance> _heatmapMPCI;
 
     float _timer = 0.0f;
+    int32 _nPixels;
     bool _isHeatmapVisible = true;
 };

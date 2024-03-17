@@ -10,7 +10,7 @@
 
 #include "NewStateComponent.generated.h"
 
-UCLASS()
+UCLASS(ClassGroup = (StateMachine), meta = (BlueprintSpawnableComponent))
 class FSM_API UNewStateComponent : public UActorComponent {
     GENERATED_BODY()
 

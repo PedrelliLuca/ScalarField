@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "FactionComponent.h"
 
-#include "AI/AIStatusWidgetComponent.h"
+#include "Components/AIStatusWidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "HealthComponent.h"
 #include "InventoryComponent.h"

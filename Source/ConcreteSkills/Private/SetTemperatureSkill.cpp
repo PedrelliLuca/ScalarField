@@ -3,7 +3,7 @@
 #include "SetTemperatureSkill.h"
 
 #include "SkillTargets/ActorSkillTarget.h"
-#include "ThermodynamicComponent.h"
+#include "ThermodynamicsInteractorComponent.h"
 
 void USetTemperatureSkill::_skillCast() {
     const auto& targets = _getTargets();
@@ -16,7 +16,7 @@ void USetTemperatureSkill::_skillCast() {
     check(IsValid(skillTarget));
     const auto target = skillTarget->GetActor();
 
-    auto thermoC = target->FindComponentByClass<UThermodynamicComponent>();
+    auto thermoC = target->FindComponentByClass<UThermodynamicsInteractorComponent>();
 
     // If this triggers, it means you didn't set up the skill targeting conditions properly. This skill targets should have a thermodynamic component.
     check(IsValid(thermoC));

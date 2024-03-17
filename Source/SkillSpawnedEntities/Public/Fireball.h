@@ -7,13 +7,14 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "SkillSpawnedEntityInterface.h"
-#include "ThermodynamicActor.h"
-#include "ThermodynamicComponent.h"
+#include "GameFramework/Actor.h"
 
 #include "Fireball.generated.h"
 
+class UThermodynamicsInteractorComponent;
+
 UCLASS()
-class SKILLSPAWNEDENTITIES_API AFireball : public AThermodynamicActor, public ISkillSpawnedEntity {
+class SKILLSPAWNEDENTITIES_API AFireball : public AActor, public ISkillSpawnedEntity {
     GENERATED_BODY()
 
 public:
@@ -26,6 +27,12 @@ protected:
     void BeginPlay() override;
 
 private:
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UThermodynamicsInteractorComponent> _thermoC = nullptr;
+
+    UPROPERTY(EditAnywhere)
+    TObjectPtr<UStaticMeshComponent> _staticMeshC = nullptr;
+
     UPROPERTY(VisibleAnywhere)
     TObjectPtr<UProjectileMovementComponent> _projectileMovementC = nullptr;
 
@@ -37,7 +44,7 @@ private:
 
     // If the fireball temperature reaches a value below this threshold, it destroys itself
     UPROPERTY(EditAnywhere, Category = "Fireball | Thresholds")
-    double _temperatureExtinctionThreshold = 270.;
+    float _temperatureExtinctionThreshold = 270.0f;
 
     UPROPERTY(EditAnywhere, Category = "Fireball | Thresholds")
     float _distanceExtinctionThreshold = 10000.0f;

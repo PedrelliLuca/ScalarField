@@ -10,7 +10,8 @@
 
 class UHealthComponent;
 class UManaComponent;
-class UThermodynamicComponent;
+class UThermodynamicsInteractorComponent;
+class UThermodynamicsPresenterComponent;
 
 /**
  *
@@ -20,7 +21,7 @@ class GAMEPLAYUI_API UHUDWidget : public UUserWidget, public IPawnBindableWidget
     GENERATED_BODY()
 
 public:
-    void SetPawn(TWeakObjectPtr<APawn> pawn);
+    void SetPawn(TWeakObjectPtr<APawn> pawn) override;
     void ForgetCurrentPawn() override;
     void BindCurrentPawn() override;
     void UnbindCurrentPawn() override;
@@ -31,7 +32,7 @@ protected:
     UFUNCTION(BlueprintImplementableEvent)
     void _setHealth();
     UFUNCTION(BlueprintImplementableEvent)
-    void _setHealthRegen(double newHealthRegen);
+    void _setHealthRegen(float newHealthRegen);
 
     UFUNCTION(BlueprintImplementableEvent)
     void _setMana();
@@ -45,9 +46,9 @@ protected:
     void _setPauseStatus(bool bIsGamePaused);
 
     UPROPERTY(BlueprintReadOnly, Category = "Health")
-    double _currentHealth = 0.;
+    float _currentHealth = 0.;
     UPROPERTY(BlueprintReadOnly, Category = "Health")
-    double _maxHealth = 0.;
+    float _maxHealth = 0.;
 
     UPROPERTY(BlueprintReadOnly, Category = "Mana")
     double _currentMana = 0.;
@@ -55,19 +56,21 @@ protected:
     double _maxMana = 0.;
 
 private:
-    void _setMaxHealth(double newMaxHealth);
-    void _setCurrentHealth(double newCurrentHealth);
+    void _setMaxHealth(float newMaxHealth);
+    void _setCurrentHealth(float newCurrentHealth);
+    void _onDeath(TObjectPtr<AActor> _);
 
     void _setMaxMana(double newMaxMana);
     void _setCurrentMana(double newCurrentMana);
 
-    void _onTemperatureChange(double newTemperture);
+    void _onTemperatureChange(float newTemperture);
 
     void _onTacticalPauseToggle(bool bIsTacticalPauseOn, double);
 
     FDelegateHandle _healthChangedHandle;
     FDelegateHandle _maxHealthChangedHandle;
     FDelegateHandle _healthRegenChangedHandle;
+    FDelegateHandle _onDeathHandle;
     FDelegateHandle _manaChangedHandle;
     FDelegateHandle _maxManaChangedHandle;
     FDelegateHandle _manaRegenChangedHandle;
@@ -76,5 +79,6 @@ private:
 
     TWeakObjectPtr<UHealthComponent> _healthC = nullptr;
     TWeakObjectPtr<UManaComponent> _manaC = nullptr;
-    TWeakObjectPtr<UThermodynamicComponent> _thermoC = nullptr;
+    TWeakObjectPtr<UThermodynamicsInteractorComponent> _thermoIntC = nullptr;
+    TWeakObjectPtr<UThermodynamicsPresenterComponent> _thermoPresC = nullptr;
 };

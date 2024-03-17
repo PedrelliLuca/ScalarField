@@ -25,8 +25,9 @@ namespace UnrealBuildTool.Rules
 				{
 					"GameplayAttributes", 
 					"TacticalPauseSystem", 
-					"Thermodynamics", 
-					// ... add private dependencies that you statically link with here ...
+					"ThermodynamicsCore", 
+					"ThermodynamicsPresenter",
+                    "DamageHandlers"
 				}
 				);
 

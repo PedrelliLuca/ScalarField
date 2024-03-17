@@ -15,8 +15,8 @@ namespace UnrealBuildTool.Rules
 					"CoreUObject",
 					"Engine",
 					"NewSkillSystem",
-					"Thermodynamics",
-					"GameplayAttributes"
+					"GameplayAttributes",
+                    "ThermodynamicsCore"
 				}
 				);
 

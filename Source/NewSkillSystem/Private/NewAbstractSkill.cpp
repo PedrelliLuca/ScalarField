@@ -72,7 +72,7 @@ FSkillTargetingResult UNewAbstractSkill::TryAddTarget(const FSkillTargetPacket& 
     TScriptInterface<ISkillTarget> target = NewObject<UObject>(this, _targetKind);
     target->Init(targetPacket);
 
-    if (_areTargetingConditionsVerifiedForTarget(target)) {
+    if (target->IsValidTarget() && _areTargetingConditionsVerifiedForTarget(target)) {
         _targets.Emplace(MoveTemp(target));
 
         check(_targets.Num() <= _nTargets);

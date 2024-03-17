@@ -2,6 +2,8 @@
 
 #include "TemperatureCastCondition.h"
 
+#include "ThermodynamicsInteractorComponent.h"
+
 bool UTemperatureCastCondition::IsVerified() const {
     check(_subjectThermoC.IsValid());
 
@@ -29,7 +31,7 @@ void UTemperatureCastCondition::SetSkillCaster(TObjectPtr<AActor> skillCaster) {
         check(IsValid(skillCaster));
         _conditionSubject = MoveTemp(skillCaster);
 
-        _subjectThermoC = _conditionSubject->FindComponentByClass<UThermodynamicComponent>();
+        _subjectThermoC = _conditionSubject->FindComponentByClass<UThermodynamicsInteractorComponent>();
         check(_subjectThermoC.IsValid());
     }
 }
