@@ -5,7 +5,7 @@
 #include "EnvironmentQuery/Contexts/EnvQueryContext_Querier.h"
 #include "EnvironmentQuery/Items/EnvQueryItemType_Actor.h"
 #include "TemperatureDamageHandlerComponent.h"
-#include "ThermodynamicComponent.h"
+#include "ThermodynamicsInteractorComponent.h"
 
 UEnvQueryTest_Comfort::UEnvQueryTest_Comfort() {
     Cost = EEnvTestCost::Low;
@@ -31,7 +31,7 @@ void UEnvQueryTest_Comfort::RunTest(FEnvQueryInstance& queryInstance) const {
                 const auto otherActor = GetItemActor(queryInstance, it.GetIndex());
 
                 const auto otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
-                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicComponent>();
+                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
                 if (!IsValid(otherThermoDmgHandlerC) || !IsValid(otherThermoC)) {
                     continue;
                 }
@@ -57,7 +57,7 @@ void UEnvQueryTest_Comfort::RunTest(FEnvQueryInstance& queryInstance) const {
                 const auto otherActor = GetItemActor(queryInstance, it.GetIndex());
 
                 const auto otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
-                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicComponent>();
+                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
                 if (!IsValid(otherThermoDmgHandlerC) || !IsValid(otherThermoC)) {
                     continue;
                 }
@@ -81,7 +81,7 @@ void UEnvQueryTest_Comfort::RunTest(FEnvQueryInstance& queryInstance) const {
                 const auto otherActor = GetItemActor(queryInstance, it.GetIndex());
 
                 const auto otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
-                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicComponent>();
+                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
                 if (!IsValid(otherThermoDmgHandlerC) || !IsValid(otherThermoC)) {
                     continue;
                 }
