@@ -13,9 +13,10 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "StateComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
-#include "ThermodynamicComponent.h"
 
 #include "EnemyStabilizerController.generated.h"
+
+class UThermodynamicsInteractorComponent;
 
 /**
  * \brief A close-range mage that is obsessed with dealing damage to its enemies. They don't care of their own well-being.
@@ -99,7 +100,7 @@ private:
     // The controlled Pawn has ownership of these
     TWeakObjectPtr<UFactionComponent> _pawnFactionC = nullptr;
     TWeakObjectPtr<UPatrolComponent> _patrolC = nullptr;
-    TWeakObjectPtr<UThermodynamicComponent> _thermodynamicC = nullptr;
+    TWeakObjectPtr<UThermodynamicsInteractorComponent> _thermodynamicC = nullptr;
     TWeakObjectPtr<UTemperatureDamageHandlerComponent> _tempDmgHandlerC = nullptr;
 
     FTimerHandle _recentlyChangedHandle;
