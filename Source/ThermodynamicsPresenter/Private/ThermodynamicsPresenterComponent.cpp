@@ -39,15 +39,18 @@ void UThermodynamicsPresenterComponent::BeginPlay() {
                         UE_LOG(LogTemp, Error, TEXT("No UMaterialParameterCollection specified, temperature presentation cannot be toggled!"));
                     }
                 } else {
-                    UE_LOG(
-                        LogTemp, Error, TEXT("Tag %s found on a non-UMeshComponent. No thermodynamics presentation on this actor!"), *FString(THERMODYNAMICS_MESH_TAG));
+                    UE_LOG(LogTemp, Error, TEXT("No material found on mesh at index %i. No thermodynamics presentation on this actor!"), _materialIndex);
                 }
             } else {
-                UE_LOG(LogTemp, Error, TEXT("No component with tag %s was found. No thermodynamics presentation on this actor!"), *FString(THERMODYNAMICS_MESH_TAG));
+                UE_LOG(LogTemp, Error, TEXT("Tag %s found on a non-UMeshComponent. No thermodynamics presentation on this actor!"),
+                    *FString(THERMODYNAMICS_MESH_TAG));
             }
         } else {
-            UE_LOG(LogTemp, Error, TEXT("No UThermodynamicsInteractorComponent was found. No thermodynamics presentation on this actor!"));
+            UE_LOG(
+                LogTemp, Error, TEXT("No component with tag %s was found. No thermodynamics presentation on this actor!"), *FString(THERMODYNAMICS_MESH_TAG));
         }
+    } else {
+        UE_LOG(LogTemp, Error, TEXT("No UThermodynamicsInteractorComponent was found. No thermodynamics presentation on this actor!"));
     }
 }
 
@@ -62,10 +65,10 @@ void UThermodynamicsPresenterComponent::_toggleThermodynamicsPresentation() {
     check(_toggleVisibilityMPCI.IsValid());
     _isThermodynamicsVisible = !_isThermodynamicsVisible;
 
-     float visibiltyValue = 0.0f;
-     if (_isThermodynamicsVisible) {
-         visibiltyValue = 1.0f;
-     }
+    float visibiltyValue = 0.0f;
+    if (_isThermodynamicsVisible) {
+        visibiltyValue = 1.0f;
+    }
 
     _toggleVisibilityMPCI->SetScalarParameterValue(_toggleParameterName, visibiltyValue);
 }
