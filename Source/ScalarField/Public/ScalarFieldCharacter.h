@@ -41,7 +41,6 @@ protected:
 private:
     void _setupThermodynamicCollisions();
     void _dmiSetup();
-    void _setOverlappingCells();
     void _updateMaterialTint(FLinearColor temperatureColor);
 
     void _temperatureChanged(double newTemperature);

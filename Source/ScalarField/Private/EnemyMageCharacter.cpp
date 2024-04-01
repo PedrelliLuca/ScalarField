@@ -6,8 +6,6 @@
 #include "BrainComponent.h"
 #include "Colorizer.h"
 #include "Components/CapsuleComponent.h"
-#include "EnvironmentCell.h"
-#include "EnvironmentGridWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "InventoryManipulationSubsystem.h"
 #include "Kismet/GameplayStatics.h"
@@ -94,7 +92,6 @@ void AEnemyMageCharacter::BeginPlay() {
     _thermodynamicC->OnTemperatureChanged.AddUObject(this, &AEnemyMageCharacter::_temperatureChanged);
 
     _dmiSetup();
-    _setOverlappingCells();
 
     const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
     check(IsValid(inventorySubsys));
@@ -123,22 +120,6 @@ void AEnemyMageCharacter::_dmiSetup() {
         const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
         _updateMaterialTint(temperatureColor);
     }
-}
-
-void AEnemyMageCharacter::_setOverlappingCells() {
-    // Retrieve all environment cells being overlapped at startup
-    TSet<AActor*> overlappingActors;
-    GetCapsuleComponent()->GetOverlappingActors(overlappingActors, AEnvironmentCell::StaticClass());
-
-    TSet<AEnvironmentCell*> overlappingCells;
-    Algo::Transform(overlappingActors, overlappingCells, [](AActor* const overlappingActor) {
-        AEnvironmentCell* overlappingCell = Cast<AEnvironmentCell>(overlappingActor);
-        check(overlappingCell != nullptr);
-        return overlappingCell;
-    });
-
-    // Send the cells to the grid subsystem to unfreeze them
-    GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>()->ActivateOverlappedCells(overlappingCells);
 }
 
 void AEnemyMageCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {

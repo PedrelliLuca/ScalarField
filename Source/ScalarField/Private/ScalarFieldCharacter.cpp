@@ -4,8 +4,6 @@
 
 #include "Colorizer.h"
 #include "Components/CapsuleComponent.h"
-#include "EnvironmentCell.h"
-#include "EnvironmentGridWorldSubsystem.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "MovementCommandSetter.h"
 
@@ -102,7 +100,6 @@ void AScalarFieldCharacter::BeginPlay() {
     _thermodynamicC->OnTemperatureChanged.AddUObject(this, &AScalarFieldCharacter::_temperatureChanged);
 
     _dmiSetup();
-    _setOverlappingCells();
 }
 
 void AScalarFieldCharacter::_setupThermodynamicCollisions() {
@@ -127,22 +124,6 @@ void AScalarFieldCharacter::_dmiSetup() {
         const FLinearColor temperatureColor = FColorizer::GenerateColorFromTemperature(_thermodynamicC->GetTemperature());
         _updateMaterialTint(temperatureColor);
     }
-}
-
-void AScalarFieldCharacter::_setOverlappingCells() {
-    // Retrieve all environment cells being overlapped at startup
-    TSet<AActor*> overlappingActors;
-    GetCapsuleComponent()->GetOverlappingActors(overlappingActors, AEnvironmentCell::StaticClass());
-
-    TSet<AEnvironmentCell*> overlappingCells;
-    Algo::Transform(overlappingActors, overlappingCells, [](AActor* const overlappingActor) {
-        AEnvironmentCell* overlappingCell = Cast<AEnvironmentCell>(overlappingActor);
-        check(overlappingCell != nullptr);
-        return overlappingCell;
-    });
-
-    // Send the cells to the grid subsystem to unfreeze them
-    GetWorld()->GetSubsystem<UEnvironmentGridWorldSubsystem>()->ActivateOverlappedCells(overlappingCells);
 }
 
 void AScalarFieldCharacter::_updateMaterialTint(const FLinearColor temperatureColor) {
