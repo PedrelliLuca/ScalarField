@@ -23,16 +23,10 @@ public:
 private:
     EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
 
-    EBTNodeResult::Type _executeTaskLegacy(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory);
-    EBTNodeResult::Type _executeTaskNew(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory);
-
     FString GetStaticDescription() const override;
 
     bool _isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill) const;
     bool _newIsManaAvailableForSkill(const TObjectPtr<APawn>& pawn, float skillManaCost) const;
-
-    UPROPERTY(EditAnywhere, Category = "Cast Spell")
-    TSubclassOf<UAbstractSkill> _skillToCast;
 
     UPROPERTY(EditAnywhere, Category = "Cast Spell")
     TSubclassOf<UNewAbstractSkill> _newSkillToCast;
@@ -43,9 +37,6 @@ private:
      * available, because it will be by the end of the cast. */
     UPROPERTY(EditAnywhere, Category = "Cast Spell")
     bool _needsManaAvailabilityToCast = true;
-
-    UPROPERTY(EditInstanceOnly, Category = "Feature Toggles")
-    bool _bNewSkillSystem = false;
 
     static constexpr int32 PROJ_LINE_HALF_LENGTH = 10000;
 };

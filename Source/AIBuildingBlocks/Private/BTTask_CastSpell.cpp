@@ -20,51 +20,6 @@ UBTTask_CastSpell::UBTTask_CastSpell() {
 }
 
 EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
-    return _bNewSkillSystem ? _executeTaskNew(ownerComp, nodeMemory) : _executeTaskLegacy(ownerComp, nodeMemory);
-}
-
-EBTNodeResult::Type UBTTask_CastSpell::_executeTaskLegacy(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
-    if (!IsValid(_skillToCast)) {
-        UE_LOG(LogTemp, Error, TEXT("%s(): Skill to cast hasn't been selected"), *FString{__FUNCTION__});
-        return EBTNodeResult::Failed;
-    }
-
-    const auto aiController = ownerComp.GetAIOwner();
-    const auto skillsContainerC = aiController->GetPawn()->FindComponentByClass<USkillsContainerComponent>();
-    if (!IsValid(skillsContainerC)) {
-        UE_LOG(LogTemp, Error, TEXT("%s(): AI-Controlled Pawn does not have a Skills Container Component"), *FString{__FUNCTION__});
-        return EBTNodeResult::Failed;
-    }
-
-    auto skill = skillsContainerC->FindSkillByClass(_skillToCast);
-    if (!IsValid(skill)) {
-        UE_LOG(LogTemp, Error, TEXT("%s(): AI-Controlled Pawn does not have the selected Skill"), *FString{__FUNCTION__});
-        return EBTNodeResult::Failed;
-    }
-
-    const auto stateC = aiController->FindComponentByClass<UStateComponent>();
-    if (!IsValid(stateC)) {
-        UE_LOG(LogTemp, Error, TEXT("%s(): AIController does not have a State Component"), *FString{__FUNCTION__});
-        return EBTNodeResult::Failed;
-    }
-
-    if (skill->RequiresTarget()) {
-        UE_LOG(LogTemp, Error, TEXT("%s(): Selected skill does not require a target. Employ \"Cast Spell on Target\" node."), *FString{__FUNCTION__});
-        return EBTNodeResult::Failed;
-    }
-
-    if (!_needsManaAvailabilityToCast || _isManaAvailableForSkill(aiController, skill)) {
-        // The spell execution can fail, for example:
-        // - In case the skill is on cooldown
-        // - In case the skill is already being executed
-        // - In case the current state does not allow the execution of skills
-        return stateC->PerformSkillExecutionBehavior(MoveTemp(skill)) ? EBTNodeResult::Succeeded : EBTNodeResult::Failed;
-    }
-
-    return EBTNodeResult::Failed;
-}
-
-EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
     const auto pawn = ownerComp.GetAIOwner()->GetPawn();
     check(IsValid(pawn));
 
@@ -168,8 +123,8 @@ EBTNodeResult::Type UBTTask_CastSpell::_executeTaskNew(UBehaviorTreeComponent& o
 
 FString UBTTask_CastSpell::GetStaticDescription() const {
     FString skillDesc{"invalid"};
-    if (IsValid(_skillToCast)) {
-        skillDesc = _skillToCast->GetClass()->GetName();
+    if (IsValid(_newSkillToCast)) {
+        skillDesc = _newSkillToCast->GetClass()->GetName();
     }
 
     return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *skillDesc);
