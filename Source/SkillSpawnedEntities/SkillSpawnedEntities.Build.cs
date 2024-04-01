@@ -15,7 +15,8 @@ namespace UnrealBuildTool.Rules
 					"CoreUObject",
 					"Engine",
 					"DamageDealers",
-					"Thermodynamics",
+					"ThermodynamicsCore",
+                    "Thermodynamics" // TODO: remove!!
 				}
 			);
 

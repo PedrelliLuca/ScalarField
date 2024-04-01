@@ -7,6 +7,7 @@
 #include "HealthComponent.h"
 #include "NewSkillsContainerComponent.h"
 #include "NewStateComponent.h"
+#include "ThermodynamicsInteractorComponent.h"
 
 AEnemyStabilizerController::AEnemyStabilizerController() {
     _movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
@@ -96,7 +97,7 @@ void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
             UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Patrol Component"), *FString{__FUNCTION__});
         }
 
-        _thermodynamicC = pawn->FindComponentByClass<UThermodynamicComponent>();
+        _thermodynamicC = pawn->FindComponentByClass<UThermodynamicsInteractorComponent>();
         if (!_thermodynamicC.IsValid()) {
             UE_LOG(LogTemp, Error, TEXT("%s(): controlled pawn is missing Thermodynamic Component"), *FString{__FUNCTION__});
         }

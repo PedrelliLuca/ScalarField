@@ -48,5 +48,6 @@ void AThermodynamicActor::_setupThermodynamicCollisions() {
 }
 
 void AThermodynamicActor::_updateMaterialBasedOnTemperature(const double temperature) {
-    check(_materialInstance != nullptr) _materialInstance->SetVectorParameterValue(TEXT("temperature"), FColorizer::GenerateColorFromTemperature(temperature));
+    check(_materialInstance != nullptr);
+    _materialInstance->SetVectorParameterValue(TEXT("temperature"), FColorizer::GenerateColorFromTemperature(temperature));
 }

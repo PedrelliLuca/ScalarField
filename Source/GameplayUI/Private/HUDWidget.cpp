@@ -2,54 +2,74 @@
 
 #include "HUDWidget.h"
 
-#include "Colorizer.h"
 #include "GameFramework/Character.h"
 #include "HealthComponent.h"
 #include "ManaComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
-#include "ThermodynamicComponent.h"
+#include "ThermodynamicsInteractorComponent.h"
+#include "ThermodynamicsPresenterComponent.h"
 
 void UHUDWidget::SetPawn(TWeakObjectPtr<APawn> pawn) {
     ForgetCurrentPawn();
 
     _healthC = pawn->FindComponentByClass<UHealthComponent>();
-    check(_healthC.IsValid());
+    if (!_healthC.IsValid()) {
+        UE_LOG(LogTemp, Error, TEXT("%s: missing UHealthComponent"), *FString(__FUNCTION__));
+    }
 
     _manaC = pawn->FindComponentByClass<UManaComponent>();
-    check(_manaC.IsValid());
+    if (!_manaC.IsValid()) {
+        UE_LOG(LogTemp, Error, TEXT("%s: missing UManaComponent"), *FString(__FUNCTION__));
+    }
 
-    _thermoC = pawn->FindComponentByClass<UThermodynamicComponent>();
-    check(_thermoC.IsValid());
+    _thermoIntC = pawn->FindComponentByClass<UThermodynamicsInteractorComponent>();
+    if (!_thermoIntC.IsValid()) {
+        UE_LOG(LogTemp, Error, TEXT("%s: missing UThermodynamicsInteractorComponent"), *FString(__FUNCTION__));
+    }
+
+    _thermoPresC = pawn->FindComponentByClass<UThermodynamicsPresenterComponent>();
+    if (!_thermoPresC.IsValid()) {
+        UE_LOG(LogTemp, Error, TEXT("%s: missing UThermodynamicsPresenterComponent"), *FString(__FUNCTION__));
+    }
 }
 
 void UHUDWidget::ForgetCurrentPawn() {
     UnbindCurrentPawn();
     _healthC = nullptr;
     _manaC = nullptr;
-    _thermoC = nullptr;
+    _thermoIntC = nullptr;
+    _thermoPresC = nullptr;
 }
 
 void UHUDWidget::BindCurrentPawn() {
     UnbindCurrentPawn();
 
-    check(_healthC.IsValid()) _setCurrentHealth(_healthC->GetCurrentHealth());
-    _setMaxHealth(_healthC->GetMaxHealth());
-    _setHealthRegen(_healthC->GetHealthRegen());
-    _healthChangedHandle = _healthC->OnHealthChanged().AddUObject(this, &UHUDWidget::_setCurrentHealth);
-    _maxHealthChangedHandle = _healthC->OnMaxHealthChanged().AddUObject(this, &UHUDWidget::_setMaxHealth);
-    _healthRegenChangedHandle = _healthC->OnHealthRegenChanged().AddUObject(this, &UHUDWidget::_setHealthRegen);
+    if (_healthC.IsValid()) {
+        _setCurrentHealth(_healthC->GetCurrentHealth());
+        _setMaxHealth(_healthC->GetMaxHealth());
+        _setHealthRegen(_healthC->GetHealthRegen());
 
-    check(_manaC.IsValid());
-    _setCurrentMana(_manaC->GetCurrentMana());
-    _setMaxMana(_manaC->GetMaxMana());
-    _setManaRegen(_manaC->GetManaRegen());
-    _manaChangedHandle = _manaC->OnManaChanged().AddUObject(this, &UHUDWidget::_setCurrentMana);
-    _maxManaChangedHandle = _manaC->OnMaxManaChanged().AddUObject(this, &UHUDWidget::_setMaxMana);
-    _manaRegenChangedHandle = _manaC->OnManaRegenChanged().AddUObject(this, &UHUDWidget::_setManaRegen);
+        _healthChangedHandle = _healthC->OnHealthChanged().AddUObject(this, &UHUDWidget::_setCurrentHealth);
+        _maxHealthChangedHandle = _healthC->OnMaxHealthChanged().AddUObject(this, &UHUDWidget::_setMaxHealth);
+        _healthRegenChangedHandle = _healthC->OnHealthRegenChanged().AddUObject(this, &UHUDWidget::_setHealthRegen);
+        _onDeathHandle = _healthC->OnDeath().AddUObject(this, &UHUDWidget::_onDeath);
+    }
 
-    check(_thermoC.IsValid());
-    _setTemperature(_thermoC->GetTemperature(), FColorizer::GenerateColorFromTemperature(_thermoC->GetTemperature()));
-    _temperatureChangedHandle = _thermoC->OnTemperatureChanged.AddUObject(this, &UHUDWidget::_onTemperatureChange);
+    if (_manaC.IsValid()) {
+        _setCurrentMana(_manaC->GetCurrentMana());
+        _setMaxMana(_manaC->GetMaxMana());
+        _setManaRegen(_manaC->GetManaRegen());
+
+        _manaChangedHandle = _manaC->OnManaChanged().AddUObject(this, &UHUDWidget::_setCurrentMana);
+        _maxManaChangedHandle = _manaC->OnMaxManaChanged().AddUObject(this, &UHUDWidget::_setMaxMana);
+        _manaRegenChangedHandle = _manaC->OnManaRegenChanged().AddUObject(this, &UHUDWidget::_setManaRegen);
+    }
+
+    if (_thermoIntC.IsValid()) {
+        _onTemperatureChange(_thermoIntC->GetTemperature());
+
+        _temperatureChangedHandle = _thermoIntC->OnTemperatureChanged.AddUObject(this, &UHUDWidget::_onTemperatureChange);
+    }
 
     check(!_pauseToggleHandle.IsValid());
     const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
@@ -62,6 +82,7 @@ void UHUDWidget::UnbindCurrentPawn() {
         _healthC->OnHealthChanged().Remove(_healthChangedHandle);
         _healthC->OnMaxHealthChanged().Remove(_maxHealthChangedHandle);
         _healthC->OnHealthRegenChanged().Remove(_healthRegenChangedHandle);
+        _healthC->OnDeath().Remove(_onDeathHandle);
     }
 
     if (_manaC.IsValid()) {
@@ -70,8 +91,8 @@ void UHUDWidget::UnbindCurrentPawn() {
         _manaC->OnManaRegenChanged().Remove(_manaRegenChangedHandle);
     }
 
-    if (_thermoC.IsValid()) {
-        _thermoC->OnTemperatureChanged.Remove(_temperatureChangedHandle);
+    if (_thermoIntC.IsValid()) {
+        _thermoIntC->OnTemperatureChanged.Remove(_temperatureChangedHandle);
     }
 
     if (_pauseToggleHandle.IsValid()) {
@@ -89,14 +110,21 @@ void UHUDWidget::Hide() {
     RemoveFromParent();
 }
 
-void UHUDWidget::_setMaxHealth(double newMaxHealth) {
+void UHUDWidget::_setMaxHealth(float newMaxHealth) {
     _maxHealth = newMaxHealth;
     _setHealth();
 }
 
-void UHUDWidget::_setCurrentHealth(double newCurrentHealth) {
+void UHUDWidget::_setCurrentHealth(float newCurrentHealth) {
     _currentHealth = newCurrentHealth;
     _setHealth();
+}
+
+// The parameter of this function is useless. In fact, this entire funciton shouldn't exist, UnbindCurrentPawn() should be the function bound to
+// UHealthComponent::OnDeath(). However, due to an architectural error (see description of FOnDeath macro, UHealthComponent.h), it is necessary. I shall
+// remove this one day.
+void UHUDWidget::_onDeath(TObjectPtr<AActor> _) {
+    UnbindCurrentPawn();
 }
 
 void UHUDWidget::_setMaxMana(double newMaxMana) {
@@ -113,6 +141,11 @@ void UHUDWidget::_onTacticalPauseToggle(const bool bIsTacticalPauseOn, double) {
     _setPauseStatus(bIsTacticalPauseOn);
 }
 
-void UHUDWidget::_onTemperatureChange(const double newTemperture) {
-    _setTemperature(newTemperture, FColorizer::GenerateColorFromTemperature(newTemperture));
+void UHUDWidget::_onTemperatureChange(const float newTemperture) {
+    auto temperatureColor = FLinearColor::Black;
+
+    if (_thermoPresC.IsValid()) {
+        temperatureColor = _thermoPresC->GetTemperatureColor();
+    }
+    _setTemperature(newTemperture, temperatureColor);
 }

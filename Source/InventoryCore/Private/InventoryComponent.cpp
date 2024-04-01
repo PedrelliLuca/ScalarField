@@ -4,6 +4,8 @@
 
 #include "Algo/Accumulate.h"
 #include "Algo/AnyOf.h"
+#include "InventoryManipulationSubsystem.h"
+#include "Kismet/GameplayStatics.h"
 
 #define LOCTEXT_NAMESPACE "InventoryComponent"
 
@@ -208,6 +210,12 @@ void UInventoryComponent::BeginPlay() {
         [[maybe_unused]] const auto itemAddResult = TryAddItem(startingItem);
         ensureAlwaysMsgf(
             itemAddResult.Result == EItemAddResult::IAR_AllItemsAdded, TEXT("Couldn't add all starting items: %s"), *itemAddResult.ErrorText.ToString());
+    }
+
+    if (_dropItemsAtDeath) {
+        const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+        check(IsValid(inventorySubsys));
+        inventorySubsys->SetupDeathDropForActor(GetOwner());
     }
 }
 

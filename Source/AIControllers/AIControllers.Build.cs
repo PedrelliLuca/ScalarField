@@ -29,6 +29,7 @@ namespace UnrealBuildTool.Rules
 					"NewSkillSystem", 
 					"FSM",
 					"GameplayAttributes",
+                    "ThermodynamicsCore"
 					// ... add private dependencies that you statically link with here ...
 				}
 				);

@@ -1,40 +1,30 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TemperatureDamageHandlerComponent.h"
-#include "TemperatureDamageType.h"
+
+#include "HealthComponent.h"
+#include "ThermodynamicsInteractorComponent.h"
 
 UTemperatureDamageHandlerComponent::UTemperatureDamageHandlerComponent() {
     PrimaryComponentTick.bCanEverTick = true;
-}
-
-void UTemperatureDamageHandlerComponent::HandleDamage(const double temperature) {
-    if (IsComponentTickEnabled()) {
-        // Damage handler on cooldown
-        return;
-    }
-
-    if (IsTemperatureComfortable(temperature)) {
-        // This temperature doesn't cause any damage to the owner
-        return;
-    }
-
-    // The temperature harms the owner
-    const TSubclassOf<UDamageType> damageType = UTemperatureDamageType::StaticClass();
-    FDamageEvent damageEvent{damageType};
-    GetOwner()->TakeDamage(_computeDamageFromTemperature(temperature), damageEvent, nullptr, GetOwner());
-
-    SetComponentTickEnabled(true);
 }
 
 void UTemperatureDamageHandlerComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
     // TickComponent() manages the cooldown of the temperature damage deltaTime
-
-    _currentInteralTime += deltaTime;
-    if (_currentInteralTime > _damageInterval) {
-        _currentInteralTime = 0.;
+    if (_isTemperatureCausingDamage()) {
         SetComponentTickEnabled(false);
+
+        FTimerDelegate delegate;
+        delegate.BindLambda([weakThis = TWeakObjectPtr<UTemperatureDamageHandlerComponent>(this), healthC = _healthC]() {
+            // Do not re-enable the tick if the owner is already dead.
+            if (weakThis.IsValid() && healthC.IsValid() && !healthC->IsDead()) {
+                weakThis->SetComponentTickEnabled(true);
+            }
+        });
+
+        GetWorld()->GetTimerManager().SetTimer(_damageCooldownTimerHandle, delegate, _damageInterval, false);
     }
 }
 
@@ -64,7 +54,48 @@ void UTemperatureDamageHandlerComponent::PostEditChangeProperty(FPropertyChanged
 }
 #endif
 
-double UTemperatureDamageHandlerComponent::_computeDamageFromTemperature(const double temperature) {
+void UTemperatureDamageHandlerComponent::BeginPlay() {
+    Super::BeginPlay();
+
+    bool isInitializationSuccessfull = true;
+
+    _healthC = GetOwner()->FindComponentByClass<UHealthComponent>();
+    if (!_healthC.IsValid()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s: Owner does not have a valid UHealthComponent and won't receive damage by temperature"), *FString(__FUNCTION__));
+        isInitializationSuccessfull = false;
+    }
+
+    _thermoInteractorC = GetOwner()->FindComponentByClass<UThermodynamicsInteractorComponent>();
+    if (!_thermoInteractorC.IsValid()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s: Owner does not have a valid UThermodynamicsInteractorComponent and won't receive damage by temperature"),
+            *FString(__FUNCTION__));
+        isInitializationSuccessfull = false;
+    }
+
+    if (!isInitializationSuccessfull) {
+        SetComponentTickEnabled(false);
+    }
+}
+
+bool UTemperatureDamageHandlerComponent::_isTemperatureCausingDamage() const {
+    bool isTemperatureCausingDamage = false;
+
+    check(_thermoInteractorC.IsValid());
+    const float temperature = _thermoInteractorC->GetTemperature();
+
+    const bool isTemperatureComfortable = temperature >= _minComfortTemperature && temperature <= _maxComfortTemperature;
+    if (!isTemperatureComfortable) {
+        check(_healthC.IsValid());
+
+        // TODO: apply damage resistances here. Even if temperature is uncomfortable, the damage might still be zero!
+
+        _healthC->TakeDamage(_computeDamageForTemperature(temperature));
+        isTemperatureCausingDamage = true;
+    }
+    return isTemperatureCausingDamage;
+}
+
+float UTemperatureDamageHandlerComponent::_computeDamageForTemperature(const float temperature) const {
     if (temperature < _minComfortTemperature) {
         return _minComfortTemperature - temperature;
     } else if (temperature > _maxComfortTemperature) {
@@ -72,5 +103,5 @@ double UTemperatureDamageHandlerComponent::_computeDamageFromTemperature(const d
     }
 
     checkNoEntry();
-    return 0.;
+    return 0.0f;
 }

@@ -2,36 +2,38 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class DamageHandlers : ModuleRules
-	{
-		public DamageHandlers(ReadOnlyTargetRules Target) : base(Target)
-		{
+    public class DamageHandlers : ModuleRules
+    {
+        public DamageHandlers(ReadOnlyTargetRules Target) : base(Target)
+        {
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
-			PublicDependencyModuleNames.AddRange(
-				new string[]
-				{
+            PublicDependencyModuleNames.AddRange(
+                new string[]
+                {
                     "Core",
                     "CoreUObject",
                     "Engine",
-					"AIModule",
-					"NavigationSystem",
+                    "AIModule",
+                    "NavigationSystem",
+                    "ThermodynamicsCore",
+                    "GameplayAttributes",
                 }
-				);
+                );
 
-			PrivateDependencyModuleNames.AddRange(
-				new string[]
-				{
-					// ... add private dependencies that you statically link with here ...
-				}
-				);
+            PrivateDependencyModuleNames.AddRange(
+                new string[]
+                {
+                    // ... add private dependencies that you statically link with here ...
+                }
+                );
 
-			DynamicallyLoadedModuleNames.AddRange(
-				new string[]
-				{
-					// ... add any modules that your module loads dynamically here ...
-				}
-				);
-		}
-	}
+            DynamicallyLoadedModuleNames.AddRange(
+                new string[]
+                {
+                    // ... add any modules that your module loads dynamically here ...
+                }
+                );
+        }
+    }
 }

@@ -162,8 +162,10 @@ void UThermodynamicComponent::_updateCounterOfChecksThisFrame() {
 }
 
 void UThermodynamicComponent::_setCurrentTempAsNext() {
-    _currentTemperature = _nextTemperature;
-    OnTemperatureChanged.Broadcast(_currentTemperature);
+    if (_nextTemperature != _currentTemperature) {
+        _currentTemperature = _nextTemperature;
+        OnTemperatureChanged.Broadcast(_currentTemperature);
+    }
 
     _counterOfChecksThisFrame = 0;
     _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();

@@ -9,7 +9,7 @@ UHealthComponent::UHealthComponent() {
 void UHealthComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-    const double healthRegenPerFrame = _healthRegenPerSecond * deltaTime;
+    const float healthRegenPerFrame = _healthRegenPerSecond * deltaTime;
     SetCurrentHealth(_currentHealth + healthRegenPerFrame);
 }
 
@@ -18,8 +18,8 @@ void UHealthComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyCha
     FProperty* const property = propertyChangedEvent.Property;
     FName propertyName = property != nullptr ? property->GetFName() : NAME_None;
     if (propertyName == GET_MEMBER_NAME_CHECKED(UHealthComponent, _maxHealth)) {
-        if (const auto initTempProperty = CastFieldChecked<FDoubleProperty>(property)) {
-            SetMaxHealth(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)));
+        if (const auto initTempProperty = CastFieldChecked<FFloatProperty>(property)) {
+            SetMaxHealth(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<float>(this)));
         }
     }
 
@@ -27,16 +27,20 @@ void UHealthComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyCha
 }
 #endif
 
-void UHealthComponent::SetCurrentHealth(const double health) {
-    _currentHealth = FMath::Clamp(health, 0., _maxHealth);
-    _onHealthChanged.Broadcast(_currentHealth);
-    if (FMath::IsNearlyZero(_currentHealth)) {
-        _onDeath.Broadcast(GetOwner());
+void UHealthComponent::SetCurrentHealth(const float health) {
+    if (!IsDead()) {
+        _currentHealth = FMath::Clamp(health, 0.0f, _maxHealth);
+        _onHealthChanged.Broadcast(_currentHealth);
+        if (IsDead()) {
+            SetHealthRegen(0.0f);
+            _onDeath.Broadcast(GetOwner());
+            SetComponentTickEnabled(false);
+        }
     }
 }
 
-void UHealthComponent::SetMaxHealth(double maxHealth, const bool bUpdateHealth /*= true*/) {
-    maxHealth = FMath::Clamp(maxHealth, 0., TNumericLimits<double>::Max());
+void UHealthComponent::SetMaxHealth(float maxHealth, const bool bUpdateHealth /*= true*/) {
+    maxHealth = FMath::Clamp(maxHealth, 0., TNumericLimits<float>::Max());
 
     _maxHealth = maxHealth;
     if (bUpdateHealth) {
@@ -46,7 +50,7 @@ void UHealthComponent::SetMaxHealth(double maxHealth, const bool bUpdateHealth /
     _onMaxHealthChanged.Broadcast(_maxHealth);
 }
 
-void UHealthComponent::SetHealthRegen(double healthRegenPerSecond) {
+void UHealthComponent::SetHealthRegen(float healthRegenPerSecond) {
     _healthRegenPerSecond = healthRegenPerSecond;
     _onHealthRegenChanged.Broadcast(_healthRegenPerSecond);
 }

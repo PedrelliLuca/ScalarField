@@ -84,7 +84,7 @@ float AEnemyMageCharacter::TakeDamage(
 void AEnemyMageCharacter::Tick(float deltaTime) {
     Super::Tick(deltaTime);
 
-    _temperatureDmgHandlerC->HandleDamage(_thermodynamicC->GetTemperature());
+    // _temperatureDmgHandlerC->HandleDamage(_thermodynamicC->GetTemperature());
 }
 
 void AEnemyMageCharacter::BeginPlay() {

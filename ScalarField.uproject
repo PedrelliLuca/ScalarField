@@ -64,13 +64,28 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		},
+		{
+			"Name": "Thermodynamics",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ThermodynamicsCore",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "ThermodynamicsPresenter",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
     {
-      "Name": "Thermodynamics",
+      "Name": "AnimationComponents",
       "Type": "Runtime",
       "LoadingPhase": "Default"
     },
     {
-      "Name": "ThermodynamicsPresenter",
+      "Name": "GameplayUI",
       "Type": "Runtime",
       "LoadingPhase": "Default"
     }

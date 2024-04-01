@@ -92,7 +92,7 @@ float AScalarFieldCharacter::TakeDamage(
 void AScalarFieldCharacter::Tick(float deltaTime) {
     Super::Tick(deltaTime);
 
-    _temperatureDmgHandlerC->HandleDamage(_thermodynamicC->GetTemperature());
+    // _temperatureDmgHandlerC->HandleDamage(_thermodynamicC->GetTemperature());
 }
 
 void AScalarFieldCharacter::BeginPlay() {
@@ -156,18 +156,7 @@ void AScalarFieldCharacter::_temperatureChanged(double newTemperature) {
 }
 
 void AScalarFieldCharacter::_die() {
-    _healthC->SetHealthRegen(0.0);
     _manaC->SetManaRegen(0.0);
-
-    GetMovementComponent()->StopMovementImmediately();
-
-    const auto playerController = GetController<APlayerController>();
-    check(IsValid(playerController));
-    playerController->DisableInput(playerController);
-
-    const TWeakInterfacePtr<IMovementCommandSetter> movementCmdSetter = playerController->FindComponentByInterface<UMovementCommandSetter>();
-    check(movementCmdSetter.IsValid());
-    movementCmdSetter->SetMovementMode(EMovementCommandMode::MCM_Still);
 
     constexpr float playRate = 1.0f;
     const bool playedSuccessfully = PlayAnimMontage(_deathMontage, playRate) > 0.0f;

@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "SkillCastCondition.h"
-#include "ThermodynamicComponent.h"
 
 #include "TemperatureCastCondition.generated.h"
+
+class UThermodynamicsInteractorComponent;
 
 /** \brief Ways to compare the subject's temperature with the condition's temperature. E.g., "Less Than" means that the subject's temperature will have to
  * be smaller than this condition's temperature. */
@@ -39,5 +40,5 @@ protected:
 
 private:
     TWeakObjectPtr<AActor> _conditionSubject;
-    TWeakObjectPtr<UThermodynamicComponent> _subjectThermoC;
+    TWeakObjectPtr<UThermodynamicsInteractorComponent> _subjectThermoC;
 };

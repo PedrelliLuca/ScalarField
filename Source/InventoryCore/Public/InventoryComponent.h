@@ -68,6 +68,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inventory", meta = (ClampMin = 0.0))
     double _volumeCapacity;
 
+    UPROPERTY(EditAnywhere, Category = "Inventory")
+    bool _dropItemsAtDeath = true;
+
     // Where we store the items in this inventory
     UPROPERTY(VisibleAnywhere, Category = "Inventory")
     TArray<TObjectPtr<UInventoryItem>> _items;
