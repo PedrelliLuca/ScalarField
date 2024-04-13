@@ -42,9 +42,6 @@ private:
     UPROPERTY(VisibleAnywhere, Category = "Chaser | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
 
-    UPROPERTY(VisibleAnywhere, Category = "Chaser | State Machine")
-    TObjectPtr<UStateComponent> _stateC;
-
     UPROPERTY(VisibleAnywhere, Category = "Chaser | Perception")
     TObjectPtr<UAIPerceptionComponent> _perceptionC;
 
@@ -68,9 +65,6 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Chaser | Behavior Tree")
     TObjectPtr<UBehaviorTree> _behaviorTree;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
-    bool _bNewSkillSystem = false;
 
     // The controlled Pawn has ownership of these
     TWeakObjectPtr<UFactionComponent> _pawnFactionC = nullptr;
