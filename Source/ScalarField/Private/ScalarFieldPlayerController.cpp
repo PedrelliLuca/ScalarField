@@ -74,7 +74,7 @@ void AScalarFieldPlayerController::_onSetDestinationPressed() {
         GetHitResultUnderCursor(ECC_Visibility, true, hit);
         stateC->TrySetMovementDestination(hit.Location);
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -89,7 +89,7 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TrySetMovementDestination(hit.Location);
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -113,7 +113,7 @@ void AScalarFieldPlayerController::_onSetTargetPressed() {
 
         stateC->TrySetSkillTarget(targetPacket);
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -123,7 +123,7 @@ void AScalarFieldPlayerController::_onSkill1Cast() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -133,7 +133,7 @@ void AScalarFieldPlayerController::_onSkill2Cast() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -143,7 +143,7 @@ void AScalarFieldPlayerController::_onSkill3Cast() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -153,7 +153,7 @@ void AScalarFieldPlayerController::_onSkill4Cast() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -163,7 +163,7 @@ void AScalarFieldPlayerController::_onSkill5Cast() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -173,7 +173,7 @@ void AScalarFieldPlayerController::_onSkill6Cast() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -181,7 +181,7 @@ void AScalarFieldPlayerController::_onSkillAbort() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryAbort();
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -189,7 +189,7 @@ void AScalarFieldPlayerController::_onInteraction() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryInteracting();
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
@@ -197,7 +197,7 @@ void AScalarFieldPlayerController::_onInventoryToggle() {
     if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryToggleInventory();
     } else {
-        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent while _bNewSkillSystem is TRUE"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
     }
 }
 
