@@ -7,7 +7,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "NewStateComponent.h"
 #include "PlayerInputData.h"
-#include "SkillsContainerComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
 #include "ThermodynamicsSubsystem.h"
 

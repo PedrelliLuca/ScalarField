@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 
-#include "AbstractSkill.h"
 #include "BehaviorTree/BTTaskNode.h"
 #include "NewAbstractSkill.h"
 
@@ -25,7 +24,6 @@ private:
 
     FString GetStaticDescription() const override;
 
-    bool _isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill) const;
     bool _newIsManaAvailableForSkill(const TObjectPtr<APawn>& pawn, float skillManaCost) const;
 
     UPROPERTY(EditAnywhere, Category = "Cast Spell")

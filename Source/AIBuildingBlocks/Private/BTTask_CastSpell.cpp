@@ -11,7 +11,6 @@
 #include "SkillPropertiesInspector.h"
 #include "SkillTargets/ActorSkillTarget.h"
 #include "SkillTargets/CasterPlaneLocationSkillTarget.h"
-#include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
 
 UBTTask_CastSpell::UBTTask_CastSpell() {
@@ -127,16 +126,6 @@ FString UBTTask_CastSpell::GetStaticDescription() const {
     }
 
     return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *skillDesc);
-}
-
-bool UBTTask_CastSpell::_isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill) const {
-    if (const auto pawn = aiController->GetPawn(); IsValid(pawn)) {
-        if (const auto manaC = pawn->FindComponentByClass<UManaComponent>(); IsValid(manaC)) {
-            return manaC->GetCurrentMana() >= skill->GetCastManaCost() + skill->GetChannelingManaCost();
-        }
-    }
-
-    return false;
 }
 
 bool UBTTask_CastSpell::_newIsManaAvailableForSkill(const TObjectPtr<APawn>& pawn, float skillManaCost) const {

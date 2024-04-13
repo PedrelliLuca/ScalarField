@@ -4,7 +4,6 @@
 
 #include "AIController.h"
 #include "NewStateComponent.h"
-#include "SkillsContainerComponent.h"
 
 UBTTask_CancelSpell::UBTTask_CancelSpell() {
     NodeName = "Cancel Spell";

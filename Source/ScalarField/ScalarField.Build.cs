@@ -16,7 +16,6 @@ public class ScalarField : ModuleRules
             "HeadMountedDisplay",
             "NavigationSystem",
             "DeveloperSettings",
-            "SkillSystem",
             "Thermodynamics",
             "MovementCommand",
             "TacticalPauseSystem",

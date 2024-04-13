@@ -35,11 +35,6 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "SkillSystem",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
 			"Name": "SkillCastConditions",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault"
