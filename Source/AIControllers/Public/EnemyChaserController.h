@@ -10,7 +10,6 @@
 #include "Components/PatrolComponent.h"
 #include "FactionComponent.h"
 #include "Perception/AIPerceptionComponent.h"
-#include "StateComponent.h"
 
 #include "EnemyChaserController.generated.h"
 

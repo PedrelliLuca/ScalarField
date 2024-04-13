@@ -11,7 +11,6 @@
 
 AEnemyStabilizerController::AEnemyStabilizerController() {
     _movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
-    _stateC = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
     _perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
     _runEQSC = CreateDefaultSubobject<URunEQSComponent>(TEXT("RunEQSComponent"));
 }
@@ -33,11 +32,6 @@ void AEnemyStabilizerController::Tick(const float deltaTime) {
 
     if (!_patrolC.IsValid()) {
         return;
-    }
-
-    if (!_bNewSkillSystem) {
-        _stateC->PerformTickBehavior(deltaTime);
-        _movementCommandC->MovementTick(deltaTime);
     }
 
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
@@ -113,27 +107,17 @@ void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
     // Setting up the logic that lets the BT know if the Target Ally has just changed or not.
     const auto targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetAllyKeyName);
     if (targetEnemyKeyId != FBlackboard::InvalidKey) {
-        if (!_bNewSkillSystem) {
-            blackBoard->RegisterObserver(
-                targetEnemyKeyId, this, FOnBlackboardChangeNotification::CreateUObject(this, &AEnemyStabilizerController::_onTargetAllyChange));
-        } else {
-            _runEQSC->OnQueryResultChange().AddUObject(this, &AEnemyStabilizerController::_newOnTargetAllyChange);
-        }
-
+        _runEQSC->OnQueryResultChange().AddUObject(this, &AEnemyStabilizerController::_newOnTargetAllyChange);
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s(): Invald value for _bbTargetAllyKeyName"), *FString{__FUNCTION__});
     }
 
-    if (!_bNewSkillSystem) {
-        // Setting up the logic that lets the BT know if we're casting or not.
-        _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionBegin);
-        _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyStabilizerController::_onSkillExecutionEnd);
-    } else {
-        if (IsValid(GetPawn())) {
-            const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
-            check(IsValid(skillsContainerC));
-            skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
-        }
+    _movementCommandC->SetDefaultMovementMode();
+
+    if (IsValid(GetPawn())) {
+        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+        check(IsValid(skillsContainerC));
+        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
     }
 }
 
@@ -188,12 +172,8 @@ void AEnemyStabilizerController::_onSkillInExecutionStatusChanged(bool isExecuti
 }
 
 void AEnemyStabilizerController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
-    if (!_bNewSkillSystem) {
-        _stateC->PerformAbortBehavior();
-    } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
+    const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+    check(IsValid(stateC));
 
-        stateC->TryAbort();
-    }
+    stateC->TryAbort();
 }
