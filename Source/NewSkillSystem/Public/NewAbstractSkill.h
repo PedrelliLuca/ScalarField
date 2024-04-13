@@ -135,7 +135,7 @@ private:
     TArray<TObjectPtr<USkillTargetingCondition>> _targetingConditions{};
 
     /** \brief Kind of target needed by the skill to execute its logic. */
-    UPROPERTY(EditDefaultsOnly, Category = "Targeting", meta = (MustImplement = "SkillTarget"))
+    UPROPERTY(EditDefaultsOnly, Category = "Targeting", meta = (MustImplement = "/Script/NewSkillSystem.SkillTarget"))
     TSubclassOf<UObject> _targetKind = nullptr;
 
     /** \brief Num of targets the skill needs to execute its logic. */

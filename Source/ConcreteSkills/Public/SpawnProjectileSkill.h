@@ -19,7 +19,7 @@ protected:
     // TODO: this can be generalized in the future by having an array of FSkillSpawnParameters struct collecting these 3 values.
 
     /** \brief Class of the actor to spawn. Must implement the ISkillSpawnedEntity interface. */
-    UPROPERTY(EditAnywhere, Category = "Projectile", meta = (MustImplement = "SkillSpawnedEntity"))
+    UPROPERTY(EditAnywhere, Category = "Projectile", meta = (MustImplement = "/Script/SkillSpawnedEntities.SkillSpawnedEntity"))
     TSubclassOf<AActor> _projectileClass = nullptr;
 
     /** \brief How far from the caster the projectile will spawn */

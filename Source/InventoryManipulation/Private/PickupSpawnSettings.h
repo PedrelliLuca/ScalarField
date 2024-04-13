@@ -20,6 +20,6 @@ public:
     TSubclassOf<AActor> GetPickupClass() const { return _pickupClass; }
 
 private:
-    UPROPERTY(EditAnywhere, Config, Category = "Pickup", meta = (MustImplement = "Pickup"))
+    UPROPERTY(EditAnywhere, Config, Category = "Pickup", meta = (MustImplement = "/Script/InventoryManipulation.Pickup"))
     TSubclassOf<AActor> _pickupClass;
 };
