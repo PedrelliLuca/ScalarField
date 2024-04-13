@@ -13,7 +13,7 @@
  *
  */
 UCLASS()
-class SCALARFIELD_API UBTTask_SetMovementTarget : public UBTTask_BlackboardBase {
+class AIBUILDINGBLOCKS_API UBTTask_SetMovementTarget : public UBTTask_BlackboardBase {
     GENERATED_BODY()
 
 public:
