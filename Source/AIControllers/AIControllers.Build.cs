@@ -16,7 +16,6 @@ namespace UnrealBuildTool.Rules
 					"Engine",
 					"AIModule",
 					"MovementCommand",
-					"SkillUserFSM",
 					"DamageHandlers",
 					"Thermodynamics",
 				}

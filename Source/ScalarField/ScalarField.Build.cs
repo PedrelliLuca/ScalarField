@@ -18,7 +18,6 @@ public class ScalarField : ModuleRules
             "DeveloperSettings",
             "SkillSystem",
             "Thermodynamics",
-            "SkillUserFSM",
             "MovementCommand",
             "TacticalPauseSystem",
             "GameplayAttributes",
