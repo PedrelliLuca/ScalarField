@@ -13,7 +13,6 @@
 #include "SkillTargets/CasterPlaneLocationSkillTarget.h"
 #include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
-#include "StateComponent.h"
 
 UBTTask_CastSpell::UBTTask_CastSpell() {
     NodeName = TEXT("Cast Spell");
