@@ -6,7 +6,6 @@
 #include "GameFramework/PlayerController.h"
 #include "InteractorPlayerComponent.h"
 #include "PlayerMovementCommandComponent.h"
-#include "StateComponent.h"
 #include "WidgetsPresenterComponent.h"
 
 #include "ScalarFieldPlayerController.generated.h"
@@ -21,13 +20,9 @@ public:
     AScalarFieldPlayerController();
 
 protected:
-    void PlayerTick(float deltaTime) override;
     void SetupInputComponent() override;
 
     void BeginPlay() override;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
-    bool _bNewSkillSystem = false;
 
 private:
     /** Input handlers for SetDestination action. */
@@ -57,9 +52,6 @@ private:
 
     UPROPERTY(VisibleAnywhere, Category = "Movement Commands")
     TObjectPtr<UPlayerMovementCommandComponent> _movementCommandC;
-
-    UPROPERTY(VisibleAnywhere, Category = "State")
-    TObjectPtr<UStateComponent> _stateC;
 
     // TODO: this will have to be moved to the pawns in order to implement group control
     UPROPERTY(VisibleAnywhere, Category = "Interaction")
