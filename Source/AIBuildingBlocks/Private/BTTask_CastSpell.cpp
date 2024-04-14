@@ -6,7 +6,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/RunEQSComponent.h"
 #include "ManaComponent.h"
-#include "NewSkillsContainerComponent.h"
+#include "SkillsContainerComponent.h"
 #include "NewStateComponent.h"
 #include "SkillPropertiesInspector.h"
 #include "SkillTargets/ActorSkillTarget.h"
@@ -26,7 +26,7 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
         return EBTNodeResult::Failed;
     }
 
-    const auto skillsContainerC = TObjectPtr<UNewSkillsContainerComponent>{pawn->FindComponentByClass<UNewSkillsContainerComponent>()};
+    const auto skillsContainerC = TObjectPtr<USkillsContainerComponent>{pawn->FindComponentByClass<USkillsContainerComponent>()};
     if (!ensureMsgf(IsValid(skillsContainerC), TEXT("AI-controlled Pawn does not have a Skills Container Component"))) {
         return EBTNodeResult::Failed;
     }

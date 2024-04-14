@@ -10,18 +10,18 @@
 #include "SkillTarget.h"
 #include "SkillTargetingResult.h"
 
-#include "NewSkillsContainerComponent.generated.h"
+#include "SkillsContainerComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillExecutionStatusChanged, bool);
 
 UCLASS(ClassGroup = (Skills), meta = (BlueprintSpawnableComponent))
-class SKILLSYSTEM_API UNewSkillsContainerComponent : public UActorComponent {
+class SKILLSYSTEM_API USkillsContainerComponent : public UActorComponent {
     GENERATED_BODY()
 
     friend class FSkillsContainerInspector;
 
 public:
-    UNewSkillsContainerComponent();
+    USkillsContainerComponent();
 
     /** \brief Given the index of a skill stored within this component, this function tries to cast it. */
     FSkillCastResult TryCastSkillAtIndex(int32 index);

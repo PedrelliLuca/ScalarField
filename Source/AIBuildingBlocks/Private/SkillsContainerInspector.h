@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 
 #include "AbstractSkill.h"
-#include "NewSkillsContainerComponent.h"
+#include "SkillsContainerComponent.h"
 #include "SkillPropertiesInspector.h"
 
-/** \brief This class is friend of UNewSkillsContainerComponent. Files who have visibility of this class are allowed to peek at UNewSkillsContainerComponent's
+/** \brief This class is friend of USkillsContainerComponent. Files who have visibility of this class are allowed to peek at USkillsContainerComponent's
  * properties. The reasons this class exists are:
  * 1. To give AI knowledge on all the possible skills at its disposal, so that it can take decisions on what to do.
  * 2. To have the UI w all the possible skills at its disposal, so that the player can take decisions on what to do.
@@ -19,7 +19,7 @@
  */
 class FSkillsContainerInspector {
 public:
-    FSkillsContainerInspector(const TObjectPtr<UNewSkillsContainerComponent>& skillsContainer)
+    FSkillsContainerInspector(const TObjectPtr<USkillsContainerComponent>& skillsContainer)
         : _skillsContainer(skillsContainer) {}
 
     TOptional<FSkillPropertiesInspector> GetSkillPropertiesByIndex(const int32 skillIndex) const {
@@ -42,5 +42,5 @@ public:
     }
 
 private:
-    TWeakObjectPtr<UNewSkillsContainerComponent> _skillsContainer = nullptr;
+    TWeakObjectPtr<USkillsContainerComponent> _skillsContainer = nullptr;
 };

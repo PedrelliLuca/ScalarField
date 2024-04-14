@@ -5,7 +5,7 @@
 #include "Algo/AnyOf.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "HealthComponent.h"
-#include "NewSkillsContainerComponent.h"
+#include "SkillsContainerComponent.h"
 #include "NewStateComponent.h"
 #include "ThermodynamicsInteractorComponent.h"
 
@@ -115,7 +115,7 @@ void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
     _movementCommandC->SetDefaultMovementMode();
 
     if (IsValid(GetPawn())) {
-        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+        const auto skillsContainerC = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
         check(IsValid(skillsContainerC));
         skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
     }

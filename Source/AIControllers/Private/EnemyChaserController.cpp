@@ -4,7 +4,7 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "HealthComponent.h"
-#include "NewSkillsContainerComponent.h"
+#include "SkillsContainerComponent.h"
 #include "NewStateComponent.h"
 
 AEnemyChaserController::AEnemyChaserController() {
@@ -73,7 +73,7 @@ void AEnemyChaserController::OnPossess(APawn* const inPawn) {
     _movementCommandC->SetDefaultMovementMode();
 
     if (IsValid(GetPawn())) {
-        const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
+        const auto skillsContainerC = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
         check(IsValid(skillsContainerC));
         skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyChaserController::_onSkillInExecutionStatusChanged);
     }

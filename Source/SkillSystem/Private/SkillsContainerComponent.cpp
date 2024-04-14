@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "NewSkillsContainerComponent.h"
+#include "SkillsContainerComponent.h"
 
 #include "AbstractSkill.h"
 
-UNewSkillsContainerComponent::UNewSkillsContainerComponent() {
+USkillsContainerComponent::USkillsContainerComponent() {
     PrimaryComponentTick.bCanEverTick = false;
 }
 
-FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 index) {
+FSkillCastResult USkillsContainerComponent::TryCastSkillAtIndex(const int32 index) {
     if (index >= _skills.Num()) {
         // TODO: this is a random thing, we should return a proper error in here!
         return FSkillCastResult::CastFail_CastConditionsViolated();
@@ -40,7 +40,7 @@ FSkillCastResult UNewSkillsContainerComponent::TryCastSkillAtIndex(const int32 i
     return skillCastResult;
 }
 
-TOptional<FSkillCastResult> UNewSkillsContainerComponent::TryCastWaitingSkill() {
+TOptional<FSkillCastResult> USkillsContainerComponent::TryCastWaitingSkill() {
     if (!ensureAlwaysMsgf(_skillWaitingForTargets.IsValid(), TEXT("No Waiting Skill to be cast."))) {
         return TOptional<FSkillCastResult>{};
     }
@@ -63,17 +63,17 @@ TOptional<FSkillCastResult> UNewSkillsContainerComponent::TryCastWaitingSkill() 
     return MoveTemp(skillCastResult);
 }
 
-bool UNewSkillsContainerComponent::AbortSkillInExecution() {
+bool USkillsContainerComponent::AbortSkillInExecution() {
     // TODO: also abort waiting skill? If not, how do we abort waiting skill?
     // _resetWaitingSkill();
     return _resetSkillInExecution(true);
 }
 
-bool UNewSkillsContainerComponent::AbortWaitingSkill() {
+bool USkillsContainerComponent::AbortWaitingSkill() {
     return _resetWaitingSkill();
 }
 
-TOptional<FSkillTargetingResult> UNewSkillsContainerComponent::TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket) {
+TOptional<FSkillTargetingResult> USkillsContainerComponent::TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket) {
     if (!_skillWaitingForTargets.IsValid()) {
         // No skill is waiting for targets
         return TOptional<FSkillTargetingResult>{};
@@ -91,7 +91,7 @@ TOptional<FSkillTargetingResult> UNewSkillsContainerComponent::TryAddTargetToWai
     return MoveTemp(skillTargetingResult);
 }
 
-void UNewSkillsContainerComponent::BeginPlay() {
+void USkillsContainerComponent::BeginPlay() {
     Super::BeginPlay();
 
     const auto caster = GetOwner();
@@ -103,7 +103,7 @@ void UNewSkillsContainerComponent::BeginPlay() {
     }
 }
 
-void UNewSkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbstractSkill> skill, const ESkillCastResult castResultValue) {
+void USkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbstractSkill> skill, const ESkillCastResult castResultValue) {
     /* If we don't get inside the following statement, it means that either:
      * 1. The result was ESkillCastResult::Success_IntoExecutionEnd. In such case, the skill was instantaneous, we don't to cache it and bind to its delegates.
      * 2. The cast was a failure, so we don't want to set the skill as "in execution". */
@@ -112,13 +112,13 @@ void UNewSkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbs
         _onSkillInExecutionStatusChanged.Broadcast(true);
 
         if (castResultValue == ESkillCastResult::Deferred) {
-            _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
+            _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &USkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
         }
-        _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
+        _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &USkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
     }
 }
 
-void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const FSkillCastResult skillCastResult) {
+void USkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const FSkillCastResult skillCastResult) {
     const auto castResultValue = skillCastResult.GetCastResult();
 
     // Success_IntoChanneling is the only result doesn't determine the end of the current skill execution.
@@ -132,7 +132,7 @@ void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const F
     }
 }
 
-void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(const FSkillChannelingResult skillChannelingResult) {
+void USkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(const FSkillChannelingResult skillChannelingResult) {
     if (skillChannelingResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
     }
@@ -140,7 +140,7 @@ void UNewSkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(c
     _onSkillInExecutionStatusChanged.Broadcast(false);
 }
 
-bool UNewSkillsContainerComponent::_resetSkillInExecution(const bool resetMovement) {
+bool USkillsContainerComponent::_resetSkillInExecution(const bool resetMovement) {
     if (_currentlyExecutedSkill.IsValid()) {
         _currentlyExecutedSkill->Abort(resetMovement);
         _currentlyExecutedSkill = nullptr;
@@ -150,7 +150,7 @@ bool UNewSkillsContainerComponent::_resetSkillInExecution(const bool resetMoveme
     return false;
 }
 
-bool UNewSkillsContainerComponent::_resetWaitingSkill() {
+bool USkillsContainerComponent::_resetWaitingSkill() {
     if (_skillWaitingForTargets.IsValid()) {
         _skillWaitingForTargets->Abort(false); // Targets' cleanup.
         _skillWaitingForTargets = nullptr;
