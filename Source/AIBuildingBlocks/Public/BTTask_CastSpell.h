@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "BehaviorTree/BTTaskNode.h"
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 #include "BTTask_CastSpell.generated.h"
 
@@ -27,7 +27,7 @@ private:
     bool _newIsManaAvailableForSkill(const TObjectPtr<APawn>& pawn, float skillManaCost) const;
 
     UPROPERTY(EditAnywhere, Category = "Cast Spell")
-    TSubclassOf<UNewAbstractSkill> _newSkillToCast;
+    TSubclassOf<UAbstractSkill> _newSkillToCast;
 
     /** \brief If true, the cast of the spell does not start if the mana necessary to both cast and channel the skill isn't immediately available. If false, the
      * cast is always tried.

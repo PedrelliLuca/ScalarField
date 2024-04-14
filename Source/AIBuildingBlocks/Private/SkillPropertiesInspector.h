@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
-/** \brief This class is friend of UNewAbstractSkill. Files who have visibility of this class are allowed to peek at UNewAbstractSkill's properties. The reasons
+/** \brief This class is friend of UAbstractSkill. Files who have visibility of this class are allowed to peek at UAbstractSkill's properties. The reasons
  * this class exists are:
  * 1. To provide AI with skill-related data, so that it can take decisions on whether to cast a certain skill or not.
  * 2. To provide UI with skill-related data, so that the player can take decisions on whether to cast a certain skill or not.
@@ -18,7 +18,7 @@
  */
 class FSkillPropertiesInspector {
 public:
-    FSkillPropertiesInspector(const TObjectPtr<UNewAbstractSkill>& skill)
+    FSkillPropertiesInspector(const TObjectPtr<UAbstractSkill>& skill)
         : _skill(skill) {}
 
     float GetTotalManaCost() const { return _skill->_castManaCost + _skill->_channelingManaCost; }
@@ -28,5 +28,5 @@ public:
     const TArray<TObjectPtr<USkillTargetingCondition>>& GetTargetingConditions() const { return _skill->_targetingConditions; }
 
 private:
-    TWeakObjectPtr<UNewAbstractSkill> _skill;
+    TWeakObjectPtr<UAbstractSkill> _skill;
 };

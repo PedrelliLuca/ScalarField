@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 #include "SpawnProjectileSkill.generated.h"
 
@@ -12,7 +12,7 @@
  * \brief A cast-only skill that spawns an actor in the world. Once casted, the caster doesn't have control over the actor's lifetime.
  */
 UCLASS(Blueprintable)
-class CONCRETESKILLS_API USpawnProjectileSkill : public UNewAbstractSkill {
+class CONCRETESKILLS_API USpawnProjectileSkill : public UAbstractSkill {
     GENERATED_BODY()
 
 protected:

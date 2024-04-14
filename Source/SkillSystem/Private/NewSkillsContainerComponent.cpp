@@ -2,7 +2,7 @@
 
 #include "NewSkillsContainerComponent.h"
 
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 UNewSkillsContainerComponent::UNewSkillsContainerComponent() {
     PrimaryComponentTick.bCanEverTick = false;
@@ -97,13 +97,13 @@ void UNewSkillsContainerComponent::BeginPlay() {
     const auto caster = GetOwner();
     _skills.Reserve(_skillClasses.Num());
     for (const auto& skillClass : _skillClasses) {
-        auto skill = NewObject<UNewAbstractSkill>(this, skillClass);
+        auto skill = NewObject<UAbstractSkill>(this, skillClass);
         skill->SetCaster(caster);
         _skills.Emplace(MoveTemp(skill));
     }
 }
 
-void UNewSkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UNewAbstractSkill> skill, const ESkillCastResult castResultValue) {
+void UNewSkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbstractSkill> skill, const ESkillCastResult castResultValue) {
     /* If we don't get inside the following statement, it means that either:
      * 1. The result was ESkillCastResult::Success_IntoExecutionEnd. In such case, the skill was instantaneous, we don't to cache it and bind to its delegates.
      * 2. The cast was a failure, so we don't want to set the skill as "in execution". */

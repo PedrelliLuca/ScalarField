@@ -15,14 +15,14 @@
 #include "TacticalPauseWorldSubsystem.h"
 #include "UObject/WeakInterfacePtr.h"
 
-#include "NewAbstractSkill.generated.h"
+#include "AbstractSkill.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCastPhaseFinish, FSkillCastResult);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnChannelingPhaseFinish, FSkillChannelingResult);
 
 /** Represents a skill of the ScalarField game. */
 UCLASS(NotBlueprintable, Abstract)
-class SKILLSYSTEM_API UNewAbstractSkill : public UObject, public FTickableGameObject {
+class SKILLSYSTEM_API UAbstractSkill : public UObject, public FTickableGameObject {
     GENERATED_BODY()
 
     friend class FSkillPropertiesInspector;
@@ -98,11 +98,11 @@ protected:
 
 private:
     /** \brief Represents the concrete cast of the skill, skill-specific logic for the cast is executed in here. */
-    virtual void _skillCast() PURE_VIRTUAL(UNewAbstractSkill::_skillCast, return;);
+    virtual void _skillCast() PURE_VIRTUAL(UAbstractSkill::_skillCast, return;);
     /** \brief Represents the concrete channeling of the skill, skill-specific logic for channeling ticks is executed in here. */
-    virtual void _skillChannelingTick(float deltaTime) PURE_VIRTUAL(UNewAbstractSkill::_channelingTickLogic, return;);
+    virtual void _skillChannelingTick(float deltaTime) PURE_VIRTUAL(UAbstractSkill::_channelingTickLogic, return;);
     /** \brief Represents the concrete abortion of the skill, skill-specific logic for cleanup is executed in here. */
-    virtual void _skillAbort() PURE_VIRTUAL(UNewAbstractSkill::_channelingTickLogic, return;);
+    virtual void _skillAbort() PURE_VIRTUAL(UAbstractSkill::_channelingTickLogic, return;);
 
     void _castTick(float deltaTime);
     void _channelingTick(float deltaTime);

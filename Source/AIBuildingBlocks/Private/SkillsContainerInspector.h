@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 #include "NewSkillsContainerComponent.h"
 #include "SkillPropertiesInspector.h"
 
@@ -30,7 +30,7 @@ public:
         return FSkillPropertiesInspector{_skillsContainer->_skills[skillIndex]};
     }
 
-    TOptional<int32> GetIndexOfSkill(const TSubclassOf<UNewAbstractSkill>& skillClass) const {
+    TOptional<int32> GetIndexOfSkill(const TSubclassOf<UAbstractSkill>& skillClass) const {
         auto optionalIndex = TOptional<int32>{};
 
         const auto index = _skillsContainer->_skills.IndexOfByPredicate([&skillClass](const auto& skill) { return skill->IsA(skillClass); });

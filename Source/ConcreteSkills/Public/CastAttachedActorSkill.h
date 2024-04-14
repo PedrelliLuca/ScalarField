@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "GameFramework/SpringArmComponent.h"
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 #include "CastAttachedActorSkill.generated.h"
 
@@ -13,7 +13,7 @@
  * \brief A cast-only skill that spawns an actor attached to the target. The attachment lasts for the entire channeling phase.
  */
 UCLASS(Blueprintable)
-class CONCRETESKILLS_API UCastAttachedActorSkill : public UNewAbstractSkill {
+class CONCRETESKILLS_API UCastAttachedActorSkill : public UAbstractSkill {
     GENERATED_BODY()
 
 protected:

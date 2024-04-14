@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
-FSkillCastResult UNewAbstractSkill::TryCast() {
+FSkillCastResult UAbstractSkill::TryCast() {
     check(_caster.IsValid());
 
     if (_onCooldown) {
@@ -36,7 +36,7 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
         _casterManaC->SetCurrentMana(currentMana - _castManaCost);
 
         _skillCast();
-        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UNewAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
+        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
         _onCooldown = true;
 
         const auto castResult = _endCast();
@@ -52,7 +52,7 @@ FSkillCastResult UNewAbstractSkill::TryCast() {
     return FSkillCastResult::CastDeferred();
 }
 
-void UNewAbstractSkill::Abort(const bool shouldResetMovement) {
+void UAbstractSkill::Abort(const bool shouldResetMovement) {
     if (shouldResetMovement) {
         _setMovementModeIfPossible(EMovementModeToSet::Default);
     }
@@ -64,7 +64,7 @@ void UNewAbstractSkill::Abort(const bool shouldResetMovement) {
     _skillAbort();
 }
 
-FSkillTargetingResult UNewAbstractSkill::TryAddTarget(const FSkillTargetPacket& targetPacket) {
+FSkillTargetingResult UAbstractSkill::TryAddTarget(const FSkillTargetPacket& targetPacket) {
     if (_targets.Num() == _nTargets) {
         return FSkillTargetingResult::TargetingFail_AlreadyAvailableTargets();
     }
@@ -86,7 +86,7 @@ FSkillTargetingResult UNewAbstractSkill::TryAddTarget(const FSkillTargetPacket& 
     return FSkillTargetingResult::TargetingFail_InvalidTarget();
 }
 
-void UNewAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
+void UAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
     // Make sure that the caster is not valid before setting it.
     if (ensureMsgf(!_caster.IsValid(), TEXT("Caster can be set only once and has already been set."))) {
         check(IsValid(caster));
@@ -114,7 +114,7 @@ void UNewAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
     }
 }
 
-void UNewAbstractSkill::Tick(const float deltaTime) {
+void UAbstractSkill::Tick(const float deltaTime) {
     if (!_pauseSubSys.IsValid()) {
         _pauseSubSys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
         check(_pauseSubSys.IsValid());
@@ -135,15 +135,15 @@ void UNewAbstractSkill::Tick(const float deltaTime) {
     }
 }
 
-bool UNewAbstractSkill::IsTickable() const {
+bool UAbstractSkill::IsTickable() const {
     return _caster.IsValid();
 }
 
-bool UNewAbstractSkill::IsAllowedToTick() const {
+bool UAbstractSkill::IsAllowedToTick() const {
     return _isTickAllowed;
 }
 
-void UNewAbstractSkill::_castTick(const float deltaTime) {
+void UAbstractSkill::_castTick(const float deltaTime) {
     // Targeting conditions must be verified during the entire cast phase.
     for (const auto& target : _targets) {
         if (!target->IsValidTarget() || !_areTargetingConditionsVerifiedForTarget(target)) {
@@ -175,7 +175,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
         }
 
         _skillCast();
-        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UNewAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
+        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
         _onCooldown = true;
 
         _endCast();
@@ -201,7 +201,7 @@ void UNewAbstractSkill::_castTick(const float deltaTime) {
     _elapsedExecutionSeconds += deltaTime;
 }
 
-void UNewAbstractSkill::_channelingTick(float deltaTime) {
+void UAbstractSkill::_channelingTick(float deltaTime) {
     if (_checkTargetingConditionsWhenChanneling) {
         // Targeting conditions must be verified during the entire cast phase.
         for (const auto& target : _targets) {
@@ -246,7 +246,7 @@ void UNewAbstractSkill::_channelingTick(float deltaTime) {
     }
 }
 
-FSkillCastResult UNewAbstractSkill::_endCast() {
+FSkillCastResult UAbstractSkill::_endCast() {
     if (_channelingSeconds > 0.0f) {             // This skill requires channeling
         if (FMath::IsNearlyZero(_castSeconds)) { // This skill cast was immediate
             _isTickAllowed = true;
@@ -268,7 +268,7 @@ FSkillCastResult UNewAbstractSkill::_endCast() {
     return toExecutionEndResult;
 }
 
-bool UNewAbstractSkill::_areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const {
+bool UAbstractSkill::_areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const {
     // TODO: When you'll have a proper error management system, this function will have to collect and return all errors thrown by the cast conditions.
     for (const auto targetingCondition : _targetingConditions) {
         if (!targetingCondition->IsVerifiedForTarget(target.GetInterface())) {
@@ -278,7 +278,7 @@ bool UNewAbstractSkill::_areTargetingConditionsVerifiedForTarget(TScriptInterfac
     return true;
 }
 
-bool UNewAbstractSkill::_areCastConditionsVerified() const {
+bool UAbstractSkill::_areCastConditionsVerified() const {
     // TODO: When you'll have a proper error management system, this function will have to collect and return all errors thrown by the cast conditions.
     for (const auto castCondition : _castConditions) {
         if (!castCondition->IsVerified()) {
@@ -288,11 +288,11 @@ bool UNewAbstractSkill::_areCastConditionsVerified() const {
     return true;
 }
 
-void UNewAbstractSkill::_onCooldownEnded() {
+void UAbstractSkill::_onCooldownEnded() {
     _onCooldown = false;
 }
 
-void UNewAbstractSkill::_setMovementModeIfPossible(const EMovementModeToSet movementModeToSet) const {
+void UAbstractSkill::_setMovementModeIfPossible(const EMovementModeToSet movementModeToSet) const {
     // It's ok for the caster to not have a movement setter. In such case, the skill won't affect its movement.
     if (!_casterMovementSetterC.IsValid()) {
         return;

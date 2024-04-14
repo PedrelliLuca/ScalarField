@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 #include "SkillCastResult.h"
 #include "SkillTarget.h"
 #include "SkillTargetingResult.h"
@@ -47,10 +47,10 @@ protected:
     void BeginPlay() override;
 
     UPROPERTY(EditAnywhere, Category = "Skills")
-    TArray<TSubclassOf<UNewAbstractSkill>> _skillClasses{};
+    TArray<TSubclassOf<UAbstractSkill>> _skillClasses{};
 
 private:
-    void _setNewSkillInExecution(TObjectPtr<UNewAbstractSkill> skill, ESkillCastResult castResultValue);
+    void _setNewSkillInExecution(TObjectPtr<UAbstractSkill> skill, ESkillCastResult castResultValue);
     void _onCurrentlyExecutedSkillCastPhaseEnd(FSkillCastResult skillCastResult);
     void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
 
@@ -58,10 +58,10 @@ private:
     bool _resetWaitingSkill();
 
     UPROPERTY()
-    TArray<TObjectPtr<UNewAbstractSkill>> _skills{};
+    TArray<TObjectPtr<UAbstractSkill>> _skills{};
 
-    TWeakObjectPtr<UNewAbstractSkill> _skillWaitingForTargets = nullptr;
-    TWeakObjectPtr<UNewAbstractSkill> _currentlyExecutedSkill = nullptr;
+    TWeakObjectPtr<UAbstractSkill> _skillWaitingForTargets = nullptr;
+    TWeakObjectPtr<UAbstractSkill> _currentlyExecutedSkill = nullptr;
 
     FOnSkillExecutionStatusChanged _onSkillInExecutionStatusChanged;
 };
