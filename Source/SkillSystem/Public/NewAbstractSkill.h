@@ -22,7 +22,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnChannelingPhaseFinish, FSkillChannelingRe
 
 /** Represents a skill of the ScalarField game. */
 UCLASS(NotBlueprintable, Abstract)
-class NEWSKILLSYSTEM_API UNewAbstractSkill : public UObject, public FTickableGameObject {
+class SKILLSYSTEM_API UNewAbstractSkill : public UObject, public FTickableGameObject {
     GENERATED_BODY()
 
     friend class FSkillPropertiesInspector;
@@ -135,7 +135,7 @@ private:
     TArray<TObjectPtr<USkillTargetingCondition>> _targetingConditions{};
 
     /** \brief Kind of target needed by the skill to execute its logic. */
-    UPROPERTY(EditDefaultsOnly, Category = "Targeting", meta = (MustImplement = "/Script/NewSkillSystem.SkillTarget"))
+    UPROPERTY(EditDefaultsOnly, Category = "Targeting", meta = (MustImplement = "/Script/SkillSystem.SkillTarget"))
     TSubclassOf<UObject> _targetKind = nullptr;
 
     /** \brief Num of targets the skill needs to execute its logic. */

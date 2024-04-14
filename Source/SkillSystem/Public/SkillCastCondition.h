@@ -7,7 +7,7 @@
 /* Represents a condition that must be verified in order to cast a skill. This can't be an interface because it's meant to be employed with the "Instanced"
  * UPROPERTY specifier, see UAbstractSkill. */
 UCLASS(NotBlueprintable, Abstract)
-class NEWSKILLSYSTEM_API USkillCastCondition : public UObject {
+class SKILLSYSTEM_API USkillCastCondition : public UObject {
     GENERATED_BODY()
 
 public:

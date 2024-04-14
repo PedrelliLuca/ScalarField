@@ -2,33 +2,27 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class AIControllers : ModuleRules
+	public class SkillSystem : ModuleRules
 	{
-		public AIControllers(ReadOnlyTargetRules Target) : base(Target)
+		public SkillSystem(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
 			PublicDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"Core",
-					"CoreUObject",
-					"Engine",
-					"AIModule",
-					"MovementCommand",
-					"DamageHandlers",
-					"Thermodynamics",
-				}
+                    "Core",
+                    "CoreUObject",
+                    "Engine",
+                    "GameplayAttributes",
+                    "MovementCommand",
+                    "TacticalPauseSystem"
+                }
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"FactionSystem", 
-					"SkillSystem", 
-					"FSM",
-					"GameplayAttributes",
-                    "ThermodynamicsCore"
 					// ... add private dependencies that you statically link with here ...
 				}
 				);

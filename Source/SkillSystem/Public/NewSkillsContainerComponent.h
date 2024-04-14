@@ -15,7 +15,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillExecutionStatusChanged, bool);
 
 UCLASS(ClassGroup = (Skills), meta = (BlueprintSpawnableComponent))
-class NEWSKILLSYSTEM_API UNewSkillsContainerComponent : public UActorComponent {
+class SKILLSYSTEM_API UNewSkillsContainerComponent : public UActorComponent {
     GENERATED_BODY()
 
     friend class FSkillsContainerInspector;

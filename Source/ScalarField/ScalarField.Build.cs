@@ -35,7 +35,7 @@ public class ScalarField : ModuleRules
             "AIControllers",
             "AIBuildingBlocks",
             "SkillCastConditions",
-            "NewSkillSystem",
+            "SkillSystem",
             "FSM",
             "ConcreteSkills",
             "ConcreteItems",

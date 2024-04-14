@@ -8,7 +8,7 @@
 /* Represents a condition that must be verified in order for a target to be valid for a skill. This can't be an interface because it's meant to be employed with
  * the "Instanced" UPROPERTY specifier, see UAbstractSkill. */
 UCLASS(NotBlueprintable, Abstract)
-class NEWSKILLSYSTEM_API USkillTargetingCondition : public UObject {
+class SKILLSYSTEM_API USkillTargetingCondition : public UObject {
     GENERATED_BODY()
 
 public:
