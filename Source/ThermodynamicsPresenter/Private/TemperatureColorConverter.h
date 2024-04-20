@@ -31,11 +31,11 @@ private:
 
     // TODO: Find a way to set these without having to re-compile.
 
-    static constexpr float TEMPERATURE_BLUE = 73.f; // Roughly -200 Celsius
-    static constexpr float TEMPERATURE_CYAN = 273.f; // Roughly 0 Celsius
-    static constexpr float TEMPERATURE_GREEN = 303.f; // Roughly 30 Celsius
-    static constexpr float TEMPERATURE_YELLOW = 333.f; // Roughly 60 Celsius
-    static constexpr float TEMPERATURE_RED = 473.f; // Roughly 200 Celsius
+    static constexpr float TEMPERATURE_BLUE = 73.f;       // Roughly -200 Celsius
+    static constexpr float TEMPERATURE_CYAN = 273.f;      // Roughly 0 Celsius
+    static constexpr float TEMPERATURE_GREEN = 303.f;     // Roughly 30 Celsius
+    static constexpr float TEMPERATURE_YELLOW = 333.f;    // Roughly 60 Celsius
+    static constexpr float TEMPERATURE_RED = 473.f;       // Roughly 200 Celsius
     static constexpr float TEMPERATURE_WINE_RED = 1273.f; // Roughly 1000 Celsius
 
     static constexpr FLinearColor BLUE{0.0f, 0.0f, 1.0f};

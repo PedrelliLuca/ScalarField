@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 
-#include "BehaviorTree/BTTaskNode.h"
 #include "AbstractSkill.h"
+#include "BehaviorTree/BTTaskNode.h"
 
 #include "BTTask_CastSpell.generated.h"
 

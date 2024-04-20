@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 
-#include "EnvironmentQuery/EnvQueryTest.h"
 #include "AbstractSkill.h"
+#include "EnvironmentQuery/EnvQueryTest.h"
 
 #include "EnvQueryTest_IsValidTargetForSkill.generated.h"
 

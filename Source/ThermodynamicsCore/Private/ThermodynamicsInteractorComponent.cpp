@@ -269,7 +269,7 @@ void UThermodynamicsInteractorComponent::_unregisterInteractor(
     auto thermoIntToRemove = *found;
 
     // During this frame, did thermoIntToRemove interact with us without us interacting with it? If so, we need to repay him right now, because we won't
-    // see it anymore during tick! 
+    // see it anymore during tick!
     // This can happen is because, while UThermodynamicsInteractorComponents are ticking, AActors are still moving.
     if (_interactorsToRepay.Find(thermoIntToRemove)) {
         _interactorsToRepay.Remove(thermoIntToRemove);

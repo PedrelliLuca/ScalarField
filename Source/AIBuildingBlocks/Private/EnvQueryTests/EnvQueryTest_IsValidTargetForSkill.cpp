@@ -4,8 +4,8 @@
 
 #include "EnvironmentQuery/Contexts/EnvQueryContext_Querier.h"
 #include "EnvironmentQuery/Items/EnvQueryItemType_Actor.h"
-#include "SkillsContainerComponent.h"
 #include "SkillTargets/ActorSkillTarget.h"
+#include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
 
 UEnvQueryTest_IsValidTargetForSkill::UEnvQueryTest_IsValidTargetForSkill(const FObjectInitializer& objectInitializer)

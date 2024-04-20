@@ -15,7 +15,7 @@ class SCALARFIELD_API AEndLevelTrigger : public ATriggerBox {
 
 protected:
     void BeginPlay() override;
-    
+
 private:
     UFUNCTION()
     void _onPlayerOverlap(AActor* overlappedActor, AActor* otherActor);

@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Components/ActorComponent.h"
 #include "AbstractSkill.h"
+#include "Components/ActorComponent.h"
 #include "SkillCastResult.h"
 #include "SkillTarget.h"
 #include "SkillTargetingResult.h"

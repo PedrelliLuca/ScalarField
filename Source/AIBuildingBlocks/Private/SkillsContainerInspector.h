@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 
 #include "AbstractSkill.h"
-#include "SkillsContainerComponent.h"
 #include "SkillPropertiesInspector.h"
+#include "SkillsContainerComponent.h"
 
 /** \brief This class is friend of USkillsContainerComponent. Files who have visibility of this class are allowed to peek at USkillsContainerComponent's
  * properties. The reasons this class exists are:

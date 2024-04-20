@@ -5,8 +5,8 @@
 #include "Algo/AnyOf.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "HealthComponent.h"
-#include "SkillsContainerComponent.h"
 #include "NewStateComponent.h"
+#include "SkillsContainerComponent.h"
 #include "ThermodynamicsInteractorComponent.h"
 
 AEnemyStabilizerController::AEnemyStabilizerController() {

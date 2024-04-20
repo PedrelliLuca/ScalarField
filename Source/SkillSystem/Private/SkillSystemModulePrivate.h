@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogSkillSystem, Log, All);
 
 class FSkillSystemModule : public ISkillSystemModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

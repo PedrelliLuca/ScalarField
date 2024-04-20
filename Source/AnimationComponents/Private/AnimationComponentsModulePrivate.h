@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogAnimationComponents, Log, All);
 
 class FAnimationComponentsModule : public IAnimationComponentsModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

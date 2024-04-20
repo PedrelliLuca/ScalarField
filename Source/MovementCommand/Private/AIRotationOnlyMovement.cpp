@@ -45,7 +45,7 @@ void UAIRotationOnlyMovement::OnMovementTick(const float deltaTime) {
         degreesThisTick = _absDegreesToRotate - _degreesSoFar;
     }
 
-    _aiController->GetPawn()->AddActorLocalRotation(_rotationSign* FRotator{0.0, degreesThisTick, 0.0});
+    _aiController->GetPawn()->AddActorLocalRotation(_rotationSign * FRotator{0.0, degreesThisTick, 0.0});
 
     _degreesSoFar += degreesThisTick;
 }

@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogThermodynamicsCore, Log, All);
 
 class FThermodynamicsCoreModule : public IThermodynamicsCoreModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

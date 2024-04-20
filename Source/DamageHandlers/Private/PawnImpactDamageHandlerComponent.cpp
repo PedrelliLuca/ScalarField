@@ -25,7 +25,7 @@ void UPawnImpactDamageHandlerComponent::BeginPlay() {
                     *FString(__FUNCTION__));
             }
 
-            _navSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(controller->GetWorld()); 
+            _navSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(controller->GetWorld());
             if (!_navSys.IsValid()) {
                 UE_LOG(LogTemp, Warning, TEXT("%s: No NavSysV1 on owner's controller, ImpactDamage won't change pawn's velocity. Is this intended?"),
                     *FString(__FUNCTION__));

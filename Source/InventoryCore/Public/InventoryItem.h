@@ -29,34 +29,62 @@ public:
     void PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) override;
 #endif
 
-    void Use(TWeakObjectPtr<AActor> actor) override {}
+    void Use(TWeakObjectPtr<AActor> actor) override {
+    }
 
-    int32 GetMaxQuantity() const override { return _maxQuantity; }
-    int32 GetQuantity() const override { return _quantity; }
+    int32 GetMaxQuantity() const override {
+        return _maxQuantity;
+    }
+    int32 GetQuantity() const override {
+        return _quantity;
+    }
 
-    double GetWeight() const override { return _weight; }
+    double GetWeight() const override {
+        return _weight;
+    }
     UFUNCTION(BlueprintPure, Category = "Item")
-    double GetStackWeight() const override { return _quantity * _weight; }
+    double GetStackWeight() const override {
+        return _quantity * _weight;
+    }
 
-    double GetVolume() const override { return _volume; }
+    double GetVolume() const override {
+        return _volume;
+    }
     UFUNCTION(BlueprintPure, Category = "Item")
-    double GetStackVolume() const { return _quantity * _volume; }
+    double GetStackVolume() const {
+        return _quantity * _volume;
+    }
 
-    const FText& GetNameText() const override { return _nameText; }
-    TObjectPtr<UTexture2D> GetThumbnail() override { return _inventoryThumbnail; }
-    TObjectPtr<UStaticMesh> GetMesh() override { return _worldMesh; }
-    FORCEINLINE const FText& GetActionText() const { return _actionText; }
+    const FText& GetNameText() const override {
+        return _nameText;
+    }
+    TObjectPtr<UTexture2D> GetThumbnail() override {
+        return _inventoryThumbnail;
+    }
+    TObjectPtr<UStaticMesh> GetMesh() override {
+        return _worldMesh;
+    }
+    FORCEINLINE const FText& GetActionText() const {
+        return _actionText;
+    }
 
     UFUNCTION(BlueprintCallable, Category = "Item")
     void SetQuantity(int32 newQuantity) override;
 
-    bool IsStackable() const override { return _bIsStackable; }
+    bool IsStackable() const override {
+        return _bIsStackable;
+    }
     UFUNCTION(BlueprintPure, Category = "Item")
-    bool ShouldShowInInventory() const override { return true; }
-    bool DoesUseConsume() const override { return _bDoesUseConsume; }
+    bool ShouldShowInInventory() const override {
+        return true;
+    }
+    bool DoesUseConsume() const override {
+        return _bDoesUseConsume;
+    }
 
     // Called to execute some logic when the item is added to the given inventory
-    virtual void OnItemAddedToInventory(TWeakObjectPtr<class UInventoryComponent> inventory) {}
+    virtual void OnItemAddedToInventory(TWeakObjectPtr<class UInventoryComponent> inventory) {
+    }
 
 protected:
     // The maximum number of items of this kind that can be part of a single stack, i.e. of a single UInventoryItem instance

@@ -23,19 +23,33 @@ public:
     void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-    double GetCurrentMana() const { return _currentMana; }
-    double GetMaxMana() const { return _maxMana; }
-    double GetManaRegen() const { return _manaRegenPerSecond; }
+    double GetCurrentMana() const {
+        return _currentMana;
+    }
+    double GetMaxMana() const {
+        return _maxMana;
+    }
+    double GetManaRegen() const {
+        return _manaRegenPerSecond;
+    }
 
     void SetCurrentMana(double mana);
     void SetMaxMana(double maxMana, bool bUpdateMana = true);
     void SetManaRegen(double manaRegenPerSecond);
 
-    void RestoreMana(double manaToRestore) { SetCurrentMana(GetCurrentMana() + manaToRestore); }
+    void RestoreMana(double manaToRestore) {
+        SetCurrentMana(GetCurrentMana() + manaToRestore);
+    }
 
-    FOnManaChanged& OnManaChanged() { return _onManaChanged; }
-    FOnMaxManaChanged& OnMaxManaChanged() { return _onMaxManaChanged; }
-    FOnManaRegenChanged& OnManaRegenChanged() { return _onManaRegenChanged; }
+    FOnManaChanged& OnManaChanged() {
+        return _onManaChanged;
+    }
+    FOnMaxManaChanged& OnMaxManaChanged() {
+        return _onMaxManaChanged;
+    }
+    FOnManaRegenChanged& OnManaRegenChanged() {
+        return _onManaRegenChanged;
+    }
 
 protected:
     void BeginPlay() override;

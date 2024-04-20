@@ -6,11 +6,11 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/RunEQSComponent.h"
 #include "ManaComponent.h"
-#include "SkillsContainerComponent.h"
 #include "NewStateComponent.h"
 #include "SkillPropertiesInspector.h"
 #include "SkillTargets/ActorSkillTarget.h"
 #include "SkillTargets/CasterPlaneLocationSkillTarget.h"
+#include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
 
 UBTTask_CastSpell::UBTTask_CastSpell() {
