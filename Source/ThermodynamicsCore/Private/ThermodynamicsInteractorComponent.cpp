@@ -62,7 +62,7 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
     const float currDeltaT_OtherBodies = _interactWithOtherComponents(deltaTime);
 
     // 2) Interact with the Heatmap Grid
-    const auto location = FVector2D(GetOwner()->GetActorLocation());
+    const auto location = FVector2D(_sphereCollisionC->GetComponentTransform().GetLocation());
     const float interactionRange = _sphereCollisionC->GetScaledSphereRadius();
     const float currDeltaT_GridNormalized = HeatmapGrid::Interact(location, interactionRange, _currentTemperature, deltaTime);
 
