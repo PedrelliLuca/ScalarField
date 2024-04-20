@@ -5,18 +5,18 @@
 #include "CoreMinimal.h"
 #include "InventoryItem.h"
 
-#include "HealingItem.generated.h"
+#include "ManaRestoringItem.generated.h"
 
 UCLASS(Blueprintable)
-class SCALARFIELD_API UHealingItem : public UInventoryItem {
+class CONCRETEITEMS_API UManaRestoringItem : public UInventoryItem {
     GENERATED_BODY()
 
 public:
-    UHealingItem();
+    UManaRestoringItem();
 
     void Use(TWeakObjectPtr<AActor> actor) override;
 
 protected:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Healing")
-    double _healAmount;
+    double _manaRestoringAmount;
 };
