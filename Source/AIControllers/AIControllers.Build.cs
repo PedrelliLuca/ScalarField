@@ -17,7 +17,6 @@ namespace UnrealBuildTool.Rules
 					"AIModule",
 					"MovementCommand",
 					"DamageHandlers",
-					"Thermodynamics",
 				}
 				);
 
