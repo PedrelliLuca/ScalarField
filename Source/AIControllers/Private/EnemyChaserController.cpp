@@ -4,12 +4,11 @@
 
 #include "BehaviorTree/BlackboardComponent.h"
 #include "HealthComponent.h"
-#include "NewSkillsContainerComponent.h"
+#include "SkillsContainerComponent.h"
 #include "NewStateComponent.h"
 
 AEnemyChaserController::AEnemyChaserController() {
     _movementCommandC = CreateDefaultSubobject<UAIMovementCommandComponent>(TEXT("AIMovementCommandComponent"));
-    _stateC = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
     _perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 }
 
@@ -18,11 +17,6 @@ void AEnemyChaserController::Tick(const float deltaTime) {
 
     if (!_patrolC.IsValid()) {
         return;
-    }
-
-    if (!_bNewSkillSystem) {
-        _stateC->PerformTickBehavior(deltaTime);
-        _movementCommandC->MovementTick(deltaTime);
     }
 
     // Did we reach our current patrol objective?
@@ -76,20 +70,12 @@ void AEnemyChaserController::OnPossess(APawn* const inPawn) {
         UE_LOG(LogTemp, Error, TEXT("%s(): Invald value for _bbTargetEnemyKeyName"), *FString{__FUNCTION__});
     }
 
-    if (_bNewSkillSystem) {
-        _movementCommandC->SetDefaultMovementMode();
-    }
+    _movementCommandC->SetDefaultMovementMode();
 
-    if (!_bNewSkillSystem) {
-        // Setting up the logic that lets the BT know if we're casting or not.
-        _stateC->OnSkillExecutionBegin().AddUObject(this, &AEnemyChaserController::_onSkillExecutionBegin);
-        _stateC->OnSkillExecutionEnd().AddUObject(this, &AEnemyChaserController::_onSkillExecutionEnd);
-    } else {
-        if (IsValid(GetPawn())) {
-            const auto skillsContainerC = GetPawn()->FindComponentByClass<UNewSkillsContainerComponent>();
-            check(IsValid(skillsContainerC));
-            skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyChaserController::_onSkillInExecutionStatusChanged);
-        }
+    if (IsValid(GetPawn())) {
+        const auto skillsContainerC = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        check(IsValid(skillsContainerC));
+        skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyChaserController::_onSkillInExecutionStatusChanged);
     }
 }
 
@@ -123,12 +109,8 @@ void AEnemyChaserController::_onSkillInExecutionStatusChanged(const bool isExecu
 }
 
 void AEnemyChaserController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
-    if (!_bNewSkillSystem) {
-        _stateC->PerformAbortBehavior();
-    } else {
-        const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
-        check(IsValid(stateC));
+    const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+    check(IsValid(stateC));
 
-        stateC->TryAbort();
-    }
+    stateC->TryAbort();
 }

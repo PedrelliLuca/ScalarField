@@ -11,7 +11,7 @@ void USkillExecutionState::SetPawn(TObjectPtr<APawn> subjectPawn) {
         check(IsValid(subjectPawn));
         _subjectPawn = MoveTemp(subjectPawn);
 
-        _subjectSkillsContainerC = _subjectPawn->FindComponentByClass<UNewSkillsContainerComponent>();
+        _subjectSkillsContainerC = _subjectPawn->FindComponentByClass<USkillsContainerComponent>();
         check(_subjectSkillsContainerC.IsValid());
 
         // TODO: remove GetController() when the command setter will be on the pawn (required for group control)

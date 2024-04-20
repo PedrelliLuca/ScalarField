@@ -16,9 +16,7 @@ namespace UnrealBuildTool.Rules
 					"Engine",
 					"AIModule",
 					"MovementCommand",
-					"SkillUserFSM",
 					"DamageHandlers",
-					"Thermodynamics",
 				}
 				);
 
@@ -26,7 +24,7 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
 					"FactionSystem", 
-					"NewSkillSystem", 
+					"SkillSystem", 
 					"FSM",
 					"GameplayAttributes",
                     "ThermodynamicsCore"

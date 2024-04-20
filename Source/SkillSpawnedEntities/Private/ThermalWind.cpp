@@ -2,7 +2,7 @@
 
 #include "ThermalWind.h"
 
-#include "ThermodynamicComponent.h"
+#include "ThermodynamicsInteractorComponent.h"
 
 AThermalWind::AThermalWind() {
     PrimaryActorTick.bCanEverTick = true;
@@ -41,7 +41,7 @@ void AThermalWind::BeginPlay() {
 
     // Particle system's setup
     TObjectPtr<UParticleSystem> activeParticleTemplate = nullptr;
-    if (const auto thermoC = Cast<UThermodynamicComponent>(_caster->GetComponentByClass(UThermodynamicComponent::StaticClass()))) {
+    if (const auto thermoC = Cast<UThermodynamicsInteractorComponent>(_caster->GetComponentByClass(UThermodynamicsInteractorComponent::StaticClass()))) {
         if (thermoC->GetTemperature() > _hotThreshold) {
             UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
             activeParticleTemplate = _hotTemplate;

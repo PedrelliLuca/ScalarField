@@ -4,7 +4,7 @@
 
 #include "EnvironmentQuery/Contexts/EnvQueryContext_Querier.h"
 #include "EnvironmentQuery/Items/EnvQueryItemType_Actor.h"
-#include "NewSkillsContainerComponent.h"
+#include "SkillsContainerComponent.h"
 #include "SkillTargets/ActorSkillTarget.h"
 #include "SkillsContainerInspector.h"
 
@@ -35,8 +35,8 @@ void UEnvQueryTest_IsValidTargetForSkill::RunTest(FEnvQueryInstance& queryInstan
     // We expect a single querier
     check(contextActors.Num() == 1);
 
-    const auto skillsContainerC = contextActors.Last()->FindComponentByClass<UNewSkillsContainerComponent>();
-    if (!ensureMsgf(IsValid(skillsContainerC), TEXT("The Context Actor doesn't have a UNewSkillsContainerComponent"))) {
+    const auto skillsContainerC = contextActors.Last()->FindComponentByClass<USkillsContainerComponent>();
+    if (!ensureMsgf(IsValid(skillsContainerC), TEXT("The Context Actor doesn't have a USkillsContainerComponent"))) {
         return;
     }
 

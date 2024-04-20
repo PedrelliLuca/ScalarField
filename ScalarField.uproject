@@ -35,11 +35,6 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "SkillSystem",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
 			"Name": "SkillCastConditions",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault"
@@ -61,11 +56,6 @@
 		},
 		{
 			"Name": "ConcreteItems",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
-		},
-		{
-			"Name": "Thermodynamics",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		},

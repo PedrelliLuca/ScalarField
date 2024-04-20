@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 #include "CastDetachedActorSkill.generated.h"
 
@@ -12,14 +12,14 @@
  * \brief A cast-only skill that spawns an actor in the world. Once casted, the caster doesn't have control over the actor's lifetime.
  */
 UCLASS(Blueprintable)
-class CONCRETESKILLS_API UCastDetachedActorSkill : public UNewAbstractSkill {
+class CONCRETESKILLS_API UCastDetachedActorSkill : public UAbstractSkill {
     GENERATED_BODY()
 
 protected:
     // TODO: this can be generalized in the future by having an array of FSkillSpawnParameters struct collecting these 3 values.
 
     /** \brief Class of the actor to spawn. Must implement the ISkillSpawnedEntity interface. */
-    UPROPERTY(EditAnywhere, Category = "Detached Actor", meta = (MustImplement = "SkillSpawnedEntity"))
+    UPROPERTY(EditAnywhere, Category = "Detached Actor", meta = (MustImplement = "/Script/SkillSpawnedEntities.SkillSpawnedEntity"))
     TSubclassOf<AActor> _actorClass = nullptr;
 
     /** \brief Transform of the actor to spawn relative to its parent. This actor won't be attached to the caster, so this relative transform only holds when

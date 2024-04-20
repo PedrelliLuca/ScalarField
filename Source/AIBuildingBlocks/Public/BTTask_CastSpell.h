@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 
-#include "AbstractSkill.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 #include "BTTask_CastSpell.generated.h"
 
@@ -23,19 +22,12 @@ public:
 private:
     EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
 
-    EBTNodeResult::Type _executeTaskLegacy(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory);
-    EBTNodeResult::Type _executeTaskNew(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory);
-
     FString GetStaticDescription() const override;
 
-    bool _isManaAvailableForSkill(const TObjectPtr<AAIController>& aiController, const TObjectPtr<UAbstractSkill>& skill) const;
     bool _newIsManaAvailableForSkill(const TObjectPtr<APawn>& pawn, float skillManaCost) const;
 
     UPROPERTY(EditAnywhere, Category = "Cast Spell")
-    TSubclassOf<UAbstractSkill> _skillToCast;
-
-    UPROPERTY(EditAnywhere, Category = "Cast Spell")
-    TSubclassOf<UNewAbstractSkill> _newSkillToCast;
+    TSubclassOf<UAbstractSkill> _newSkillToCast;
 
     /** \brief If true, the cast of the spell does not start if the mana necessary to both cast and channel the skill isn't immediately available. If false, the
      * cast is always tried.
@@ -43,9 +35,6 @@ private:
      * available, because it will be by the end of the cast. */
     UPROPERTY(EditAnywhere, Category = "Cast Spell")
     bool _needsManaAvailabilityToCast = true;
-
-    UPROPERTY(EditInstanceOnly, Category = "Feature Toggles")
-    bool _bNewSkillSystem = false;
 
     static constexpr int32 PROJ_LINE_HALF_LENGTH = 10000;
 };

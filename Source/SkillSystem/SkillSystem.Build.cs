@@ -11,13 +11,12 @@ namespace UnrealBuildTool.Rules
 			PublicDependencyModuleNames.AddRange(
 				new string[]
 				{
-					"Core",
+                    "Core",
                     "CoreUObject",
                     "Engine",
-					"Thermodynamics",
-					"MaterialSystem",
-					"MovementCommand",
-					"SkillSpawnedEntities",
+                    "GameplayAttributes",
+                    "MovementCommand",
+                    "TacticalPauseSystem"
                 }
 				);
 

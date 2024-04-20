@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "EnvironmentQuery/EnvQueryTest.h"
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 #include "EnvQueryTest_IsValidTargetForSkill.generated.h"
 
@@ -27,7 +27,7 @@ private:
 
     /** testing mode */
     UPROPERTY(EditDefaultsOnly, Category = "Relationship")
-    TSubclassOf<UNewAbstractSkill> _skill;
+    TSubclassOf<UAbstractSkill> _skill;
 
     /** context */
     UPROPERTY(EditDefaultsOnly, Category = "Relationship")

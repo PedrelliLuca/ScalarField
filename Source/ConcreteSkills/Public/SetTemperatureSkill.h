@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "NewAbstractSkill.h"
+#include "AbstractSkill.h"
 
 #include "SetTemperatureSkill.generated.h"
 
@@ -12,7 +12,7 @@
  * \brief A cast-only skill that spawns an actor attached to the target. The attachment lasts for the entire channeling phase.
  */
 UCLASS(Blueprintable)
-class CONCRETESKILLS_API USetTemperatureSkill : public UNewAbstractSkill {
+class CONCRETESKILLS_API USetTemperatureSkill : public UAbstractSkill {
     GENERATED_BODY()
 
 private:

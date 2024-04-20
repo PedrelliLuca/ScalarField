@@ -11,7 +11,6 @@
 #include "Components/RunEQSComponent.h"
 #include "FactionComponent.h"
 #include "Perception/AIPerceptionComponent.h"
-#include "StateComponent.h"
 #include "TemperatureDamageHandlerComponent.h"
 
 #include "EnemyStabilizerController.generated.h"
@@ -48,9 +47,6 @@ private:
 
     UPROPERTY(VisibleAnywhere, Category = "Stabilizer | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;
-
-    UPROPERTY(VisibleAnywhere, Category = "Stabilizer | State Machine")
-    TObjectPtr<UStateComponent> _stateC;
 
     UPROPERTY(VisibleAnywhere, Category = "Stabilizer | Perception")
     TObjectPtr<UAIPerceptionComponent> _perceptionC;
@@ -91,9 +87,6 @@ private:
 
     UPROPERTY(EditDefaultsOnly, Category = "Stabilizer | Behavior Tree")
     TObjectPtr<UBehaviorTree> _behaviorTree;
-
-    UPROPERTY(EditDefaultsOnly, Category = "Feature Toggles")
-    bool _bNewSkillSystem = false;
 
     float _timeSinceInfluencerCheck = 0.0f;
 

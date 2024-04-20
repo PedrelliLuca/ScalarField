@@ -19,15 +19,13 @@ namespace UnrealBuildTool.Rules
 					"GameplayTasks",
 					"MovementCommand",
 					"GameplayAttributes",
-					"NewSkillSystem",
+					"SkillSystem",
                 }
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-                    "SkillSystem",
-                    "SkillUserFSM",
 					"DamageHandlers",
 					"ThermodynamicsCore", 
 					"FSM", 

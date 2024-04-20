@@ -20,10 +20,4 @@ public:
 
 private:
     EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) override;
-
-    EBTNodeResult::Type _executeTaskLegacy(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory);
-    EBTNodeResult::Type _executeTaskNew(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory);
-
-    UPROPERTY(EditInstanceOnly, Category = "Feature Toggles")
-    bool _bNewSkillSystem = false;
 };
