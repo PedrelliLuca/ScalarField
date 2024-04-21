@@ -8,6 +8,7 @@
 #include "CollisionsCollectionComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_SixParams(FCollectionBeginOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32, bool, const FHitResult&);
+DECLARE_MULTICAST_DELEGATE_FourParams(FCollectionEndOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32);
 
 struct FCollectionSphereParameters {
     FVector2D RootRelativeLocation = FVector2D::ZeroVector;
@@ -23,6 +24,9 @@ class COLLISIONSCOLLECTION_API UCollisionsCollectionComponent : public UActorCom
 
 public:
     UCollisionsCollectionComponent();
+
+    FCollectionBeginOverlapSignature OnCollectionBeginOverlap;
+    FCollectionEndOverlapSignature OnCollectionEndOverlap;
 
 protected:
     void BeginPlay() override;
@@ -55,6 +59,6 @@ private:
 
     TArray<FCollectionSphereParameters> _collectionSpheres;
 
-    // The number of elements in the collection which are currently overlapping
-    int32 _overlappingElements;
+    // Given a non-collection element, this tells the number of collection elements currently overlapping with it.
+    TMap<UPrimitiveComponent*, int> _externalsToOverlappingElements;
 };

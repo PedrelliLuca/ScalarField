@@ -61,10 +61,25 @@ void UCollisionsCollectionComponent::_collectSpheres() {
 
 void UCollisionsCollectionComponent::_collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor,
     UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
-    // If _overlappingElements was 0 fire event saying collection is now overlapping. Then, increase _overlappingElements.
+    // Did the collection just start overlapping with otherComp?
+    if (!_externalsToOverlappingElements.Find(otherComp))
+    {
+        _externalsToOverlappingElements.Emplace(otherComp, 0);
+        OnCollectionBeginOverlap.Broadcast(overlappedComponent, otherActor, otherComp, otherBodyIndex, bFromSweep, sweepResult);
+    }
+
+    ++_externalsToOverlappingElements.FindChecked(otherComp);
 }
 
 void UCollisionsCollectionComponent::_collectionElementEndOverlap(
     UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
     // Decrease _overlappingElements. If counter is now 0 fire event saying collection is not overlapping anymore
+
+    int& overlappingElements = _externalsToOverlappingElements.FindChecked(otherComp);
+    --overlappingElements;
+
+    if (overlappingElements == 0)
+    {
+        _externalsToOverlappingElements.Remove(otherComp);
+    }
 }
