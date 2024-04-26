@@ -9,7 +9,7 @@
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTemperatureChanged, float);
 
-class USphereComponent;
+class UCollisionsCollectionComponent;
 
 /**
  * \brief TODO
@@ -46,10 +46,8 @@ private:
 
     void _setInitialInteractors();
 
-    UFUNCTION()
     void _registerInteractor(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex,
         bool bFromSweep, const FHitResult& sweepResult);
-    UFUNCTION()
     void _unregisterInteractor(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 
     UPROPERTY(EditAnywhere, Category = "Thermodynamic Parameters")
@@ -61,7 +59,7 @@ private:
     float _currentTemperature;
     float _nextTemperature;
 
-    TWeakObjectPtr<USphereComponent> _sphereCollisionC;
+    TWeakObjectPtr<UCollisionsCollectionComponent> _collisionsCollectionC;
     // The number of times this component will be checked this frame by other thermodynamic interactors
     uint32 _counterOfChecksThisFrame;
     // Count of how many times this component got checked by other thermodynamic component this frame. When the counter reaches _timesToBeCheckedThisFrame, we
