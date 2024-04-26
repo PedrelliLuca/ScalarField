@@ -34,6 +34,10 @@ bool UCollisionsCollectionComponent::HasElement(UPrimitiveComponent* collectionE
     return _collectionElements.Find(collectionElement);
 }
 
+const TArray<FCollectionSphereParameters>& UCollisionsCollectionComponent::GetCollectionSpheres() const {
+    return _collectionSpheres;
+}
+
 void UCollisionsCollectionComponent::BeginPlay() {
     Super::BeginPlay();
 
@@ -68,7 +72,7 @@ void UCollisionsCollectionComponent::_collectSpheres() {
         }
 
         FCollectionSphereParameters sphereParameters;
-        sphereParameters.RootRelativeLocation = FVector2D(sphere->GetComponentTransform().GetLocation());
+        sphereParameters.WorldLocation = FVector2D(sphere->GetComponentTransform().GetLocation());
         sphereParameters.Radius = sphere->GetScaledSphereRadius();
         _collectionSpheres.Add(MoveTemp(sphereParameters));
 

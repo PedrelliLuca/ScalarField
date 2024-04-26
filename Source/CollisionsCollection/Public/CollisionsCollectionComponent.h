@@ -11,7 +11,7 @@ DECLARE_MULTICAST_DELEGATE_SixParams(FCollectionBeginOverlapSignature, UPrimitiv
 DECLARE_MULTICAST_DELEGATE_FourParams(FCollectionEndOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32);
 
 struct FCollectionSphereParameters {
-    FVector2D RootRelativeLocation = FVector2D::ZeroVector;
+    FVector2D WorldLocation = FVector2D::ZeroVector;
     float Radius = 0.0f;
 };
 
@@ -32,6 +32,8 @@ public:
     void GetOverlappingComponents(TArray<UPrimitiveComponent*>& outOverlappingComponents) const;
 
     bool HasElement(UPrimitiveComponent* collectionElement) const;
+
+    const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
 
     FCollectionBeginOverlapSignature OnCollectionBeginOverlap;
     FCollectionEndOverlapSignature OnCollectionEndOverlap;
