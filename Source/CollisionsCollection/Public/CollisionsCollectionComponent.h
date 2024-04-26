@@ -25,6 +25,12 @@ class COLLISIONSCOLLECTION_API UCollisionsCollectionComponent : public UActorCom
 public:
     UCollisionsCollectionComponent();
 
+    // Queries world and updates overlap tracking state for each component of this collection.
+    void UpdateOverlaps();
+
+    // Returns unique list of components this collection is overlapping with.
+    void GetOverlappingComponents(TArray<UPrimitiveComponent*>& outOverlappingComponents) const;
+
     FCollectionBeginOverlapSignature OnCollectionBeginOverlap;
     FCollectionEndOverlapSignature OnCollectionEndOverlap;
 

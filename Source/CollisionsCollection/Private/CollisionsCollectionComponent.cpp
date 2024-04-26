@@ -18,6 +18,18 @@ UCollisionsCollectionComponent::UCollisionsCollectionComponent()
     PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UCollisionsCollectionComponent::UpdateOverlaps() {
+    for (auto element : _collectionElements) {
+        element->UpdateOverlaps();
+    }
+}
+
+void UCollisionsCollectionComponent::GetOverlappingComponents(TArray<UPrimitiveComponent*>& outOverlappingComponents) const {
+    for (auto element : _collectionElements) {
+        element->GetOverlappingComponents(outOverlappingComponents);
+    }
+}
+
 void UCollisionsCollectionComponent::BeginPlay() {
     Super::BeginPlay();
 
