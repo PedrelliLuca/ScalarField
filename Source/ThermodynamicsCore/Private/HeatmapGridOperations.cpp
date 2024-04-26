@@ -2,6 +2,7 @@
 
 #include "HeatmapGridOperations.h"
 
+#include "CollisionsCollectionComponent.h"
 #include "DrawDebugHelpers.h"
 #include "HeatmapGrid.h"
 #include "ThermodynamicsSubsystem.h"
@@ -65,7 +66,13 @@ bool _rectangleCircleIntersection(const FVector2D rectangleLocation, const FVect
     return cornerDistanceSquared <= radius * radius;
 }
 
-float Interact(const FVector2D interactorWorldLocation, const float interactorRange, const float interactorTemperature, const float deltaTime) {
+float _spheresInteraction(const TArray<FCollectionSphereParameters>& spheres, const float interactorTemperature, const float deltaTime) {
+    for (const FCollectionSphereParameters& sphere : spheres) {
+    
+    }
+}
+
+float Interact(UCollisionsCollectionComponent* collisionsCollection, const float interactorTemperature, const float deltaTime) {
     float interactorCurrDeltaT_Normalized = 0.0f;
     if (_grid.IsSet()) {
         FHeatmapGrid& grid = _grid.GetValue();
