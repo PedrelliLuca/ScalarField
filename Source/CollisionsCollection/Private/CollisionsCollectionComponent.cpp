@@ -13,7 +13,7 @@ UCollisionsCollectionComponent::UCollisionsCollectionComponent()
     : _collectionTag("")
     , _collectionCollisionProfileName("")
     , _collectionSpheres()
-    , _overlappingElements(0) {
+    , _externalsToOverlappingElements() {
     PrimaryComponentTick.bCanEverTick = false;
 }
 
@@ -61,25 +61,26 @@ void UCollisionsCollectionComponent::_collectSpheres() {
 
 void UCollisionsCollectionComponent::_collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor,
     UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
+    int* overlappingElements = nullptr;
+
     // Did the collection just start overlapping with otherComp?
-    if (!_externalsToOverlappingElements.Find(otherComp))
-    {
-        _externalsToOverlappingElements.Emplace(otherComp, 0);
+    if (overlappingElements = _externalsToOverlappingElements.Find(otherComp); !overlappingElements) {
+        overlappingElements = &_externalsToOverlappingElements.Emplace(otherComp, 0);
         OnCollectionBeginOverlap.Broadcast(overlappedComponent, otherActor, otherComp, otherBodyIndex, bFromSweep, sweepResult);
     }
 
-    ++_externalsToOverlappingElements.FindChecked(otherComp);
+    ++(*overlappingElements);
 }
 
 void UCollisionsCollectionComponent::_collectionElementEndOverlap(
     UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
-    // Decrease _overlappingElements. If counter is now 0 fire event saying collection is not overlapping anymore
-
     int& overlappingElements = _externalsToOverlappingElements.FindChecked(otherComp);
-    --overlappingElements;
+    check(overlappingElements != 0);
 
-    if (overlappingElements == 0)
-    {
+    // Decrease _overlappingElements. If counter is now 0 fire event saying collection is not overlapping anymore
+    --overlappingElements;
+    if (overlappingElements == 0) {
+        OnCollectionEndOverlap.Broadcast(overlappedComponent, otherActor, otherComp, otherBodyIndex);
         _externalsToOverlappingElements.Remove(otherComp);
     }
 }
