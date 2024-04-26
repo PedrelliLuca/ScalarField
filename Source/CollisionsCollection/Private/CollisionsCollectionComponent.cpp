@@ -13,6 +13,7 @@ UCollisionsCollectionComponent::UCollisionsCollectionComponent()
     : _collectionTag("")
     , _collectionCollisionProfileName("")
     , _collectionSpheres()
+    , _collectionElements()
     , _externalsToOverlappingElements() {
     PrimaryComponentTick.bCanEverTick = false;
 }
@@ -26,6 +27,7 @@ void UCollisionsCollectionComponent::BeginPlay() {
 void UCollisionsCollectionComponent::_collectSpheres() {
     const TArray<UActorComponent*> sphereActors = GetOwner()->GetComponentsByTag(USphereComponent::StaticClass(), _collectionTag);
     _collectionSpheres.Reserve(sphereActors.Num());
+    _collectionElements.Reserve(sphereActors.Num());
 
     for (auto sphereActor : sphereActors) {
         const auto sphere = Cast<USphereComponent>(sphereActor);
@@ -56,31 +58,39 @@ void UCollisionsCollectionComponent::_collectSpheres() {
 
         sphere->OnComponentBeginOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementBeginOverlap);
         sphere->OnComponentEndOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementEndOverlap);
+
+        _collectionElements.Emplace(sphere);
     }
 }
 
 void UCollisionsCollectionComponent::_collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor,
     UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
-    int* overlappingElements = nullptr;
+    // Collection elements must not fire overlap events with each other, they must look like a single collision for client classes.
+    if (!_collectionElements.Find(otherComp)) {
+        int* overlappingElements = nullptr;
 
-    // Did the collection just start overlapping with otherComp?
-    if (overlappingElements = _externalsToOverlappingElements.Find(otherComp); !overlappingElements) {
-        overlappingElements = &_externalsToOverlappingElements.Emplace(otherComp, 0);
-        OnCollectionBeginOverlap.Broadcast(overlappedComponent, otherActor, otherComp, otherBodyIndex, bFromSweep, sweepResult);
+        // Did the collection just start overlapping with otherComp?
+        if (overlappingElements = _externalsToOverlappingElements.Find(otherComp); !overlappingElements) {
+            overlappingElements = &_externalsToOverlappingElements.Emplace(otherComp, 0);
+            OnCollectionBeginOverlap.Broadcast(overlappedComponent, otherActor, otherComp, otherBodyIndex, bFromSweep, sweepResult);
+        }
+
+        ++(*overlappingElements);
     }
-
-    ++(*overlappingElements);
 }
 
 void UCollisionsCollectionComponent::_collectionElementEndOverlap(
     UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
-    int& overlappingElements = _externalsToOverlappingElements.FindChecked(otherComp);
-    check(overlappingElements != 0);
+    // Collection elements must not fire overlap events with each other, they must look like a single collision for client classes.
+    if (!_collectionElements.Find(otherComp)) {
+        int& overlappingElements = _externalsToOverlappingElements.FindChecked(otherComp);
+        check(overlappingElements != 0);
 
-    // Decrease _overlappingElements. If counter is now 0 fire event saying collection is not overlapping anymore
-    --overlappingElements;
-    if (overlappingElements == 0) {
-        OnCollectionEndOverlap.Broadcast(overlappedComponent, otherActor, otherComp, otherBodyIndex);
-        _externalsToOverlappingElements.Remove(otherComp);
+        // Decrease _overlappingElements. If counter is now 0 fire event saying collection is not overlapping anymore
+        --overlappingElements;
+        if (overlappingElements == 0) {
+            OnCollectionEndOverlap.Broadcast(overlappedComponent, otherActor, otherComp, otherBodyIndex);
+            _externalsToOverlappingElements.Remove(otherComp);
+        }
     }
 }

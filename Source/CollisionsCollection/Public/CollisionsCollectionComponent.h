@@ -16,7 +16,7 @@ struct FCollectionSphereParameters {
 };
 
 /**
- * \brief Collects Sphere Collisions with a given tag so that they can act as one for other components.
+ * \brief Collects Sphere Collisions with a given tag so that they can look as a single non trivial collision for clients.
  */
 UCLASS(ClassGroup = "Collision", meta = (BlueprintSpawnableComponent))
 class COLLISIONSCOLLECTION_API UCollisionsCollectionComponent : public UActorComponent {
@@ -57,7 +57,13 @@ private:
     UPROPERTY(EditAnywhere, Category = "Collection Parameters")
     bool _generateOverlapEvents;
 
+    // For cache-friendly, fast iterations.
     TArray<FCollectionSphereParameters> _collectionSpheres;
+
+    // Non cache-friendly, meant exclusively for internal use. Needed because:
+    // 1. The collection needs to provide some functions analogous to USceneComponent ones (e.g. UpdateOverlaps())
+    // 2. We don't want collection elements to fire overlap events with each other.
+    TSet<UPrimitiveComponent*> _collectionElements;
 
     // Given a non-collection element, this tells the number of collection elements currently overlapping with it.
     TMap<UPrimitiveComponent*, int> _externalsToOverlappingElements;
