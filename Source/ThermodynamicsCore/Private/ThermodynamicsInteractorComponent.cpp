@@ -258,8 +258,10 @@ void UThermodynamicsInteractorComponent::_registerInteractor(UPrimitiveComponent
 
 void UThermodynamicsInteractorComponent::_unregisterInteractor(
     UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
-    TWeakObjectPtr<UThermodynamicsInteractorComponent>* found = Algo::FindByPredicate(_collidingInteractors,
-        [otherComp](const TWeakObjectPtr<UThermodynamicsInteractorComponent>& thermoIntC) { return thermoIntC->_collisionsCollectionC == otherComp; });
+    TWeakObjectPtr<UThermodynamicsInteractorComponent>* found =
+        Algo::FindByPredicate(_collidingInteractors, [otherComp](const TWeakObjectPtr<UThermodynamicsInteractorComponent>& thermoIntC) {
+            return thermoIntC->_collisionsCollectionC->HasElement(otherComp);
+        });
 
     // If this is nullptr, either:
     // 1. otherComp's UThermodynamicsInteractorC was never registered => there is a problem in the registration logic.

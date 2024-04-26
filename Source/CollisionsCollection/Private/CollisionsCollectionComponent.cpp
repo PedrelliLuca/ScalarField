@@ -30,6 +30,10 @@ void UCollisionsCollectionComponent::GetOverlappingComponents(TArray<UPrimitiveC
     }
 }
 
+bool UCollisionsCollectionComponent::HasElement(UPrimitiveComponent* collectionElement) const {
+    return _collectionElements.Find(collectionElement);
+}
+
 void UCollisionsCollectionComponent::BeginPlay() {
     Super::BeginPlay();
 
