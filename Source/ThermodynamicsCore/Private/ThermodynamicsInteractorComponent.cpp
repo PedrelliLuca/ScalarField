@@ -174,15 +174,19 @@ void UThermodynamicsInteractorComponent::_retrieveThermodynamicCollision() {
         _collidingInteractors.Empty();
 
         // When a UCollisionsCollectionComponent spawns, even if it's already colliding with something, OnCollectionBeginOverlap doesn't Broadcast().
-        // We need this to detect if some other AActor is already interacting with us thermodynamically.
-        _setInitialInteractors();
+        // _setInitialInteractors detects if some other AActor is already interacting with us thermodynamically. In case the collection begins play after us,
+        // schedule it for later.
+        if (_collisionsCollectionC->HasBegunPlay()) {
+            _setInitialInteractors();
+        } else {
+            _collisionsCollectionC->OnCollectionPlayBegun.AddUObject(this, &UThermodynamicsInteractorComponent::_setInitialInteractors);
+        }
 
         // Setup of the interactors' registration on overlap status change.
         _collisionsCollectionC->OnCollectionBeginOverlap.AddUObject(this, &UThermodynamicsInteractorComponent::_registerInteractor);
         _collisionsCollectionC->OnCollectionEndOverlap.AddUObject(this, &UThermodynamicsInteractorComponent::_unregisterInteractor);
-
     } else {
-        UE_LOG(LogTemp,Error, TEXT("UCollisionsCollectionComponent not found. No thermodynamics for this actor!"));
+        UE_LOG(LogTemp, Error, TEXT("UCollisionsCollectionComponent not found. No thermodynamics for this actor!"));
         SetComponentTickEnabled(false);
     }
 }

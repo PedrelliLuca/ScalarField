@@ -12,6 +12,7 @@
 UCollisionsCollectionComponent::UCollisionsCollectionComponent()
     : _collectionTag("")
     , _collectionCollisionProfileName("")
+    , _generateOverlapEvents(true)
     , _collectionSpheres()
     , _collectionElements()
     , _externalsToOverlappingElements() {
@@ -42,6 +43,8 @@ void UCollisionsCollectionComponent::BeginPlay() {
     Super::BeginPlay();
 
     _collectSpheres();
+
+    OnCollectionPlayBegun.Broadcast();
 }
 
 void UCollisionsCollectionComponent::_collectSpheres() {

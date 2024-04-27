@@ -7,6 +7,7 @@
 #include "Components/ActorComponent.h"
 #include "CollisionsCollectionComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FCollectionPlayBegunSignature);
 DECLARE_MULTICAST_DELEGATE_SixParams(FCollectionBeginOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32, bool, const FHitResult&);
 DECLARE_MULTICAST_DELEGATE_FourParams(FCollectionEndOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32);
 
@@ -34,6 +35,8 @@ public:
     bool HasElement(UPrimitiveComponent const* collectionElement) const;
 
     const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
+
+    FCollectionPlayBegunSignature OnCollectionPlayBegun;
 
     FCollectionBeginOverlapSignature OnCollectionBeginOverlap;
     FCollectionEndOverlapSignature OnCollectionEndOverlap;
