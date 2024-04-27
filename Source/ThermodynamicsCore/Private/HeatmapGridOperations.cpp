@@ -78,9 +78,7 @@ float _spheresInteraction(const TArray<FCollectionSphereParameters>& spheres, co
     // makes it possible to avoid that.
     TArray<bool> didInteractWithCell;
     didInteractWithCell.Reserve(grid.Locations.Num());
-    for (bool& b : didInteractWithCell) {
-        b = false;
-    }
+    didInteractWithCell.Init(false, grid.Locations.Num());
 
     // The currDeltaT of the collection takes all the interacting cells into account
     float collectionCurrDeltaT = 0.0f;
