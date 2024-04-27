@@ -48,7 +48,7 @@ void Deinitialize() {
     _grid.Reset();
 }
 
-bool _rectangleCircleIntersection(const FVector2D rectangleLocation, const FVector2D rectangleExtension, const FVector2D circleLocation, const float radius) {
+bool _doRectangleCircleIntersect(const FVector2D rectangleLocation, const FVector2D rectangleExtension, const FVector2D circleLocation, const float radius) {
     const auto distance = FVector2D(FMath::Abs(circleLocation.X - rectangleLocation.X), FMath::Abs(circleLocation.Y - rectangleLocation.Y));
 
     if (distance.X > (rectangleExtension.X + radius) || distance.Y > (rectangleExtension.Y + radius)) {
@@ -66,71 +66,86 @@ bool _rectangleCircleIntersection(const FVector2D rectangleLocation, const FVect
     return cornerDistanceSquared <= radius * radius;
 }
 
-float _spheresInteraction(const TArray<FCollectionSphereParameters>& spheres, const float interactorTemperature, const float deltaTime) {
-    for (const FCollectionSphereParameters& sphere : spheres) {
-    
+float _spheresInteraction(const TArray<FCollectionSphereParameters>& spheres, const float collectionTemperature, const float deltaTime) {
+    check(_grid.IsSet());
+
+    FHeatmapGrid& grid = _grid.GetValue();
+    const FVector2D& cellsExtent = grid.Attributes.CellsExtent;
+    const auto cellsSize = cellsExtent * 2.0;
+    const FIntVector2& numbersOfCells = grid.Attributes.NumbersOfCells;
+
+    // Given a cell, we don't want it to interact with more than one element of the collection, as this latter is meant to represent a single body. This cache
+    // makes it possible to avoid that.
+    TArray<bool> didInteractWithCell;
+    didInteractWithCell.Reserve(grid.Locations.Num());
+    for (bool& b : didInteractWithCell) {
+        b = false;
     }
-}
 
-float Interact(UCollisionsCollectionComponent* collisionsCollection, const float interactorTemperature, const float deltaTime) {
-    float interactorCurrDeltaT_Normalized = 0.0f;
-    if (_grid.IsSet()) {
-        FHeatmapGrid& grid = _grid.GetValue();
+    // The currDeltaT of the collection takes all the interacting cells into account
+    float collectionCurrDeltaT = 0.0f;
+    int32 numberOfInteractingCells = 0;
 
-        const FVector2D& cellsExtent = grid.Attributes.CellsExtent;
-        const auto cellsSize = cellsExtent * 2.0;
-        const FIntVector2& numbersOfCells = grid.Attributes.NumbersOfCells;
+    TArray<float>& currentTemperatures = grid.CurrentTemperatures;
+    TArray<float>& nextTemperatures = grid.NextTemperatures;
 
+    // We make each sphere of the collection interact with the grid
+    for (const FCollectionSphereParameters& sphere : spheres) {
         // From World Space to Grid Space
-        const FVector2D interactorGridLocation = interactorWorldLocation - grid.Attributes.BottomLeftCorner;
-        const bool interactorWithinXBounds = 0.0f <= interactorGridLocation.X && interactorGridLocation.X <= numbersOfCells.X * cellsSize.X;
-        const bool interactorWithinYBounds = 0.0f <= interactorGridLocation.Y && interactorGridLocation.Y <= numbersOfCells.Y * cellsSize.Y;
-        // Is the interactor within the grid bounds?
-        if (interactorWithinXBounds && interactorWithinYBounds) {
+        const FVector2D sphereGridLocation = sphere.WorldLocation - grid.Attributes.BottomLeftCorner;
+        const bool sphereWithinXBounds = 0.0f <= sphereGridLocation.X && sphereGridLocation.X <= numbersOfCells.X * cellsSize.X;
+        const bool sphereWithinYBounds = 0.0f <= sphereGridLocation.Y && sphereGridLocation.Y <= numbersOfCells.Y * cellsSize.Y;
+        // Is the sphere within the grid bounds?
+        if (sphereWithinXBounds && sphereWithinYBounds) {
             // The cell (i, j) containing the bottom-left corner of the square enclosing the interaction circle
-            const FVector2D bottomLeftLocation = interactorGridLocation - interactorRange * FVector2D::UnitVector;
+            const FVector2D bottomLeftLocation = sphereGridLocation - sphere.Radius * FVector2D::UnitVector;
             auto bottomLeftCoordinates = FIntVector2(bottomLeftLocation.X / cellsSize.X, bottomLeftLocation.Y / cellsSize.Y);
             bottomLeftCoordinates = FIntVector2(FMath::Max(bottomLeftCoordinates.X, 0), FMath::Max(bottomLeftCoordinates.Y, 0));
 
             // The cell (i, j) containing the top-right corner of the square enclosing the interaction circle
-            const FVector2D topRightLocation = interactorGridLocation + interactorRange * FVector2D::UnitVector;
+            const FVector2D topRightLocation = sphereGridLocation + sphere.Radius * FVector2D::UnitVector;
             auto topRightCoordinates = FIntVector2(topRightLocation.X / cellsSize.X, topRightLocation.Y / cellsSize.Y);
             topRightCoordinates = FIntVector2(FMath::Min(topRightCoordinates.X, numbersOfCells.X - 1), FMath::Min(topRightCoordinates.Y, numbersOfCells.Y - 1));
 
             check(bottomLeftCoordinates.X <= topRightCoordinates.X && bottomLeftCoordinates.Y <= topRightCoordinates.Y);
 
             const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
-            // The currDeltaT of the interactor takes all the interacting cells into account
-            float interactorCurrDeltaT = 0.0f;
-            int32 numberOfInteractingCells = 0;
 
-            TArray<float>& currentTemperatures = grid.CurrentTemperatures;
-            TArray<float>& nextTemperatures = grid.NextTemperatures;
-
-            // Looping over cells intersecting the interactor's enclosing square (only these can intersect the interactor's circle)
+            // Looping over cells intersecting the sphere's enclosing square (only these can intersect the interactor's circle)
             for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
                 for (int32 i = bottomLeftCoordinates.X; i <= topRightCoordinates.X; ++i) {
                     const int32 k = convert2DTo1D(i, j);
-                    if (_rectangleCircleIntersection(grid.Locations[k], cellsExtent, interactorWorldLocation, interactorRange)) {
-                        ++numberOfInteractingCells;
-                        // This currDeltaT is from the interactor's POV, which is why the interactorTemperature is on the right hand side.
-                        // If the interactor's T is greater than the cell's, currDeltaT < 0 => the interactor emits heat (interactorCurrDeltaT decreases)
+                    if (!didInteractWithCell[k] && _doRectangleCircleIntersect(grid.Locations[k], cellsExtent, sphere.WorldLocation, sphere.Radius)) {
+                        // This currDeltaT is from the collection's POV, which is why the collectionTemperature is on the right hand side.
+                        // If the colletion's T is greater than the cell's, currDeltaT < 0 => the collection emits heat (collectionCurrDeltaT decreases)
                         // and the cell absorbs heat (nextTemperatures[k] increases).
-                        // If the interactor's T is smaller than the cell's, currDeltaT > 0 => the interactor absorbs heat (interactorCurrDeltaT increases)
+                        // If the collection's T is smaller than the cell's, currDeltaT > 0 => the collection absorbs heat (collectionCurrDeltaT increases)
                         // and the cell emits heat (nextTemperatures[k] decreases).
-                        const float currDeltaT = currentTemperatures[k] - interactorTemperature;
+                        const float currDeltaT = currentTemperatures[k] - collectionTemperature;
 
-                        interactorCurrDeltaT += currDeltaT;
+                        collectionCurrDeltaT += currDeltaT;
                         nextTemperatures[k] -= (UThermodynamicsSubsystem::ROD_CONSTANT * currDeltaT * deltaTime / grid.Attributes.HeatCapacity);
+
+                        ++numberOfInteractingCells;
+                        didInteractWithCell[k] = true;
                     }
                 }
             }
-
-            // The normalized version of the interactor's currDeltaT is an average of the interactions with the cells. This is important to avoid having the
-            // grid weight way more than other bodies. This is realistic: sure, we are using a grid to represent the air of our map, but in the end, air is a
-            // single body.
-            interactorCurrDeltaT_Normalized = interactorCurrDeltaT / numberOfInteractingCells;
         }
+    }
+
+    // The normalized version of the collection's currDeltaT is an average of the interactions with the cells. This is important to avoid having the
+    // grid weight way more than other collections (i.e. other bodies). This is realistic: sure, we are using a grid to represent the air of our map,
+    // but in the end air is a single body.
+    const float collectionCurrDeltaT_Normalized = collectionCurrDeltaT / numberOfInteractingCells;
+    return collectionCurrDeltaT_Normalized;
+}
+
+float Interact(UCollisionsCollectionComponent* collisionsCollection, const float collectionTemperature, const float deltaTime) {
+    float interactorCurrDeltaT_Normalized = 0.0f;
+    if (_grid.IsSet()) {
+        interactorCurrDeltaT_Normalized = _spheresInteraction(collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
+        // TODO: _boxesInteraction(), _capsulesInteraction()
     }
 
     return interactorCurrDeltaT_Normalized;
