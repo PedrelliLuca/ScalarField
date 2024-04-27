@@ -31,7 +31,7 @@ public:
     // Returns unique list of components this collection is overlapping with.
     void GetOverlappingComponents(TArray<UPrimitiveComponent*>& outOverlappingComponents) const;
 
-    bool HasElement(UPrimitiveComponent* collectionElement) const;
+    bool HasElement(UPrimitiveComponent const* collectionElement) const;
 
     const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
 

@@ -30,8 +30,8 @@ void UCollisionsCollectionComponent::GetOverlappingComponents(TArray<UPrimitiveC
     }
 }
 
-bool UCollisionsCollectionComponent::HasElement(UPrimitiveComponent* collectionElement) const {
-    return _collectionElements.Find(collectionElement);
+bool UCollisionsCollectionComponent::HasElement(UPrimitiveComponent const* collectionElement) const {
+    return _collectionElements.Find(collectionElement) != nullptr;
 }
 
 const TArray<FCollectionSphereParameters>& UCollisionsCollectionComponent::GetCollectionSpheres() const {
