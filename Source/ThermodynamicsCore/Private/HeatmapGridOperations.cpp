@@ -67,7 +67,7 @@ bool _doRectangleCircleIntersect(const FVector2D rectangleLocation, const FVecto
 }
 
 float _spheresInteraction(
-    const FVector2D& interactorLocation, const TArray<FCollectionSphereParameters>& spheres, const float collectionTemperature, const float deltaTime) {
+    const FTransform& interactorTransform, const TArray<FCollectionSphereParameters>& spheres, const float collectionTemperature, const float deltaTime) {
     check(_grid.IsSet());
 
     FHeatmapGrid& grid = _grid.GetValue();
@@ -91,7 +91,8 @@ float _spheresInteraction(
     // We make each sphere of the collection interact with the grid
     for (const FCollectionSphereParameters& sphere : spheres) {
         // From Sphere Space to World Space to Grid Space
-        const FVector2D sphereWorldLocation = sphere.RootRelativeLocation + interactorLocation;
+        const auto sphereToWorldTransform = sphere.RootRelativeTransform * interactorTransform;
+        const auto sphereWorldLocation = FVector2D(sphereToWorldTransform.TransformPosition(FVector::ZeroVector));
         const FVector2D sphereGridLocation = sphereWorldLocation - grid.Attributes.BottomLeftCorner;
         const bool sphereWithinXBounds = 0.0f <= sphereGridLocation.X && sphereGridLocation.X <= numbersOfCells.X * cellsSize.X;
         const bool sphereWithinYBounds = 0.0f <= sphereGridLocation.Y && sphereGridLocation.Y <= numbersOfCells.Y * cellsSize.Y;
@@ -142,11 +143,11 @@ float _spheresInteraction(
 }
 
 float Interact(
-    const FVector& interactorLocation, UCollisionsCollectionComponent* collisionsCollection, const float collectionTemperature, const float deltaTime) {
+    const FTransform& interactorTransform, UCollisionsCollectionComponent* collisionsCollection, const float collectionTemperature, const float deltaTime) {
     float interactorCurrDeltaT_Normalized = 0.0f;
     if (_grid.IsSet()) {
         interactorCurrDeltaT_Normalized =
-            _spheresInteraction(FVector2D(interactorLocation), collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
+            _spheresInteraction(interactorTransform, collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
         // TODO: _boxesInteraction(), _capsulesInteraction()
     }
 
