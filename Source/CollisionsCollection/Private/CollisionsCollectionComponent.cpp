@@ -25,9 +25,14 @@ void UCollisionsCollectionComponent::UpdateOverlaps() {
     }
 }
 
-void UCollisionsCollectionComponent::GetOverlappingComponents(TArray<UPrimitiveComponent*>& outOverlappingComponents) const {
+void UCollisionsCollectionComponent::GetOverlappingComponents(TSet<UPrimitiveComponent*>& componentsOverlappingCollection) const {
+    componentsOverlappingCollection.Reset();
+
     for (auto element : _collectionElements) {
-        element->GetOverlappingComponents(outOverlappingComponents);
+        auto componentsOverlappingElement = TSet<UPrimitiveComponent*>();
+        element->GetOverlappingComponents(componentsOverlappingElement);
+
+        componentsOverlappingCollection.Append(componentsOverlappingElement);
     }
 }
 

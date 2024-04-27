@@ -30,7 +30,7 @@ public:
     void UpdateOverlaps();
 
     // Returns unique list of components this collection is overlapping with.
-    void GetOverlappingComponents(TArray<UPrimitiveComponent*>& outOverlappingComponents) const;
+    void GetOverlappingComponents(TSet<UPrimitiveComponent*>& componentsOverlappingCollection) const;
 
     bool HasElement(UPrimitiveComponent const* collectionElement) const;
 

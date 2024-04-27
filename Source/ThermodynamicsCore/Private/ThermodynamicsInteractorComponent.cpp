@@ -199,7 +199,7 @@ void UThermodynamicsInteractorComponent::_setInitialInteractors() {
     // I think this might be due to this component ticking on TG_PostUpdateWork the 1st frame.
     _collisionsCollectionC->UpdateOverlaps();
 
-    TArray<TObjectPtr<UPrimitiveComponent>> overlappingCollisions;
+    TSet<UPrimitiveComponent*> overlappingCollisions;
     _collisionsCollectionC->GetOverlappingComponents(overlappingCollisions);
 
 #ifdef LOG_THERMODYNAMICS
