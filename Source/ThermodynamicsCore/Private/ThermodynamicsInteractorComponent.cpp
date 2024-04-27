@@ -62,7 +62,8 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
 
     // 2) Interact with the Heatmap Grid
     check(_collisionsCollectionC.IsValid());
-    const float currDeltaT_GridNormalized = HeatmapGrid::Interact(_collisionsCollectionC.Get(), _currentTemperature, deltaTime);
+    const FVector interactorLocation = GetOwner()->GetActorLocation();
+    const float currDeltaT_GridNormalized = HeatmapGrid::Interact(interactorLocation, _collisionsCollectionC.Get(), _currentTemperature, deltaTime);
 
     const float totalCurrDeltaT = currDeltaT_GridNormalized + currDeltaT_OtherBodies + _unregisteredDeltaTemperature;
     const float totalDeltaT = (UThermodynamicsSubsystem::ROD_CONSTANT * totalCurrDeltaT * deltaTime) / _heatCapacity;

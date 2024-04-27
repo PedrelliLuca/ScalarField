@@ -80,7 +80,7 @@ void UCollisionsCollectionComponent::_collectSpheres() {
         }
 
         FCollectionSphereParameters sphereParameters;
-        sphereParameters.WorldLocation = FVector2D(sphere->GetComponentTransform().GetLocation());
+        sphereParameters.RootRelativeLocation = FVector2D(sphere->GetRelativeLocation());
         sphereParameters.Radius = sphere->GetScaledSphereRadius();
         _collectionSpheres.Add(MoveTemp(sphereParameters));
 

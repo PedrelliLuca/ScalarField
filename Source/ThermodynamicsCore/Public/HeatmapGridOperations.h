@@ -20,7 +20,7 @@ void Deinitialize();
 
 // Realizes a thermodynamic interaction between the given interactor (location, range, temperature) and the grid in the time deltaTime.
 // Returns the grid-normalized currDeltaT, i.e. the sum of all the currDeltaTs with the interacting cells divided by the number of interacting cells.
-float Interact(UCollisionsCollectionComponent* collisionsCollection, float interactorTemperature, float deltaTime);
+float Interact(const FVector& interactorLocation, UCollisionsCollectionComponent* collisionsCollection, float interactorTemperature, float deltaTime);
 
 // Realizes thermodynamic interactions between each cell and its orthogonal neighbors.
 void SelfInteract(float deltaTime);

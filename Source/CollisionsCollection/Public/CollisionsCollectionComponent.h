@@ -12,7 +12,7 @@ DECLARE_MULTICAST_DELEGATE_SixParams(FCollectionBeginOverlapSignature, UPrimitiv
 DECLARE_MULTICAST_DELEGATE_FourParams(FCollectionEndOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32);
 
 struct FCollectionSphereParameters {
-    FVector2D WorldLocation = FVector2D::ZeroVector;
+    FVector2D RootRelativeLocation = FVector2D::ZeroVector;
     float Radius = 0.0f;
 };
 

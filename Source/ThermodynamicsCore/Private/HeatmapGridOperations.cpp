@@ -66,7 +66,8 @@ bool _doRectangleCircleIntersect(const FVector2D rectangleLocation, const FVecto
     return cornerDistanceSquared <= radius * radius;
 }
 
-float _spheresInteraction(const TArray<FCollectionSphereParameters>& spheres, const float collectionTemperature, const float deltaTime) {
+float _spheresInteraction(
+    const FVector2D& interactorLocation, const TArray<FCollectionSphereParameters>& spheres, const float collectionTemperature, const float deltaTime) {
     check(_grid.IsSet());
 
     FHeatmapGrid& grid = _grid.GetValue();
@@ -89,8 +90,9 @@ float _spheresInteraction(const TArray<FCollectionSphereParameters>& spheres, co
 
     // We make each sphere of the collection interact with the grid
     for (const FCollectionSphereParameters& sphere : spheres) {
-        // From World Space to Grid Space
-        const FVector2D sphereGridLocation = sphere.WorldLocation - grid.Attributes.BottomLeftCorner;
+        // From Sphere Space to World Space to Grid Space
+        const FVector2D sphereWorldLocation = sphere.RootRelativeLocation + interactorLocation;
+        const FVector2D sphereGridLocation = sphereWorldLocation - grid.Attributes.BottomLeftCorner;
         const bool sphereWithinXBounds = 0.0f <= sphereGridLocation.X && sphereGridLocation.X <= numbersOfCells.X * cellsSize.X;
         const bool sphereWithinYBounds = 0.0f <= sphereGridLocation.Y && sphereGridLocation.Y <= numbersOfCells.Y * cellsSize.Y;
         // Is the sphere within the grid bounds?
@@ -113,7 +115,7 @@ float _spheresInteraction(const TArray<FCollectionSphereParameters>& spheres, co
             for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
                 for (int32 i = bottomLeftCoordinates.X; i <= topRightCoordinates.X; ++i) {
                     const int32 k = convert2DTo1D(i, j);
-                    if (!didInteractWithCell[k] && _doRectangleCircleIntersect(grid.Locations[k], cellsExtent, sphere.WorldLocation, sphere.Radius)) {
+                    if (!didInteractWithCell[k] && _doRectangleCircleIntersect(grid.Locations[k], cellsExtent, sphereWorldLocation, sphere.Radius)) {
                         // This currDeltaT is from the collection's POV, which is why the collectionTemperature is on the right hand side.
                         // If the colletion's T is greater than the cell's, currDeltaT < 0 => the collection emits heat (collectionCurrDeltaT decreases)
                         // and the cell absorbs heat (nextTemperatures[k] increases).
@@ -139,10 +141,12 @@ float _spheresInteraction(const TArray<FCollectionSphereParameters>& spheres, co
     return collectionCurrDeltaT_Normalized;
 }
 
-float Interact(UCollisionsCollectionComponent* collisionsCollection, const float collectionTemperature, const float deltaTime) {
+float Interact(
+    const FVector& interactorLocation, UCollisionsCollectionComponent* collisionsCollection, const float collectionTemperature, const float deltaTime) {
     float interactorCurrDeltaT_Normalized = 0.0f;
     if (_grid.IsSet()) {
-        interactorCurrDeltaT_Normalized = _spheresInteraction(collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
+        interactorCurrDeltaT_Normalized =
+            _spheresInteraction(FVector2D(interactorLocation), collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
         // TODO: _boxesInteraction(), _capsulesInteraction()
     }
 
