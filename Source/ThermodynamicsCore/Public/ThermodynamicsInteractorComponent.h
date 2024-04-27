@@ -77,7 +77,7 @@ private:
 
     float _unregisteredDeltaTemperature;
 
-    // TODO: this should be read via UDeveloperSettings
-    inline static const char* THERMODYNAMICS_COLLISION_TAG = "ThermodynamicsCollision";
-    inline static const char* THERMODYNAMICS_COLLISION_PROFILE_NAME = "HeatExchanger";
+    // TODO remove: this should be read via UDeveloperSettings
+    /*inline static const char* THERMODYNAMICS_COLLISION_TAG = "ThermodynamicsCollision";
+    inline static const char* THERMODYNAMICS_COLLISION_PROFILE_NAME = "HeatExchanger";*/
 };

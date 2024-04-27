@@ -4,8 +4,6 @@
 
 #include "Algo/ForEach.h"
 #include "CollisionsCollectionComponent.h"
-#include "Components/BoxComponent.h"
-#include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "HeatmapGridOperations.h"
 #include "ThermodynamicsSubsystem.h"
@@ -166,47 +164,25 @@ void UThermodynamicsInteractorComponent::_setCurrentTemperatureAsNext() {
 }
 
 void UThermodynamicsInteractorComponent::_retrieveThermodynamicCollision() {
-    bool successfullRetrieval = false;
-    auto errorMessage = FString("");
+    UCollisionsCollectionComponent* const collisionsCollectionC = GetOwner()->FindComponentByClass<UCollisionsCollectionComponent>();
+    if (IsValid(collisionsCollectionC)) {
+        _collisionsCollectionC = collisionsCollectionC;
 
-    const TArray<UActorComponent*> possibleCollisions = GetOwner()->GetComponentsByTag(USphereComponent::StaticClass(), FName{THERMODYNAMICS_COLLISION_TAG});
-    if (!possibleCollisions.IsEmpty()) {
-        if (const auto sphereCollisionC = Cast<USphereComponent>(possibleCollisions[0]); IsValid(sphereCollisionC)) {
-            const FName collisionProfileName = sphereCollisionC->GetCollisionProfileName();
-            if (collisionProfileName == FName(THERMODYNAMICS_COLLISION_PROFILE_NAME)) {
-                if (sphereCollisionC->GetGenerateOverlapEvents()) {
-                    _collisionsCollectionC = sphereCollisionC;
-                    successfullRetrieval = true;
+        // Setup the simultaneity mechanism.
+        _counterOfChecksThisFrame = 0;
+        _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
+        _collidingInteractors.Empty();
 
-                    // Setup the simultaneity mechanism.
-                    _counterOfChecksThisFrame = 0;
-                    _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
-                    _collidingInteractors.Empty();
+        // When a UCollisionsCollectionComponent spawns, even if it's already colliding with something, OnCollectionBeginOverlap doesn't Broadcast().
+        // We need this to detect if some other AActor is already interacting with us thermodynamically.
+        _setInitialInteractors();
 
-                    // When a UPrimitiveComponent spawns, even if it's already colliding with something, OnComponentBeginOverlap doesn't Broadcast().
-                    // We need this to detect if some other AActor is already interacting with us thermodynamically.
-                    _setInitialInteractors();
+        // Setup of the interactors' registration on overlap status change.
+        _collisionsCollectionC->OnCollectionBeginOverlap.AddUObject(this, &UThermodynamicsInteractorComponent::_registerInteractor);
+        _collisionsCollectionC->OnCollectionEndOverlap.AddUObject(this, &UThermodynamicsInteractorComponent::_unregisterInteractor);
 
-                    // Setup of the interactors' registration on overlap status change.
-                    _collisionsCollectionC->OnCollectionBeginOverlap.AddUObject(this, &UThermodynamicsInteractorComponent::_registerInteractor);
-                    _collisionsCollectionC->OnCollectionEndOverlap.AddUObject(this, &UThermodynamicsInteractorComponent::_unregisterInteractor);
-                } else {
-                    errorMessage = FString::Printf(TEXT("Collisions disabled on USphereComponent. No thermodynamics for this actor!"));
-                }
-            } else {
-                errorMessage = FString::Printf(TEXT("Collision profile of USphereComponent is not %s. No thermodynamics for this actor!"),
-                    *FString(THERMODYNAMICS_COLLISION_PROFILE_NAME));
-            }
-        } else {
-            errorMessage =
-                FString::Printf(TEXT("Tag %s found on a non-USphereComponent. No thermodynamics for this actor!"), *FString(THERMODYNAMICS_COLLISION_TAG));
-        }
     } else {
-        errorMessage = FString::Printf(TEXT("No component with tag %s was found. No thermodynamics for this actor!"), *FString(THERMODYNAMICS_COLLISION_TAG));
-    }
-
-    if (!successfullRetrieval) {
-        UE_LOG(LogTemp, Error, TEXT("%s"), *errorMessage);
+        UE_LOG(LogTemp,Error, TEXT("UCollisionsCollectionComponent not found. No thermodynamics for this actor!"));
         SetComponentTickEnabled(false);
     }
 }
