@@ -10,7 +10,7 @@
 class UCollisionsCollectionComponent;
 class UPrimitiveComponent;
 
-/*!
+/**
  * \brief TODO
  */
 UCLASS()
@@ -21,7 +21,8 @@ public:
     void AddCollection(TWeakObjectPtr<UCollisionsCollectionComponent> collection);
     void RemoveCollection(TWeakObjectPtr<UCollisionsCollectionComponent> collection);
 
+    TWeakObjectPtr<UCollisionsCollectionComponent> GetCollectionByElement(const UPrimitiveComponent* element) const;
+
 private:
     TMap<TWeakObjectPtr<UPrimitiveComponent>, TWeakObjectPtr<UCollisionsCollectionComponent>> _elementToCollection;
-
 };

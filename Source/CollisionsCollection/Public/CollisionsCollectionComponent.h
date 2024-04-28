@@ -82,6 +82,8 @@ private:
     // 2. We don't want collection elements to fire overlap events with each other.
     TSet<UPrimitiveComponent*> _collectionElements;
 
-    // Given a non-collection element, this tells the number of collection elements currently overlapping with it.
-    TMap<UPrimitiveComponent*, int> _externalsToOverlappingElements;
+    // Given another collection and one of its elements, tells the number of elements of this collection currently overlapping with it.
+    TMap<TWeakObjectPtr<UCollisionsCollectionComponent>, TMap<TWeakObjectPtr<UPrimitiveComponent>, int>> _overlapsWithOtherCollectionElements;
+
+    TWeakObjectPtr<UCollisionsCollectionSubsystem> _subsystem;
 };

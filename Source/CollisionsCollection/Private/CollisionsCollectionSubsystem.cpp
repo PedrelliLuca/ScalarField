@@ -16,3 +16,7 @@ void UCollisionsCollectionSubsystem::RemoveCollection(TWeakObjectPtr<UCollisions
         check(nRemoved == 1);
     }
 }
+
+TWeakObjectPtr<UCollisionsCollectionComponent> UCollisionsCollectionSubsystem::GetCollectionByElement(const UPrimitiveComponent* element) const {
+    return _elementToCollection.FindChecked(element);
+}
