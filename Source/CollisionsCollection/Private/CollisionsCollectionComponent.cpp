@@ -2,6 +2,7 @@
 
 #include "CollisionsCollectionComponent.h"
 
+#include "CollisionsCollectionSubsystem.h"
 #include "Components/SphereComponent.h"
 
 // https://stackoverflow.com/questions/14421656/is-there-widely-available-wide-character-variant-of-file
@@ -51,10 +52,20 @@ const TArray<FCollectionSphereParameters>& UCollisionsCollectionComponent::GetCo
     return _collectionSpheres;
 }
 
+void UCollisionsCollectionComponent::EndPlay(const EEndPlayReason::Type endPlayReason) {
+    Super::EndPlay(endPlayReason);
+
+    UCollisionsCollectionSubsystem* collectionsSubsys = GetWorld()->GetSubsystem<UCollisionsCollectionSubsystem>();
+    collectionsSubsys->RemoveCollection(this);
+}
+
 void UCollisionsCollectionComponent::BeginPlay() {
     Super::BeginPlay();
 
     _collectSpheres();
+
+    UCollisionsCollectionSubsystem* collectionsSubsys = GetWorld()->GetSubsystem<UCollisionsCollectionSubsystem>();
+    collectionsSubsys->AddCollection(this);
 
     OnCollectionPlayBegun.Broadcast();
 }

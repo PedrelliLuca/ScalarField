@@ -23,6 +23,8 @@ UCLASS(ClassGroup = "Collision", meta = (BlueprintSpawnableComponent))
 class COLLISIONSCOLLECTION_API UCollisionsCollectionComponent : public UActorComponent {
     GENERATED_BODY()
 
+    friend class UCollisionsCollectionSubsystem;
+
 public:
     UCollisionsCollectionComponent();
 
@@ -32,7 +34,7 @@ public:
     // Returns unique list of components this collection is overlapping with.
     void GetOverlappingComponents(TSet<UPrimitiveComponent*>& componentsOverlappingCollection) const;
 
-    bool HasElement(UPrimitiveComponent const* collectionElement) const;
+    bool HasElement(const UPrimitiveComponent* collectionElement) const;
 
     const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
 
@@ -40,6 +42,8 @@ public:
 
     FCollectionBeginOverlapSignature OnCollectionBeginOverlap;
     FCollectionEndOverlapSignature OnCollectionEndOverlap;
+
+    void EndPlay(EEndPlayReason::Type endPlayReason) override;
 
 protected:
     void BeginPlay() override;
