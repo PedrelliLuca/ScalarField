@@ -34,9 +34,16 @@ void UCollisionsCollectionComponent::GetOverlappingComponents(TSet<UPrimitiveCom
 
         componentsOverlappingCollection.Append(componentsOverlappingElement);
     }
+
+    // Collection elements must ignore each other, they must look like a single collision for client classes. UPrimitiveComponent::GetOverlappingComponents(),
+    // so we need to take care of removing collection elements from the out parameter.
+    for (auto element : _collectionElements) {
+        [[maybe_unused]] const int32 nRemoved = componentsOverlappingCollection.Remove(element);
+        check(nRemoved == 0 || nRemoved == 1);
+    }
 }
 
-bool UCollisionsCollectionComponent::HasElement(UPrimitiveComponent const* collectionElement) const {
+bool UCollisionsCollectionComponent::HasElement(const UPrimitiveComponent* collectionElement) const {
     return _collectionElements.Find(collectionElement) != nullptr;
 }
 
