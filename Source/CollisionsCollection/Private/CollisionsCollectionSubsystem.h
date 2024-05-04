@@ -19,7 +19,10 @@ class UCollisionsCollectionSubsystem : public UWorldSubsystem {
 
 public:
     void AddCollection(TWeakObjectPtr<UCollisionsCollectionComponent> collection);
-    void RemoveCollection(TWeakObjectPtr<UCollisionsCollectionComponent> collection);
+
+    // This function is meant to be called during UCollisionsCollectionComponent::BeginDestroy(), when the collection is marked for pending kill.
+    // TWeakObjectPtrs of pending kill objects crash when operator->() (aka FWeakObjectPtr::Get()) is called, which is way a raw pointer is used insted.
+    void RemovePendingKillCollection(UCollisionsCollectionComponent* collection);
 
     TWeakObjectPtr<UCollisionsCollectionComponent> GetCollectionByElement(const UPrimitiveComponent* element) const;
 

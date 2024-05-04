@@ -10,7 +10,9 @@ void UCollisionsCollectionSubsystem::AddCollection(TWeakObjectPtr<UCollisionsCol
     }
 }
 
-void UCollisionsCollectionSubsystem::RemoveCollection(TWeakObjectPtr<UCollisionsCollectionComponent> collection) {
+void UCollisionsCollectionSubsystem::RemovePendingKillCollection(UCollisionsCollectionComponent* collection) {
+    check(collection->IsPendingKill());
+
     for (auto element : collection->_collectionElements) {
         [[maybe_unused]] const int32 nRemoved = _elementToCollection.Remove(element);
         check(nRemoved == 1);

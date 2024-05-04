@@ -40,7 +40,7 @@ void UCollisionsCollectionComponent::GetOverlappingComponents(TSet<UPrimitiveCom
     // Collection elements must ignore each other, they must look like a single collision for client classes. UPrimitiveComponent::GetOverlappingComponents(),
     // so we need to take care of removing collection elements from the out parameter.
     for (auto element : _collectionElements) {
-        [[maybe_unused]] const int32 nRemoved = componentsOverlappingCollection.Remove(element);
+        [[maybe_unused]] const int32 nRemoved = componentsOverlappingCollection.Remove(element.Get());
         check(nRemoved == 0 || nRemoved == 1);
     }
 }
@@ -53,9 +53,16 @@ const TArray<FCollectionSphereParameters>& UCollisionsCollectionComponent::GetCo
     return _collectionSpheres;
 }
 
-void UCollisionsCollectionComponent::EndPlay(const EEndPlayReason::Type endPlayReason) {
-    Super::EndPlay(endPlayReason);
-    _subsystem->RemoveCollection(this);
+void UCollisionsCollectionComponent::BeginDestroy() {
+    Super::BeginDestroy();
+
+    // We must make sure to not crash on these scenarios:
+    // At the death of the World instance, the subsystem might have been collected already.
+    // Moreover, if you change map from the editor, BeginDestroy() is called for all instances on the current map.
+    if (_subsystem.IsValid())
+    {
+        _subsystem->RemovePendingKillCollection(this);
+    }
 }
 
 void UCollisionsCollectionComponent::BeginPlay() {

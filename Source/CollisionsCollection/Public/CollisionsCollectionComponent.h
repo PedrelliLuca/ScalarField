@@ -11,6 +11,8 @@ DECLARE_MULTICAST_DELEGATE(FCollectionPlayBegunSignature);
 DECLARE_MULTICAST_DELEGATE_SixParams(FCollectionBeginOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32, bool, const FHitResult&);
 DECLARE_MULTICAST_DELEGATE_FourParams(FCollectionEndOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32);
 
+class UCollisionsCollectionSubsystem;
+
 struct FCollectionSphereParameters {
     FTransform RootRelativeTransform = FTransform::Identity;
     float Radius = 0.0f;
@@ -43,7 +45,7 @@ public:
     FCollectionBeginOverlapSignature OnCollectionBeginOverlap;
     FCollectionEndOverlapSignature OnCollectionEndOverlap;
 
-    void EndPlay(EEndPlayReason::Type endPlayReason) override;
+    void BeginDestroy() override;
 
 protected:
     void BeginPlay() override;
@@ -80,7 +82,7 @@ private:
     // Non cache-friendly, meant exclusively for internal use. Needed because:
     // 1. The collection needs to provide some functions analogous to USceneComponent ones (e.g. UpdateOverlaps())
     // 2. We don't want collection elements to fire overlap events with each other.
-    TSet<UPrimitiveComponent*> _collectionElements;
+    TSet<TWeakObjectPtr<UPrimitiveComponent>> _collectionElements;
 
     // Given another collection and one of its elements, tells the number of elements of this collection currently overlapping with it.
     TMap<TWeakObjectPtr<UCollisionsCollectionComponent>, TMap<TWeakObjectPtr<UPrimitiveComponent>, int>> _overlapsWithOtherCollectionElements;
