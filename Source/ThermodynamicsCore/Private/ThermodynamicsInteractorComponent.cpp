@@ -3,8 +3,7 @@
 #include "ThermodynamicsInteractorComponent.h"
 
 #include "Algo/ForEach.h"
-#include "Components/BoxComponent.h"
-#include "Components/SphereComponent.h"
+#include "CollisionsCollectionComponent.h"
 #include "GameFramework/Actor.h"
 #include "HeatmapGridOperations.h"
 #include "ThermodynamicsSubsystem.h"
@@ -62,9 +61,9 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
     const float currDeltaT_OtherBodies = _interactWithOtherComponents(deltaTime);
 
     // 2) Interact with the Heatmap Grid
-    const auto location = FVector2D(GetOwner()->GetActorLocation());
-    const float interactionRange = _sphereCollisionC->GetScaledSphereRadius();
-    const float currDeltaT_GridNormalized = HeatmapGrid::Interact(location, interactionRange, _currentTemperature, deltaTime);
+    check(_collisionsCollectionC.IsValid());
+    const FTransform& interactorTransform = GetOwner()->GetTransform();
+    const float currDeltaT_GridNormalized = HeatmapGrid::Interact(interactorTransform, _collisionsCollectionC.Get(), _currentTemperature, deltaTime);
 
     const float totalCurrDeltaT = currDeltaT_GridNormalized + currDeltaT_OtherBodies + _unregisteredDeltaTemperature;
     const float totalDeltaT = (UThermodynamicsSubsystem::ROD_CONSTANT * totalCurrDeltaT * deltaTime) / _heatCapacity;
@@ -166,61 +165,43 @@ void UThermodynamicsInteractorComponent::_setCurrentTemperatureAsNext() {
 }
 
 void UThermodynamicsInteractorComponent::_retrieveThermodynamicCollision() {
-    bool successfullRetrieval = false;
-    auto errorMessage = FString("");
+    UCollisionsCollectionComponent* const collisionsCollectionC = GetOwner()->FindComponentByClass<UCollisionsCollectionComponent>();
+    if (IsValid(collisionsCollectionC)) {
+        _collisionsCollectionC = collisionsCollectionC;
 
-    const TArray<UActorComponent*> possibleCollisions = GetOwner()->GetComponentsByTag(USphereComponent::StaticClass(), FName{THERMODYNAMICS_COLLISION_TAG});
-    if (!possibleCollisions.IsEmpty()) {
-        if (const auto sphereCollisionC = Cast<USphereComponent>(possibleCollisions[0]); IsValid(sphereCollisionC)) {
-            const FName collisionProfileName = sphereCollisionC->GetCollisionProfileName();
-            if (collisionProfileName == FName(THERMODYNAMICS_COLLISION_PROFILE_NAME)) {
-                if (sphereCollisionC->GetGenerateOverlapEvents()) {
-                    _sphereCollisionC = sphereCollisionC;
-                    successfullRetrieval = true;
+        // Setup the simultaneity mechanism.
+        _counterOfChecksThisFrame = 0;
+        _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
+        _collidingInteractors.Empty();
 
-                    // Setup the simultaneity mechanism.
-                    _counterOfChecksThisFrame = 0;
-                    _timesToBeCheckedThisFrame = TNumericLimits<uint32>::Max();
-                    _collidingInteractors.Empty();
-
-                    // When a UPrimitiveComponent spawns, even if it's already colliding with something, OnComponentBeginOverlap doesn't Broadcast().
-                    // We need this to detect if some other AActor is already interacting with us thermodynamically.
-                    _setInitialInteractors();
-
-                    // Setup of the interactors' registration on overlap status change.
-                    _sphereCollisionC->OnComponentBeginOverlap.AddDynamic(this, &UThermodynamicsInteractorComponent::_registerInteractor);
-                    _sphereCollisionC->OnComponentEndOverlap.AddDynamic(this, &UThermodynamicsInteractorComponent::_unregisterInteractor);
-                } else {
-                    errorMessage = FString::Printf(TEXT("Collisions disabled on USphereComponent. No thermodynamics for this actor!"));
-                }
-            } else {
-                errorMessage = FString::Printf(TEXT("Collision profile of USphereComponent is not %s. No thermodynamics for this actor!"),
-                    *FString(THERMODYNAMICS_COLLISION_PROFILE_NAME));
-            }
+        // When a UCollisionsCollectionComponent spawns, even if it's already colliding with something, OnCollectionBeginOverlap doesn't Broadcast().
+        // _setInitialInteractors detects if some other AActor is already interacting with us thermodynamically. In case the collection begins play after us,
+        // schedule it for later.
+        if (_collisionsCollectionC->HasBegunPlay()) {
+            _setInitialInteractors();
         } else {
-            errorMessage =
-                FString::Printf(TEXT("Tag %s found on a non-USphereComponent. No thermodynamics for this actor!"), *FString(THERMODYNAMICS_COLLISION_TAG));
+            _collisionsCollectionC->OnCollectionPlayBegun.AddUObject(this, &UThermodynamicsInteractorComponent::_setInitialInteractors);
         }
-    } else {
-        errorMessage = FString::Printf(TEXT("No component with tag %s was found. No thermodynamics for this actor!"), *FString(THERMODYNAMICS_COLLISION_TAG));
-    }
 
-    if (!successfullRetrieval) {
-        UE_LOG(LogTemp, Error, TEXT("%s"), *errorMessage);
+        // Setup of the interactors' registration on overlap status change.
+        _collisionsCollectionC->OnCollectionBeginOverlap.AddUObject(this, &UThermodynamicsInteractorComponent::_registerInteractor);
+        _collisionsCollectionC->OnCollectionEndOverlap.AddUObject(this, &UThermodynamicsInteractorComponent::_unregisterInteractor);
+    } else {
+        UE_LOG(LogTemp, Error, TEXT("UCollisionsCollectionComponent not found. No thermodynamics for this actor!"));
         SetComponentTickEnabled(false);
     }
 }
 
 void UThermodynamicsInteractorComponent::_setInitialInteractors() {
-    // Do not call this function if _sphereCollisionC hasn't been set.
-    check(_sphereCollisionC.IsValid());
+    // Do not call this function if _collisionsCollectionC hasn't been set.
+    check(_collisionsCollectionC.IsValid());
 
     // Overlaps are messed up without this call.
     // I think this might be due to this component ticking on TG_PostUpdateWork the 1st frame.
-    _sphereCollisionC->UpdateOverlaps();
+    _collisionsCollectionC->UpdateOverlaps();
 
-    TArray<TObjectPtr<UPrimitiveComponent>> overlappingCollisions;
-    _sphereCollisionC->GetOverlappingComponents(overlappingCollisions);
+    TSet<UPrimitiveComponent*> overlappingCollisions;
+    _collisionsCollectionC->GetOverlappingComponents(overlappingCollisions);
 
 #ifdef LOG_THERMODYNAMICS
     auto thisName = FString(GetOwner()->GetName());
@@ -257,8 +238,10 @@ void UThermodynamicsInteractorComponent::_registerInteractor(UPrimitiveComponent
 
 void UThermodynamicsInteractorComponent::_unregisterInteractor(
     UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
-    TWeakObjectPtr<UThermodynamicsInteractorComponent>* found = Algo::FindByPredicate(_collidingInteractors,
-        [otherComp](const TWeakObjectPtr<UThermodynamicsInteractorComponent>& thermoIntC) { return thermoIntC->_sphereCollisionC == otherComp; });
+    TWeakObjectPtr<UThermodynamicsInteractorComponent>* found =
+        Algo::FindByPredicate(_collidingInteractors, [otherComp](const TWeakObjectPtr<UThermodynamicsInteractorComponent>& thermoIntC) {
+            return thermoIntC->_collisionsCollectionC->HasElement(otherComp);
+        });
 
     // If this is nullptr, either:
     // 1. otherComp's UThermodynamicsInteractorC was never registered => there is a problem in the registration logic.
