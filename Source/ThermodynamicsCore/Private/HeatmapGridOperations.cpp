@@ -66,24 +66,11 @@ bool _doRectangleCircleIntersect(const FVector2D rectangleLocation, const FVecto
     return cornerDistanceSquared <= radius * radius;
 }
 
-float _spheresInteraction(
+void _spheresInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, int32& numberOfInteractingCells, float& collectionCurrDeltaT,
     const FTransform& interactorTransform, const TArray<FCollectionSphereParameters>& spheres, const float collectionTemperature, const float deltaTime) {
-    check(_grid.IsSet());
-
-    FHeatmapGrid& grid = _grid.GetValue();
     const FVector2D& cellsExtent = grid.Attributes.CellsExtent;
     const auto cellsSize = cellsExtent * 2.0;
     const FIntVector2& numbersOfCells = grid.Attributes.NumbersOfCells;
-
-    // Given a cell, we don't want it to interact with more than one element of the collection, as this latter is meant to represent a single body. This cache
-    // makes it possible to avoid that.
-    TArray<bool> didInteractWithCell;
-    didInteractWithCell.Reserve(grid.Locations.Num());
-    didInteractWithCell.Init(false, grid.Locations.Num());
-
-    // The currDeltaT of the collection takes all the interacting cells into account
-    float collectionCurrDeltaT = 0.0f;
-    int32 numberOfInteractingCells = 0;
 
     TArray<float>& currentTemperatures = grid.CurrentTemperatures;
     TArray<float>& nextTemperatures = grid.NextTemperatures;
@@ -134,24 +121,37 @@ float _spheresInteraction(
             }
         }
     }
-
-    // The normalized version of the collection's currDeltaT is an average of the interactions with the cells. This is important to avoid having the
-    // grid weight way more than other collections (i.e. other bodies). This is realistic: sure, we are using a grid to represent the air of our map,
-    // but in the end air is a single body.
-    const float collectionCurrDeltaT_Normalized = collectionCurrDeltaT / numberOfInteractingCells;
-    return collectionCurrDeltaT_Normalized;
 }
 
 float Interact(
     const FTransform& interactorTransform, UCollisionsCollectionComponent* collisionsCollection, const float collectionTemperature, const float deltaTime) {
-    float interactorCurrDeltaT_Normalized = 0.0f;
+    float collectionCurrDeltaT_Normalized = 0.0f;
     if (_grid.IsSet()) {
-        interactorCurrDeltaT_Normalized =
-            _spheresInteraction(interactorTransform, collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
+        check(_grid.IsSet());
+
+        FHeatmapGrid& grid = _grid.GetValue();
+
+        // Given a cell, we don't want it to interact with more than one element of the collection, as this latter is meant to represent a single body. This
+        // cache makes it possible to avoid that.
+        TArray<bool> didInteractWithCell;
+        didInteractWithCell.Reserve(grid.Locations.Num());
+        didInteractWithCell.Init(false, grid.Locations.Num());
+
+        // The currDeltaT of the collection takes all the interacting cells into account
+        float collectionCurrDeltaT = 0.0f;
+        int32 numberOfInteractingCells = 0;
+
+        _spheresInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, interactorTransform,
+            collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
         // TODO: _boxesInteraction(), _capsulesInteraction()
+
+        // The normalized version of the collection's currDeltaT is an average of the interactions with the cells. This is important to avoid having the
+        // grid weight way more than other collections (i.e. other bodies). This is realistic: sure, we are using a grid to represent the air of our map,
+        // but in the end air is a single body.
+        collectionCurrDeltaT_Normalized = collectionCurrDeltaT / numberOfInteractingCells;
     }
 
-    return interactorCurrDeltaT_Normalized;
+    return collectionCurrDeltaT_Normalized;
 }
 
 void SelfInteract(const float deltaTime) {
