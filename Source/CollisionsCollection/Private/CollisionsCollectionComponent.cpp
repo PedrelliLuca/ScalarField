@@ -55,6 +55,10 @@ const TArray<FCollectionSphereParameters>& UCollisionsCollectionComponent::GetCo
     return _collectionSpheres;
 }
 
+const TArray<FCollectionBoxParameters>& UCollisionsCollectionComponent::GetCollectionBoxes() const {
+    return _collectionBoxes;
+}
+
 void UCollisionsCollectionComponent::BeginDestroy() {
     Super::BeginDestroy();
 
@@ -145,7 +149,10 @@ void UCollisionsCollectionComponent::_collectBoxes() {
         FCollectionBoxParameters boxParameters;
         boxParameters.RootRelativeTransform = box->GetRelativeTransform();
         const FVector boxExtent = box->GetScaledBoxExtent();
-        boxParameters.Box = FBox2D(FVector2D(-boxExtent), FVector2D(boxExtent));
+        boxParameters.BottomLeft = FVector(-boxExtent.X, -boxExtent.Y, 0.0);
+        boxParameters.BottomRight = FVector(-boxExtent.X, boxExtent.Y, 0.0);
+        boxParameters.TopRight = FVector(boxExtent.X, boxExtent.Y, 0.0);
+        boxParameters.TopLeft = FVector(boxExtent.X, boxExtent.Y, 0.0);
         _collectionBoxes.Add(MoveTemp(boxParameters));
 
         box->OnComponentBeginOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementBeginOverlap);

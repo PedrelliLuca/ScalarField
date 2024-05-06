@@ -48,22 +48,26 @@ void Deinitialize() {
     _grid.Reset();
 }
 
-bool _doRectangleCircleIntersect(const FVector2D rectangleLocation, const FVector2D rectangleExtension, const FVector2D circleLocation, const float radius) {
-    const auto distance = FVector2D(FMath::Abs(circleLocation.X - rectangleLocation.X), FMath::Abs(circleLocation.Y - rectangleLocation.Y));
+bool _doesCellIntersectCircle(const FVector2D cellLocation, const FVector2D cellExtension, const FVector2D circleLocation, const float radius) {
+    const auto distance = FVector2D(FMath::Abs(circleLocation.X - cellLocation.X), FMath::Abs(circleLocation.Y - cellLocation.Y));
 
-    if (distance.X > (rectangleExtension.X + radius) || distance.Y > (rectangleExtension.Y + radius)) {
+    if (distance.X > (cellExtension.X + radius) || distance.Y > (cellExtension.Y + radius)) {
         return false;
     }
 
-    if (distance.X <= rectangleExtension.X || distance.Y <= rectangleExtension.Y) {
+    if (distance.X <= cellExtension.X || distance.Y <= cellExtension.Y) {
         return true;
     }
 
     // If you're here it means that:
-    // rectangleExtension.X < distance.X < rectangleExtension.X + radius
-    // rectangleExtension.Y < distance.Y < rectangleExtension.Y + radius
-    const double cornerDistanceSquared = FMath::Pow(distance.X - rectangleExtension.X, 2.0) + FMath::Pow(distance.Y - rectangleExtension.Y, 2.0);
+    // cellExtension.X < distance.X < cellExtension.X + radius
+    // cellExtension.Y < distance.Y < cellExtension.Y + radius
+    const double cornerDistanceSquared = FMath::Pow(distance.X - cellExtension.X, 2.0) + FMath::Pow(distance.Y - cellExtension.Y, 2.0);
     return cornerDistanceSquared <= radius * radius;
+}
+
+bool _doesCellIntersectRectangle(const FVector2D cellLocation, const FVector2D cellExtension, const TArray<FVector2D>& rectangleVertices) {
+    return false;
 }
 
 void _spheresInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, int32& numberOfInteractingCells, float& collectionCurrDeltaT,
@@ -83,7 +87,7 @@ void _spheresInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, 
         const FVector2D sphereGridLocation = sphereWorldLocation - grid.Attributes.BottomLeftCorner;
         const bool sphereWithinXBounds = 0.0f <= sphereGridLocation.X && sphereGridLocation.X <= numbersOfCells.X * cellsSize.X;
         const bool sphereWithinYBounds = 0.0f <= sphereGridLocation.Y && sphereGridLocation.Y <= numbersOfCells.Y * cellsSize.Y;
-        // Is the sphere within the grid bounds?
+        // Is the sphere centre within the grid bounds?
         if (sphereWithinXBounds && sphereWithinYBounds) {
             // The cell (i, j) containing the bottom-left corner of the square enclosing the interaction circle
             const FVector2D bottomLeftLocation = sphereGridLocation - sphere.Radius * FVector2D::UnitVector;
@@ -103,7 +107,81 @@ void _spheresInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, 
             for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
                 for (int32 i = bottomLeftCoordinates.X; i <= topRightCoordinates.X; ++i) {
                     const int32 k = convert2DTo1D(i, j);
-                    if (!didInteractWithCell[k] && _doRectangleCircleIntersect(grid.Locations[k], cellsExtent, sphereWorldLocation, sphere.Radius)) {
+                    if (!didInteractWithCell[k] && _doesCellIntersectCircle(grid.Locations[k], cellsExtent, sphereWorldLocation, sphere.Radius)) {
+                        // This currDeltaT is from the collection's POV, which is why the collectionTemperature is on the right hand side.
+                        // If the colletion's T is greater than the cell's, currDeltaT < 0 => the collection emits heat (collectionCurrDeltaT decreases)
+                        // and the cell absorbs heat (nextTemperatures[k] increases).
+                        // If the collection's T is smaller than the cell's, currDeltaT > 0 => the collection absorbs heat (collectionCurrDeltaT increases)
+                        // and the cell emits heat (nextTemperatures[k] decreases).
+                        const float currDeltaT = currentTemperatures[k] - collectionTemperature;
+
+                        collectionCurrDeltaT += currDeltaT;
+                        nextTemperatures[k] -= (UThermodynamicsSubsystem::ROD_CONSTANT * currDeltaT * deltaTime / grid.Attributes.HeatCapacity);
+
+                        ++numberOfInteractingCells;
+                        didInteractWithCell[k] = true;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void _boxesInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, int32& numberOfInteractingCells, float& collectionCurrDeltaT,
+    const FTransform& interactorTransform, const TArray<FCollectionBoxParameters>& boxes, const float collectionTemperature, const float deltaTime) {
+    const FVector2D& cellsExtent = grid.Attributes.CellsExtent;
+    const auto cellsSize = cellsExtent * 2.0;
+    const FIntVector2& numbersOfCells = grid.Attributes.NumbersOfCells;
+
+    TArray<float>& currentTemperatures = grid.CurrentTemperatures;
+    TArray<float>& nextTemperatures = grid.NextTemperatures;
+
+    const auto worldToGridTransform = FTransform(FVector(-grid.Attributes.BottomLeftCorner.X, -grid.Attributes.BottomLeftCorner.Y, 0.0)).Inverse();
+
+    // We make each sphere of the collection interact with the grid
+    for (const FCollectionBoxParameters& box : boxes) {
+        // From Box Space to World Space to Grid Space
+        const auto boxToWorldTransform = box.RootRelativeTransform * interactorTransform;
+        const auto boxToGridTransform = boxToWorldTransform * worldToGridTransform;
+        const auto boxGridLocation = FVector2D(boxToGridTransform.TransformPosition(FVector::ZeroVector));
+        const bool sphereWithinXBounds = 0.0f <= boxGridLocation.X && boxGridLocation.X <= numbersOfCells.X * cellsSize.X;
+        const bool sphereWithinYBounds = 0.0f <= boxGridLocation.Y && boxGridLocation.Y <= numbersOfCells.Y * cellsSize.Y;
+        // Is the box centre within the grid bounds?
+        if (sphereWithinXBounds && sphereWithinYBounds) {
+            TArray<FVector2D> boxWorldVertices;
+            boxWorldVertices.Reserve(4);
+            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.BottomLeft));
+            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.BottomRight));
+            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.TopLeft));
+            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.TopRight));
+
+            auto bottomLeftLocation = FVector2D(TNumericLimits<double>::Max(), TNumericLimits<double>::Max());
+            auto topRightLocation = FVector2D(TNumericLimits<double>::Min(), TNumericLimits<double>::Min());
+            
+            for (const FVector2D& vertex : boxWorldVertices) {
+                bottomLeftLocation.X = FMath::Min(bottomLeftLocation.X, vertex.X);
+                bottomLeftLocation.Y = FMath::Min(bottomLeftLocation.Y, vertex.Y);
+                topRightLocation.X = FMath::Max(topRightLocation.X, vertex.X);
+                topRightLocation.Y = FMath::Max(topRightLocation.Y, vertex.Y);
+            }
+
+            // The cell (i, j) containing the bottom-left corner of the box
+            auto bottomLeftCoordinates = FIntVector2(bottomLeftLocation.X / cellsSize.X, bottomLeftLocation.Y / cellsSize.Y);
+            bottomLeftCoordinates = FIntVector2(FMath::Max(bottomLeftCoordinates.X, 0), FMath::Max(bottomLeftCoordinates.Y, 0));
+
+            // The cell (i, j) containing the top-right corner of the box
+            auto topRightCoordinates = FIntVector2(topRightLocation.X / cellsSize.X, topRightLocation.Y / cellsSize.Y);
+            topRightCoordinates = FIntVector2(FMath::Min(topRightCoordinates.X, numbersOfCells.X - 1), FMath::Min(topRightCoordinates.Y, numbersOfCells.Y - 1));
+
+            check(bottomLeftCoordinates.X <= topRightCoordinates.X && bottomLeftCoordinates.Y <= topRightCoordinates.Y);
+
+            const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
+
+            // Looping over cells intersecting the box's enclosing rectangle (only these can intersect the interactor's circle)
+            for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
+                for (int32 i = bottomLeftCoordinates.X; i <= topRightCoordinates.X; ++i) {
+                    const int32 k = convert2DTo1D(i, j);
+                    if (!didInteractWithCell[k] && _doesCellIntersectRectangle(grid.Locations[k], cellsExtent, boxWorldVertices)) {
                         // This currDeltaT is from the collection's POV, which is why the collectionTemperature is on the right hand side.
                         // If the colletion's T is greater than the cell's, currDeltaT < 0 => the collection emits heat (collectionCurrDeltaT decreases)
                         // and the cell absorbs heat (nextTemperatures[k] increases).

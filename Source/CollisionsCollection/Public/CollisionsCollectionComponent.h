@@ -20,7 +20,10 @@ struct FCollectionSphereParameters {
 
 struct FCollectionBoxParameters {
     FTransform RootRelativeTransform = FTransform::Identity;
-    FBox2D Box;
+    FVector BottomLeft = FVector::ZeroVector;
+    FVector BottomRight = FVector::ZeroVector;
+    FVector TopRight = FVector::ZeroVector;
+    FVector TopLeft = FVector::ZeroVector;
 };
 
 /**
@@ -44,6 +47,7 @@ public:
     bool HasElement(const UPrimitiveComponent* collectionElement) const;
 
     const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
+    const TArray<FCollectionBoxParameters>& GetCollectionBoxes() const;
 
     FCollectionPlayBegunSignature OnCollectionPlayBegun;
 
