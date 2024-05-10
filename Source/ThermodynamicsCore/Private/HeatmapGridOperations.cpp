@@ -66,8 +66,69 @@ bool _doesCellIntersectCircle(const FVector2D cellLocation, const FVector2D cell
     return cornerDistanceSquared <= radius * radius;
 }
 
+bool _doesPolygonIntersectPolygon(const TArray<FVector2D>& polygonA, const TArray<FVector2D>& polygonB) {
+    // If we can find a line separating the two polygons, they do not intersect. Let's look for it.
+
+    // For each polygon...
+    const auto polygons = TArray<TArray<FVector2D>>{polygonA, polygonB};
+    for (const auto& polygon : polygons) {
+        // For each edge (p1, p2)...
+        for (int32 i1 = 0; i1 < polygon.Num(); ++i1) {
+            const int32 i2 = (i1 + 1) % polygon.Num();
+            const FVector2D& p1 = polygon[i1];
+            const FVector2D& p2 = polygon[i2];
+
+            // The edge is a separating line if, given any of its perpendicular axes, the projection of the two rectangles on that axes do not intersect.
+            // For simplicity, we use the perpendicular axes passing by the origin (0, 0)
+            const auto n = FVector2D(p2.Y - p1.Y, p1.X - p2.X);
+
+            // We project polygonA on n by using the dot product. minA is the point of polyA whose distance from 0 is min, maxA is analogous.
+            auto minA = TNumericLimits<double>::Max();
+            auto maxA = TNumericLimits<double>::Lowest();
+            for (const auto& pA : polygonA) {
+                const double projected = FVector2D::DotProduct(n, pA);
+
+                if (projected < minA) {
+                    minA = projected;
+                }
+                if (projected > maxA) {
+                    maxA = projected;
+                }
+            }
+
+            // Repeat for polygon B
+            auto minB = TNumericLimits<double>::Max();
+            auto maxB = TNumericLimits<double>::Lowest();
+            for (const auto& pB : polygonB) {
+                const double projected = FVector2D::DotProduct(n, pB);
+
+                if (projected < minB) {
+                    minB = projected;
+                }
+                if (projected > maxB) {
+                    maxB = projected;
+                }
+            }
+
+            if (maxA < minB || maxB < minA) {
+                // Yep, edge (p1, p2) is a separating line, the two polygons do not intersect.
+                return false;
+            }
+        }
+    }
+
+    // We haven't found a single edge acting as separating line, meaning the polygons do intersect.
+    return true;
+}
+
 bool _doesCellIntersectRectangle(const FVector2D cellLocation, const FVector2D cellExtension, const TArray<FVector2D>& rectangleVertices) {
-    return false;
+    auto cellVertices = TArray<FVector2D>();
+    cellVertices.Reserve(4);
+    cellVertices.Emplace(cellLocation.X - cellExtension.X, cellLocation.Y - cellExtension.Y);
+    cellVertices.Emplace(cellLocation.X - cellExtension.X, cellLocation.Y + cellExtension.Y);
+    cellVertices.Emplace(cellLocation.X + cellExtension.X, cellLocation.Y + cellExtension.Y);
+    cellVertices.Emplace(cellLocation.X + cellExtension.X, cellLocation.Y - cellExtension.Y);
+    return _doesPolygonIntersectPolygon(cellVertices, rectangleVertices);
 }
 
 void _spheresInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, int32& numberOfInteractingCells, float& collectionCurrDeltaT,
@@ -136,7 +197,7 @@ void _boxesInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, in
     TArray<float>& currentTemperatures = grid.CurrentTemperatures;
     TArray<float>& nextTemperatures = grid.NextTemperatures;
 
-    const auto worldToGridTransform = FTransform(FVector(-grid.Attributes.BottomLeftCorner.X, -grid.Attributes.BottomLeftCorner.Y, 0.0)).Inverse();
+    const auto worldToGridTransform = FTransform(FVector(grid.Attributes.BottomLeftCorner, 0.0f)).Inverse();
 
     // We make each sphere of the collection interact with the grid
     for (const FCollectionBoxParameters& box : boxes) {
@@ -152,12 +213,12 @@ void _boxesInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, in
             boxWorldVertices.Reserve(4);
             boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.BottomLeft));
             boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.BottomRight));
-            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.TopLeft));
             boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.TopRight));
+            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.TopLeft));
 
             auto bottomLeftLocation = FVector2D(TNumericLimits<double>::Max(), TNumericLimits<double>::Max());
-            auto topRightLocation = FVector2D(TNumericLimits<double>::Min(), TNumericLimits<double>::Min());
-            
+            auto topRightLocation = FVector2D(TNumericLimits<double>::Lowest(), TNumericLimits<double>::Lowest());
+
             for (const FVector2D& vertex : boxWorldVertices) {
                 bottomLeftLocation.X = FMath::Min(bottomLeftLocation.X, vertex.X);
                 bottomLeftLocation.Y = FMath::Min(bottomLeftLocation.Y, vertex.Y);
@@ -221,7 +282,9 @@ float Interact(
 
         _spheresInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, interactorTransform,
             collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
-        // TODO: _boxesInteraction(), _capsulesInteraction()
+        _boxesInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, interactorTransform,
+            collisionsCollection->GetCollectionBoxes(), collectionTemperature, deltaTime);
+        // TODO: _capsulesInteraction()
 
         // The normalized version of the collection's currDeltaT is an average of the interactions with the cells. This is important to avoid having the
         // grid weight way more than other collections (i.e. other bodies). This is realistic: sure, we are using a grid to represent the air of our map,
