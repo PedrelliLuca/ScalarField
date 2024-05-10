@@ -152,7 +152,7 @@ void UCollisionsCollectionComponent::_collectBoxes() {
         boxParameters.BottomLeft = FVector(-boxExtent.X, -boxExtent.Y, 0.0);
         boxParameters.BottomRight = FVector(-boxExtent.X, boxExtent.Y, 0.0);
         boxParameters.TopRight = FVector(boxExtent.X, boxExtent.Y, 0.0);
-        boxParameters.TopLeft = FVector(boxExtent.X, boxExtent.Y, 0.0);
+        boxParameters.TopLeft = FVector(boxExtent.X, -boxExtent.Y, 0.0);
         _collectionBoxes.Add(MoveTemp(boxParameters));
 
         box->OnComponentBeginOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementBeginOverlap);
