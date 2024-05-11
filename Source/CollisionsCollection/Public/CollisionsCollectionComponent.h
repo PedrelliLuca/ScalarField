@@ -26,6 +26,12 @@ struct FCollectionBoxParameters {
     FVector TopLeft = FVector::ZeroVector;
 };
 
+struct FCollectionCapsuleParameters {
+    FCollectionBoxParameters CapsuleBox;
+    FCollectionSphereParameters UpperSphere;
+    FCollectionSphereParameters LowerSphere;
+};
+
 /**
  * \brief Collects Sphere Collisions with a given tag so that they can look as a single non trivial collision for clients.
  */
@@ -62,7 +68,7 @@ protected:
 private:
     void _collectSpheres();
     void _collectBoxes();
-    // TODO: _collectCapsules()
+    void _collectCapsules();
 
     UFUNCTION()
     void _collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex,
@@ -89,6 +95,7 @@ private:
     // For cache-friendly, fast iterations.
     TArray<FCollectionSphereParameters> _collectionSpheres;
     TArray<FCollectionBoxParameters> _collectionBoxes;
+    TArray<FCollectionCapsuleParameters> _collectionCapsules;
 
     // Non cache-friendly, meant exclusively for internal use. Needed because:
     // 1. The collection needs to provide some functions analogous to USceneComponent ones (e.g. UpdateOverlaps())
