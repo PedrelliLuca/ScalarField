@@ -209,17 +209,17 @@ void _boxesInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, in
         const bool sphereWithinYBounds = 0.0f <= boxGridLocation.Y && boxGridLocation.Y <= numbersOfCells.Y * cellsSize.Y;
         // Is the box centre within the grid bounds?
         if (sphereWithinXBounds && sphereWithinYBounds) {
-            TArray<FVector2D> boxWorldVertices;
-            boxWorldVertices.Reserve(4);
-            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.BottomLeft));
-            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.BottomRight));
-            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.TopRight));
-            boxWorldVertices.Emplace(boxToGridTransform.TransformPosition(box.TopLeft));
+            TArray<FVector2D> boxGridVertices;
+            boxGridVertices.Reserve(4);
+            boxGridVertices.Emplace(boxToGridTransform.TransformPosition(box.BottomLeft));
+            boxGridVertices.Emplace(boxToGridTransform.TransformPosition(box.BottomRight));
+            boxGridVertices.Emplace(boxToGridTransform.TransformPosition(box.TopRight));
+            boxGridVertices.Emplace(boxToGridTransform.TransformPosition(box.TopLeft));
 
             auto bottomLeftLocation = FVector2D(TNumericLimits<double>::Max(), TNumericLimits<double>::Max());
             auto topRightLocation = FVector2D(TNumericLimits<double>::Lowest(), TNumericLimits<double>::Lowest());
 
-            for (const FVector2D& vertex : boxWorldVertices) {
+            for (const FVector2D& vertex : boxGridVertices) {
                 bottomLeftLocation.X = FMath::Min(bottomLeftLocation.X, vertex.X);
                 bottomLeftLocation.Y = FMath::Min(bottomLeftLocation.Y, vertex.Y);
                 topRightLocation.X = FMath::Max(topRightLocation.X, vertex.X);
@@ -237,6 +237,13 @@ void _boxesInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, in
             check(bottomLeftCoordinates.X <= topRightCoordinates.X && bottomLeftCoordinates.Y <= topRightCoordinates.Y);
 
             const auto convert2DTo1D = [nRows = numbersOfCells.X](int32 i, int32 j) -> int32 { return j * nRows + i; };
+
+            TArray<FVector2D> boxWorldVertices;
+            boxWorldVertices.Reserve(4);
+            boxWorldVertices.Emplace(boxToWorldTransform.TransformPosition(box.BottomLeft));
+            boxWorldVertices.Emplace(boxToWorldTransform.TransformPosition(box.BottomRight));
+            boxWorldVertices.Emplace(boxToWorldTransform.TransformPosition(box.TopRight));
+            boxWorldVertices.Emplace(boxToWorldTransform.TransformPosition(box.TopLeft));
 
             // Looping over cells intersecting the box's enclosing rectangle (only these can intersect the interactor's circle)
             for (int32 j = bottomLeftCoordinates.Y; j <= topRightCoordinates.Y; ++j) {
