@@ -18,6 +18,14 @@ struct FCollectionSphereParameters {
     float Radius = 0.0f;
 };
 
+struct FCollectionBoxParameters {
+    FTransform RootRelativeTransform = FTransform::Identity;
+    FVector BottomLeft = FVector::ZeroVector;
+    FVector BottomRight = FVector::ZeroVector;
+    FVector TopRight = FVector::ZeroVector;
+    FVector TopLeft = FVector::ZeroVector;
+};
+
 /**
  * \brief Collects Sphere Collisions with a given tag so that they can look as a single non trivial collision for clients.
  */
@@ -39,6 +47,7 @@ public:
     bool HasElement(const UPrimitiveComponent* collectionElement) const;
 
     const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
+    const TArray<FCollectionBoxParameters>& GetCollectionBoxes() const;
 
     FCollectionPlayBegunSignature OnCollectionPlayBegun;
 
@@ -52,7 +61,8 @@ protected:
 
 private:
     void _collectSpheres();
-    // TODO: _collectCapsules(), _collectBoxes()
+    void _collectBoxes();
+    // TODO: _collectCapsules()
 
     UFUNCTION()
     void _collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex,
@@ -78,6 +88,7 @@ private:
 
     // For cache-friendly, fast iterations.
     TArray<FCollectionSphereParameters> _collectionSpheres;
+    TArray<FCollectionBoxParameters> _collectionBoxes;
 
     // Non cache-friendly, meant exclusively for internal use. Needed because:
     // 1. The collection needs to provide some functions analogous to USceneComponent ones (e.g. UpdateOverlaps())

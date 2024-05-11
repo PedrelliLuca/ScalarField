@@ -3,6 +3,7 @@
 #include "CollisionsCollectionComponent.h"
 
 #include "CollisionsCollectionSubsystem.h"
+#include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
 
 // https://stackoverflow.com/questions/14421656/is-there-widely-available-wide-character-variant-of-file
@@ -15,6 +16,7 @@ UCollisionsCollectionComponent::UCollisionsCollectionComponent()
     , _collectionCollisionProfileName("")
     , _generateOverlapEvents(true)
     , _collectionSpheres()
+    , _collectionBoxes()
     , _collectionElements()
     , _overlapsWithOtherCollectionElements()
     , _subsystem() {
@@ -53,14 +55,17 @@ const TArray<FCollectionSphereParameters>& UCollisionsCollectionComponent::GetCo
     return _collectionSpheres;
 }
 
+const TArray<FCollectionBoxParameters>& UCollisionsCollectionComponent::GetCollectionBoxes() const {
+    return _collectionBoxes;
+}
+
 void UCollisionsCollectionComponent::BeginDestroy() {
     Super::BeginDestroy();
 
     // We must make sure to not crash on these scenarios:
     // At the death of the World instance, the subsystem might have been collected already.
     // Moreover, if you change map from the editor, BeginDestroy() is called for all instances on the current map.
-    if (_subsystem.IsValid())
-    {
+    if (_subsystem.IsValid()) {
         _subsystem->RemovePendingKillCollection(this);
     }
 }
@@ -69,6 +74,7 @@ void UCollisionsCollectionComponent::BeginPlay() {
     Super::BeginPlay();
 
     _collectSpheres();
+    _collectBoxes();
 
     _subsystem = GetWorld()->GetSubsystem<UCollisionsCollectionSubsystem>();
     _subsystem->AddCollection(this);
@@ -79,9 +85,8 @@ void UCollisionsCollectionComponent::BeginPlay() {
 void UCollisionsCollectionComponent::_collectSpheres() {
     const TArray<UActorComponent*> sphereActors = GetOwner()->GetComponentsByTag(USphereComponent::StaticClass(), _collectionTag);
     _collectionSpheres.Reserve(sphereActors.Num());
-    _collectionElements.Reserve(sphereActors.Num());
 
-    for (auto sphereActor : sphereActors) {
+    for (const auto sphereActor : sphereActors) {
         const auto sphere = Cast<USphereComponent>(sphereActor);
         check(sphere);
 
@@ -112,6 +117,48 @@ void UCollisionsCollectionComponent::_collectSpheres() {
         sphere->OnComponentEndOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementEndOverlap);
 
         _collectionElements.Emplace(sphere);
+    }
+}
+
+void UCollisionsCollectionComponent::_collectBoxes() {
+    const TArray<UActorComponent*> boxActors = GetOwner()->GetComponentsByTag(UBoxComponent::StaticClass(), _collectionTag);
+    _collectionBoxes.Reserve(boxActors.Num());
+
+    for (const auto boxActor : boxActors) {
+        const auto box = Cast<UBoxComponent>(boxActor);
+        check(box);
+
+        const auto collisionProfile = box->GetCollisionProfileName();
+        if (collisionProfile != _collectionCollisionProfileName) {
+            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
+                *collisionProfile.ToString(), *_collectionCollisionProfileName.ToString());
+
+            box->SetCollisionProfileName(_collectionCollisionProfileName);
+        }
+
+        const bool generateOverlapEvents = box->GetGenerateOverlapEvents();
+        if (generateOverlapEvents != _generateOverlapEvents) {
+            const auto collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
+            const auto collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
+            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
+                collectionString);
+
+            box->SetGenerateOverlapEvents(_generateOverlapEvents);
+        }
+
+        FCollectionBoxParameters boxParameters;
+        boxParameters.RootRelativeTransform = box->GetRelativeTransform();
+        const FVector boxExtent = box->GetScaledBoxExtent();
+        boxParameters.BottomLeft = FVector(-boxExtent.X, -boxExtent.Y, 0.0);
+        boxParameters.BottomRight = FVector(-boxExtent.X, boxExtent.Y, 0.0);
+        boxParameters.TopRight = FVector(boxExtent.X, boxExtent.Y, 0.0);
+        boxParameters.TopLeft = FVector(boxExtent.X, -boxExtent.Y, 0.0);
+        _collectionBoxes.Add(MoveTemp(boxParameters));
+
+        box->OnComponentBeginOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementBeginOverlap);
+        box->OnComponentEndOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementEndOverlap);
+
+        _collectionElements.Emplace(box);
     }
 }
 
