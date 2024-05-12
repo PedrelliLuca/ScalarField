@@ -155,10 +155,46 @@ void UCollisionsCollectionComponent::_collectBoxes() {
         auto boxParameters = FCollectionBoxParameters();
         boxParameters.RootRelativeTransform = box->GetRelativeTransform();
         const FVector boxExtent = box->GetScaledBoxExtent();
-        boxParameters.BottomLeft = FVector(-boxExtent.X, -boxExtent.Y, 0.0);
-        boxParameters.BottomRight = FVector(-boxExtent.X, boxExtent.Y, 0.0);
-        boxParameters.TopRight = FVector(boxExtent.X, boxExtent.Y, 0.0);
-        boxParameters.TopLeft = FVector(boxExtent.X, -boxExtent.Y, 0.0);
+
+        const auto v1 = FVector(- boxExtent.X, -boxExtent.Y, -boxExtent.Z);
+        const auto v2 = FVector(-boxExtent.X, boxExtent.Y, -boxExtent.Z);
+        const auto v3 = FVector(-boxExtent.X, boxExtent.Y, boxExtent.Z);
+        const auto v4 = FVector(-boxExtent.X, -boxExtent.Y, boxExtent.Z);
+        const auto v5 = FVector(boxExtent.X, -boxExtent.Y, -boxExtent.Z);
+        const auto v6 = FVector(boxExtent.X, boxExtent.Y, -boxExtent.Z);
+        const auto v7 = FVector(boxExtent.X, boxExtent.Y, boxExtent.Z);
+        const auto v8 = FVector(boxExtent.X, -boxExtent.Y, boxExtent.Z);
+
+        boxParameters.FrontFace[0] = v5;
+        boxParameters.FrontFace[1] = v6;
+        boxParameters.FrontFace[2] = v7;
+        boxParameters.FrontFace[3] = v8;
+
+        boxParameters.LeftFace[0] = v1;
+        boxParameters.LeftFace[1] = v5;
+        boxParameters.LeftFace[2] = v8;
+        boxParameters.LeftFace[3] = v4;
+
+        boxParameters.BackFace[0] = v2;
+        boxParameters.BackFace[1] = v1;
+        boxParameters.BackFace[2] = v4;
+        boxParameters.BackFace[3] = v3;
+
+        boxParameters.RightFace[0] = v6;
+        boxParameters.RightFace[1] = v2;
+        boxParameters.RightFace[2] = v3;
+        boxParameters.RightFace[3] = v7;
+
+        boxParameters.TopFace[0] = v8;
+        boxParameters.TopFace[1] = v7;
+        boxParameters.TopFace[2] = v3;
+        boxParameters.TopFace[3] = v4;
+
+        boxParameters.BottomFace[0] = v1;
+        boxParameters.BottomFace[1] = v2;
+        boxParameters.BottomFace[2] = v6;
+        boxParameters.BottomFace[3] = v5;
+
         _collectionBoxes.Add(MoveTemp(boxParameters));
 
         box->OnComponentBeginOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementBeginOverlap);
@@ -170,7 +206,7 @@ void UCollisionsCollectionComponent::_collectBoxes() {
 
 void UCollisionsCollectionComponent::_collectCapsules() {
     const TArray<UActorComponent*> capsuleActors = GetOwner()->GetComponentsByTag(UCapsuleComponent::StaticClass(), _collectionTag);
-    _collectionBoxes.Reserve(capsuleActors.Num());
+    /*_collectionBoxes.Reserve(capsuleActors.Num());
 
     for (const auto capsuleActor : capsuleActors) {
         const auto capsule = Cast<UCapsuleComponent>(capsuleActor);
@@ -219,7 +255,7 @@ void UCollisionsCollectionComponent::_collectCapsules() {
         capsule->OnComponentEndOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementEndOverlap);
 
         _collectionElements.Emplace(capsule);
-    }
+    }*/
 }
 
 void UCollisionsCollectionComponent::_collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor,

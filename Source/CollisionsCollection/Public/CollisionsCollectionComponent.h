@@ -20,10 +20,17 @@ struct FCollectionSphereParameters {
 
 struct FCollectionBoxParameters {
     FTransform RootRelativeTransform = FTransform::Identity;
-    FVector BottomLeft = FVector::ZeroVector;
-    FVector BottomRight = FVector::ZeroVector;
-    FVector TopRight = FVector::ZeroVector;
-    FVector TopLeft = FVector::ZeroVector;
+
+    // Consider an observer inside the box, looking in the positive X direction. The front face is the one in front of him, and so on.
+    // Vertices order: BottomLeft, BottomRight, TopRight, TopLeft. 
+    // Left and Right for the face are defined by the in box observer turning their head towards the face.
+
+    TStaticArray<FVector, 4> FrontFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> LeftFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> BackFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> RightFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> TopFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> BottomFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
 };
 
 struct FCollectionCapsuleParameters {
