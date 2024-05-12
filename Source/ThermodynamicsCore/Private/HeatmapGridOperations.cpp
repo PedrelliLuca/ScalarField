@@ -269,6 +269,22 @@ void _boxesInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, in
     }
 }
 
+void _capsulesInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, int32& numberOfInteractingCells, float& collectionCurrDeltaT,
+    const FTransform& interactorTransform, const TArray<FCollectionCapsuleParameters>& capsules, const float collectionTemperature, const float deltaTime) {
+    for (const FCollectionCapsuleParameters& capsule : capsules) {
+        TArray<FCollectionBoxParameters> capsuleBox;
+        capsuleBox.Add(capsule.CylinderBox);
+        _boxesInteraction(
+            grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, interactorTransform, capsuleBox, collectionTemperature, deltaTime);
+
+        TArray<FCollectionSphereParameters> capsuleSpheres;
+        capsuleSpheres.Add(capsule.UpperSphere);
+        capsuleSpheres.Add(capsule.LowerSphere);
+        _spheresInteraction(
+            grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, interactorTransform, capsuleSpheres, collectionTemperature, deltaTime);
+    }
+}
+
 float Interact(
     const FTransform& interactorTransform, UCollisionsCollectionComponent* collisionsCollection, const float collectionTemperature, const float deltaTime) {
     float collectionCurrDeltaT_Normalized = 0.0f;
@@ -291,7 +307,8 @@ float Interact(
             collisionsCollection->GetCollectionSpheres(), collectionTemperature, deltaTime);
         _boxesInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, interactorTransform,
             collisionsCollection->GetCollectionBoxes(), collectionTemperature, deltaTime);
-        // TODO: _capsulesInteraction()
+        _capsulesInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, interactorTransform,
+            collisionsCollection->GetCollectionCapsules(), collectionTemperature, deltaTime);
 
         // The normalized version of the collection's currDeltaT is an average of the interactions with the cells. This is important to avoid having the
         // grid weight way more than other collections (i.e. other bodies). This is realistic: sure, we are using a grid to represent the air of our map,

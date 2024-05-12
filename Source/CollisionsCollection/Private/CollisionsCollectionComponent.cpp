@@ -60,6 +60,10 @@ const TArray<FCollectionBoxParameters>& UCollisionsCollectionComponent::GetColle
     return _collectionBoxes;
 }
 
+const TArray<FCollectionCapsuleParameters>& UCollisionsCollectionComponent::GetCollectionCapsules() const {
+    return _collectionCapsules;
+}
+
 void UCollisionsCollectionComponent::BeginDestroy() {
     Super::BeginDestroy();
 
@@ -194,7 +198,7 @@ void UCollisionsCollectionComponent::_collectCapsules() {
         const float radius = capsule->GetScaledCapsuleRadius();
 
         auto capsuleParameters = FCollectionCapsuleParameters();
-        FCollectionBoxParameters& box = capsuleParameters.CapsuleBox;
+        FCollectionBoxParameters& box = capsuleParameters.CylinderBox;
         box.RootRelativeTransform = capsule->GetRelativeTransform();
         box.BottomLeft = FVector(-radius, -radius, 0.0);
         box.BottomRight = FVector(-radius, radius, 0.0);

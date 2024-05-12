@@ -27,7 +27,7 @@ struct FCollectionBoxParameters {
 };
 
 struct FCollectionCapsuleParameters {
-    FCollectionBoxParameters CapsuleBox;
+    FCollectionBoxParameters CylinderBox;
     FCollectionSphereParameters UpperSphere;
     FCollectionSphereParameters LowerSphere;
 };
@@ -54,6 +54,7 @@ public:
 
     const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
     const TArray<FCollectionBoxParameters>& GetCollectionBoxes() const;
+    const TArray<FCollectionCapsuleParameters>& GetCollectionCapsules() const;
 
     FCollectionPlayBegunSignature OnCollectionPlayBegun;
 
