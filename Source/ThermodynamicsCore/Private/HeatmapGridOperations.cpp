@@ -281,8 +281,8 @@ void _boxesInteraction(FHeatmapGrid& grid, TArray<bool>& didInteractWithCell, in
                 boxToWorldTransform, collectionTemperature, deltaTime);
             _boxSideInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, box.RightFace, boxToGridTransform,
                 boxToWorldTransform, collectionTemperature, deltaTime);
-            _boxSideInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, box.TopFace, boxToGridTransform,
-                boxToWorldTransform, collectionTemperature, deltaTime);
+            _boxSideInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, box.TopFace, boxToGridTransform, boxToWorldTransform,
+                collectionTemperature, deltaTime);
             _boxSideInteraction(grid, didInteractWithCell, numberOfInteractingCells, collectionCurrDeltaT, box.BottomFace, boxToGridTransform,
                 boxToWorldTransform, collectionTemperature, deltaTime);
         }
