@@ -20,10 +20,23 @@ struct FCollectionSphereParameters {
 
 struct FCollectionBoxParameters {
     FTransform RootRelativeTransform = FTransform::Identity;
-    FVector BottomLeft = FVector::ZeroVector;
-    FVector BottomRight = FVector::ZeroVector;
-    FVector TopRight = FVector::ZeroVector;
-    FVector TopLeft = FVector::ZeroVector;
+
+    // Consider an observer inside the box, looking in the positive X direction. The front face is the one in front of him, and so on.
+    // Vertices order: BottomLeft, BottomRight, TopRight, TopLeft.
+    // Left and Right for the face are defined by the in box observer turning their head towards the face.
+
+    TStaticArray<FVector, 4> FrontFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> LeftFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> BackFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> RightFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> TopFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+    TStaticArray<FVector, 4> BottomFace = TStaticArray<FVector, 4>(FVector::ZeroVector);
+};
+
+struct FCollectionCapsuleParameters {
+    FCollectionBoxParameters CylinderBox;
+    FCollectionSphereParameters UpperSphere;
+    FCollectionSphereParameters LowerSphere;
 };
 
 /**
@@ -48,6 +61,7 @@ public:
 
     const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
     const TArray<FCollectionBoxParameters>& GetCollectionBoxes() const;
+    const TArray<FCollectionCapsuleParameters>& GetCollectionCapsules() const;
 
     FCollectionPlayBegunSignature OnCollectionPlayBegun;
 
@@ -62,7 +76,7 @@ protected:
 private:
     void _collectSpheres();
     void _collectBoxes();
-    // TODO: _collectCapsules()
+    void _collectCapsules();
 
     UFUNCTION()
     void _collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex,
@@ -89,6 +103,7 @@ private:
     // For cache-friendly, fast iterations.
     TArray<FCollectionSphereParameters> _collectionSpheres;
     TArray<FCollectionBoxParameters> _collectionBoxes;
+    TArray<FCollectionCapsuleParameters> _collectionCapsules;
 
     // Non cache-friendly, meant exclusively for internal use. Needed because:
     // 1. The collection needs to provide some functions analogous to USceneComponent ones (e.g. UpdateOverlaps())

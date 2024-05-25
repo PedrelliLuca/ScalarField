@@ -6,7 +6,7 @@
 DECLARE_LOG_CATEGORY_EXTERN(LogCollisionsCollection, Log, All);
 
 class FCollisionsCollectionModule : public ICollisionsCollectionModule {
-	/** IModuleInterface implementation */
-	void StartupModule() override;
-	void ShutdownModule() override;
+    /** IModuleInterface implementation */
+    void StartupModule() override;
+    void ShutdownModule() override;
 };

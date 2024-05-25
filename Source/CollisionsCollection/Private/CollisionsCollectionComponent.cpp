@@ -4,12 +4,56 @@
 
 #include "CollisionsCollectionSubsystem.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 
 // https://stackoverflow.com/questions/14421656/is-there-widely-available-wide-character-variant-of-file
 #define WIDE2(X) L##X
 #define WIDE1(X) WIDE2(X)
 #define WFUNCTION WIDE1(__FUNCTION__)
+
+namespace CollectionParameterHelpers {
+void BoxSidesFiller(FCollectionBoxParameters& box, const FVector& boxExtent) {
+    const auto v1 = FVector(-boxExtent.X, -boxExtent.Y, -boxExtent.Z);
+    const auto v2 = FVector(-boxExtent.X, boxExtent.Y, -boxExtent.Z);
+    const auto v3 = FVector(-boxExtent.X, boxExtent.Y, boxExtent.Z);
+    const auto v4 = FVector(-boxExtent.X, -boxExtent.Y, boxExtent.Z);
+    const auto v5 = FVector(boxExtent.X, -boxExtent.Y, -boxExtent.Z);
+    const auto v6 = FVector(boxExtent.X, boxExtent.Y, -boxExtent.Z);
+    const auto v7 = FVector(boxExtent.X, boxExtent.Y, boxExtent.Z);
+    const auto v8 = FVector(boxExtent.X, -boxExtent.Y, boxExtent.Z);
+
+    box.FrontFace[0] = v5;
+    box.FrontFace[1] = v6;
+    box.FrontFace[2] = v7;
+    box.FrontFace[3] = v8;
+
+    box.LeftFace[0] = v1;
+    box.LeftFace[1] = v5;
+    box.LeftFace[2] = v8;
+    box.LeftFace[3] = v4;
+
+    box.BackFace[0] = v2;
+    box.BackFace[1] = v1;
+    box.BackFace[2] = v4;
+    box.BackFace[3] = v3;
+
+    box.RightFace[0] = v6;
+    box.RightFace[1] = v2;
+    box.RightFace[2] = v3;
+    box.RightFace[3] = v7;
+
+    box.TopFace[0] = v8;
+    box.TopFace[1] = v7;
+    box.TopFace[2] = v3;
+    box.TopFace[3] = v4;
+
+    box.BottomFace[0] = v1;
+    box.BottomFace[1] = v2;
+    box.BottomFace[2] = v6;
+    box.BottomFace[3] = v5;
+}
+} // namespace CollectionParameterHelpers
 
 UCollisionsCollectionComponent::UCollisionsCollectionComponent()
     : _collectionTag("")
@@ -59,6 +103,10 @@ const TArray<FCollectionBoxParameters>& UCollisionsCollectionComponent::GetColle
     return _collectionBoxes;
 }
 
+const TArray<FCollectionCapsuleParameters>& UCollisionsCollectionComponent::GetCollectionCapsules() const {
+    return _collectionCapsules;
+}
+
 void UCollisionsCollectionComponent::BeginDestroy() {
     Super::BeginDestroy();
 
@@ -75,6 +123,7 @@ void UCollisionsCollectionComponent::BeginPlay() {
 
     _collectSpheres();
     _collectBoxes();
+    _collectCapsules();
 
     _subsystem = GetWorld()->GetSubsystem<UCollisionsCollectionSubsystem>();
     _subsystem->AddCollection(this);
@@ -92,7 +141,7 @@ void UCollisionsCollectionComponent::_collectSpheres() {
 
         const auto collisionProfile = sphere->GetCollisionProfileName();
         if (collisionProfile != _collectionCollisionProfileName) {
-            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
+            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Sphere collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
                 *collisionProfile.ToString(), *_collectionCollisionProfileName.ToString());
 
             sphere->SetCollisionProfileName(_collectionCollisionProfileName);
@@ -102,13 +151,13 @@ void UCollisionsCollectionComponent::_collectSpheres() {
         if (generateOverlapEvents != _generateOverlapEvents) {
             const auto collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
             const auto collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
-            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
+            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Sphere collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
                 collectionString);
 
             sphere->SetGenerateOverlapEvents(_generateOverlapEvents);
         }
 
-        FCollectionSphereParameters sphereParameters;
+        auto sphereParameters = FCollectionSphereParameters();
         sphereParameters.RootRelativeTransform = sphere->GetRelativeTransform();
         sphereParameters.Radius = sphere->GetScaledSphereRadius();
         _collectionSpheres.Add(MoveTemp(sphereParameters));
@@ -130,7 +179,7 @@ void UCollisionsCollectionComponent::_collectBoxes() {
 
         const auto collisionProfile = box->GetCollisionProfileName();
         if (collisionProfile != _collectionCollisionProfileName) {
-            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
+            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Box collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
                 *collisionProfile.ToString(), *_collectionCollisionProfileName.ToString());
 
             box->SetCollisionProfileName(_collectionCollisionProfileName);
@@ -140,25 +189,74 @@ void UCollisionsCollectionComponent::_collectBoxes() {
         if (generateOverlapEvents != _generateOverlapEvents) {
             const auto collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
             const auto collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
-            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
+            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Box collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
                 collectionString);
 
             box->SetGenerateOverlapEvents(_generateOverlapEvents);
         }
 
-        FCollectionBoxParameters boxParameters;
+        auto boxParameters = FCollectionBoxParameters();
         boxParameters.RootRelativeTransform = box->GetRelativeTransform();
         const FVector boxExtent = box->GetScaledBoxExtent();
-        boxParameters.BottomLeft = FVector(-boxExtent.X, -boxExtent.Y, 0.0);
-        boxParameters.BottomRight = FVector(-boxExtent.X, boxExtent.Y, 0.0);
-        boxParameters.TopRight = FVector(boxExtent.X, boxExtent.Y, 0.0);
-        boxParameters.TopLeft = FVector(boxExtent.X, -boxExtent.Y, 0.0);
+        CollectionParameterHelpers::BoxSidesFiller(boxParameters, boxExtent);
         _collectionBoxes.Add(MoveTemp(boxParameters));
 
         box->OnComponentBeginOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementBeginOverlap);
         box->OnComponentEndOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementEndOverlap);
 
         _collectionElements.Emplace(box);
+    }
+}
+
+void UCollisionsCollectionComponent::_collectCapsules() {
+    const TArray<UActorComponent*> capsuleActors = GetOwner()->GetComponentsByTag(UCapsuleComponent::StaticClass(), _collectionTag);
+    _collectionBoxes.Reserve(capsuleActors.Num());
+
+    for (const auto capsuleActor : capsuleActors) {
+        const auto capsule = Cast<UCapsuleComponent>(capsuleActor);
+        check(capsule);
+
+        const auto collisionProfile = capsule->GetCollisionProfileName();
+        if (collisionProfile != _collectionCollisionProfileName) {
+            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Capsule collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
+                *collisionProfile.ToString(), *_collectionCollisionProfileName.ToString());
+
+            capsule->SetCollisionProfileName(_collectionCollisionProfileName);
+        }
+
+        const bool generateOverlapEvents = capsule->GetGenerateOverlapEvents();
+        if (generateOverlapEvents != _generateOverlapEvents) {
+            const auto collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
+            const auto collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
+            UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Capsule collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
+                collectionString);
+
+            capsule->SetGenerateOverlapEvents(_generateOverlapEvents);
+        }
+
+        const float halfHeight = capsule->GetScaledCapsuleHalfHeight();
+        const float radius = capsule->GetScaledCapsuleRadius();
+
+        auto capsuleParameters = FCollectionCapsuleParameters();
+        FCollectionBoxParameters& box = capsuleParameters.CylinderBox;
+        box.RootRelativeTransform = capsule->GetRelativeTransform();
+        const auto boxExtent = FVector(radius, radius, halfHeight);
+        CollectionParameterHelpers::BoxSidesFiller(box, boxExtent);
+
+        FCollectionSphereParameters& upperSphere = capsuleParameters.UpperSphere;
+        upperSphere.RootRelativeTransform = FTransform(halfHeight * FVector::UpVector) * box.RootRelativeTransform;
+        upperSphere.Radius = radius;
+
+        FCollectionSphereParameters& lowerSphere = capsuleParameters.LowerSphere;
+        lowerSphere.RootRelativeTransform = FTransform(halfHeight * FVector::DownVector) * box.RootRelativeTransform;
+        lowerSphere.Radius = radius;
+
+        _collectionCapsules.Add(MoveTemp(capsuleParameters));
+
+        capsule->OnComponentBeginOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementBeginOverlap);
+        capsule->OnComponentEndOverlap.AddDynamic(this, &UCollisionsCollectionComponent::_collectionElementEndOverlap);
+
+        _collectionElements.Emplace(capsule);
     }
 }
 
