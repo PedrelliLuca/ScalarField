@@ -77,7 +77,7 @@ void UHeatmapPresenterComponent::_updateHeatmap() {
     if (temperatures.Num() != 0) {
         check(temperatures.Num() == _nPixels);
 
-        FTexture2DMipMap* const mipMap = &_heatmapTexture->PlatformData->Mips[0];
+        FTexture2DMipMap* const mipMap = &_heatmapTexture->GetPlatformData()->Mips[0];
         FByteBulkData* const bulkData = &mipMap->BulkData;
         uint8* const rawImageData = static_cast<uint8*>(bulkData->Lock(LOCK_READ_WRITE));
 

@@ -3,6 +3,7 @@
 #include "AIRotoTranslationMovement.h"
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "NavigationSystem.h"
 
 #define LOCTEXT_NAMESPACE "AIRotoTranslationMovement"

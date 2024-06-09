@@ -8,7 +8,7 @@ public class ScalarFieldTarget : TargetRules
 	public ScalarFieldTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
+		DefaultBuildSettings = BuildSettingsVersion.V5;
 		ExtraModuleNames.Add("ScalarField");
 	}
 }
