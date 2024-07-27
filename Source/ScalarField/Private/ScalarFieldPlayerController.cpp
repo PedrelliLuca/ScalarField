@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NewStateComponent.h"
 #include "PlayerInputData.h"
+#include "SkillsContainerComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
 #include "ThermodynamicsSubsystem.h"
 
@@ -51,10 +52,6 @@ void AScalarFieldPlayerController::BeginPlay() {
     pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
     _bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
 
-    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
-    inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
-    inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
-
     if (const auto pawn = GetPawn(); IsValid(pawn)) {
         if (const auto healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
             healthC->OnDeath().AddUObject(this, &AScalarFieldPlayerController::_onControlledPawnDeath);
@@ -62,6 +59,17 @@ void AScalarFieldPlayerController::BeginPlay() {
     }
 
     _movementCommandC->SetDefaultMovementMode();
+
+    _widgetsPresenterC->CreateAllWidgets();
+    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+    inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
+    inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
+
+    if (const TObjectPtr<USkillsContainerComponent> skillsC = GetPawn()->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC))
+    {
+        skillsC->CreateAllSkills();
+        _widgetsPresenterC->ProvideSkillsToWidgets(skillsC);
+    }
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {

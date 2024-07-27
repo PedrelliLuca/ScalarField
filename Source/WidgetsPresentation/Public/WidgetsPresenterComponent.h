@@ -10,6 +10,8 @@
 
 #include "WidgetsPresenterComponent.generated.h"
 
+class USkillsContainerComponent;
+
 /**
  * \brief Component that stores the widgets associated with the onwer player controlelr
  */
@@ -21,8 +23,8 @@ public:
     TWeakInterfacePtr<IPawnBindableWidget> GetHUDWidget();
     TWeakInterfacePtr<IInventoryContainerWidget> GetInventoryContainerWidget();
 
-protected:
-    void BeginPlay() override;
+    void CreateAllWidgets();
+    void ProvideSkillsToWidgets(TObjectPtr<USkillsContainerComponent> skillsContainer);
 
 private:
     void _createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC);

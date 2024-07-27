@@ -8,6 +8,16 @@ USkillsContainerComponent::USkillsContainerComponent() {
     PrimaryComponentTick.bCanEverTick = false;
 }
 
+void USkillsContainerComponent::CreateAllSkills() {
+    const auto caster = GetOwner();
+    _skills.Reserve(_skillClasses.Num());
+    for (const auto& skillClass : _skillClasses) {
+        auto skill = NewObject<UAbstractSkill>(this, skillClass);
+        skill->SetCaster(caster);
+        _skills.Emplace(MoveTemp(skill));
+    }
+}
+
 FSkillCastResult USkillsContainerComponent::TryCastSkillAtIndex(const int32 index) {
     if (index >= _skills.Num()) {
         // TODO: this is a random thing, we should return a proper error in here!
@@ -91,18 +101,6 @@ TOptional<FSkillTargetingResult> USkillsContainerComponent::TryAddTargetToWaitin
     return MoveTemp(skillTargetingResult);
 }
 
-void USkillsContainerComponent::BeginPlay() {
-    Super::BeginPlay();
-
-    const auto caster = GetOwner();
-    _skills.Reserve(_skillClasses.Num());
-    for (const auto& skillClass : _skillClasses) {
-        auto skill = NewObject<UAbstractSkill>(this, skillClass);
-        skill->SetCaster(caster);
-        _skills.Emplace(MoveTemp(skill));
-    }
-}
-
 void USkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbstractSkill> skill, const ESkillCastResult castResultValue) {
     /* If we don't get inside the following statement, it means that either:
      * 1. The result was ESkillCastResult::Success_IntoExecutionEnd. In such case, the skill was instantaneous, we don't to cache it and bind to its delegates.
@@ -134,6 +132,7 @@ void USkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const FSki
 
 void USkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(const FSkillChannelingResult skillChannelingResult) {
     if (skillChannelingResult.IsFailure()) {
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
     }
     _currentlyExecutedSkill = nullptr;

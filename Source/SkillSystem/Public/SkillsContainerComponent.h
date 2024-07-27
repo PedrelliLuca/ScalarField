@@ -23,6 +23,8 @@ class SKILLSYSTEM_API USkillsContainerComponent : public UActorComponent {
 public:
     USkillsContainerComponent();
 
+    void CreateAllSkills();
+
     /** \brief Given the index of a skill stored within this component, this function tries to cast it. */
     FSkillCastResult TryCastSkillAtIndex(int32 index);
 
@@ -44,8 +46,6 @@ public:
     FOnSkillExecutionStatusChanged& OnSkillInExecutionStatusChanged() { return _onSkillInExecutionStatusChanged; }
 
 protected:
-    void BeginPlay() override;
-
     UPROPERTY(EditAnywhere, Category = "Skills")
     TArray<TSubclassOf<UAbstractSkill>> _skillClasses{};
 

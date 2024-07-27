@@ -14,14 +14,16 @@ TWeakInterfacePtr<IInventoryContainerWidget> UWidgetsPresenterComponent::GetInve
     return asInventoryContainer;
 }
 
-void UWidgetsPresenterComponent::BeginPlay() {
-    Super::BeginPlay();
-
+void UWidgetsPresenterComponent::CreateAllWidgets() {
     const TWeakObjectPtr<APlayerController> playerC = Cast<APlayerController>(GetOwner());
     check(playerC.IsValid());
 
     _createHUD(playerC);
     _createInventoryPresenter(playerC);
+}
+
+void UWidgetsPresenterComponent::ProvideSkillsToWidgets(TObjectPtr<USkillsContainerComponent> skillsContainer) {
+    // TODO: Send the skills to the HUD's SkillIconContainerWidget, which then will take care of creating the SkillIconWidgets and setting them up.
 }
 
 void UWidgetsPresenterComponent::_createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC) {
