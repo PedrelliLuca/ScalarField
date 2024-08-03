@@ -7,6 +7,8 @@
 
 #include "SkillIconContainerWidget.generated.h"
 
+class USkillsContainerComponent;
+
 /**
  *
  */
@@ -15,4 +17,5 @@ class GAMEPLAYUI_API USkillIconContainerWidget : public UUserWidget {
     GENERATED_BODY()
 
 public:
+    void BuildIconsFromContainer(TObjectPtr<USkillsContainerComponent> skillsContainer);
 };

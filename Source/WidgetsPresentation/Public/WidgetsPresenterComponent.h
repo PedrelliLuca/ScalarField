@@ -5,12 +5,15 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
-#include "HUDWidget.h"
-#include "InventoryPresenterWidget.h"
 
 #include "WidgetsPresenterComponent.generated.h"
 
+class IInventoryContainerWidget;
+class IPawnBindableWidget;
+class UHUDWidget;
+class UInventoryPresenterWidget;
 class USkillsContainerComponent;
+class USkillIconContainerWidget;
 
 /**
  * \brief Component that stores the widgets associated with the onwer player controlelr
@@ -41,4 +44,7 @@ private:
 
     UPROPERTY()
     TObjectPtr<UInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
+
+    UPROPERTY()
+    TObjectPtr<USkillIconContainerWidget> _skillIconContainerWidget = nullptr;
 };

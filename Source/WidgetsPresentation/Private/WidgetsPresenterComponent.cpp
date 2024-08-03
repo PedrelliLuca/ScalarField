@@ -2,6 +2,10 @@
 
 #include "WidgetsPresenterComponent.h"
 
+#include "HUDWidget.h"
+#include "InventoryPresenterWidget.h"
+#include "SkillIconContainerWidget.h"
+
 TWeakInterfacePtr<IPawnBindableWidget> UWidgetsPresenterComponent::GetHUDWidget() {
     TWeakInterfacePtr<IPawnBindableWidget> asPawnBindable = Cast<IPawnBindableWidget>(_hudWidget);
     check(asPawnBindable.IsValid());
@@ -23,7 +27,7 @@ void UWidgetsPresenterComponent::CreateAllWidgets() {
 }
 
 void UWidgetsPresenterComponent::ProvideSkillsToWidgets(TObjectPtr<USkillsContainerComponent> skillsContainer) {
-    // TODO: Send the skills to the HUD's SkillIconContainerWidget, which then will take care of creating the SkillIconWidgets and setting them up.
+    _skillIconContainerWidget->BuildIconsFromContainer(MoveTemp(skillsContainer));
 }
 
 void UWidgetsPresenterComponent::_createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC) {

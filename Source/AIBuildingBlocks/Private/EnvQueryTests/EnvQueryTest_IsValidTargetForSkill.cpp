@@ -4,6 +4,7 @@
 
 #include "EnvironmentQuery/Contexts/EnvQueryContext_Querier.h"
 #include "EnvironmentQuery/Items/EnvQueryItemType_Actor.h"
+#include "SkillPropertiesInspector.h"
 #include "SkillTargets/ActorSkillTarget.h"
 #include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"

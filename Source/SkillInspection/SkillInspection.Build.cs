@@ -2,9 +2,9 @@
 
 namespace UnrealBuildTool.Rules
 {
-	public class GameplayUI : ModuleRules
+	public class SkillInspection : ModuleRules
 	{
-		public GameplayUI(ReadOnlyTargetRules Target) : base(Target)
+		public SkillInspection(ReadOnlyTargetRules Target) : base(Target)
 		{
             PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
             
@@ -12,26 +12,17 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
                     "Core",
-					"CoreUObject",
-					"Engine",
-					"UMG", 
-					"GameplayAttributes", 
-					"AbstractUI",
+                    "CoreUObject",
+                    "Engine",
                 }
 				);
 
 			PrivateDependencyModuleNames.AddRange(
 				new string[]
 				{
-                    "DamageHandlers",
-                    "GameplayAttributes",
-					"SkillInspection",
                     "SkillSystem",
-                    "TacticalPauseSystem", 
-					"ThermodynamicsCore", 
-					"ThermodynamicsPresenter",
-				}
-				);
+                }
+                );
 
 			DynamicallyLoadedModuleNames.AddRange(
 				new string[]
