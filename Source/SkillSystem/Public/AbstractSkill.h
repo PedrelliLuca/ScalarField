@@ -53,33 +53,21 @@ public:
     bool IsAllowedToTick() const override;
 
     /** \brief We have to override this because it's virtual pure in FTickableGameObject, but in practice it's not needed. */
-    TStatId GetStatId() const override {
-        return TStatId{};
-    }
+    TStatId GetStatId() const override { return TStatId{}; }
 
 #pragma endregion
 
     /** \brief Returns the delegate broadcasting what's going on during the casting phase tick. */
-    FOnCastPhaseFinish& OnCastPhaseEnd() {
-        return _onCastPhaseEnd;
-    }
+    FOnCastPhaseFinish& OnCastPhaseEnd() { return _onCastPhaseEnd; }
 
     /** \brief Returns the delegate broadcasting what's going on during the channeling phase tick. */
-    FOnChannelingPhaseFinish& OnChannelingPhaseEnd() {
-        return _onChannelingPhaseEnd;
-    }
+    FOnChannelingPhaseFinish& OnChannelingPhaseEnd() { return _onChannelingPhaseEnd; }
 
 protected:
-    const TWeakObjectPtr<AActor>& _getCaster() const {
-        return _caster;
-    }
-    const TArray<TScriptInterface<ISkillTarget>>& _getTargets() const {
-        return _targets;
-    }
+    const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
+    const TArray<TScriptInterface<ISkillTarget>>& _getTargets() const { return _targets; }
 
-    float _getChannelingSeconds() const {
-        return _channelingSeconds;
-    }
+    float _getChannelingSeconds() const { return _channelingSeconds; }
 
     /** \brief The time it takes for the skill to be castable again. The countdown starts from the moment the cast is complete. */
     UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.0"))

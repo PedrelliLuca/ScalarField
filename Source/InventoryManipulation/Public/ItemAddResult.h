@@ -23,10 +23,10 @@ public:
     FItemAddResult() {}
     FItemAddResult(int32 itemQuantity)
         : ItemQuantity(itemQuantity)
-        , ItemQuantityActuallyGiven(0){};
+        , ItemQuantityActuallyGiven(0) {};
     FItemAddResult(int32 itemQuantity, int32 itemQuantityActuallyGiven)
         : ItemQuantity(itemQuantity)
-        , ItemQuantityActuallyGiven(itemQuantityActuallyGiven){};
+        , ItemQuantityActuallyGiven(itemQuantityActuallyGiven) {};
 
     // Functions that make building instances of this struct easier
     static FItemAddResult AddedNone(int32 itemQuantity, const FText& errorText);

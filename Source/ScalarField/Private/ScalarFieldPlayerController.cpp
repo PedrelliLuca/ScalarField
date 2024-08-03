@@ -65,8 +65,7 @@ void AScalarFieldPlayerController::BeginPlay() {
     inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
     inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
 
-    if (const TObjectPtr<USkillsContainerComponent> skillsC = GetPawn()->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC))
-    {
+    if (const TObjectPtr<USkillsContainerComponent> skillsC = GetPawn()->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC)) {
         skillsC->CreateAllSkills();
         _widgetsPresenterC->ProvideSkillsToWidgets(skillsC);
     }
