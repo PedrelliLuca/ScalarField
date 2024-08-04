@@ -31,6 +31,7 @@ TOptional<int32> FSkillsContainerInspector::GetIndexOfSkill(const TSubclassOf<UA
 }
 
 void FSkillsContainerInspector::ForEachSkill(const TFunction<void(const FSkillPropertiesInspector&)> skillPropertiesFunc) const {
+    check(_skillsContainer.IsValid());
     for (TObjectPtr<UAbstractSkill> skill : _skillsContainer->_skills) {
         auto skillPropertiesIns = FSkillPropertiesInspector(skill);
         skillPropertiesFunc(skillPropertiesIns);

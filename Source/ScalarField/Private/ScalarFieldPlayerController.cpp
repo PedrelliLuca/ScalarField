@@ -60,15 +60,18 @@ void AScalarFieldPlayerController::BeginPlay() {
 
     _movementCommandC->SetDefaultMovementMode();
 
-    _widgetsPresenterC->CreateAllWidgets();
-    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
-    inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
-    inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
-
     if (const TObjectPtr<USkillsContainerComponent> skillsC = GetPawn()->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC)) {
         skillsC->CreateAllSkills();
-        _widgetsPresenterC->ProvideSkillsToWidgets(skillsC);
+        _widgetsPresenterC->CreateHUD(skillsC);
+    } else {
+        _widgetsPresenterC->CreateHUD(); 
     }
+
+    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+    inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
+
+    _widgetsPresenterC->CreateInventoryMenu();
+    inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {

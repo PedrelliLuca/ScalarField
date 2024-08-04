@@ -13,7 +13,6 @@ class IPawnBindableWidget;
 class UHUDWidget;
 class UInventoryPresenterWidget;
 class USkillsContainerComponent;
-class USkillIconContainerWidget;
 
 /**
  * \brief Component that stores the widgets associated with the onwer player controlelr
@@ -26,13 +25,11 @@ public:
     TWeakInterfacePtr<IPawnBindableWidget> GetHUDWidget();
     TWeakInterfacePtr<IInventoryContainerWidget> GetInventoryContainerWidget();
 
-    void CreateAllWidgets();
-    void ProvideSkillsToWidgets(TObjectPtr<USkillsContainerComponent> skillsContainer);
+    void CreateHUD();
+    void CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer);
+    void CreateInventoryMenu();
 
 private:
-    void _createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
-    void _createInventoryPresenter(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
-
     UPROPERTY(EditDefaultsOnly, Category = "Pickup")
     TSubclassOf<UHUDWidget> _hudWidgetClass = nullptr;
 
@@ -44,7 +41,4 @@ private:
 
     UPROPERTY()
     TObjectPtr<UInventoryPresenterWidget> _inventoryPresenterWidget = nullptr;
-
-    UPROPERTY()
-    TObjectPtr<USkillIconContainerWidget> _skillIconContainerWidget = nullptr;
 };

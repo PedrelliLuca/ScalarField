@@ -4,7 +4,6 @@
 
 #include "HUDWidget.h"
 #include "InventoryPresenterWidget.h"
-#include "SkillIconContainerWidget.h"
 
 TWeakInterfacePtr<IPawnBindableWidget> UWidgetsPresenterComponent::GetHUDWidget() {
     TWeakInterfacePtr<IPawnBindableWidget> asPawnBindable = Cast<IPawnBindableWidget>(_hudWidget);
@@ -18,20 +17,9 @@ TWeakInterfacePtr<IInventoryContainerWidget> UWidgetsPresenterComponent::GetInve
     return asInventoryContainer;
 }
 
-void UWidgetsPresenterComponent::CreateAllWidgets() {
-    const TWeakObjectPtr<APlayerController> playerC = Cast<APlayerController>(GetOwner());
-    check(playerC.IsValid());
-
-    _createHUD(playerC);
-    _createInventoryPresenter(playerC);
-}
-
-void UWidgetsPresenterComponent::ProvideSkillsToWidgets(TObjectPtr<USkillsContainerComponent> skillsContainer) {
-    _skillIconContainerWidget->BuildIconsFromContainer(MoveTemp(skillsContainer));
-}
-
-void UWidgetsPresenterComponent::_createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC) {
-    check(ownerPlayerC.IsValid());
+void UWidgetsPresenterComponent::CreateHUD() {
+    const TObjectPtr<APlayerController> ownerPlayerC = Cast<APlayerController>(GetOwner());
+    check(IsValid(ownerPlayerC));
     check(IsValid(_hudWidgetClass));
 
     _hudWidget = CreateWidget<UHUDWidget>(ownerPlayerC.Get(), _hudWidgetClass);
@@ -40,8 +28,14 @@ void UWidgetsPresenterComponent::_createHUD(const TWeakObjectPtr<APlayerControll
     _hudWidget->AddToViewport();
 }
 
-void UWidgetsPresenterComponent::_createInventoryPresenter(const TWeakObjectPtr<APlayerController>& ownerPlayerC) {
-    check(ownerPlayerC.IsValid());
+void UWidgetsPresenterComponent::CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer) {
+    CreateHUD();
+    _hudWidget->InitSkillIconContainer(skillsContainer);
+}
+
+void UWidgetsPresenterComponent::CreateInventoryMenu() {
+    const TObjectPtr<APlayerController> ownerPlayerC = Cast<APlayerController>(GetOwner());
+    check(IsValid(ownerPlayerC));
     check(IsValid(_inventoryPresenterWidgetClass));
 
     _inventoryPresenterWidget = CreateWidget<UInventoryPresenterWidget>(ownerPlayerC.Get(), _inventoryPresenterWidgetClass);

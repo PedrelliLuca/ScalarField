@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "HealthComponent.h"
 #include "ManaComponent.h"
+#include "SkillIconContainerWidget.h"
 #include "TacticalPauseWorldSubsystem.h"
 #include "ThermodynamicsInteractorComponent.h"
 #include "ThermodynamicsPresenterComponent.h"
@@ -108,6 +109,10 @@ void UHUDWidget::Show() {
 
 void UHUDWidget::Hide() {
     RemoveFromParent();
+}
+
+void UHUDWidget::InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer) {
+    _skillIconContainer->BuildIconsFromContainer(skillsContainer);
 }
 
 void UHUDWidget::_setMaxHealth(float newMaxHealth) {
