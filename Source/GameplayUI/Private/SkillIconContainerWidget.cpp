@@ -2,6 +2,7 @@
 
 #include "SkillIconContainerWidget.h"
 
+#include "Components/HorizontalBox.h"
 #include "Components/WrapBox.h"
 #include "SkillIconWidget.h"
 #include "SkillsContainerComponent.h"
@@ -12,9 +13,12 @@ void USkillIconContainerWidget::BuildIconsFromContainer(const TObjectPtr<USkills
     _skillSlots->SetVisibility(ESlateVisibility::Visible);
     const auto containerInspector = FSkillsContainerInspector(skillsContainer);
 
-    containerInspector.ForEachSkill([owner = GetOwningPlayer(), skillSlots = _skillSlots](const FSkillPropertiesInspector& skillProp) {
-        const TObjectPtr<USkillIconWidget> skillIconW = CreateWidget<USkillIconWidget>(owner, USkillIconWidget::StaticClass());
-        skillIconW->SetVisibility(ESlateVisibility::Visible);
-        skillSlots->AddChildToWrapBox(skillIconW);
-    });
+    if (ensureMsgf(IsValid(_skillIconClass), TEXT(__FUNCTION__ ": Invalid Skill Icon Class, set it from Widget."))) {
+        containerInspector.ForEachSkill(
+            [owner = GetOwningPlayer(), skillSlots = _skillSlots, skillIconClass = _skillIconClass](const FSkillPropertiesInspector& skillProp) {
+                const TObjectPtr<USkillIconWidget> skillIconW = CreateWidget<USkillIconWidget>(owner, skillIconClass);
+                skillIconW->SetVisibility(ESlateVisibility::Visible);
+                skillSlots->AddChildToWrapBox(skillIconW);
+            });
+    }
 }

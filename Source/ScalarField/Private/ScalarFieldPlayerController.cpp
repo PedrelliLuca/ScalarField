@@ -64,7 +64,7 @@ void AScalarFieldPlayerController::BeginPlay() {
         skillsC->CreateAllSkills();
         _widgetsPresenterC->CreateHUD(skillsC);
     } else {
-        _widgetsPresenterC->CreateHUD(); 
+        _widgetsPresenterC->CreateHUD();
     }
 
     const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
