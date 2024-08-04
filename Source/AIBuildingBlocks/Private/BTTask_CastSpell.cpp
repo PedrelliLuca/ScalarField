@@ -32,7 +32,7 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
     }
 
     const auto skillsContainerInsp = FSkillsContainerInspector{skillsContainerC};
-    const auto optionalSkillIdx = FSkillsContainerInspector{skillsContainerC}.GetIndexOfSkill(_newSkillToCast);
+    const auto optionalSkillIdx = skillsContainerInsp.GetIndexOfSkill(_newSkillToCast);
     if (!ensureMsgf(optionalSkillIdx.IsSet(), TEXT("AI-controlled Pawn does not have the selected Skill"))) {
         return EBTNodeResult::Failed;
     }

@@ -29,44 +29,24 @@ public:
     void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-    float GetCurrentHealth() const {
-        return _currentHealth;
-    }
-    float GetMaxHealth() const {
-        return _maxHealth;
-    }
-    float GetHealthRegen() const {
-        return _healthRegenPerSecond;
-    }
+    float GetCurrentHealth() const { return _currentHealth; }
+    float GetMaxHealth() const { return _maxHealth; }
+    float GetHealthRegen() const { return _healthRegenPerSecond; }
 
     void SetCurrentHealth(float health);
     void SetMaxHealth(float maxHealth, bool bUpdateHealth = true);
     void SetHealthRegen(float healthRegenPerSecond);
 
-    void TakeDamage(float damage) {
-        SetCurrentHealth(GetCurrentHealth() - damage);
-    }
-    void Heal(float healthToAdd) {
-        SetCurrentHealth(GetCurrentHealth() + healthToAdd);
-    }
+    void TakeDamage(float damage) { SetCurrentHealth(GetCurrentHealth() - damage); }
+    void Heal(float healthToAdd) { SetCurrentHealth(GetCurrentHealth() + healthToAdd); }
 
     UFUNCTION(BlueprintPure)
-    bool IsDead() const {
-        return FMath::IsNearlyZero(_currentHealth);
-    }
+    bool IsDead() const { return FMath::IsNearlyZero(_currentHealth); }
 
-    FOnHealthChanged& OnHealthChanged() {
-        return _onHealthChanged;
-    }
-    FOnMaxHealthChanged& OnMaxHealthChanged() {
-        return _onMaxHealthChanged;
-    }
-    FOnHealthRegenChanged& OnHealthRegenChanged() {
-        return _onHealthRegenChanged;
-    }
-    FOnDeath& OnDeath() {
-        return _onDeath;
-    }
+    FOnHealthChanged& OnHealthChanged() { return _onHealthChanged; }
+    FOnMaxHealthChanged& OnMaxHealthChanged() { return _onMaxHealthChanged; }
+    FOnHealthRegenChanged& OnHealthRegenChanged() { return _onHealthRegenChanged; }
+    FOnDeath& OnDeath() { return _onDeath; }
 
 protected:
     void BeginPlay() override;

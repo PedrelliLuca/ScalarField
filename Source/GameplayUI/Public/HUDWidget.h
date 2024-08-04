@@ -10,6 +10,8 @@
 
 class UHealthComponent;
 class UManaComponent;
+class USkillsContainerComponent;
+class USkillIconContainerWidget;
 class UThermodynamicsInteractorComponent;
 class UThermodynamicsPresenterComponent;
 
@@ -27,6 +29,8 @@ public:
     void UnbindCurrentPawn() override;
     void Show() override;
     void Hide() override;
+
+    void InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer);
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)
@@ -81,4 +85,7 @@ private:
     TWeakObjectPtr<UManaComponent> _manaC = nullptr;
     TWeakObjectPtr<UThermodynamicsInteractorComponent> _thermoIntC = nullptr;
     TWeakObjectPtr<UThermodynamicsPresenterComponent> _thermoPresC = nullptr;
+
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<USkillIconContainerWidget> _skillIconContainer = nullptr;
 };

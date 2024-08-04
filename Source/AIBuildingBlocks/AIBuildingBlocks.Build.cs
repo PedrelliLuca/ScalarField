@@ -19,6 +19,7 @@ namespace UnrealBuildTool.Rules
 					"GameplayTasks",
 					"MovementCommand",
 					"GameplayAttributes",
+					"SkillInspection",
 					"SkillSystem",
                 }
 				);

@@ -5,10 +5,14 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
-#include "HUDWidget.h"
-#include "InventoryPresenterWidget.h"
 
 #include "WidgetsPresenterComponent.generated.h"
+
+class IInventoryContainerWidget;
+class IPawnBindableWidget;
+class UHUDWidget;
+class UInventoryPresenterWidget;
+class USkillsContainerComponent;
 
 /**
  * \brief Component that stores the widgets associated with the onwer player controlelr
@@ -21,13 +25,11 @@ public:
     TWeakInterfacePtr<IPawnBindableWidget> GetHUDWidget();
     TWeakInterfacePtr<IInventoryContainerWidget> GetInventoryContainerWidget();
 
-protected:
-    void BeginPlay() override;
+    void CreateHUD();
+    void CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer);
+    void CreateInventoryMenu();
 
 private:
-    void _createHUD(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
-    void _createInventoryPresenter(const TWeakObjectPtr<APlayerController>& ownerPlayerC);
-
     UPROPERTY(EditDefaultsOnly, Category = "Pickup")
     TSubclassOf<UHUDWidget> _hudWidgetClass = nullptr;
 
