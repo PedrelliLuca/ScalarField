@@ -116,8 +116,6 @@ private:
     bool _areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const;
     bool _areCastConditionsVerified() const;
 
-    void _onCooldownEnded();
-
     enum class EMovementModeToSet : uint8
     {
         Default,
@@ -150,7 +148,6 @@ private:
     TWeakInterfacePtr<IMovementCommandSetter> _casterMovementSetterC = nullptr;
 
     FTimerHandle _cooldownTimer{};
-    bool _onCooldown = false;
 
     bool _isTickAllowed = false;
 

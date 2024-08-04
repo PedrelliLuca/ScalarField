@@ -5,7 +5,8 @@
 FSkillCastResult UAbstractSkill::TryCast() {
     check(_caster.IsValid());
 
-    if (_onCooldown) {
+    const bool isOnCooldown = GetWorld()->GetTimerManager().IsTimerActive(_cooldownTimer);
+    if (isOnCooldown) {
         _setMovementModeIfPossible(EMovementModeToSet::Default);
         return FSkillCastResult::CastFail_Cooldown();
     }
@@ -36,8 +37,7 @@ FSkillCastResult UAbstractSkill::TryCast() {
         _casterManaC->SetCurrentMana(currentMana - _castManaCost);
 
         _skillCast();
-        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
-        _onCooldown = true;
+        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, _cooldownSeconds, false);
 
         const auto castResult = _endCast();
         return castResult;
@@ -175,8 +175,7 @@ void UAbstractSkill::_castTick(const float deltaTime) {
         }
 
         _skillCast();
-        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
-        _onCooldown = true;
+        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, _cooldownSeconds, false);
 
         _endCast();
         _elapsedExecutionSeconds += _castSeconds - _elapsedExecutionSeconds;
@@ -286,10 +285,6 @@ bool UAbstractSkill::_areCastConditionsVerified() const {
         }
     }
     return true;
-}
-
-void UAbstractSkill::_onCooldownEnded() {
-    _onCooldown = false;
 }
 
 void UAbstractSkill::_setMovementModeIfPossible(const EMovementModeToSet movementModeToSet) const {
