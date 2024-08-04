@@ -51,8 +51,7 @@ protected:
 
 private:
     void _setNewSkillInExecution(TObjectPtr<UAbstractSkill> skill, ESkillCastResult castResultValue);
-    void _onCurrentlyExecutedSkillCastPhaseEnd(FSkillCastResult skillCastResult);
-    void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
+    void _onCurrentlyExecutedSkillStatusChanged(ESkillStatus newStatus);
 
     bool _resetSkillInExecution(bool resetMovement);
     bool _resetWaitingSkill();
@@ -61,7 +60,8 @@ private:
     TArray<TObjectPtr<UAbstractSkill>> _skills{};
 
     TWeakObjectPtr<UAbstractSkill> _skillWaitingForTargets = nullptr;
-    TWeakObjectPtr<UAbstractSkill> _currentlyExecutedSkill = nullptr;
+    TWeakObjectPtr<UAbstractSkill> _skillCurrentlyBeingExecuted = nullptr;
+    FDelegateHandle _skillBeingExecutedDelegate;
 
     FOnSkillExecutionStatusChanged _onSkillInExecutionStatusChanged;
 };

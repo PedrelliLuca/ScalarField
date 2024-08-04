@@ -17,8 +17,17 @@
 
 #include "AbstractSkill.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnCastPhaseFinish, FSkillCastResult);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnChannelingPhaseFinish, FSkillChannelingResult);
+UENUM(BlueprintType)
+enum class ESkillStatus : uint8
+{
+    None UMETA(DisplayName = "Available (None)"),
+    Targeting UMETA(DisplayName = "Targeting"),
+    Casting UMETA(DisplayName = "Casting"),
+    Channeling UMETA(DisplayName = "Channeling"),
+    Cooldown UMETA(DisplayName = "Cooldown"),
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillStatusChanged, ESkillStatus);
 
 /** Represents a skill of the ScalarField game. */
 UCLASS(NotBlueprintable, Abstract)
@@ -32,8 +41,8 @@ public:
      * SetCaster() will trigger a check. */
     FSkillCastResult TryCast();
 
-    /** \brief Aborts the skill execution: clears the delegates, clears the targets, stops ticking. If shouldResetMovement is set to true, the movement mode
-     * will be set to the default one. */
+    /** \brief Aborts the skill execution: clears the delegate, clears the targets, stops ticking. If shouldResetMovement is set to true, the movement mode
+     * will be set to the default one. Determines whether the cooldown timer should start or not. */
     void Abort(bool shouldResetMovement);
 
     /** \brief Adds a target to the skill. This function can have many outcomes, you can see all of them in ESkillTargetingResult. Calling this function before
@@ -57,11 +66,7 @@ public:
 
 #pragma endregion
 
-    /** \brief Returns the delegate broadcasting what's going on during the casting phase tick. */
-    FOnCastPhaseFinish& OnCastPhaseEnd() { return _onCastPhaseEnd; }
-
-    /** \brief Returns the delegate broadcasting what's going on during the channeling phase tick. */
-    FOnChannelingPhaseFinish& OnChannelingPhaseEnd() { return _onChannelingPhaseEnd; }
+    FOnSkillStatusChanged& OnSkillStatusChanged() { return _onSkillStatusChanged; }
 
 protected:
     const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
@@ -69,7 +74,10 @@ protected:
 
     float _getChannelingSeconds() const { return _channelingSeconds; }
 
-    /** \brief The time it takes for the skill to be castable again. The countdown starts from the moment the cast is complete. */
+    /** \brief The time it takes for the skill to be castable again. The countdown starts when one of the following is true:
+    1. The cast is complete and there is no channeling.
+    2. The channeling is complete.
+    3. The channeling is aborted. */
     UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.0"))
     float _cooldownSeconds = 1.0f;
 
@@ -97,6 +105,8 @@ protected:
     EMovementCommandMode _channelingMovementMode;
 
 private:
+    void _abort(bool shouldResetMovement, bool shouldStartCooldownTimer);
+
     /** \brief Represents the concrete cast of the skill, skill-specific logic for the cast is executed in here. */
     virtual void _skillCast() PURE_VIRTUAL(UAbstractSkill::_skillCast, return;);
     /** \brief Represents the concrete channeling of the skill, skill-specific logic for channeling ticks is executed in here. */
@@ -154,8 +164,7 @@ private:
     float _elapsedExecutionSeconds = 0.0f;
     float _castManaLeftToPay = 0.0f;
 
-    FOnCastPhaseFinish _onCastPhaseEnd{};
-    FOnChannelingPhaseFinish _onChannelingPhaseEnd{};
+    FOnSkillStatusChanged _onSkillStatusChanged;
 
     TWeakObjectPtr<UTacticalPauseWorldSubsystem> _pauseSubSys = nullptr;
 };

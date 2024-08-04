@@ -106,44 +106,27 @@ void USkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbstra
      * 1. The result was ESkillCastResult::Success_IntoExecutionEnd. In such case, the skill was instantaneous, we don't to cache it and bind to its delegates.
      * 2. The cast was a failure, so we don't want to set the skill as "in execution". */
     if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
-        _currentlyExecutedSkill = skill;
+        _skillCurrentlyBeingExecuted = skill;
         _onSkillInExecutionStatusChanged.Broadcast(true);
 
-        if (castResultValue == ESkillCastResult::Deferred) {
-            _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &USkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
+        if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
+            _skillBeingExecutedDelegate =
+                _skillCurrentlyBeingExecuted->OnSkillStatusChanged().AddUObject(this, &USkillsContainerComponent::_onCurrentlyExecutedSkillStatusChanged);
         }
-        _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &USkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
     }
 }
 
-void USkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const FSkillCastResult skillCastResult) {
-    const auto castResultValue = skillCastResult.GetCastResult();
-
-    // Success_IntoChanneling is the only result doesn't determine the end of the current skill execution.
-    if (skillCastResult.IsFailure()) {
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
-    }
-
-    if (castResultValue != ESkillCastResult::Success_IntoChanneling) {
-        _currentlyExecutedSkill = nullptr;
+void USkillsContainerComponent::_onCurrentlyExecutedSkillStatusChanged(const ESkillStatus newStatus) {
+    if (newStatus == ESkillStatus::Cooldown || newStatus == ESkillStatus::None) {
+        _skillCurrentlyBeingExecuted->OnSkillStatusChanged().Remove(_skillBeingExecutedDelegate);
+        _skillCurrentlyBeingExecuted = nullptr;
         _onSkillInExecutionStatusChanged.Broadcast(false);
     }
-}
-
-void USkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(const FSkillChannelingResult skillChannelingResult) {
-    if (skillChannelingResult.IsFailure()) {
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
-    }
-    _currentlyExecutedSkill = nullptr;
-    _onSkillInExecutionStatusChanged.Broadcast(false);
 }
 
 bool USkillsContainerComponent::_resetSkillInExecution(const bool resetMovement) {
-    if (_currentlyExecutedSkill.IsValid()) {
-        _currentlyExecutedSkill->Abort(resetMovement);
-        _currentlyExecutedSkill = nullptr;
-        _onSkillInExecutionStatusChanged.Broadcast(false);
+    if (_skillCurrentlyBeingExecuted.IsValid()) {
+        _skillCurrentlyBeingExecuted->Abort(resetMovement);
         return true;
     }
     return false;
