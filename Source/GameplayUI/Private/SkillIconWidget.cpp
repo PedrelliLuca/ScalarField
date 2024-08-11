@@ -16,14 +16,14 @@ void USkillIconWidget::InitFromSkillProperties(const FSkillPropertiesInspector& 
         }
     };
 
-    skillProp.OnSkillStatusChanged().AddUObject(this, &USkillIconWidget::_onSkillStatusChanged);
+    skillProp.OnSkillStatusChanged().AddLambda(MoveTemp(skillStatusChangedCallback));
 }
 
 void USkillIconWidget::_setupCooldownTimer(const ESkillStatus newStatus) {
     FTimerManager& timerManager = GetWorld()->GetTimerManager();
 
     // We can't be entering cooldown when we're already on cooldown, something went horribly wrong (either here or in UAbstractSkill).
-    check(timerManager.IsTimerActive(_cooldownTimer));
+    check(!timerManager.IsTimerActive(_cooldownTimer));
 
     float cooldownTimeRemaining = _skillCooldownSeconds;
     _onCooldownUpdate(cooldownTimeRemaining, true);
