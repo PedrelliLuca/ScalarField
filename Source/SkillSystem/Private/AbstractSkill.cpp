@@ -39,7 +39,7 @@ FSkillCastResult UAbstractSkill::TryCast() {
         _casterManaC->SetCurrentMana(currentMana - _castManaCost);
 
         _skillCast();
-        
+
         const auto castResult = _endCast();
         return castResult;
     }
@@ -152,7 +152,9 @@ void UAbstractSkill::_abort(const bool shouldResetMovement, const bool shouldSta
 
     if (shouldStartCooldownTimer) {
         check(!GetWorld()->GetTimerManager().IsTimerActive(_cooldownTimer));
-        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, _cooldownSeconds, false);
+
+        auto cooldownTimerCallback = [this]() { _onSkillStatusChanged.Broadcast(ESkillStatus::None); };
+        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, MoveTemp(cooldownTimerCallback), _cooldownSeconds, false);
         _onSkillStatusChanged.Broadcast(ESkillStatus::Cooldown);
     } else {
         _onSkillStatusChanged.Broadcast(ESkillStatus::None);
