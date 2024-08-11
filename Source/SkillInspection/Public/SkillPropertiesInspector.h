@@ -7,6 +7,9 @@
 class UAbstractSkill;
 class USkillTargetingCondition;
 
+enum class ESkillStatus : uint8;
+typedef TMulticastDelegate<void(ESkillStatus)> FOnSkillStatusChanged;
+
 /** \brief This class is friend of UAbstractSkill. Files who have visibility of this class are allowed to peek at UAbstractSkill's properties. The reasons
  * this class exists are:
  * 1. To provide AI with skill-related data, so that it can take decisions on whether to cast a certain skill or not.
@@ -21,9 +24,13 @@ public:
 
     float GetTotalManaCost() const;
 
+    float GetCooldownSeconds() const;
+
     TSubclassOf<UObject> GetTargetKind() const;
 
     const TArray<TObjectPtr<USkillTargetingCondition>>& GetTargetingConditions() const;
+
+    FOnSkillStatusChanged& OnSkillStatusChanged() const;
 
 private:
     TWeakObjectPtr<UAbstractSkill> _skill;
