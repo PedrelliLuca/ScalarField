@@ -17,7 +17,7 @@ void USkillIconContainerWidget::BuildIconsFromContainer(const TObjectPtr<USkills
         containerInspector.ForEachSkill(
             [owner = GetOwningPlayer(), skillSlots = _skillSlots, skillIconClass = _skillIconClass](const FSkillPropertiesInspector& skillProp) {
                 const TObjectPtr<USkillIconWidget> skillIconW = CreateWidget<USkillIconWidget>(owner, skillIconClass);
-                skillIconW->SetVisibility(ESlateVisibility::Visible);
+                skillIconW->InitFromSkillProperties(skillProp);
                 skillSlots->AddChildToWrapBox(skillIconW);
             });
     }
