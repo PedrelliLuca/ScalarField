@@ -74,9 +74,14 @@ TOptional<FSkillCastResult> USkillsContainerComponent::TryCastWaitingSkill() {
 }
 
 bool USkillsContainerComponent::AbortSkillInExecution() {
-    // TODO: also abort waiting skill? If not, how do we abort waiting skill?
-    // _resetWaitingSkill();
-    return _resetSkillInExecution(true);
+    bool executionSkillReset = false;
+    const bool waitingSkillReset = _resetWaitingSkill();
+
+    // We want to abort only one skill at a time: if we a skill waiting for targets and a skill in execution, only the former gets aborted.
+    if (!waitingSkillReset) {
+        executionSkillReset = _resetSkillInExecution(true);
+    }
+    return executionSkillReset || waitingSkillReset;
 }
 
 bool USkillsContainerComponent::AbortWaitingSkill() {
