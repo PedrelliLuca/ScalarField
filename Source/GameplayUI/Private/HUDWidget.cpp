@@ -111,8 +111,8 @@ void UHUDWidget::Hide() {
     RemoveFromParent();
 }
 
-void UHUDWidget::InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer) {
-    _skillIconContainer->BuildIconsFromContainer(skillsContainer);
+void UHUDWidget::InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
+    _skillIconContainer->BuildIconsFromContainer(skillsContainer, stateMachine);
 }
 
 void UHUDWidget::_setMaxHealth(float newMaxHealth) {

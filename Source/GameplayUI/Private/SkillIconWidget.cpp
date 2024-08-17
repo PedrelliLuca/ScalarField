@@ -3,10 +3,14 @@
 #include "SkillIconWidget.h"
 
 #include "AbstractSkill.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/Button.h"
 #include "Components/Image.h"
+#include "NewStateComponent.h"
 #include "SkillPropertiesInspector.h"
 
-void USkillIconWidget::InitFromSkillProperties(const FSkillPropertiesInspector& skillProp) {
+void USkillIconWidget::InitFromSkillProperties(
+    const FSkillPropertiesInspector& skillProp, const TObjectPtr<UNewStateComponent>& stateMachine, const int32 skillIndex) {
     _skillCooldownSeconds = skillProp.GetCooldownSeconds();
     _skillThumbnail->SetBrushFromTexture(skillProp.GetSkillThumbnail());
 
@@ -19,6 +23,12 @@ void USkillIconWidget::InitFromSkillProperties(const FSkillPropertiesInspector& 
     };
 
     skillProp.OnSkillStatusChanged().AddLambda(MoveTemp(skillStatusChangedCallback));
+
+    if (IsValid(stateMachine)) {
+        _hudOwnerState = stateMachine;
+        _skillIndex = skillIndex;
+        _skillExecutionButton->OnReleased.AddDynamic(this, &USkillIconWidget::_tryCastSkill);
+    }
 }
 
 void USkillIconWidget::_setupCooldownTimer(const ESkillStatus newStatus) {
@@ -40,4 +50,13 @@ void USkillIconWidget::_setupCooldownTimer(const ESkillStatus newStatus) {
     };
 
     timerManager.SetTimer(_cooldownTimer, MoveTemp(cooldownUpdateCallback), _intervalBetweenCooldownUpdates, true);
+}
+
+void USkillIconWidget::_tryCastSkill() {
+    if (_hudOwnerState.IsValid()) {
+        check(_skillIndex.IsSet());
+        _hudOwnerState->TryCastSkillAtIndex(_skillIndex.GetValue());
+    }
+
+    UWidgetBlueprintLibrary::SetFocusToGameViewport();
 }

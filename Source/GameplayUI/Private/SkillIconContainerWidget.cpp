@@ -8,17 +8,18 @@
 #include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
 
-void USkillIconContainerWidget::BuildIconsFromContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer) {
+void USkillIconContainerWidget::BuildIconsFromContainer(
+    const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
     _skillSlots->ClearChildren();
     _skillSlots->SetVisibility(ESlateVisibility::Visible);
     const auto containerInspector = FSkillsContainerInspector(skillsContainer);
 
     if (ensureMsgf(IsValid(_skillIconClass), TEXT(__FUNCTION__ ": Invalid Skill Icon Class, set it from Widget."))) {
-        containerInspector.ForEachSkill(
-            [owner = GetOwningPlayer(), skillSlots = _skillSlots, skillIconClass = _skillIconClass](const FSkillPropertiesInspector& skillProp) {
-                const TObjectPtr<USkillIconWidget> skillIconW = CreateWidget<USkillIconWidget>(owner, skillIconClass);
-                skillIconW->InitFromSkillProperties(skillProp);
-                skillSlots->AddChildToWrapBox(skillIconW);
-            });
+        containerInspector.ForEachSkill([owner = GetOwningPlayer(), stateMachine, skillSlots = _skillSlots, skillIconClass = _skillIconClass](
+                                            const FSkillPropertiesInspector& skillProp, const int32 skillIndex) {
+            const TObjectPtr<USkillIconWidget> skillIconW = CreateWidget<USkillIconWidget>(owner, skillIconClass);
+            skillIconW->InitFromSkillProperties(skillProp, stateMachine, skillIndex);
+            skillSlots->AddChildToWrapBox(skillIconW);
+        });
     }
 }

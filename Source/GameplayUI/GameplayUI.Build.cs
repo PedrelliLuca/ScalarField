@@ -24,6 +24,7 @@ namespace UnrealBuildTool.Rules
 				new string[]
 				{
                     "DamageHandlers",
+					"FSM",
                     "GameplayAttributes",
 					"SkillInspection",
                     "SkillSystem",

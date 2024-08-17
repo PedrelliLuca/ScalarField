@@ -10,6 +10,7 @@
 
 class UHealthComponent;
 class UManaComponent;
+class UNewStateComponent;
 class USkillsContainerComponent;
 class USkillIconContainerWidget;
 class UThermodynamicsInteractorComponent;
@@ -30,7 +31,7 @@ public:
     void Show() override;
     void Hide() override;
 
-    void InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer);
+    void InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine);
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)

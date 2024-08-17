@@ -28,9 +28,9 @@ void UWidgetsPresenterComponent::CreateHUD() {
     _hudWidget->AddToViewport();
 }
 
-void UWidgetsPresenterComponent::CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer) {
+void UWidgetsPresenterComponent::CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
     CreateHUD();
-    _hudWidget->InitSkillIconContainer(skillsContainer);
+    _hudWidget->InitSkillIconContainer(skillsContainer, stateMachine);
 }
 
 void UWidgetsPresenterComponent::CreateInventoryMenu() {

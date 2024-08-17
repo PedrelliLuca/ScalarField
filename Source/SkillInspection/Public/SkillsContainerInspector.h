@@ -23,7 +23,7 @@ public:
 
     TOptional<int32> GetIndexOfSkill(const TSubclassOf<UAbstractSkill>& skillClass) const;
 
-    void ForEachSkill(TFunction<void(const FSkillPropertiesInspector&)> skillPropertiesFunc) const;
+    void ForEachSkill(const TFunction<void(const FSkillPropertiesInspector&, int32)> skillPropertiesFunc) const;
 
 private:
     TWeakObjectPtr<USkillsContainerComponent> _skillsContainer = nullptr;

@@ -8,7 +8,9 @@
 #include "SkillIconWidget.generated.h"
 
 class FSkillPropertiesInspector;
+class UButton;
 class UImage;
+class UNewStateComponent;
 
 /**
  *
@@ -18,7 +20,7 @@ class GAMEPLAYUI_API USkillIconWidget : public UUserWidget {
     GENERATED_BODY()
 
 public:
-    void InitFromSkillProperties(const FSkillPropertiesInspector& skillProp);
+    void InitFromSkillProperties(const FSkillPropertiesInspector& skillProp, const TObjectPtr<UNewStateComponent>& stateMachine, int32 skillIndex);
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)
@@ -33,10 +35,19 @@ protected:
 private:
     void _setupCooldownTimer(ESkillStatus newStatus);
 
+    UFUNCTION()
+    void _tryCastSkill();
+
     float _skillCooldownSeconds;
 
     FTimerHandle _cooldownTimer;
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UImage> _skillThumbnail;
+
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UButton> _skillExecutionButton;
+
+    TWeakObjectPtr<UNewStateComponent> _hudOwnerState;
+    TOptional<int32> _skillIndex;
 };

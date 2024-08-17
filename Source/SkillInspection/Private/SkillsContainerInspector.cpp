@@ -30,10 +30,13 @@ TOptional<int32> FSkillsContainerInspector::GetIndexOfSkill(const TSubclassOf<UA
     return optionalIndex;
 }
 
-void FSkillsContainerInspector::ForEachSkill(const TFunction<void(const FSkillPropertiesInspector&)> skillPropertiesFunc) const {
+void FSkillsContainerInspector::ForEachSkill(const TFunction<void(const FSkillPropertiesInspector&, int32)> skillPropertiesFunc) const {
     check(_skillsContainer.IsValid());
+
+    int32 skillIndex = 0;
     for (TObjectPtr<UAbstractSkill> skill : _skillsContainer->_skills) {
         auto skillPropertiesIns = FSkillPropertiesInspector(skill);
-        skillPropertiesFunc(skillPropertiesIns);
+        skillPropertiesFunc(skillPropertiesIns, skillIndex);
+        ++skillIndex;
     }
 }

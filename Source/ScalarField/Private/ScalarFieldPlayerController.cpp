@@ -52,19 +52,20 @@ void AScalarFieldPlayerController::BeginPlay() {
     pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
     _bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
 
-    if (const auto pawn = GetPawn(); IsValid(pawn)) {
-        if (const auto healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
-            healthC->OnDeath().AddUObject(this, &AScalarFieldPlayerController::_onControlledPawnDeath);
-        }
-    }
-
     _movementCommandC->SetDefaultMovementMode();
 
-    if (const TObjectPtr<USkillsContainerComponent> skillsC = GetPawn()->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC)) {
-        skillsC->CreateAllSkills();
-        _widgetsPresenterC->CreateHUD(skillsC);
-    } else {
-        _widgetsPresenterC->CreateHUD();
+    TObjectPtr<APawn> ownedPawn = GetPawn();
+    if (IsValid(ownedPawn)) {
+        if (const auto healthC = ownedPawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
+            healthC->OnDeath().AddUObject(this, &AScalarFieldPlayerController::_onControlledPawnDeath);
+        }
+
+        if (const TObjectPtr<USkillsContainerComponent> skillsC = ownedPawn->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC)) {
+            skillsC->CreateAllSkills();
+            _widgetsPresenterC->CreateHUD(skillsC, ownedPawn->FindComponentByClass<UNewStateComponent>());
+        } else {
+            _widgetsPresenterC->CreateHUD();
+        }
     }
 
     const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();

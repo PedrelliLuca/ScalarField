@@ -12,6 +12,7 @@ class IInventoryContainerWidget;
 class IPawnBindableWidget;
 class UHUDWidget;
 class UInventoryPresenterWidget;
+class UNewStateComponent;
 class USkillsContainerComponent;
 
 /**
@@ -26,7 +27,7 @@ public:
     TWeakInterfacePtr<IInventoryContainerWidget> GetInventoryContainerWidget();
 
     void CreateHUD();
-    void CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer);
+    void CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine);
     void CreateInventoryMenu();
 
 private:
