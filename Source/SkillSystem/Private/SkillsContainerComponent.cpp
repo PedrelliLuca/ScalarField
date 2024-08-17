@@ -30,10 +30,13 @@ FSkillCastResult USkillsContainerComponent::TryCastSkillAtIndex(const int32 inde
     if (skillCastResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
 
-        // In case of failure, do not override the waiting skill unless the skill that just failed requires targets.
+        // In case of failure, do not override the waiting skill, unless the skill that just failed requires targets.
         if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_MissingTarget) {
-            _resetWaitingSkill();
-            _skillWaitingForTargets = _skills[index];
+            // We don't want a _resetWaitingSkill() call in case the skill that just failed is the same one that is waiting.
+            if (_skills[index] != _skillWaitingForTargets) {
+                _resetWaitingSkill();
+                _skillWaitingForTargets = _skills[index];
+            }
         }
 
         return skillCastResult;
