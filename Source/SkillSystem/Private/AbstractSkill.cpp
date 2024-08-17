@@ -255,9 +255,10 @@ void UAbstractSkill::_channelingTick(float deltaTime) {
 FSkillCastResult UAbstractSkill::_endCast() {
     if (_channelingSeconds > 0.0f) {             // This skill requires channeling
         if (FMath::IsNearlyZero(_castSeconds)) { // This skill cast was immediate
-            _isTickAllowed = true;
             _elapsedExecutionSeconds = 0.0f;
         }
+
+        _isTickAllowed = true;
 
         _setMovementModeIfPossible(EMovementModeToSet::Channeling);
         _onSkillStatusChanged.Broadcast(ESkillStatus::Channeling);
