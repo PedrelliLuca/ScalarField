@@ -23,6 +23,8 @@ class SKILLSYSTEM_API USkillsContainerComponent : public UActorComponent {
 public:
     USkillsContainerComponent();
 
+    void CreateAllSkills();
+
     /** \brief Given the index of a skill stored within this component, this function tries to cast it. */
     FSkillCastResult TryCastSkillAtIndex(int32 index);
 
@@ -44,15 +46,12 @@ public:
     FOnSkillExecutionStatusChanged& OnSkillInExecutionStatusChanged() { return _onSkillInExecutionStatusChanged; }
 
 protected:
-    void BeginPlay() override;
-
     UPROPERTY(EditAnywhere, Category = "Skills")
     TArray<TSubclassOf<UAbstractSkill>> _skillClasses{};
 
 private:
     void _setNewSkillInExecution(TObjectPtr<UAbstractSkill> skill, ESkillCastResult castResultValue);
-    void _onCurrentlyExecutedSkillCastPhaseEnd(FSkillCastResult skillCastResult);
-    void _onCurrentlyExecutedSkillChannelingPhaseEnd(FSkillChannelingResult skillChannelingResult);
+    void _onCurrentlyExecutedSkillStatusChanged(ESkillStatus newStatus);
 
     bool _resetSkillInExecution(bool resetMovement);
     bool _resetWaitingSkill();
@@ -61,7 +60,8 @@ private:
     TArray<TObjectPtr<UAbstractSkill>> _skills{};
 
     TWeakObjectPtr<UAbstractSkill> _skillWaitingForTargets = nullptr;
-    TWeakObjectPtr<UAbstractSkill> _currentlyExecutedSkill = nullptr;
+    TWeakObjectPtr<UAbstractSkill> _skillCurrentlyBeingExecuted = nullptr;
+    FDelegateHandle _skillBeingExecutedDelegate;
 
     FOnSkillExecutionStatusChanged _onSkillInExecutionStatusChanged;
 };

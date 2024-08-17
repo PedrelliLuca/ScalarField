@@ -117,6 +117,8 @@ void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
     if (IsValid(GetPawn())) {
         const auto skillsContainerC = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
         check(IsValid(skillsContainerC));
+
+        skillsContainerC->CreateAllSkills();
         skillsContainerC->OnSkillInExecutionStatusChanged().AddUObject(this, &AEnemyStabilizerController::_onSkillInExecutionStatusChanged);
     }
 }

@@ -51,17 +51,6 @@ TScriptInterface<IFSMState> USkillExecutionState::TryStopMovement() {
 
 FStateResponse_TryCastSkill USkillExecutionState::TryCastSkillAtIndex(const int32 index) {
     auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
-
-    /* In case the skill we're trying to cast is in execution, we abort it and try casting it again. There is no guarantee that the 2nd time we'll succeed BUT,
-     * since we aborted, this time we must not get ESkillCastResult::Fail_InExecution. */
-    if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_InExecution) {
-        [[maybe_unused]] const auto abortSuccessful = _subjectSkillsContainerC->AbortSkillInExecution();
-        check(abortSuccessful);
-
-        skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
-        check(skillCastResult.GetCastResult() != ESkillCastResult::Fail_InExecution);
-    }
-
     return FStateResponse_TryCastSkill{_keepCurrentState(), MoveTemp(skillCastResult)};
 }
 

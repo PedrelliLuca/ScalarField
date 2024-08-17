@@ -8,6 +8,16 @@ USkillsContainerComponent::USkillsContainerComponent() {
     PrimaryComponentTick.bCanEverTick = false;
 }
 
+void USkillsContainerComponent::CreateAllSkills() {
+    const auto caster = GetOwner();
+    _skills.Reserve(_skillClasses.Num());
+    for (const auto& skillClass : _skillClasses) {
+        auto skill = NewObject<UAbstractSkill>(this, skillClass);
+        skill->SetCaster(caster);
+        _skills.Emplace(MoveTemp(skill));
+    }
+}
+
 FSkillCastResult USkillsContainerComponent::TryCastSkillAtIndex(const int32 index) {
     if (index >= _skills.Num()) {
         // TODO: this is a random thing, we should return a proper error in here!
@@ -20,10 +30,13 @@ FSkillCastResult USkillsContainerComponent::TryCastSkillAtIndex(const int32 inde
     if (skillCastResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
 
-        // In case of failure, do not override the waiting skill unless the skill that just failed requires targets.
+        // In case of failure, do not override the waiting skill, unless the skill that just failed requires targets.
         if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_MissingTarget) {
-            _resetWaitingSkill();
-            _skillWaitingForTargets = _skills[index];
+            // We don't want a _resetWaitingSkill() call in case the skill that just failed is the same one that is waiting.
+            if (_skills[index] != _skillWaitingForTargets) {
+                _resetWaitingSkill();
+                _skillWaitingForTargets = _skills[index];
+            }
         }
 
         return skillCastResult;
@@ -64,9 +77,14 @@ TOptional<FSkillCastResult> USkillsContainerComponent::TryCastWaitingSkill() {
 }
 
 bool USkillsContainerComponent::AbortSkillInExecution() {
-    // TODO: also abort waiting skill? If not, how do we abort waiting skill?
-    // _resetWaitingSkill();
-    return _resetSkillInExecution(true);
+    bool executionSkillReset = false;
+    const bool waitingSkillReset = _resetWaitingSkill();
+
+    // We want to abort only one skill at a time: if we a skill waiting for targets and a skill in execution, only the former gets aborted.
+    if (!waitingSkillReset) {
+        executionSkillReset = _resetSkillInExecution(true);
+    }
+    return executionSkillReset || waitingSkillReset;
 }
 
 bool USkillsContainerComponent::AbortWaitingSkill() {
@@ -91,60 +109,32 @@ TOptional<FSkillTargetingResult> USkillsContainerComponent::TryAddTargetToWaitin
     return MoveTemp(skillTargetingResult);
 }
 
-void USkillsContainerComponent::BeginPlay() {
-    Super::BeginPlay();
-
-    const auto caster = GetOwner();
-    _skills.Reserve(_skillClasses.Num());
-    for (const auto& skillClass : _skillClasses) {
-        auto skill = NewObject<UAbstractSkill>(this, skillClass);
-        skill->SetCaster(caster);
-        _skills.Emplace(MoveTemp(skill));
-    }
-}
-
 void USkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbstractSkill> skill, const ESkillCastResult castResultValue) {
     /* If we don't get inside the following statement, it means that either:
      * 1. The result was ESkillCastResult::Success_IntoExecutionEnd. In such case, the skill was instantaneous, we don't to cache it and bind to its delegates.
      * 2. The cast was a failure, so we don't want to set the skill as "in execution". */
     if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
-        _currentlyExecutedSkill = skill;
+        _skillCurrentlyBeingExecuted = skill;
         _onSkillInExecutionStatusChanged.Broadcast(true);
 
-        if (castResultValue == ESkillCastResult::Deferred) {
-            _currentlyExecutedSkill->OnCastPhaseEnd().AddUObject(this, &USkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd);
+        if (castResultValue == ESkillCastResult::Deferred || castResultValue == ESkillCastResult::Success_IntoChanneling) {
+            _skillBeingExecutedDelegate =
+                _skillCurrentlyBeingExecuted->OnSkillStatusChanged().AddUObject(this, &USkillsContainerComponent::_onCurrentlyExecutedSkillStatusChanged);
         }
-        _currentlyExecutedSkill->OnChannelingPhaseEnd().AddUObject(this, &USkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd);
     }
 }
 
-void USkillsContainerComponent::_onCurrentlyExecutedSkillCastPhaseEnd(const FSkillCastResult skillCastResult) {
-    const auto castResultValue = skillCastResult.GetCastResult();
-
-    // Success_IntoChanneling is the only result doesn't determine the end of the current skill execution.
-    if (skillCastResult.IsFailure()) {
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
-    }
-
-    if (castResultValue != ESkillCastResult::Success_IntoChanneling) {
-        _currentlyExecutedSkill = nullptr;
+void USkillsContainerComponent::_onCurrentlyExecutedSkillStatusChanged(const ESkillStatus newStatus) {
+    if (newStatus == ESkillStatus::Cooldown || newStatus == ESkillStatus::None) {
+        _skillCurrentlyBeingExecuted->OnSkillStatusChanged().Remove(_skillBeingExecutedDelegate);
+        _skillCurrentlyBeingExecuted = nullptr;
         _onSkillInExecutionStatusChanged.Broadcast(false);
     }
-}
-
-void USkillsContainerComponent::_onCurrentlyExecutedSkillChannelingPhaseEnd(const FSkillChannelingResult skillChannelingResult) {
-    if (skillChannelingResult.IsFailure()) {
-        UE_LOG(LogTemp, Warning, TEXT("%s"), *skillChannelingResult.GetErrorText().ToString());
-    }
-    _currentlyExecutedSkill = nullptr;
-    _onSkillInExecutionStatusChanged.Broadcast(false);
 }
 
 bool USkillsContainerComponent::_resetSkillInExecution(const bool resetMovement) {
-    if (_currentlyExecutedSkill.IsValid()) {
-        _currentlyExecutedSkill->Abort(resetMovement);
-        _currentlyExecutedSkill = nullptr;
-        _onSkillInExecutionStatusChanged.Broadcast(false);
+    if (_skillCurrentlyBeingExecuted.IsValid()) {
+        _skillCurrentlyBeingExecuted->Abort(resetMovement);
         return true;
     }
     return false;

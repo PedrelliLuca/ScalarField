@@ -5,16 +5,10 @@
 FSkillCastResult UAbstractSkill::TryCast() {
     check(_caster.IsValid());
 
-    if (_onCooldown) {
+    const bool isOnCooldown = GetWorld()->GetTimerManager().IsTimerActive(_cooldownTimer);
+    if (isOnCooldown) {
         _setMovementModeIfPossible(EMovementModeToSet::Default);
         return FSkillCastResult::CastFail_Cooldown();
-    }
-
-    // TODO: if targets are required by this skill, check if all of them are available and return a specific FSkillCastResult kind.
-    if (_targets.Num() != _nTargets) {
-        // If we have more targets then we can handle, something went horribly wrong.
-        check(_targets.Num() < _nTargets);
-        return FSkillCastResult::CastFail_MissingTarget();
     }
 
     if (!_areCastConditionsVerified()) {
@@ -27,6 +21,15 @@ FSkillCastResult UAbstractSkill::TryCast() {
         return FSkillCastResult::CastFail_InExecution();
     }
 
+    // TODO: if targets are required by this skill, check if all of them are available and return a specific FSkillCastResult kind.
+    if (_targets.Num() != _nTargets) {
+        _onSkillStatusChanged.Broadcast(ESkillStatus::Targeting);
+
+        // If we have more targets then we can handle, something went horribly wrong.
+        check(_targets.Num() < _nTargets);
+        return FSkillCastResult::CastFail_MissingTarget();
+    }
+
     if (FMath::IsNearlyZero(_castSeconds)) {
         const auto currentMana = _casterManaC->GetCurrentMana();
         if (currentMana < _castManaCost) {
@@ -36,8 +39,6 @@ FSkillCastResult UAbstractSkill::TryCast() {
         _casterManaC->SetCurrentMana(currentMana - _castManaCost);
 
         _skillCast();
-        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
-        _onCooldown = true;
 
         const auto castResult = _endCast();
         return castResult;
@@ -49,19 +50,14 @@ FSkillCastResult UAbstractSkill::TryCast() {
     _elapsedExecutionSeconds = 0.0f;
 
     _setMovementModeIfPossible(EMovementModeToSet::Cast);
+    _onSkillStatusChanged.Broadcast(ESkillStatus::Casting);
     return FSkillCastResult::CastDeferred();
 }
 
 void UAbstractSkill::Abort(const bool shouldResetMovement) {
-    if (shouldResetMovement) {
-        _setMovementModeIfPossible(EMovementModeToSet::Default);
-    }
-
-    _isTickAllowed = false;
-    _onCastPhaseEnd.Clear();
-    _onChannelingPhaseEnd.Clear();
-    _targets.Empty();
-    _skillAbort();
+    // An abort prompted by clients can start the skill's cooldown only if the skill is channeling.
+    const bool isChanneling = _castSeconds < _elapsedExecutionSeconds && _elapsedExecutionSeconds < _castSeconds + _channelingSeconds;
+    _abort(shouldResetMovement, isChanneling);
 }
 
 FSkillTargetingResult UAbstractSkill::TryAddTarget(const FSkillTargetPacket& targetPacket) {
@@ -77,6 +73,7 @@ FSkillTargetingResult UAbstractSkill::TryAddTarget(const FSkillTargetPacket& tar
 
         check(_targets.Num() <= _nTargets);
         if (_targets.Num() == _nTargets) {
+            _onSkillStatusChanged.Broadcast(ESkillStatus::Casting);
             return FSkillTargetingResult::TargetingSuccess_IntoCast();
         }
 
@@ -143,20 +140,39 @@ bool UAbstractSkill::IsAllowedToTick() const {
     return _isTickAllowed;
 }
 
+void UAbstractSkill::_abort(const bool shouldResetMovement, const bool shouldStartCooldownTimer) {
+    if (shouldResetMovement) {
+        _setMovementModeIfPossible(EMovementModeToSet::Default);
+    }
+
+    _isTickAllowed = false;
+    _elapsedExecutionSeconds = 0.0f;
+    _targets.Empty();
+    _skillAbort();
+
+    if (shouldStartCooldownTimer) {
+        check(!GetWorld()->GetTimerManager().IsTimerActive(_cooldownTimer));
+
+        auto cooldownTimerCallback = [this]() { _onSkillStatusChanged.Broadcast(ESkillStatus::None); };
+        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, MoveTemp(cooldownTimerCallback), _cooldownSeconds, false);
+        _onSkillStatusChanged.Broadcast(ESkillStatus::Cooldown);
+    } else {
+        _onSkillStatusChanged.Broadcast(ESkillStatus::None);
+    }
+}
+
 void UAbstractSkill::_castTick(const float deltaTime) {
     // Targeting conditions must be verified during the entire cast phase.
     for (const auto& target : _targets) {
         if (!target->IsValidTarget() || !_areTargetingConditionsVerifiedForTarget(target)) {
-            _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_TargetingConditionsViolated());
-            Abort(true);
+            _abort(true, false);
             return;
         }
     }
 
     // Cast conditions must be verified during the entire cast phase.
     if (!_areCastConditionsVerified()) {
-        _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_CastConditionsViolated());
-        Abort(true);
+        _abort(true, false);
         return;
     }
 
@@ -167,17 +183,13 @@ void UAbstractSkill::_castTick(const float deltaTime) {
             if (currentMana < _castManaLeftToPay) {
                 _casterManaC->SetCurrentMana(0.0f);
 
-                _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
-                Abort(true);
+                _abort(true, false);
                 return;
             }
             _casterManaC->SetCurrentMana(currentMana - _castManaLeftToPay);
         }
 
         _skillCast();
-        GetWorld()->GetTimerManager().SetTimer(_cooldownTimer, this, &UAbstractSkill::_onCooldownEnded, _cooldownSeconds, false);
-        _onCooldown = true;
-
         _endCast();
         _elapsedExecutionSeconds += _castSeconds - _elapsedExecutionSeconds;
         return;
@@ -189,9 +201,7 @@ void UAbstractSkill::_castTick(const float deltaTime) {
 
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
-
-            _onCastPhaseEnd.Broadcast(FSkillCastResult::CastFail_InsufficientMana());
-            Abort(true);
+            _abort(true, false);
             return;
         }
 
@@ -206,8 +216,7 @@ void UAbstractSkill::_channelingTick(float deltaTime) {
         // Targeting conditions must be verified during the entire cast phase.
         for (const auto& target : _targets) {
             if (!target->IsValidTarget() || !_areTargetingConditionsVerifiedForTarget(target)) {
-                _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingFail_TargetingConditionsViolated());
-                Abort(true);
+                _abort(true, true);
                 return;
             }
         }
@@ -228,9 +237,7 @@ void UAbstractSkill::_channelingTick(float deltaTime) {
 
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
-
-            _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingFail_InsufficientMana());
-            Abort(true);
+            _abort(true, true);
             return;
         }
 
@@ -241,31 +248,26 @@ void UAbstractSkill::_channelingTick(float deltaTime) {
     _elapsedExecutionSeconds += deltaTime;
 
     if (FMath::IsNearlyEqual(_elapsedExecutionSeconds, executionSeconds)) {
-        _onChannelingPhaseEnd.Broadcast(FSkillChannelingResult::ChannelingSuccess());
-        Abort(true);
+        _abort(true, true);
     }
 }
 
 FSkillCastResult UAbstractSkill::_endCast() {
     if (_channelingSeconds > 0.0f) {             // This skill requires channeling
         if (FMath::IsNearlyZero(_castSeconds)) { // This skill cast was immediate
-            _isTickAllowed = true;
             _elapsedExecutionSeconds = 0.0f;
         }
 
-        auto toChannelingResult = FSkillCastResult::CastSuccess_IntoChanneling();
-        _onCastPhaseEnd.Broadcast(toChannelingResult);
-        _onCastPhaseEnd.Clear();
+        _isTickAllowed = true;
 
         _setMovementModeIfPossible(EMovementModeToSet::Channeling);
-        return toChannelingResult;
+        _onSkillStatusChanged.Broadcast(ESkillStatus::Channeling);
+        return FSkillCastResult::CastSuccess_IntoChanneling();
     }
 
     // This skill does not require channeling => it's over!
-    auto toExecutionEndResult = FSkillCastResult::CastSuccess_IntoExecutionEnd();
-    _onCastPhaseEnd.Broadcast(toExecutionEndResult);
-    Abort(true);
-    return toExecutionEndResult;
+    _abort(true, true);
+    return FSkillCastResult::CastSuccess_IntoExecutionEnd();
 }
 
 bool UAbstractSkill::_areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const {
@@ -286,10 +288,6 @@ bool UAbstractSkill::_areCastConditionsVerified() const {
         }
     }
     return true;
-}
-
-void UAbstractSkill::_onCooldownEnded() {
-    _onCooldown = false;
 }
 
 void UAbstractSkill::_setMovementModeIfPossible(const EMovementModeToSet movementModeToSet) const {

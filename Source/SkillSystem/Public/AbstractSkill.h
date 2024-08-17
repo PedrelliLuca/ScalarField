@@ -17,8 +17,17 @@
 
 #include "AbstractSkill.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnCastPhaseFinish, FSkillCastResult);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnChannelingPhaseFinish, FSkillChannelingResult);
+UENUM(BlueprintType)
+enum class ESkillStatus : uint8
+{
+    None UMETA(DisplayName = "Available (None)"),
+    Targeting UMETA(DisplayName = "Targeting"),
+    Casting UMETA(DisplayName = "Casting"),
+    Channeling UMETA(DisplayName = "Channeling"),
+    Cooldown UMETA(DisplayName = "Cooldown"),
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSkillStatusChanged, ESkillStatus);
 
 /** Represents a skill of the ScalarField game. */
 UCLASS(NotBlueprintable, Abstract)
@@ -32,8 +41,8 @@ public:
      * SetCaster() will trigger a check. */
     FSkillCastResult TryCast();
 
-    /** \brief Aborts the skill execution: clears the delegates, clears the targets, stops ticking. If shouldResetMovement is set to true, the movement mode
-     * will be set to the default one. */
+    /** \brief Aborts the skill execution: clears the delegate, clears the targets, stops ticking. If shouldResetMovement is set to true, the movement mode
+     * will be set to the default one. Determines whether the cooldown timer should start or not. */
     void Abort(bool shouldResetMovement);
 
     /** \brief Adds a target to the skill. This function can have many outcomes, you can see all of them in ESkillTargetingResult. Calling this function before
@@ -53,62 +62,54 @@ public:
     bool IsAllowedToTick() const override;
 
     /** \brief We have to override this because it's virtual pure in FTickableGameObject, but in practice it's not needed. */
-    TStatId GetStatId() const override {
-        return TStatId{};
-    }
+    TStatId GetStatId() const override { return TStatId{}; }
 
 #pragma endregion
 
-    /** \brief Returns the delegate broadcasting what's going on during the casting phase tick. */
-    FOnCastPhaseFinish& OnCastPhaseEnd() {
-        return _onCastPhaseEnd;
-    }
-
-    /** \brief Returns the delegate broadcasting what's going on during the channeling phase tick. */
-    FOnChannelingPhaseFinish& OnChannelingPhaseEnd() {
-        return _onChannelingPhaseEnd;
-    }
+    FOnSkillStatusChanged& OnSkillStatusChanged() { return _onSkillStatusChanged; }
 
 protected:
-    const TWeakObjectPtr<AActor>& _getCaster() const {
-        return _caster;
-    }
-    const TArray<TScriptInterface<ISkillTarget>>& _getTargets() const {
-        return _targets;
-    }
+    const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
+    const TArray<TScriptInterface<ISkillTarget>>& _getTargets() const { return _targets; }
 
-    float _getChannelingSeconds() const {
-        return _channelingSeconds;
-    }
+    float _getChannelingSeconds() const { return _channelingSeconds; }
 
-    /** \brief The time it takes for the skill to be castable again. The countdown starts from the moment the cast is complete. */
-    UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Presentation")
+    TObjectPtr<UTexture2D> _skillThumbnail;
+
+    /** \brief The time it takes for the skill to be castable again. The countdown starts when one of the following is true:
+    1. The cast is complete and there is no channeling.
+    2. The channeling is complete.
+    3. The channeling is aborted. */
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Cooldown", meta = (ClampMin = "0.0"))
     float _cooldownSeconds = 1.0f;
 
     /** \brief Duration of the cast phase of the skill. */
-    UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Casting", meta = (ClampMin = "0.0"))
     float _castSeconds = 1.0f;
     /** \brief The cost in mana that is spent during casting. */
-    UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Casting", meta = (ClampMin = "0.0"))
     float _castManaCost = 50.0f;
 
     /** \brief Duration of the channeling phase of the skill. */
-    UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Casting", meta = (ClampMin = "0.0"))
     float _channelingSeconds = 1.0f;
     /** \brief The cost in mana that is spent during channeling. */
-    UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Casting", meta = (ClampMin = "0.0"))
     float _channelingManaCost = 50.0f;
 
     /** \brief If true, targeting conditions are checked while channeling. This implies that, if one of them fails, the skill is aborted. */
-    UPROPERTY(EditDefaultsOnly, Category = "Chanelling")
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Chanelling")
     bool _checkTargetingConditionsWhenChanneling = false;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Movement Modes")
     EMovementCommandMode _castMovementMode;
-    UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Movement Modes")
     EMovementCommandMode _channelingMovementMode;
 
 private:
+    void _abort(bool shouldResetMovement, bool shouldStartCooldownTimer);
+
     /** \brief Represents the concrete cast of the skill, skill-specific logic for the cast is executed in here. */
     virtual void _skillCast() PURE_VIRTUAL(UAbstractSkill::_skillCast, return;);
     /** \brief Represents the concrete channeling of the skill, skill-specific logic for channeling ticks is executed in here. */
@@ -127,8 +128,6 @@ private:
 
     bool _areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const;
     bool _areCastConditionsVerified() const;
-
-    void _onCooldownEnded();
 
     enum class EMovementModeToSet : uint8
     {
@@ -162,15 +161,13 @@ private:
     TWeakInterfacePtr<IMovementCommandSetter> _casterMovementSetterC = nullptr;
 
     FTimerHandle _cooldownTimer{};
-    bool _onCooldown = false;
 
     bool _isTickAllowed = false;
 
     float _elapsedExecutionSeconds = 0.0f;
     float _castManaLeftToPay = 0.0f;
 
-    FOnCastPhaseFinish _onCastPhaseEnd{};
-    FOnChannelingPhaseFinish _onChannelingPhaseEnd{};
+    FOnSkillStatusChanged _onSkillStatusChanged;
 
     TWeakObjectPtr<UTacticalPauseWorldSubsystem> _pauseSubSys = nullptr;
 };

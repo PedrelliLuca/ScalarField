@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NewStateComponent.h"
 #include "PlayerInputData.h"
+#include "SkillsContainerComponent.h"
 #include "TacticalPauseWorldSubsystem.h"
 #include "ThermodynamicsSubsystem.h"
 
@@ -51,17 +52,27 @@ void AScalarFieldPlayerController::BeginPlay() {
     pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
     _bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
 
-    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
-    inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
-    inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
+    _movementCommandC->SetDefaultMovementMode();
 
-    if (const auto pawn = GetPawn(); IsValid(pawn)) {
-        if (const auto healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
+    TObjectPtr<APawn> ownedPawn = GetPawn();
+    if (IsValid(ownedPawn)) {
+        if (const auto healthC = ownedPawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
             healthC->OnDeath().AddUObject(this, &AScalarFieldPlayerController::_onControlledPawnDeath);
+        }
+
+        if (const TObjectPtr<USkillsContainerComponent> skillsC = ownedPawn->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC)) {
+            skillsC->CreateAllSkills();
+            _widgetsPresenterC->CreateHUD(skillsC, ownedPawn->FindComponentByClass<UNewStateComponent>());
+        } else {
+            _widgetsPresenterC->CreateHUD();
         }
     }
 
-    _movementCommandC->SetDefaultMovementMode();
+    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+    inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
+
+    _widgetsPresenterC->CreateInventoryMenu();
+    inventorySubsys->SetInventoryContainerWidget(_widgetsPresenterC->GetInventoryContainerWidget());
 }
 
 void AScalarFieldPlayerController::_onSetDestinationPressed() {
