@@ -18,6 +18,10 @@ float FSkillPropertiesInspector::GetCooldownSeconds() const {
     return _skill->_cooldownSeconds;
 }
 
+TObjectPtr<UTexture2D> FSkillPropertiesInspector::GetSkillThumbnail() const {
+    return _skill->_skillThumbnail;
+}
+
 TSubclassOf<UObject> FSkillPropertiesInspector::GetTargetKind() const {
     check(_skill.IsValid());
     return _skill->_targetKind;

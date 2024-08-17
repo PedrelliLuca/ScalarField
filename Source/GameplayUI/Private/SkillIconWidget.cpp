@@ -3,10 +3,12 @@
 #include "SkillIconWidget.h"
 
 #include "AbstractSkill.h"
+#include "Components/Image.h"
 #include "SkillPropertiesInspector.h"
 
 void USkillIconWidget::InitFromSkillProperties(const FSkillPropertiesInspector& skillProp) {
     _skillCooldownSeconds = skillProp.GetCooldownSeconds();
+    _skillThumbnail->SetBrushFromTexture(skillProp.GetSkillThumbnail());
 
     auto skillStatusChangedCallback = [this](const ESkillStatus newStatus) {
         _onSkillStatusChanged(newStatus);

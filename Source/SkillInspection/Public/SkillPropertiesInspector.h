@@ -26,6 +26,8 @@ public:
 
     float GetCooldownSeconds() const;
 
+    TObjectPtr<UTexture2D> GetSkillThumbnail() const;
+
     TSubclassOf<UObject> GetTargetKind() const;
 
     const TArray<TObjectPtr<USkillTargetingCondition>>& GetTargetingConditions() const;

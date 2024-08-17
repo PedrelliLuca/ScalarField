@@ -74,34 +74,37 @@ protected:
 
     float _getChannelingSeconds() const { return _channelingSeconds; }
 
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Presentation")
+    TObjectPtr<UTexture2D> _skillThumbnail;
+
     /** \brief The time it takes for the skill to be castable again. The countdown starts when one of the following is true:
     1. The cast is complete and there is no channeling.
     2. The channeling is complete.
     3. The channeling is aborted. */
-    UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Cooldown", meta = (ClampMin = "0.0"))
     float _cooldownSeconds = 1.0f;
 
     /** \brief Duration of the cast phase of the skill. */
-    UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Casting", meta = (ClampMin = "0.0"))
     float _castSeconds = 1.0f;
     /** \brief The cost in mana that is spent during casting. */
-    UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Casting", meta = (ClampMin = "0.0"))
     float _castManaCost = 50.0f;
 
     /** \brief Duration of the channeling phase of the skill. */
-    UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Casting", meta = (ClampMin = "0.0"))
     float _channelingSeconds = 1.0f;
     /** \brief The cost in mana that is spent during channeling. */
-    UPROPERTY(EditDefaultsOnly, Category = "Casting", meta = (ClampMin = "0.0"))
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Casting", meta = (ClampMin = "0.0"))
     float _channelingManaCost = 50.0f;
 
     /** \brief If true, targeting conditions are checked while channeling. This implies that, if one of them fails, the skill is aborted. */
-    UPROPERTY(EditDefaultsOnly, Category = "Chanelling")
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Chanelling")
     bool _checkTargetingConditionsWhenChanneling = false;
 
-    UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Movement Modes")
     EMovementCommandMode _castMovementMode;
-    UPROPERTY(EditDefaultsOnly, Category = "Movement Modes")
+    UPROPERTY(EditDefaultsOnly, Category = "Abstract Skill | Movement Modes")
     EMovementCommandMode _channelingMovementMode;
 
 private:

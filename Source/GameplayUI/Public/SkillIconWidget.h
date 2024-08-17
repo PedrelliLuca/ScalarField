@@ -8,6 +8,7 @@
 #include "SkillIconWidget.generated.h"
 
 class FSkillPropertiesInspector;
+class UImage;
 
 /**
  *
@@ -35,4 +36,7 @@ private:
     float _skillCooldownSeconds;
 
     FTimerHandle _cooldownTimer;
+
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UImage> _skillThumbnail;
 };
