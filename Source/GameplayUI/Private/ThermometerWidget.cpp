@@ -2,18 +2,28 @@
 
 #include "ThermometerWidget.h"
 
+#include "TemperatureDamageHandlerComponent.h"
 #include "ThermodynamicsInteractorComponent.h"
 #include "ThermodynamicsPresenterComponent.h"
 
-void UThermometerWidget::SetPawn(TWeakObjectPtr<APawn> const pawn) {
+void UThermometerWidget::SetPawn(const TWeakObjectPtr<APawn> pawn) {
     _thermoIntC = pawn->FindComponentByClass<UThermodynamicsInteractorComponent>();
     if (!_thermoIntC.IsValid()) {
-        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__": missing UThermodynamicsInteractorComponent"));
+        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__ ": missing UThermodynamicsInteractorComponent"));
     }
 
     _thermoPresC = pawn->FindComponentByClass<UThermodynamicsPresenterComponent>();
     if (!_thermoPresC.IsValid()) {
-        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__": missing UThermodynamicsPresenterComponent"));
+        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__ ": missing UThermodynamicsPresenterComponent"));
+    }
+
+    _tempDmgHandlerC = pawn->FindComponentByClass<UTemperatureDamageHandlerComponent>();
+    if (!_tempDmgHandlerC.IsValid()) {
+        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__ ": missing UTemperatureDamageHandlerComponent"));
+    } else {
+        const float minComfortTemperature = _tempDmgHandlerC->GetMinComfortTemperature();
+        const float maxComfortTemperature = _tempDmgHandlerC->GetMaxComfortTemperature();
+        _setComfortInterval(minComfortTemperature, maxComfortTemperature);
     }
 }
 
@@ -45,11 +55,12 @@ void UThermometerWidget::_unbindAll() {
     }
 }
 
-void UThermometerWidget::_onTemperatureChange(const float newTemperture) {
+void UThermometerWidget::_onTemperatureChange(const float newTemperature) {
     auto temperatureColor = FLinearColor::Black;
 
     if (_thermoPresC.IsValid()) {
         temperatureColor = _thermoPresC->GetTemperatureColor();
     }
-    _setTemperature(newTemperture, temperatureColor);
+
+    _setTemperature(newTemperature, temperatureColor);
 }

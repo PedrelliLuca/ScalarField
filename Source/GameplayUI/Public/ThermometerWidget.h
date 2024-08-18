@@ -8,6 +8,7 @@
 
 #include "ThermometerWidget.generated.h"
 
+class UTemperatureDamageHandlerComponent;
 class UThermodynamicsInteractorComponent;
 class UThermodynamicsPresenterComponent;
 
@@ -26,7 +27,10 @@ public:
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)
-    void _setTemperature(double temperature, FLinearColor temperatureColor);
+    void _setTemperature(float temperature, FLinearColor temperatureColor);
+
+    UFUNCTION(BlueprintImplementableEvent)
+    void _setComfortInterval(float minComfortTemperature, float maxComfortTemperature);
 
 private:
     void _bindAll();
@@ -38,4 +42,5 @@ private:
 
     TWeakObjectPtr<UThermodynamicsInteractorComponent> _thermoIntC = nullptr;
     TWeakObjectPtr<UThermodynamicsPresenterComponent> _thermoPresC = nullptr;
+    TWeakObjectPtr<UTemperatureDamageHandlerComponent> _tempDmgHandlerC = nullptr;
 };

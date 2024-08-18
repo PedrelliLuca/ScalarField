@@ -9,17 +9,17 @@
 #include "TacticalPauseWorldSubsystem.h"
 #include "ThermometerWidget.h"
 
-void UHUDWidget::SetPawn(TWeakObjectPtr<APawn> const pawn) {
+void UHUDWidget::SetPawn(const TWeakObjectPtr<APawn> pawn) {
     ForgetCurrentPawn();
 
     _healthC = pawn->FindComponentByClass<UHealthComponent>();
     if (!_healthC.IsValid()) {
-        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__": missing UHealthComponent"));
+        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__ ": missing UHealthComponent"));
     }
 
     _manaC = pawn->FindComponentByClass<UManaComponent>();
     if (!_manaC.IsValid()) {
-        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__": missing UManaComponent"));
+        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__ ": missing UManaComponent"));
     }
 
     _thermometerWidget->SetPawn(pawn);
@@ -32,7 +32,6 @@ void UHUDWidget::ForgetCurrentPawn() {
 
     _thermometerWidget->ForgetCurrentPawn();
 }
-
 
 void UHUDWidget::Show() {
     _thermometerWidget->Show();
