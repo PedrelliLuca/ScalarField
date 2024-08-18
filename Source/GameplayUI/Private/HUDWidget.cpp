@@ -7,43 +7,35 @@
 #include "ManaComponent.h"
 #include "SkillIconContainerWidget.h"
 #include "TacticalPauseWorldSubsystem.h"
-#include "ThermodynamicsInteractorComponent.h"
-#include "ThermodynamicsPresenterComponent.h"
+#include "ThermometerWidget.h"
 
-void UHUDWidget::SetPawn(TWeakObjectPtr<APawn> pawn) {
+void UHUDWidget::SetPawn(TWeakObjectPtr<APawn> const pawn) {
     ForgetCurrentPawn();
 
     _healthC = pawn->FindComponentByClass<UHealthComponent>();
     if (!_healthC.IsValid()) {
-        UE_LOG(LogTemp, Error, TEXT("%s: missing UHealthComponent"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__": missing UHealthComponent"));
     }
 
     _manaC = pawn->FindComponentByClass<UManaComponent>();
     if (!_manaC.IsValid()) {
-        UE_LOG(LogTemp, Error, TEXT("%s: missing UManaComponent"), *FString(__FUNCTION__));
+        UE_LOG(LogTemp, Error, TEXT(__FUNCTION__": missing UManaComponent"));
     }
 
-    _thermoIntC = pawn->FindComponentByClass<UThermodynamicsInteractorComponent>();
-    if (!_thermoIntC.IsValid()) {
-        UE_LOG(LogTemp, Error, TEXT("%s: missing UThermodynamicsInteractorComponent"), *FString(__FUNCTION__));
-    }
-
-    _thermoPresC = pawn->FindComponentByClass<UThermodynamicsPresenterComponent>();
-    if (!_thermoPresC.IsValid()) {
-        UE_LOG(LogTemp, Error, TEXT("%s: missing UThermodynamicsPresenterComponent"), *FString(__FUNCTION__));
-    }
+    _thermometerWidget->SetPawn(pawn);
 }
 
 void UHUDWidget::ForgetCurrentPawn() {
     _unbindAll();
     _healthC = nullptr;
     _manaC = nullptr;
-    _thermoIntC = nullptr;
-    _thermoPresC = nullptr;
+
+    _thermometerWidget->ForgetCurrentPawn();
 }
 
 
 void UHUDWidget::Show() {
+    _thermometerWidget->Show();
     _bindAll();
     AddToViewport();
 }
@@ -51,6 +43,7 @@ void UHUDWidget::Show() {
 void UHUDWidget::Hide() {
     RemoveFromParent();
     _unbindAll();
+    _thermometerWidget->Hide();
 }
 
 void UHUDWidget::InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
@@ -81,12 +74,6 @@ void UHUDWidget::_bindAll() {
         _manaRegenChangedHandle = _manaC->OnManaRegenChanged().AddUObject(this, &UHUDWidget::_setManaRegen);
     }
 
-    if (_thermoIntC.IsValid()) {
-        _onTemperatureChange(_thermoIntC->GetTemperature());
-
-        _temperatureChangedHandle = _thermoIntC->OnTemperatureChanged.AddUObject(this, &UHUDWidget::_onTemperatureChange);
-    }
-
     check(!_pauseToggleHandle.IsValid());
     const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
     _setPauseStatus(pauseSubsys->IsTacticalPauseOn());
@@ -105,10 +92,6 @@ void UHUDWidget::_unbindAll() {
         _manaC->OnManaChanged().Remove(_manaChangedHandle);
         _manaC->OnMaxManaChanged().Remove(_maxManaChangedHandle);
         _manaC->OnManaRegenChanged().Remove(_manaRegenChangedHandle);
-    }
-
-    if (_thermoIntC.IsValid()) {
-        _thermoIntC->OnTemperatureChanged.Remove(_temperatureChangedHandle);
     }
 
     if (_pauseToggleHandle.IsValid()) {
@@ -147,13 +130,4 @@ void UHUDWidget::_setCurrentMana(double newCurrentMana) {
 
 void UHUDWidget::_onTacticalPauseToggle(const bool bIsTacticalPauseOn, double) {
     _setPauseStatus(bIsTacticalPauseOn);
-}
-
-void UHUDWidget::_onTemperatureChange(const float newTemperture) {
-    auto temperatureColor = FLinearColor::Black;
-
-    if (_thermoPresC.IsValid()) {
-        temperatureColor = _thermoPresC->GetTemperatureColor();
-    }
-    _setTemperature(newTemperture, temperatureColor);
 }

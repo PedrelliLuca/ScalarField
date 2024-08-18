@@ -13,8 +13,7 @@ class UManaComponent;
 class UNewStateComponent;
 class USkillsContainerComponent;
 class USkillIconContainerWidget;
-class UThermodynamicsInteractorComponent;
-class UThermodynamicsPresenterComponent;
+class UThermometerWidget;
 
 /**
  *
@@ -69,8 +68,6 @@ private:
     void _setMaxMana(double newMaxMana);
     void _setCurrentMana(double newCurrentMana);
 
-    void _onTemperatureChange(float newTemperture);
-
     void _onTacticalPauseToggle(bool bIsTacticalPauseOn, double);
 
     FDelegateHandle _healthChangedHandle;
@@ -80,14 +77,14 @@ private:
     FDelegateHandle _manaChangedHandle;
     FDelegateHandle _maxManaChangedHandle;
     FDelegateHandle _manaRegenChangedHandle;
-    FDelegateHandle _temperatureChangedHandle;
     FDelegateHandle _pauseToggleHandle;
 
     TWeakObjectPtr<UHealthComponent> _healthC = nullptr;
     TWeakObjectPtr<UManaComponent> _manaC = nullptr;
-    TWeakObjectPtr<UThermodynamicsInteractorComponent> _thermoIntC = nullptr;
-    TWeakObjectPtr<UThermodynamicsPresenterComponent> _thermoPresC = nullptr;
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<USkillIconContainerWidget> _skillIconContainer = nullptr;
+
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UThermometerWidget> _thermometerWidget = nullptr;
 };
