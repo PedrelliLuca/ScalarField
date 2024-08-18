@@ -19,7 +19,6 @@ void UAIStatusWidgetComponent::BeginPlay() {
         if (const auto aiStatusWidget = Cast<IPawnBindableWidget>(GetUserWidgetObject())) {
             // TODO: why not actor? See IPawnBindableWidget comment.
             aiStatusWidget->SetPawn(ownerPawn);
-            aiStatusWidget->BindCurrentPawn();
         } else {
             UE_LOG(LogTemp, Error, TEXT("%s: Invalid User Widget, must be an AITemperatureWidget"), *FString{__FUNCTION__});
         }

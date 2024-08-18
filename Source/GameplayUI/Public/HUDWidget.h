@@ -26,8 +26,6 @@ class GAMEPLAYUI_API UHUDWidget : public UUserWidget, public IPawnBindableWidget
 public:
     void SetPawn(TWeakObjectPtr<APawn> pawn) override;
     void ForgetCurrentPawn() override;
-    void BindCurrentPawn() override;
-    void UnbindCurrentPawn() override;
     void Show() override;
     void Hide() override;
 
@@ -61,6 +59,9 @@ protected:
     double _maxMana = 0.;
 
 private:
+    void _bindAll();
+    void _unbindAll();
+
     void _setMaxHealth(float newMaxHealth);
     void _setCurrentHealth(float newCurrentHealth);
     void _onDeath(TObjectPtr<AActor> _);

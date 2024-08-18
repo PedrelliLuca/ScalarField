@@ -24,8 +24,7 @@ void UWidgetsPresenterComponent::CreateHUD() {
 
     _hudWidget = CreateWidget<UHUDWidget>(ownerPlayerC.Get(), _hudWidgetClass);
     _hudWidget->SetPawn(ownerPlayerC->GetPawn());
-    _hudWidget->BindCurrentPawn();
-    _hudWidget->AddToViewport();
+    _hudWidget->Show();
 }
 
 void UWidgetsPresenterComponent::CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {

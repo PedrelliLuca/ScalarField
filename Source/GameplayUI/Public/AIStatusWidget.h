@@ -22,8 +22,6 @@ class GAMEPLAYUI_API UAIStatusWidget : public UUserWidget, public IPawnBindableW
 public:
     void SetPawn(TWeakObjectPtr<APawn> pawn) override;
     void ForgetCurrentPawn() override;
-    void BindCurrentPawn() override;
-    void UnbindCurrentPawn() override;
     void Show() override;
     void Hide() override;
 
@@ -75,4 +73,8 @@ protected:
     TWeakObjectPtr<UHealthComponent> _healthC = nullptr;
     TWeakObjectPtr<UManaComponent> _manaC = nullptr;
     TWeakObjectPtr<UThermodynamicsInteractorComponent> _thermoIntC = nullptr;
+
+private:
+    void _bindAll();
+    void _unbindAll();
 };

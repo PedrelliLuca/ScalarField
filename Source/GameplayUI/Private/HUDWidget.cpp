@@ -35,15 +35,30 @@ void UHUDWidget::SetPawn(TWeakObjectPtr<APawn> pawn) {
 }
 
 void UHUDWidget::ForgetCurrentPawn() {
-    UnbindCurrentPawn();
+    _unbindAll();
     _healthC = nullptr;
     _manaC = nullptr;
     _thermoIntC = nullptr;
     _thermoPresC = nullptr;
 }
 
-void UHUDWidget::BindCurrentPawn() {
-    UnbindCurrentPawn();
+
+void UHUDWidget::Show() {
+    _bindAll();
+    AddToViewport();
+}
+
+void UHUDWidget::Hide() {
+    RemoveFromParent();
+    _unbindAll();
+}
+
+void UHUDWidget::InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
+    _skillIconContainer->BuildIconsFromContainer(skillsContainer, stateMachine);
+}
+
+void UHUDWidget::_bindAll() {
+    _unbindAll();
 
     if (_healthC.IsValid()) {
         _setCurrentHealth(_healthC->GetCurrentHealth());
@@ -78,7 +93,7 @@ void UHUDWidget::BindCurrentPawn() {
     _pauseToggleHandle = pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &UHUDWidget::_onTacticalPauseToggle);
 }
 
-void UHUDWidget::UnbindCurrentPawn() {
+void UHUDWidget::_unbindAll() {
     if (_healthC.IsValid()) {
         _healthC->OnHealthChanged().Remove(_healthChangedHandle);
         _healthC->OnMaxHealthChanged().Remove(_maxHealthChangedHandle);
@@ -103,18 +118,6 @@ void UHUDWidget::UnbindCurrentPawn() {
     }
 }
 
-void UHUDWidget::Show() {
-    AddToViewport();
-}
-
-void UHUDWidget::Hide() {
-    RemoveFromParent();
-}
-
-void UHUDWidget::InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
-    _skillIconContainer->BuildIconsFromContainer(skillsContainer, stateMachine);
-}
-
 void UHUDWidget::_setMaxHealth(float newMaxHealth) {
     _maxHealth = newMaxHealth;
     _setHealth();
@@ -129,7 +132,7 @@ void UHUDWidget::_setCurrentHealth(float newCurrentHealth) {
 // UHealthComponent::OnDeath(). However, due to an architectural error (see description of FOnDeath macro, UHealthComponent.h), it is necessary. I shall
 // remove this one day.
 void UHUDWidget::_onDeath(TObjectPtr<AActor> _) {
-    UnbindCurrentPawn();
+    _unbindAll();
 }
 
 void UHUDWidget::_setMaxMana(double newMaxMana) {
