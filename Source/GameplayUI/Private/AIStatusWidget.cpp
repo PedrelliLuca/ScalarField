@@ -32,59 +32,17 @@ void UAIStatusWidget::SetPawn(TWeakObjectPtr<APawn> pawn) {
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: missing UTemperatureDamagehandlerComponent"), *FString(__FUNCTION__));
     }
+
+    _bindAll();
 }
 
 void UAIStatusWidget::ForgetCurrentPawn() {
-    UnbindCurrentPawn();
+    _unbindAll();
     _healthC = nullptr;
     _manaC = nullptr;
     _thermoIntC = nullptr;
     _comfortLowerLimit = 0.0f;
     _comfortUpperLimit = TNumericLimits<float>::Max();
-}
-
-void UAIStatusWidget::BindCurrentPawn() {
-    UnbindCurrentPawn();
-
-    if (_healthC.IsValid()) {
-        _setCurrentHealth(_healthC->GetCurrentHealth());
-        _setMaxHealth(_healthC->GetMaxHealth());
-
-        _healthChangedHandle = _healthC->OnHealthChanged().AddUObject(this, &UAIStatusWidget::_setCurrentHealth);
-        _maxHealthChangedHandle = _healthC->OnMaxHealthChanged().AddUObject(this, &UAIStatusWidget::_setMaxHealth);
-        _onDeathHandle = _healthC->OnDeath().AddUObject(this, &UAIStatusWidget::_onDeath);
-    }
-
-    if (_manaC.IsValid()) {
-        _setCurrentMana(_manaC->GetCurrentMana());
-        _setMaxMana(_manaC->GetMaxMana());
-
-        _manaChangedHandle = _manaC->OnManaChanged().AddUObject(this, &UAIStatusWidget::_setCurrentMana);
-        _maxManaChangedHandle = _manaC->OnMaxManaChanged().AddUObject(this, &UAIStatusWidget::_setMaxMana);
-    }
-
-    if (_thermoIntC.IsValid()) {
-        _setCurrentTemperature(_thermoIntC->GetTemperature());
-
-        _temperatureChangedHandle = _thermoIntC->OnTemperatureChanged.AddUObject(this, &UAIStatusWidget::_setCurrentTemperature);
-    }
-}
-
-void UAIStatusWidget::UnbindCurrentPawn() {
-    if (_healthC.IsValid()) {
-        _healthC->OnHealthChanged().Remove(_healthChangedHandle);
-        _healthC->OnMaxHealthChanged().Remove(_maxHealthChangedHandle);
-        _healthC->OnDeath().Remove(_onDeathHandle);
-    }
-
-    if (_manaC.IsValid()) {
-        _manaC->OnManaChanged().Remove(_manaChangedHandle);
-        _manaC->OnMaxManaChanged().Remove(_maxManaChangedHandle);
-    }
-
-    if (_thermoIntC.IsValid()) {
-        _thermoIntC->OnTemperatureChanged.Remove(_temperatureChangedHandle);
-    }
 }
 
 void UAIStatusWidget::Show() {
@@ -118,7 +76,7 @@ void UAIStatusWidget::_setMaxHealth(const float newMaxHealth) {
 // UHealthComponent::OnDeath(). However, due to an architectural error (see description of FOnDeath macro, UHealthComponent.h), it is necessary. I shall
 // remove this one day.
 void UAIStatusWidget::_onDeath(TObjectPtr<AActor> _) {
-    UnbindCurrentPawn();
+    _unbindAll();
 }
 
 void UAIStatusWidget::_setCurrentMana(const double newMana) {
@@ -129,4 +87,46 @@ void UAIStatusWidget::_setCurrentMana(const double newMana) {
 void UAIStatusWidget::_setMaxMana(const double newMaxMana) {
     _maxMana = newMaxMana;
     _updateMana();
+}
+
+void UAIStatusWidget::_bindAll() {
+    if (_healthC.IsValid()) {
+        _setCurrentHealth(_healthC->GetCurrentHealth());
+        _setMaxHealth(_healthC->GetMaxHealth());
+
+        _healthChangedHandle = _healthC->OnHealthChanged().AddUObject(this, &UAIStatusWidget::_setCurrentHealth);
+        _maxHealthChangedHandle = _healthC->OnMaxHealthChanged().AddUObject(this, &UAIStatusWidget::_setMaxHealth);
+        _onDeathHandle = _healthC->OnDeath().AddUObject(this, &UAIStatusWidget::_onDeath);
+    }
+
+    if (_manaC.IsValid()) {
+        _setCurrentMana(_manaC->GetCurrentMana());
+        _setMaxMana(_manaC->GetMaxMana());
+
+        _manaChangedHandle = _manaC->OnManaChanged().AddUObject(this, &UAIStatusWidget::_setCurrentMana);
+        _maxManaChangedHandle = _manaC->OnMaxManaChanged().AddUObject(this, &UAIStatusWidget::_setMaxMana);
+    }
+
+    if (_thermoIntC.IsValid()) {
+        _setCurrentTemperature(_thermoIntC->GetTemperature());
+
+        _temperatureChangedHandle = _thermoIntC->OnTemperatureChanged.AddUObject(this, &UAIStatusWidget::_setCurrentTemperature);
+    }
+}
+
+void UAIStatusWidget::_unbindAll() {
+    if (_healthC.IsValid()) {
+        _healthC->OnHealthChanged().Remove(_healthChangedHandle);
+        _healthC->OnMaxHealthChanged().Remove(_maxHealthChangedHandle);
+        _healthC->OnDeath().Remove(_onDeathHandle);
+    }
+
+    if (_manaC.IsValid()) {
+        _manaC->OnManaChanged().Remove(_manaChangedHandle);
+        _manaC->OnMaxManaChanged().Remove(_maxManaChangedHandle);
+    }
+
+    if (_thermoIntC.IsValid()) {
+        _thermoIntC->OnTemperatureChanged.Remove(_temperatureChangedHandle);
+    }
 }

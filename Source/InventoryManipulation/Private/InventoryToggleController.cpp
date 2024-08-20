@@ -18,7 +18,6 @@ void UInventoryToggleController::SetHUDToShowOnClose(TWeakInterfacePtr<IPawnBind
 void UInventoryToggleController::OpenInventoryOfActor(TWeakObjectPtr<AActor>&& actor) {
     check(_hudToShowOnClose.IsValid());
     _hudToShowOnClose->Hide();
-    _hudToShowOnClose->UnbindCurrentPawn();
 
     const auto inventoryC = actor->FindComponentByInterface(UInventory::StaticClass());
     TWeakInterfacePtr<IInventory> inventory = Cast<IInventory>(inventoryC);
@@ -31,7 +30,6 @@ void UInventoryToggleController::CloseInventory() {
     _inventoryContainer->HideInventory();
 
     check(_hudToShowOnClose.IsValid());
-    _hudToShowOnClose->BindCurrentPawn();
     _hudToShowOnClose->Show();
 }
 

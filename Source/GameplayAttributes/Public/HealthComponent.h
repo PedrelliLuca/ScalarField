@@ -12,7 +12,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthRegenChanged, float);
 
 // TODO: this delegate should not send the TObjectPtr<AActor>, who subscribes to it should already know the actor!!
 // This is needed because of an architectural error in UPickupSpawnController: _dropPickupsOnDeath() should not exist! Instead, _spawnPickup() should be called
-// recursively on death by the UPickupSpawnController. Problem is, the pickup system is tightly bound to the inventor UI at the moment, while spawning pickups
+// recursively on death by the UPickupSpawnController. Problem is, the pickup system is tightly bound to the inventory UI at the moment, while spawning pickups
 // on death has nothing to do with the UI.
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeath, TObjectPtr<AActor>);
 
