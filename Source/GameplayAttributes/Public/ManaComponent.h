@@ -6,9 +6,9 @@
 #include "CoreMinimal.h"
 #include "ManaComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnManaChanged, double);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxManaChanged, double);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnManaRegenChanged, double);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnManaChanged, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMaxManaChanged, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnManaRegenChanged, float);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class GAMEPLAYATTRIBUTES_API UManaComponent : public UActorComponent {
@@ -23,15 +23,15 @@ public:
     void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
 
-    double GetCurrentMana() const { return _currentMana; }
-    double GetMaxMana() const { return _maxMana; }
-    double GetManaRegen() const { return _manaRegenPerSecond; }
+    float GetCurrentMana() const { return _currentMana; }
+    float GetMaxMana() const { return _maxMana; }
+    float GetManaRegen() const { return _manaRegenPerSecond; }
 
-    void SetCurrentMana(double mana);
-    void SetMaxMana(double maxMana, bool bUpdateMana = true);
-    void SetManaRegen(double manaRegenPerSecond);
+    void SetCurrentMana(float mana);
+    void SetMaxMana(float maxMana, bool bUpdateMana = true);
+    void SetManaRegen(float manaRegenPerSecond);
 
-    void RestoreMana(double manaToRestore) { SetCurrentMana(GetCurrentMana() + manaToRestore); }
+    void RestoreMana(float manaToRestore) { SetCurrentMana(GetCurrentMana() + manaToRestore); }
 
     FOnManaChanged& OnManaChanged() { return _onManaChanged; }
     FOnMaxManaChanged& OnMaxManaChanged() { return _onMaxManaChanged; }
@@ -42,14 +42,14 @@ protected:
 
 private:
     UPROPERTY(EditAnywhere, Category = "Mana", meta = (ClampMin = "0"))
-    double _maxMana = 0.;
+    float _maxMana = 0.;
 
     // How much mana we regenerate in 1 second
     UPROPERTY(EditAnywhere, Category = "Mana", meta = (ClampMin = "0"))
-    double _manaRegenPerSecond = 0.;
+    float _manaRegenPerSecond = 0.;
 
     UPROPERTY(VisibleAnywhere, Category = "Mana")
-    double _currentMana = 0.;
+    float _currentMana = 0.;
 
     FOnManaChanged _onManaChanged;
     FOnMaxManaChanged _onMaxManaChanged;

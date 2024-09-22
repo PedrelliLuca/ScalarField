@@ -67,22 +67,22 @@ void UGameplayAttributesWidget::_unbindAll() {
     }
 }
 
-void UGameplayAttributesWidget::_setMaxHealth(float newMaxHealth) {
+void UGameplayAttributesWidget::_setMaxHealth(const float newMaxHealth) {
     _maxHealth = newMaxHealth;
     _setHealth();
 }
 
-void UGameplayAttributesWidget::_setCurrentHealth(float newCurrentHealth) {
+void UGameplayAttributesWidget::_setCurrentHealth(const float newCurrentHealth) {
     _currentHealth = newCurrentHealth;
     _setHealth();
 }
 
-void UGameplayAttributesWidget::_setMaxMana(double newMaxMana) {
+void UGameplayAttributesWidget::_setMaxMana(const float newMaxMana) {
     _maxMana = newMaxMana;
     _setMana();
 }
 
-void UGameplayAttributesWidget::_setCurrentMana(double newCurrentMana) {
+void UGameplayAttributesWidget::_setCurrentMana(const float newCurrentMana) {
     _currentMana = newCurrentMana;
     _setMana();
 }

@@ -33,7 +33,7 @@ protected:
     UFUNCTION(BlueprintImplementableEvent)
     void _setMana();
     UFUNCTION(BlueprintImplementableEvent)
-    void _setManaRegen(double newManaRegen);
+    void _setManaRegen(float newManaRegen);
 
     UPROPERTY(BlueprintReadOnly, Category = "Health")
     float _currentHealth = 0.;
@@ -51,8 +51,8 @@ private:
 
     void _setMaxHealth(float newMaxHealth);
     void _setCurrentHealth(float newCurrentHealth);
-    void _setMaxMana(double newMaxMana);
-    void _setCurrentMana(double newCurrentMana);
+    void _setMaxMana(float newMaxMana);
+    void _setCurrentMana(float newCurrentMana);
 
     FDelegateHandle _healthChangedHandle;
     FDelegateHandle _maxHealthChangedHandle;

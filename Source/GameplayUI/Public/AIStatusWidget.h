@@ -43,8 +43,8 @@ protected:
     void _setMaxHealth(float newMaxHealth);
     void _onDeath(TObjectPtr<AActor> _);
 
-    void _setCurrentMana(double newMana);
-    void _setMaxMana(double newMaxMana);
+    void _setCurrentMana(float newMana);
+    void _setMaxMana(float newMaxMana);
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Comfort Interval")
     float _comfortUpperLimit = -1.0f;
