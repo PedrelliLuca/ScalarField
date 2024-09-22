@@ -79,12 +79,12 @@ void UAIStatusWidget::_onDeath(TObjectPtr<AActor> _) {
     _unbindAll();
 }
 
-void UAIStatusWidget::_setCurrentMana(const double newMana) {
+void UAIStatusWidget::_setCurrentMana(const float newMana) {
     _currentMana = newMana;
     _updateMana();
 }
 
-void UAIStatusWidget::_setMaxMana(const double newMaxMana) {
+void UAIStatusWidget::_setMaxMana(const float newMaxMana) {
     _maxMana = newMaxMana;
     _updateMana();
 }

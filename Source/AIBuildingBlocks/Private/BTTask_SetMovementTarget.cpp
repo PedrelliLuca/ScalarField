@@ -31,9 +31,11 @@ EBTNodeResult::Type UBTTask_SetMovementTarget::ExecuteTask(UBehaviorTreeComponen
 
     } else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass()) {
         const auto keyValue = blackboardC->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
-        const auto targetActor = Cast<AActor>(keyValue);
-        check(IsValid(targetActor));
-        targetLocation = targetActor->GetActorLocation();
+
+        // If the targetActor is not about to be killed by the garbage collector
+        if (const auto targetActor = Cast<AActor>(keyValue); IsValid(targetActor)) {
+            targetLocation = targetActor->GetActorLocation();
+        }
     } else {
         checkNoEntry();
     }
