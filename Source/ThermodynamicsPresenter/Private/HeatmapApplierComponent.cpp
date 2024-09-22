@@ -13,7 +13,7 @@ void UHeatmapApplierComponent::BeginPlay() {
     Super::BeginPlay();
 
     UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
-    const TWeakObjectPtr<UMaterialInstanceDynamic> heatmapMID = thermoSubsys->GetHeatmapMaterialInstance();
+    TWeakObjectPtr<UMaterialInstanceDynamic> const heatmapMID = thermoSubsys->GetHeatmapMaterialInstance();
     if (heatmapMID.IsValid()) {
         _applyToStaticMesh(heatmapMID);
     } else {
@@ -21,7 +21,7 @@ void UHeatmapApplierComponent::BeginPlay() {
     }
 }
 
-void UHeatmapApplierComponent::_applyToStaticMesh(const TWeakObjectPtr<UMaterialInstanceDynamic> heatmapMID) {
+void UHeatmapApplierComponent::_applyToStaticMesh(TWeakObjectPtr<UMaterialInstanceDynamic> const heatmapMID) {
     UStaticMeshComponent* const staticMesh = GetOwner()->FindComponentByClass<UStaticMeshComponent>();
     staticMesh->SetMaterial(0, heatmapMID.Get());
 

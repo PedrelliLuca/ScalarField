@@ -30,12 +30,12 @@ float UThermodynamicsInteractorComponent::GetTemperature() const {
     return _currentTemperature;
 }
 
-void UThermodynamicsInteractorComponent::SetTemperature(const float newTemperature) {
+void UThermodynamicsInteractorComponent::SetTemperature(float const newTemperature) {
     _currentTemperature = newTemperature;
     _nextTemperature = newTemperature;
 }
 
-void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
+void UThermodynamicsInteractorComponent::TickComponent(float const deltaTime, ELevelTick const tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
     // Suppose this just spawned and some of the _collidingInteractors have already _setCurrentTemperatureAsNext(). Updating their counters would cause them to
@@ -58,15 +58,15 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
     UE_LOG(LogTemp, Warning, TEXT("%s will be checked %i times this frame"), *thisName, _timesToBeCheckedThisFrame);
 #endif
 
-    const float currDeltaT_OtherBodies = _interactWithOtherComponents(deltaTime);
+    float const currDeltaT_OtherBodies = _interactWithOtherComponents(deltaTime);
 
     // 2) Interact with the Heatmap Grid
     check(_collisionsCollectionC.IsValid());
-    const FTransform& interactorTransform = GetOwner()->GetTransform();
-    const float currDeltaT_GridNormalized = HeatmapGrid::Interact(interactorTransform, _collisionsCollectionC.Get(), _currentTemperature, deltaTime);
+    FTransform const& interactorTransform = GetOwner()->GetTransform();
+    float const currDeltaT_GridNormalized = HeatmapGrid::Interact(interactorTransform, _collisionsCollectionC.Get(), _currentTemperature, deltaTime);
 
-    const float totalCurrDeltaT = currDeltaT_GridNormalized + currDeltaT_OtherBodies + _unregisteredDeltaTemperature;
-    const float totalDeltaT = (UThermodynamicsSubsystem::ROD_CONSTANT * totalCurrDeltaT * deltaTime) / _heatCapacity;
+    float const totalCurrDeltaT = currDeltaT_GridNormalized + currDeltaT_OtherBodies + _unregisteredDeltaTemperature;
+    float const totalDeltaT = (UThermodynamicsSubsystem::ROD_CONSTANT * totalCurrDeltaT * deltaTime) / _heatCapacity;
 
     _nextTemperature += totalDeltaT;
     _unregisteredDeltaTemperature = 0.0f;
@@ -84,9 +84,9 @@ void UThermodynamicsInteractorComponent::TickComponent(const float deltaTime, co
 #if WITH_EDITOR
 void UThermodynamicsInteractorComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) {
     FProperty* const property = propertyChangedEvent.Property;
-    const FName propertyName = property != nullptr ? property->GetFName() : NAME_None;
+    FName const propertyName = property != nullptr ? property->GetFName() : NAME_None;
     if (propertyName == GET_MEMBER_NAME_CHECKED(UThermodynamicsInteractorComponent, _initialTemperature)) {
-        if (const auto initTempProperty = CastFieldChecked<FFloatProperty>(property)) {
+        if (auto const initTempProperty = CastFieldChecked<FFloatProperty>(property)) {
             float initialTemperature = initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<float>(this));
             initialTemperature = FMath::Clamp(initialTemperature, 0., TNumericLimits<float>::Max());
 
@@ -112,10 +112,10 @@ void UThermodynamicsInteractorComponent::BeginPlay() {
     _retrieveThermodynamicCollision();
 }
 
-float UThermodynamicsInteractorComponent::_interactWithOtherComponents(const float deltaTime) {
+float UThermodynamicsInteractorComponent::_interactWithOtherComponents(float const deltaTime) {
     float deltaTemperature = 0.0f;
 
-    for (const TWeakObjectPtr<UThermodynamicsInteractorComponent>& otherThermoIntC : _collidingInteractors) {
+    for (TWeakObjectPtr<UThermodynamicsInteractorComponent> const& otherThermoIntC : _collidingInteractors) {
         if (!otherThermoIntC->_hasNeverTicked) {
             // This currDeltaT is from this component'sPOV, which is why its _currentTemperature is on the right hand side.
             // If this interactor's T is greater than the other's, deltaT < 0 => this interactor emits heat (deltaTemperature decreases).
@@ -208,9 +208,9 @@ void UThermodynamicsInteractorComponent::_setInitialInteractors() {
     UE_LOG(LogTemp, Warning, TEXT("%s initial interactors:"), *thisName);
 #endif
 
-    Algo::ForEach(overlappingCollisions, [&heatExchangers = _collidingInteractors](const TObjectPtr<const UPrimitiveComponent> otherCollision) {
-        const auto otherOwner = otherCollision->GetOwner();
-        const auto otherThermoIntC = otherOwner->FindComponentByClass<UThermodynamicsInteractorComponent>();
+    Algo::ForEach(overlappingCollisions, [&heatExchangers = _collidingInteractors](TObjectPtr<UPrimitiveComponent const> const otherCollision) {
+        auto const otherOwner = otherCollision->GetOwner();
+        auto const otherThermoIntC = otherOwner->FindComponentByClass<UThermodynamicsInteractorComponent>();
         // If I have a thermodynamic collision I must have a thermodynamic component
         check(IsValid(otherThermoIntC));
         heatExchangers.Emplace(otherThermoIntC);
@@ -223,8 +223,8 @@ void UThermodynamicsInteractorComponent::_setInitialInteractors() {
 }
 
 void UThermodynamicsInteractorComponent::_registerInteractor(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp,
-    int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
-    const auto otherThermoIntC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
+    int32 otherBodyIndex, bool bFromSweep, FHitResult const& sweepResult) {
+    auto const otherThermoIntC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
     check(IsValid(otherThermoIntC));
 
     _collidingInteractors.Emplace(otherThermoIntC);
@@ -239,7 +239,7 @@ void UThermodynamicsInteractorComponent::_registerInteractor(UPrimitiveComponent
 void UThermodynamicsInteractorComponent::_unregisterInteractor(
     UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex) {
     TWeakObjectPtr<UThermodynamicsInteractorComponent>* found =
-        Algo::FindByPredicate(_collidingInteractors, [otherComp](const TWeakObjectPtr<UThermodynamicsInteractorComponent>& thermoIntC) {
+        Algo::FindByPredicate(_collidingInteractors, [otherComp](TWeakObjectPtr<UThermodynamicsInteractorComponent> const& thermoIntC) {
             return thermoIntC->_collisionsCollectionC->HasElement(otherComp);
         });
 

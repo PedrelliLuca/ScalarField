@@ -9,11 +9,11 @@ bool UHasComponentsTargetingCondition::IsVerifiedForTarget(ISkillTarget* const s
     check(skillTarget != nullptr);
     check(!_requiredComponents.IsEmpty());
 
-    const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget);
+    auto const actorSkillTarget = Cast<UActorSkillTarget>(skillTarget);
     if (!ensureMsgf(IsValid(actorSkillTarget), TEXT("This condition should only be applied to targets of type UActorSkillTarget!"))) {
         return false;
     }
 
     return Algo::AllOf(_requiredComponents,
-        [targetActor = actorSkillTarget->GetActor()](const auto& requiredComponent) { return IsValid(targetActor->FindComponentByClass(requiredComponent)); });
+        [targetActor = actorSkillTarget->GetActor()](auto const& requiredComponent) { return IsValid(targetActor->FindComponentByClass(requiredComponent)); });
 }

@@ -31,7 +31,7 @@ void USkillExecutionState::OnLeave() {
     _subjectSkillsContainerC->AbortWaitingSkill();
 }
 
-TScriptInterface<IFSMState> USkillExecutionState::Tick(const float deltaTime) {
+TScriptInterface<IFSMState> USkillExecutionState::Tick(float const deltaTime) {
     _movementCommandSetter->MovementTick(deltaTime);
     if (_interactor.IsValid()) {
         _interactor->PerformFocusCheck();
@@ -39,7 +39,7 @@ TScriptInterface<IFSMState> USkillExecutionState::Tick(const float deltaTime) {
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> USkillExecutionState::TrySetMovementDestination(const FVector& movementDestination) {
+TScriptInterface<IFSMState> USkillExecutionState::TrySetMovementDestination(FVector const& movementDestination) {
     _movementCommandSetter->SetDestination(movementDestination);
     return _keepCurrentState();
 }
@@ -49,7 +49,7 @@ TScriptInterface<IFSMState> USkillExecutionState::TryStopMovement() {
     return _keepCurrentState();
 }
 
-FStateResponse_TryCastSkill USkillExecutionState::TryCastSkillAtIndex(const int32 index) {
+FStateResponse_TryCastSkill USkillExecutionState::TryCastSkillAtIndex(int32 const index) {
     auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
     return FStateResponse_TryCastSkill{_keepCurrentState(), MoveTemp(skillCastResult)};
 }
@@ -59,7 +59,7 @@ TScriptInterface<IFSMState> USkillExecutionState::TryAbort() {
     return _keepCurrentState();
 }
 
-FStateResponse_TrySetSkillTarget USkillExecutionState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+FStateResponse_TrySetSkillTarget USkillExecutionState::TrySetSkillTarget(FSkillTargetPacket const& targetPacket) {
     auto skillTargetingResult = _subjectSkillsContainerC->TryAddTargetToWaitingSkill(targetPacket);
     TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> optionalResultVariant{};
 
@@ -74,7 +74,7 @@ FStateResponse_TrySetSkillTarget USkillExecutionState::TrySetSkillTarget(const F
             /* In case the skill we're trying to cast is in execution, we abort it and try casting it again. There is no guarantee that the 2nd time we'll
              * succeed BUT, since we aborted, this time we must not get ESkillCastResult::Fail_InExecution. */
             if (skillCastResult.GetCastResult() == ESkillCastResult::Fail_InExecution) {
-                [[maybe_unused]] const auto abortSuccessful = _subjectSkillsContainerC->AbortSkillInExecution();
+                [[maybe_unused]] auto const abortSuccessful = _subjectSkillsContainerC->AbortSkillInExecution();
                 check(abortSuccessful);
 
                 optionalSkillCastResult = _subjectSkillsContainerC->TryCastWaitingSkill();
@@ -93,7 +93,7 @@ TScriptInterface<IFSMState> USkillExecutionState::TryInteracting() {
     // Not all pawns might have an _interactor. However, if they don't, they shouldn't be calling this function!!
     check(_interactor.IsValid());
 
-    const bool interactionSuccessful = _interactor->PerformInteractionCheck();
+    bool const interactionSuccessful = _interactor->PerformInteractionCheck();
     if (interactionSuccessful) {
         _subjectSkillsContainerC->AbortSkillInExecution();
     }

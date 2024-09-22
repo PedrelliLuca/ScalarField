@@ -38,7 +38,7 @@ public:
 
     /* Tries to add a certain quantity of items of a given class to the inventory. */
     UFUNCTION(BlueprintCallable, Category = "Inventory")
-    FItemAddResult TryAddItemFromClass(TSubclassOf<UInventoryItem> itemClass, const int32 quantity);
+    FItemAddResult TryAddItemFromClass(TSubclassOf<UInventoryItem> itemClass, int32 const quantity);
 
     /* Takes some quantity of the item away from the inventory. Removes the item if the quantity reaches 0. The quantity of the item
     that was actually consumed (i.e. the one that takes into account how much of the item we have in the inventory) is returned.*/
@@ -83,5 +83,5 @@ private:
     // DO NOT CALL Add() or Emplace() on the _items array directly! Use this instead.
     // Adds the item to the inventory. If the input item is not owned by this inventory, makes a copy of it with this as outer
     // before adding. The item with this as outer is returned.
-    TObjectPtr<UInventoryItem> _addItem(const TWeakInterfacePtr<IItem> item);
+    TObjectPtr<UInventoryItem> _addItem(TWeakInterfacePtr<IItem> const item);
 };

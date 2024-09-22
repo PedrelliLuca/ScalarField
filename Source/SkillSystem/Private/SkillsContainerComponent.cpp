@@ -9,16 +9,16 @@ USkillsContainerComponent::USkillsContainerComponent() {
 }
 
 void USkillsContainerComponent::CreateAllSkills() {
-    const auto caster = GetOwner();
+    auto const caster = GetOwner();
     _skills.Reserve(_skillClasses.Num());
-    for (const auto& skillClass : _skillClasses) {
+    for (auto const& skillClass : _skillClasses) {
         auto skill = NewObject<UAbstractSkill>(this, skillClass);
         skill->SetCaster(caster);
         _skills.Emplace(MoveTemp(skill));
     }
 }
 
-FSkillCastResult USkillsContainerComponent::TryCastSkillAtIndex(const int32 index) {
+FSkillCastResult USkillsContainerComponent::TryCastSkillAtIndex(int32 const index) {
     if (index >= _skills.Num()) {
         // TODO: this is a random thing, we should return a proper error in here!
         return FSkillCastResult::CastFail_CastConditionsViolated();
@@ -26,7 +26,7 @@ FSkillCastResult USkillsContainerComponent::TryCastSkillAtIndex(const int32 inde
 
     check(IsValid(_skills[index]));
 
-    const auto skillCastResult = _skills[index]->TryCast();
+    auto const skillCastResult = _skills[index]->TryCast();
     if (skillCastResult.IsFailure()) {
         UE_LOG(LogTemp, Warning, TEXT("%s"), *skillCastResult.GetErrorText().ToString());
 
@@ -78,7 +78,7 @@ TOptional<FSkillCastResult> USkillsContainerComponent::TryCastWaitingSkill() {
 
 bool USkillsContainerComponent::AbortSkillInExecution() {
     bool executionSkillReset = false;
-    const bool waitingSkillReset = _resetWaitingSkill();
+    bool const waitingSkillReset = _resetWaitingSkill();
 
     // We want to abort only one skill at a time: if we a skill waiting for targets and a skill in execution, only the former gets aborted.
     if (!waitingSkillReset) {
@@ -91,14 +91,14 @@ bool USkillsContainerComponent::AbortWaitingSkill() {
     return _resetWaitingSkill();
 }
 
-TOptional<FSkillTargetingResult> USkillsContainerComponent::TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket) {
+TOptional<FSkillTargetingResult> USkillsContainerComponent::TryAddTargetToWaitingSkill(FSkillTargetPacket const& targetPacket) {
     if (!_skillWaitingForTargets.IsValid()) {
         // No skill is waiting for targets
         return TOptional<FSkillTargetingResult>{};
     }
 
     auto skillTargetingResult = _skillWaitingForTargets->TryAddTarget(targetPacket);
-    const auto targetingResult = skillTargetingResult.GetTargetingResult();
+    auto const targetingResult = skillTargetingResult.GetTargetingResult();
 
     if (skillTargetingResult.IsFailure()) {
         // If every target has already been provided to the skill we expect _skillWaitingForTargets to be nullptr.
@@ -109,7 +109,7 @@ TOptional<FSkillTargetingResult> USkillsContainerComponent::TryAddTargetToWaitin
     return MoveTemp(skillTargetingResult);
 }
 
-void USkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbstractSkill> skill, const ESkillCastResult castResultValue) {
+void USkillsContainerComponent::_setNewSkillInExecution(TObjectPtr<UAbstractSkill> const skill, ESkillCastResult const castResultValue) {
     /* If we don't get inside the following statement, it means that either:
      * 1. The result was ESkillCastResult::Success_IntoExecutionEnd. In such case, the skill was instantaneous, we don't to cache it and bind to its delegates.
      * 2. The cast was a failure, so we don't want to set the skill as "in execution". */
@@ -124,7 +124,7 @@ void USkillsContainerComponent::_setNewSkillInExecution(const TObjectPtr<UAbstra
     }
 }
 
-void USkillsContainerComponent::_onCurrentlyExecutedSkillStatusChanged(const ESkillStatus newStatus) {
+void USkillsContainerComponent::_onCurrentlyExecutedSkillStatusChanged(ESkillStatus const newStatus) {
     if (newStatus == ESkillStatus::Cooldown || newStatus == ESkillStatus::None) {
         _skillCurrentlyBeingExecuted->OnSkillStatusChanged().Remove(_skillBeingExecutedDelegate);
         _skillCurrentlyBeingExecuted = nullptr;
@@ -132,7 +132,7 @@ void USkillsContainerComponent::_onCurrentlyExecutedSkillStatusChanged(const ESk
     }
 }
 
-bool USkillsContainerComponent::_resetSkillInExecution(const bool resetMovement) {
+bool USkillsContainerComponent::_resetSkillInExecution(bool const resetMovement) {
     if (_skillCurrentlyBeingExecuted.IsValid()) {
         _skillCurrentlyBeingExecuted->Abort(resetMovement);
         return true;

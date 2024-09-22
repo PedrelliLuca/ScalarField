@@ -18,7 +18,7 @@ void UInventoryOpenState::SetPawn(TObjectPtr<APawn> subjectPawn) {
 }
 
 void UInventoryOpenState::OnEnter() {
-    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+    auto const inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
     inventorySubsys->OpenInventoryOfActor(_subjectPawn);
 
     _inventoryWidgetCloseHandle = inventorySubsys->OnInventoryClosedFromUI().AddUObject(_subjectStateC.Get(), &UNewStateComponent::TryToggleInventory);
@@ -27,16 +27,16 @@ void UInventoryOpenState::OnEnter() {
 }
 
 void UInventoryOpenState::OnLeave() {
-    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+    auto const inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
     inventorySubsys->CloseInventory();
     inventorySubsys->OnInventoryClosedFromUI().Remove(_inventoryWidgetCloseHandle);
 }
 
-TScriptInterface<IFSMState> UInventoryOpenState::Tick(const float deltaTime) {
+TScriptInterface<IFSMState> UInventoryOpenState::Tick(float const deltaTime) {
     return _keepCurrentState();
 }
 
-TScriptInterface<IFSMState> UInventoryOpenState::TrySetMovementDestination(const FVector& movementDestination) {
+TScriptInterface<IFSMState> UInventoryOpenState::TrySetMovementDestination(FVector const& movementDestination) {
     return _keepCurrentState();
 }
 
@@ -52,7 +52,7 @@ TScriptInterface<IFSMState> UInventoryOpenState::TryAbort() {
     return _keepCurrentState();
 }
 
-FStateResponse_TrySetSkillTarget UInventoryOpenState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+FStateResponse_TrySetSkillTarget UInventoryOpenState::TrySetSkillTarget(FSkillTargetPacket const& targetPacket) {
     return FStateResponse_TrySetSkillTarget{_keepCurrentState(), TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>>{}};
 }
 

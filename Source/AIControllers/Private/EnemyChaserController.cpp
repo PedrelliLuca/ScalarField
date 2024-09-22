@@ -12,7 +12,7 @@ AEnemyChaserController::AEnemyChaserController() {
     _perceptionC = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent"));
 }
 
-void AEnemyChaserController::Tick(const float deltaTime) {
+void AEnemyChaserController::Tick(float const deltaTime) {
     Super::Tick(deltaTime);
 
     if (!_patrolC.IsValid()) {
@@ -20,12 +20,12 @@ void AEnemyChaserController::Tick(const float deltaTime) {
     }
 
     // Did we reach our current patrol objective?
-    if (const auto pawn = GetPawn(); IsValid(pawn)) {
-        const auto pawnLocation = GetPawn()->GetActorLocation();
+    if (auto const pawn = GetPawn(); IsValid(pawn)) {
+        auto const pawnLocation = GetPawn()->GetActorLocation();
         if (pawnLocation.Equals(_patrolC->GetCurrentPatrolObjective(), _patrolC->GetPatrolObjectiveTolerance())) {
             _patrolC->UpdatePatrolObjective();
 
-            const auto blackBoard = GetBlackboardComponent();
+            auto const blackBoard = GetBlackboardComponent();
             blackBoard->SetValueAsVector(_bbPatrolObjectiveKeyName, _patrolC->GetCurrentPatrolObjective());
         }
     }
@@ -41,11 +41,11 @@ void AEnemyChaserController::OnPossess(APawn* const inPawn) {
 
     RunBehaviorTree(_behaviorTree);
 
-    const auto blackBoard = GetBlackboardComponent();
+    auto const blackBoard = GetBlackboardComponent();
 
     // Making sure the controlled pawn has a patrolC and setting the first objective for the BB.
-    if (const auto pawn = GetPawn(); IsValid(pawn)) {
-        if (const auto healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
+    if (auto const pawn = GetPawn(); IsValid(pawn)) {
+        if (auto const healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
             healthC->OnDeath().AddUObject(this, &AEnemyChaserController::_onControlledPawnDeath);
         }
 
@@ -62,7 +62,7 @@ void AEnemyChaserController::OnPossess(APawn* const inPawn) {
     }
 
     // Setting up the logic that lets the BT know if the Target Enemy has just changed or not.
-    const auto targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetEnemyKeyName);
+    auto const targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetEnemyKeyName);
     if (targetEnemyKeyId != FBlackboard::InvalidKey) {
         blackBoard->RegisterObserver(
             targetEnemyKeyId, this, FOnBlackboardChangeNotification::CreateUObject(this, &AEnemyChaserController::_onTargetEnemyChange));
@@ -73,7 +73,7 @@ void AEnemyChaserController::OnPossess(APawn* const inPawn) {
     _movementCommandC->SetDefaultMovementMode();
 
     if (IsValid(GetPawn())) {
-        const auto skillsContainerC = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        auto const skillsContainerC = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
         check(IsValid(skillsContainerC));
 
         skillsContainerC->CreateAllSkills();
@@ -81,7 +81,7 @@ void AEnemyChaserController::OnPossess(APawn* const inPawn) {
     }
 }
 
-EBlackboardNotificationResult AEnemyChaserController::_onTargetEnemyChange(const UBlackboardComponent& blackboard, const FBlackboard::FKey changedKeyID) {
+EBlackboardNotificationResult AEnemyChaserController::_onTargetEnemyChange(UBlackboardComponent const& blackboard, FBlackboard::FKey const changedKeyID) {
     // I might be pushing my luck here...
     auto& nonConstBB = const_cast<UBlackboardComponent&>(blackboard);
     nonConstBB.SetValueAsBool(_bbTargetRecentlyChangedKeyName, true);
@@ -96,22 +96,22 @@ EBlackboardNotificationResult AEnemyChaserController::_onTargetEnemyChange(const
 }
 
 void AEnemyChaserController::_onSkillExecutionBegin() {
-    const auto blackBoard = GetBlackboardComponent();
+    auto const blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, true);
 }
 
 void AEnemyChaserController::_onSkillExecutionEnd() {
-    const auto blackBoard = GetBlackboardComponent();
+    auto const blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, false);
 }
 
-void AEnemyChaserController::_onSkillInExecutionStatusChanged(const bool isExecutingSomeSkill) {
-    const auto blackBoard = GetBlackboardComponent();
+void AEnemyChaserController::_onSkillInExecutionStatusChanged(bool const isExecutingSomeSkill) {
+    auto const blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, isExecutingSomeSkill);
 }
 
-void AEnemyChaserController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
-    const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+void AEnemyChaserController::_onControlledPawnDeath(TObjectPtr<AActor> const deadActor) {
+    auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
     check(IsValid(stateC));
 
     stateC->TryAbort();

@@ -19,20 +19,20 @@ FLinearColor UThermodynamicsPresenterComponent::GetTemperatureColor() const {
 void UThermodynamicsPresenterComponent::BeginPlay() {
     Super::BeginPlay();
 
-    if (const auto thermoInteractorC = GetOwner()->FindComponentByClass<UThermodynamicsInteractorComponent>(); IsValid(thermoInteractorC)) {
-        const TArray<UActorComponent*> possibleMeshes = GetOwner()->GetComponentsByTag(UMeshComponent::StaticClass(), FName{THERMODYNAMICS_MESH_TAG});
+    if (auto const thermoInteractorC = GetOwner()->FindComponentByClass<UThermodynamicsInteractorComponent>(); IsValid(thermoInteractorC)) {
+        TArray<UActorComponent*> const possibleMeshes = GetOwner()->GetComponentsByTag(UMeshComponent::StaticClass(), FName{THERMODYNAMICS_MESH_TAG});
 
         if (!possibleMeshes.IsEmpty()) {
             check(possibleMeshes.Num() == 1);
 
-            if (const auto thermodynamicsMesh = Cast<UMeshComponent>(possibleMeshes[0]); IsValid(thermodynamicsMesh)) {
-                if (const auto material = thermodynamicsMesh->GetMaterial(_materialIndex); IsValid(material)) {
+            if (auto const thermodynamicsMesh = Cast<UMeshComponent>(possibleMeshes[0]); IsValid(thermodynamicsMesh)) {
+                if (auto const material = thermodynamicsMesh->GetMaterial(_materialIndex); IsValid(material)) {
                     _thermodynamicsMaterialInstance = thermodynamicsMesh->CreateDynamicMaterialInstance(0, material, TEXT("Thermodynamics Material"));
                     check(IsValid(_thermodynamicsMaterialInstance));
                     thermoInteractorC->OnTemperatureChanged.AddUObject(this, &UThermodynamicsPresenterComponent::_updateThermodynamicsPresentation);
 
                     if (_toggleVisibilityMPC) {
-                        const auto thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
+                        auto const thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
                         thermoSubsys->OnHeatmapVisualizationToggle.AddUObject(this, &UThermodynamicsPresenterComponent::_toggleThermodynamicsPresentation);
                         _toggleVisibilityMPCI = GetWorld()->GetParameterCollectionInstance(_toggleVisibilityMPC);
                     } else {
@@ -54,7 +54,7 @@ void UThermodynamicsPresenterComponent::BeginPlay() {
     }
 }
 
-void UThermodynamicsPresenterComponent::_updateThermodynamicsPresentation(const float temperature) {
+void UThermodynamicsPresenterComponent::_updateThermodynamicsPresentation(float const temperature) {
     check(IsValid(_thermodynamicsMaterialInstance));
 
     _thermodynamicsColor = FTemperatureColorConverter::TemperatureToColor(temperature);

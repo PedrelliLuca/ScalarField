@@ -24,7 +24,7 @@ private:
 
     FString GetStaticDescription() const override;
 
-    bool _newIsManaAvailableForSkill(const TObjectPtr<APawn>& pawn, float skillManaCost) const;
+    bool _newIsManaAvailableForSkill(TObjectPtr<APawn> const& pawn, float skillManaCost) const;
 
     UPROPERTY(EditAnywhere, Category = "Cast Spell")
     TSubclassOf<UAbstractSkill> _newSkillToCast;

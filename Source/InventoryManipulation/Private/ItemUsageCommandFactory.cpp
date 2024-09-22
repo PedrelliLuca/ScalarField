@@ -5,7 +5,7 @@
 #include "ItemUsageCommand.h"
 
 TScriptInterface<IPauseCommand> UItemUsageCommandFactory::CreateCommand() {
-    const auto command = NewObject<UItemUsageCommand>(this, UItemUsageCommand::StaticClass());
+    auto const command = NewObject<UItemUsageCommand>(this, UItemUsageCommand::StaticClass());
     command->_item = MoveTemp(_item);
     command->_inventory = MoveTemp(_inventory);
     command->_quantity = _quantity;

@@ -8,7 +8,7 @@
 #include "CollisionsCollectionComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FCollectionPlayBegunSignature);
-DECLARE_MULTICAST_DELEGATE_SixParams(FCollectionBeginOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32, bool, const FHitResult&);
+DECLARE_MULTICAST_DELEGATE_SixParams(FCollectionBeginOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32, bool, FHitResult const&);
 DECLARE_MULTICAST_DELEGATE_FourParams(FCollectionEndOverlapSignature, UPrimitiveComponent*, AActor*, UPrimitiveComponent*, int32);
 
 class UCollisionsCollectionSubsystem;
@@ -57,11 +57,11 @@ public:
     // Returns unique list of components this collection is overlapping with.
     void GetOverlappingComponents(TSet<UPrimitiveComponent*>& componentsOverlappingCollection) const;
 
-    bool HasElement(const UPrimitiveComponent* collectionElement) const;
+    bool HasElement(UPrimitiveComponent const* collectionElement) const;
 
-    const TArray<FCollectionSphereParameters>& GetCollectionSpheres() const;
-    const TArray<FCollectionBoxParameters>& GetCollectionBoxes() const;
-    const TArray<FCollectionCapsuleParameters>& GetCollectionCapsules() const;
+    TArray<FCollectionSphereParameters> const& GetCollectionSpheres() const;
+    TArray<FCollectionBoxParameters> const& GetCollectionBoxes() const;
+    TArray<FCollectionCapsuleParameters> const& GetCollectionCapsules() const;
 
     FCollectionPlayBegunSignature OnCollectionPlayBegun;
 
@@ -80,7 +80,7 @@ private:
 
     UFUNCTION()
     void _collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex,
-        bool bFromSweep, const FHitResult& sweepResult);
+        bool bFromSweep, FHitResult const& sweepResult);
 
     UFUNCTION()
     void _collectionElementEndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);

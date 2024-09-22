@@ -16,7 +16,7 @@ UHeatmapPresenterComponent::UHeatmapPresenterComponent()
     PrimaryComponentTick.TickGroup = ETickingGroup::TG_PostUpdateWork;
 }
 
-void UHeatmapPresenterComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
+void UHeatmapPresenterComponent::TickComponent(float const deltaTime, ELevelTick const tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
     if (!_heatmapTexture) {
@@ -37,7 +37,7 @@ void UHeatmapPresenterComponent::BeginPlay() {
         _heatmapMID = UMaterialInstanceDynamic::Create(_heatmapMaterial, this, FName(""));
 
         if (UHeatmapParametersComponent* heatmapParametersC = GetOwner()->FindComponentByClass<UHeatmapParametersComponent>(); heatmapParametersC) {
-            const FIntVector2 nCells = heatmapParametersC->GetNumberOfCellsXY();
+            FIntVector2 const nCells = heatmapParametersC->GetNumberOfCellsXY();
             _nPixels = nCells.X * nCells.Y;
 
             _heatmapTexture = UTexture2D::CreateTransient(nCells.X, nCells.Y);
@@ -46,10 +46,10 @@ void UHeatmapPresenterComponent::BeginPlay() {
             _heatmapMID->SetTextureParameterValue(FName("GridTexture"), _heatmapTexture);
 
             if (UBoxComponent* const boxC = GetOwner()->FindComponentByClass<UBoxComponent>(); boxC) {
-                const FVector boxExtent = boxC->GetUnscaledBoxExtent();
+                FVector const boxExtent = boxC->GetUnscaledBoxExtent();
                 _heatmapMID->SetVectorParameterValue(FName("TextureDimensions"), 2.0 * boxExtent);
 
-                const FVector boxWorldLocation = boxC->GetComponentTransform().GetLocation();
+                FVector const boxWorldLocation = boxC->GetComponentTransform().GetLocation();
                 _heatmapMID->SetVectorParameterValue(FName("TextureOffset"), boxWorldLocation - boxExtent);
 
                 UThermodynamicsSubsystem* thermoSubsys = GetWorld()->GetSubsystem<UThermodynamicsSubsystem>();
@@ -73,7 +73,7 @@ void UHeatmapPresenterComponent::BeginPlay() {
 }
 
 void UHeatmapPresenterComponent::_updateHeatmap() {
-    const TArray<float>& temperatures = HeatmapGrid::GetTemperatures();
+    TArray<float> const& temperatures = HeatmapGrid::GetTemperatures();
     if (temperatures.Num() != 0) {
         check(temperatures.Num() == _nPixels);
 
@@ -88,11 +88,11 @@ void UHeatmapPresenterComponent::_updateHeatmap() {
         constexpr int32 RED_OFFSET = 2;
         constexpr int32 ALPHA_OFFSET = 3;
         for (int32 i = 0; i < _nPixels; ++i) {
-            const bool isOdd = i & 1;
-            const FLinearColor linearColor = FTemperatureColorConverter::TemperatureToColor(temperatures[i]);
-            const FColor pixelColor = linearColor.ToFColor(false);
+            bool const isOdd = i & 1;
+            FLinearColor const linearColor = FTemperatureColorConverter::TemperatureToColor(temperatures[i]);
+            FColor const pixelColor = linearColor.ToFColor(false);
 
-            const int32 pixelStart = STEP * i;
+            int32 const pixelStart = STEP * i;
             rawImageData[pixelStart + BLUE_OFFSET] = static_cast<uint8>(pixelColor.B);
             rawImageData[pixelStart + GREEN_OFFSET] = static_cast<uint8>(pixelColor.G);
             rawImageData[pixelStart + RED_OFFSET] = static_cast<uint8>(pixelColor.R);

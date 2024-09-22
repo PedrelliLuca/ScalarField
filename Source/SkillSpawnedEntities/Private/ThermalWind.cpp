@@ -8,7 +8,7 @@ AThermalWind::AThermalWind() {
     PrimaryActorTick.bCanEverTick = true;
 
     _impactOneHitDmgDealerC = CreateDefaultSubobject<UImpactOneHitDamageDealerComponent>(TEXT("Impact One Hit Dmg Dealer"));
-    if (const auto impactCapsule = _impactOneHitDmgDealerC->GetImpactCapsule()) {
+    if (auto const impactCapsule = _impactOneHitDmgDealerC->GetImpactCapsule()) {
         SetRootComponent(impactCapsule);
     }
 
@@ -19,10 +19,10 @@ AThermalWind::AThermalWind() {
     _coldTemplate = CreateDefaultSubobject<UParticleSystem>(TEXT("Cold Particle System"));
 }
 
-void AThermalWind::Tick(const float deltaTime) {
+void AThermalWind::Tick(float const deltaTime) {
     Super::Tick(deltaTime);
 
-    const auto impactCapsule = _impactOneHitDmgDealerC->GetImpactCapsule();
+    auto const impactCapsule = _impactOneHitDmgDealerC->GetImpactCapsule();
     DrawDebugCapsule(GetWorld(), impactCapsule->GetComponentLocation(), impactCapsule->GetUnscaledCapsuleHalfHeight(),
         impactCapsule->GetUnscaledCapsuleRadius(), impactCapsule->GetComponentRotation().Quaternion(), FColor::Green, false);
 }
@@ -41,7 +41,7 @@ void AThermalWind::BeginPlay() {
 
     // Particle system's setup
     TObjectPtr<UParticleSystem> activeParticleTemplate = nullptr;
-    if (const auto thermoC = Cast<UThermodynamicsInteractorComponent>(_caster->GetComponentByClass(UThermodynamicsInteractorComponent::StaticClass()))) {
+    if (auto const thermoC = Cast<UThermodynamicsInteractorComponent>(_caster->GetComponentByClass(UThermodynamicsInteractorComponent::StaticClass()))) {
         if (thermoC->GetTemperature() > _hotThreshold) {
             UE_LOG(LogTemp, Warning, TEXT("BURN!!!"));
             activeParticleTemplate = _hotTemplate;

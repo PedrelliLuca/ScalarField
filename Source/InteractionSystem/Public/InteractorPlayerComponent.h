@@ -44,11 +44,11 @@ protected:
 private:
     // Focus functions
     void _endFocus() override;
-    const TWeakObjectPtr<UInteractableComponent>& _getInteractableBeingFocused() const { return _interactionData.InteractableBeingFocused; }
+    TWeakObjectPtr<UInteractableComponent> const& _getInteractableBeingFocused() const { return _interactionData.InteractableBeingFocused; }
 
     // Interaction functions
     void _interact() override;
-    const TWeakObjectPtr<UInteractableComponent>& _getInteractableBeingInteracted() const { return _interactionData.InteractableBeingInteracted; }
+    TWeakObjectPtr<UInteractableComponent> const& _getInteractableBeingInteracted() const { return _interactionData.InteractableBeingInteracted; }
 
     TWeakObjectPtr<APlayerController> _ownerPlayerController = nullptr;
     FPlayerInteractionData _interactionData{};

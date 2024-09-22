@@ -24,8 +24,8 @@ void AScalarFieldPickup::InitializePickup(TSubclassOf<UObject> itemClass, int32 
 void AScalarFieldPickup::PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) {
     Super::PostEditChangeProperty(propertyChangedEvent);
 
-    const auto property = propertyChangedEvent.Property;
-    const auto propertyName = property != nullptr ? property->GetFName() : NAME_None;
+    auto const property = propertyChangedEvent.Property;
+    auto const propertyName = property != nullptr ? property->GetFName() : NAME_None;
 
     // If a new pickup is selected in the property editor, change the mesh to reflect the new item being selected
     if (propertyName == GET_MEMBER_NAME_CHECKED(AScalarFieldPickup, _itemTemplate) && IsValid(_itemTemplate)) {

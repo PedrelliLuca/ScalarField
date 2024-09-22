@@ -21,23 +21,23 @@ void UImpactOneHitDamageDealerComponent::BeginPlay() {
 }
 
 void UImpactOneHitDamageDealerComponent::_tryApplyImpulse(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp,
-    int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
+    int32 otherBodyIndex, bool bFromSweep, FHitResult const& sweepResult) {
     // This component cannot damage its owner nor actors that have already been damaged.
     if (otherActor == GetOwner() || _hitActors.Contains(otherActor)) {
         return;
     }
 
-    const auto impactHandler = Cast<IImpactDamageHandler>(otherActor->FindComponentByInterface((UImpactDamageHandler::StaticClass())));
+    auto const impactHandler = Cast<IImpactDamageHandler>(otherActor->FindComponentByInterface((UImpactDamageHandler::StaticClass())));
     if (impactHandler == nullptr) {
         // The hit actor doesn't know how to handle impact damage
         return;
     }
 
-    const auto otherLocation = otherActor->GetActorLocation();
-    const auto otherProjectedLocation = FVector{otherLocation.X, otherLocation.Y, _impulseCenter.Z};
-    const auto impulseDirection = (otherProjectedLocation - _impulseCenter).GetSafeNormal();
+    auto const otherLocation = otherActor->GetActorLocation();
+    auto const otherProjectedLocation = FVector{otherLocation.X, otherLocation.Y, _impulseCenter.Z};
+    auto const impulseDirection = (otherProjectedLocation - _impulseCenter).GetSafeNormal();
 
-    const auto velocity = impulseDirection * _impulseIntensity;
+    auto const velocity = impulseDirection * _impulseIntensity;
 
     impactHandler->HandleImpact(velocity, _impactDamage);
 

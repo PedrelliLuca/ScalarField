@@ -17,8 +17,8 @@ public:
 
     bool IsDone() const { return _result->Items.Num() == _currentIdx; }
 
-    const uint8* Current() const { return _result->RawData.GetData() + _result->Items[_currentIdx].DataOffset; }
-    const uint8* operator*() const { return Current(); }
+    uint8 const* Current() const { return _result->RawData.GetData() + _result->Items[_currentIdx].DataOffset; }
+    uint8 const* operator*() const { return Current(); }
 
     void Next() { ++_currentIdx; }
     void operator++() { Next(); } // Pre-increment operator
@@ -35,13 +35,13 @@ class AICONTROLLERS_API URunEQSComponent : public UActorComponent {
     GENERATED_BODY()
 
 public:
-    URunEQSComponent(const FObjectInitializer& objectInitializer);
+    URunEQSComponent(FObjectInitializer const& objectInitializer);
 
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
     FQueryItemsIterator GetQueryItemsIterator() const { return FQueryItemsIterator{_queryResult}; }
 
-    bool DidQueryReturnItems(const int32 requiredItems) const;
+    bool DidQueryReturnItems(int32 const requiredItems) const;
 
     FOnQueryResultChange& OnQueryResultChange() { return _onQueryResultChange; }
 
@@ -55,7 +55,7 @@ private:
 
     /* Note: This only works with EQs returning actors.
      * TODO: refactor this to also work with Environment Queries that return locations */
-    bool _didQueryItemsChange(const TSharedPtr<FEnvQueryResult>& result) const;
+    bool _didQueryItemsChange(TSharedPtr<FEnvQueryResult> const& result) const;
 
     UPROPERTY(Category = "EQS", EditAnywhere)
     FEQSParametrizedQueryExecutionRequest _eqsRequest;

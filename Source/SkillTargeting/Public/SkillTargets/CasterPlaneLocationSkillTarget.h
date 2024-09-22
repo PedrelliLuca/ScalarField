@@ -13,7 +13,7 @@ class SKILLTARGETING_API UCasterPlaneLocationSkillTarget : public UObject, publi
     GENERATED_BODY()
 
 public:
-    void Init(const FSkillTargetPacket& targetPacket) override;
+    void Init(FSkillTargetPacket const& targetPacket) override;
 
     bool IsValidTarget() const override { return true; }
 

@@ -10,6 +10,6 @@ void UPatrolComponent::UpdatePatrolObjective() {
     _currentPatrolObjectiveIdx = (_currentPatrolObjectiveIdx + 1) % _patrolObjectives.Num();
 }
 
-const FVector& UPatrolComponent::GetCurrentPatrolObjective() const {
+FVector const& UPatrolComponent::GetCurrentPatrolObjective() const {
     return _patrolObjectives[_currentPatrolObjectiveIdx];
 }

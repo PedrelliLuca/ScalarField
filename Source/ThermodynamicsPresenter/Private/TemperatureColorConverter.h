@@ -6,7 +6,7 @@
 
 class FTemperatureColorConverter {
 public:
-    static FLinearColor TemperatureToColor(const float temperature) {
+    static FLinearColor TemperatureToColor(float const temperature) {
         if (temperature <= TEMPERATURE_BLUE) {
             return BLUE;
         } else if (temperature <= TEMPERATURE_CYAN) {
@@ -24,8 +24,8 @@ public:
     }
 
 private:
-    static FLinearColor _interpolateInRGB(const float value, const float min, const float max, const FLinearColor colorMin, const FLinearColor colorMax) {
-        const float alphaValue = (value - min) / (max - min);
+    static FLinearColor _interpolateInRGB(float const value, float const min, float const max, FLinearColor const colorMin, FLinearColor const colorMax) {
+        float const alphaValue = (value - min) / (max - min);
         return FMath::Lerp(colorMin, colorMax, alphaValue);
     }
 

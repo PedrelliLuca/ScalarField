@@ -16,7 +16,7 @@ void UAIStatusWidgetComponent::BeginPlay() {
     Super::BeginPlay();
 
     if (APawn* ownerPawn = Cast<APawn>(GetOwner()); IsValid(ownerPawn)) {
-        if (const auto aiStatusWidget = Cast<IPawnBindableWidget>(GetUserWidgetObject())) {
+        if (auto const aiStatusWidget = Cast<IPawnBindableWidget>(GetUserWidgetObject())) {
             // TODO: why not actor? See IPawnBindableWidget comment.
             aiStatusWidget->SetPawn(ownerPawn);
         } else {

@@ -10,10 +10,10 @@ UBTTask_CancelSpell::UBTTask_CancelSpell() {
 }
 
 EBTNodeResult::Type UBTTask_CancelSpell::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
-    const auto pawn = ownerComp.GetAIOwner()->GetPawn();
+    auto const pawn = ownerComp.GetAIOwner()->GetPawn();
     check(IsValid(pawn));
 
-    const auto stateC = pawn->FindComponentByClass<UNewStateComponent>();
+    auto const stateC = pawn->FindComponentByClass<UNewStateComponent>();
     if (!ensureAlwaysMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
         return EBTNodeResult::Failed;
     }

@@ -20,7 +20,7 @@ typedef TMulticastDelegate<void(ESkillStatus)> FOnSkillStatusChanged;
  */
 class SKILLINSPECTION_API FSkillPropertiesInspector {
 public:
-    FSkillPropertiesInspector(const TObjectPtr<UAbstractSkill>& skill);
+    FSkillPropertiesInspector(TObjectPtr<UAbstractSkill> const& skill);
 
     float GetTotalManaCost() const;
 
@@ -30,7 +30,7 @@ public:
 
     TSubclassOf<UObject> GetTargetKind() const;
 
-    const TArray<TObjectPtr<USkillTargetingCondition>>& GetTargetingConditions() const;
+    TArray<TObjectPtr<USkillTargetingCondition>> const& GetTargetingConditions() const;
 
     FOnSkillStatusChanged& OnSkillStatusChanged() const;
 

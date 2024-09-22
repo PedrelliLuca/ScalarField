@@ -5,17 +5,17 @@
 #include "PickupInterface.h"
 
 void UPickupSpawnCommand::Execute() {
-    const int32 droppedQuantity = _inventory->ConsumeItem(_item.Get(), _quantity);
+    int32 const droppedQuantity = _inventory->ConsumeItem(_item.Get(), _quantity);
 
     FActorSpawnParameters spawnParams{};
     spawnParams.bNoFail = true;
     spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-    const FTransform spawnTransform = _getPickupLocationCallback();
+    FTransform const spawnTransform = _getPickupLocationCallback();
 
     check(IsValid(_pickupClass));
 
-    const TWeakInterfacePtr<IPickup> pickup = GetWorld()->SpawnActor<AActor>(_pickupClass, spawnTransform, spawnParams);
+    TWeakInterfacePtr<IPickup> const pickup = GetWorld()->SpawnActor<AActor>(_pickupClass, spawnTransform, spawnParams);
     check(pickup.IsValid());
 
     pickup->InitializePickup(_item.GetObject()->GetClass(), droppedQuantity);

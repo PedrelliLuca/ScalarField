@@ -10,8 +10,8 @@ UBTTask_CancelMovement::UBTTask_CancelMovement() {
 }
 
 EBTNodeResult::Type UBTTask_CancelMovement::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
-    const auto aiController = ownerComp.GetAIOwner();
-    const auto aiMovementCommandC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
+    auto const aiController = ownerComp.GetAIOwner();
+    auto const aiMovementCommandC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
     if (!IsValid(aiMovementCommandC)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): AI Controller does not have a Movement Command Component"), *FString{__FUNCTION__});
         return EBTNodeResult::Failed;

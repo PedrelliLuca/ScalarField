@@ -18,7 +18,7 @@ AFireball::AFireball() {
     _projectileMovementC = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 }
 
-void AFireball::Tick(const float deltaTime) {
+void AFireball::Tick(float const deltaTime) {
     Super::Tick(deltaTime);
 
     if (!_caster.IsValid()) {
@@ -31,7 +31,7 @@ void AFireball::Tick(const float deltaTime) {
         return;
     }
 
-    const auto distanceFromCaster = (GetActorLocation() - _caster->GetActorLocation()).Length();
+    auto const distanceFromCaster = (GetActorLocation() - _caster->GetActorLocation()).Length();
     if (distanceFromCaster > _distanceExtinctionThreshold) {
         Destroy();
     }

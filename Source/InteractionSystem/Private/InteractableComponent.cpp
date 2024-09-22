@@ -60,8 +60,8 @@ double UInteractableComponent::GetInteractionPercentage() const {
     // This could be refactored in the future so that an array of percentages is returned, one for each interactor,
     // with the player's one being marked. This way, the widget could show a progress bar for each interactor
     double highestPercentage = 0.0;
-    for (const auto& interactor : _interactors) {
-        const double interactorPercentage = 1.0 - interactor->GetTimeLeftBeforeInteraction() / _interactionTime;
+    for (auto const& interactor : _interactors) {
+        double const interactorPercentage = 1.0 - interactor->GetTimeLeftBeforeInteraction() / _interactionTime;
         if (interactorPercentage > highestPercentage) {
             highestPercentage = interactorPercentage;
         }
@@ -69,12 +69,12 @@ double UInteractableComponent::GetInteractionPercentage() const {
     return highestPercentage;
 }
 
-void UInteractableComponent::SetInteractableNameText(const FText& newInteractableNameText) {
+void UInteractableComponent::SetInteractableNameText(FText const& newInteractableNameText) {
     _interactableNameText = newInteractableNameText;
     RefreshWidget();
 }
 
-void UInteractableComponent::SetInteractableActionText(const FText& newInteractableActionText) {
+void UInteractableComponent::SetInteractableActionText(FText const& newInteractableActionText) {
     _interactableActionText = newInteractableActionText;
     RefreshWidget();
 }
@@ -85,7 +85,7 @@ void UInteractableComponent::RefreshWidget() {
         return;
     }
 
-    const TWeakObjectPtr<UInteractionWidget> interactionWidget = Cast<UInteractionWidget>(GetUserWidgetObject());
+    TWeakObjectPtr<UInteractionWidget> const interactionWidget = Cast<UInteractionWidget>(GetUserWidgetObject());
     // The widget associated to an interaction component has to be an interaction widget
     check(interactionWidget.IsValid());
 
@@ -99,7 +99,7 @@ void UInteractableComponent::BeginPlay() {
      * interactable. */
     TInlineComponentArray<UMeshComponent*> meshComponents;
     GetOwner()->GetComponents<UMeshComponent>(meshComponents);
-    for (const auto meshC : meshComponents) {
+    for (auto const meshC : meshComponents) {
         if (meshC->IsVisible()) {
             meshC->SetRenderCustomDepth(true);
         }
@@ -109,7 +109,7 @@ void UInteractableComponent::BeginPlay() {
 void UInteractableComponent::Deactivate() {
     Super::Deactivate();
 
-    for (const auto& interactor : _interactors) {
+    for (auto const& interactor : _interactors) {
         if (IsValid(interactor.GetObject())) {
             EndFocus(interactor);
             EndInteraction(interactor);
@@ -118,9 +118,9 @@ void UInteractableComponent::Deactivate() {
     _interactors.Empty();
 }
 
-bool UInteractableComponent::_canInteract(const TScriptInterface<IInteractor>& interactor) const {
+bool UInteractableComponent::_canInteract(TScriptInterface<IInteractor> const& interactor) const {
     // We want to stop a 2nd interactor from interacting in case multiple interactors aren't allowed.
-    const bool bIsAlreadyBeingInteracted = !_bAllowMultipleInteractors && _interactors.Num() >= 1;
+    bool const bIsAlreadyBeingInteracted = !_bAllowMultipleInteractors && _interactors.Num() >= 1;
     // Moreover, the interaction cannot occur if the interactor isn't valid or this component isn't active.
     return IsValid(interactor.GetObject()) && IsActive() && !bIsAlreadyBeingInteracted;
 }

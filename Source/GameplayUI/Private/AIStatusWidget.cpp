@@ -53,21 +53,21 @@ void UAIStatusWidget::Hide() {
     // TODO: bind to some input so that player can choose to hide AI Status?
 }
 
-void UAIStatusWidget::SetComfortIntervalLimits(const float upperLimit, const float lowerLimit) {
+void UAIStatusWidget::SetComfortIntervalLimits(float const upperLimit, float const lowerLimit) {
     _comfortUpperLimit = upperLimit;
     _comfortLowerLimit = lowerLimit;
 }
 
-void UAIStatusWidget::_setCurrentTemperature(const float newTemperature) {
+void UAIStatusWidget::_setCurrentTemperature(float const newTemperature) {
     _updateThermometer(newTemperature);
 }
 
-void UAIStatusWidget::_setCurrentHealth(const float newHealth) {
+void UAIStatusWidget::_setCurrentHealth(float const newHealth) {
     _currentHealth = newHealth;
     _updateHealth();
 }
 
-void UAIStatusWidget::_setMaxHealth(const float newMaxHealth) {
+void UAIStatusWidget::_setMaxHealth(float const newMaxHealth) {
     _maxHealth = newMaxHealth;
     _updateHealth();
 }
@@ -79,12 +79,12 @@ void UAIStatusWidget::_onDeath(TObjectPtr<AActor> _) {
     _unbindAll();
 }
 
-void UAIStatusWidget::_setCurrentMana(const float newMana) {
+void UAIStatusWidget::_setCurrentMana(float const newMana) {
     _currentMana = newMana;
     _updateMana();
 }
 
-void UAIStatusWidget::_setMaxMana(const float newMaxMana) {
+void UAIStatusWidget::_setMaxMana(float const newMaxMana) {
     _maxMana = newMaxMana;
     _updateMana();
 }

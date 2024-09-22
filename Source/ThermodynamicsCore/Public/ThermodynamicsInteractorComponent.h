@@ -47,7 +47,7 @@ private:
     void _setInitialInteractors();
 
     void _registerInteractor(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex,
-        bool bFromSweep, const FHitResult& sweepResult);
+        bool bFromSweep, FHitResult const& sweepResult);
     void _unregisterInteractor(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 
     UPROPERTY(EditAnywhere, Category = "Thermodynamic Parameters")

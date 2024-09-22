@@ -4,16 +4,16 @@
 
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 
-void UAIRotationOnlyMovement::OnSetDestination(const FVector& destination) {
+void UAIRotationOnlyMovement::OnSetDestination(FVector const& destination) {
     check(_aiController.IsValid());
-    const auto aiPawn = _aiController->GetPawn();
+    auto const aiPawn = _aiController->GetPawn();
 
     // World reference (wr) frame
-    const auto wrDestination = destination;
+    auto const wrDestination = destination;
 
     // Pawn reference (pr) frame
-    const auto prDestination = aiPawn->GetTransform().InverseTransformPosition(wrDestination);
-    const auto prRotation = prDestination.Rotation();
+    auto const prDestination = aiPawn->GetTransform().InverseTransformPosition(wrDestination);
+    auto const prRotation = prDestination.Rotation();
 
     _absDegreesToRotate = FMath::Abs(prRotation.Yaw);
     _rotationSign = FMath::Sign(prRotation.Yaw);
@@ -28,7 +28,7 @@ void UAIRotationOnlyMovement::OnStopMovement() {
     _degreesSoFar = 0.0;
 }
 
-void UAIRotationOnlyMovement::OnMovementTick(const float deltaTime) {
+void UAIRotationOnlyMovement::OnMovementTick(float const deltaTime) {
     check(_aiController.IsValid());
 
     if (_degreesSoFar > _absDegreesToRotate - _movementParameters.AngularTolerance) {
@@ -50,7 +50,7 @@ void UAIRotationOnlyMovement::OnMovementTick(const float deltaTime) {
     _degreesSoFar += degreesThisTick;
 }
 
-void UAIRotationOnlyMovement::SetMovementParameters(const FMovementParameters& params) {
+void UAIRotationOnlyMovement::SetMovementParameters(FMovementParameters const& params) {
     _movementParameters = params.RotationOnlyMovementParameters;
 }
 

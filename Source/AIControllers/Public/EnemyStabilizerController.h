@@ -33,7 +33,7 @@ protected:
     void OnPossess(APawn* inPawn) override;
 
 private:
-    EBlackboardNotificationResult _onTargetAllyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
+    EBlackboardNotificationResult _onTargetAllyChange(UBlackboardComponent const& blackboard, FBlackboard::FKey changedKeyID);
     void _newOnTargetAllyChange();
 
     void _checkTargetAllyForAttachment();
@@ -43,7 +43,7 @@ private:
 
     void _onSkillInExecutionStatusChanged(bool isExecutingSomeSkill);
 
-    void _onControlledPawnDeath(const TObjectPtr<AActor> deadActor);
+    void _onControlledPawnDeath(TObjectPtr<AActor> const deadActor);
 
     UPROPERTY(VisibleAnywhere, Category = "Stabilizer | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;

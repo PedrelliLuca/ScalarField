@@ -24,7 +24,7 @@ public:
     virtual void SetMovementMode(EMovementCommandMode mode) = 0;
     virtual void SetDefaultMovementMode() = 0;
 
-    virtual void SetDestination(const FVector& destination) = 0;
+    virtual void SetDestination(FVector const& destination) = 0;
     virtual void StopMovement() = 0;
     virtual void MovementTick(float deltaTime) = 0;
 };

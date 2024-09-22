@@ -3,11 +3,11 @@
 #include "CastDetachedActorSkill.h"
 
 void UCastDetachedActorSkill::_skillCast() {
-    const auto& caster = _getCaster();
+    auto const& caster = _getCaster();
     check(caster.IsValid());
 
-    const FTransform& casterToWorld = caster->GetTransform();
-    const TWeakObjectPtr<AActor> spawnedActor = GetWorld()->SpawnActor<AActor>(_actorClass, _actorToCaster * casterToWorld);
+    FTransform const& casterToWorld = caster->GetTransform();
+    TWeakObjectPtr<AActor> const spawnedActor = GetWorld()->SpawnActor<AActor>(_actorClass, _actorToCaster * casterToWorld);
 
     float actualLifetimeSeconds;
     if (FMath::IsNearlyZero(_actorLifetimeSeconds)) {
@@ -32,7 +32,7 @@ void UCastDetachedActorSkill::_skillCast() {
         actualLifetimeSeconds, false);
 }
 
-void UCastDetachedActorSkill::_skillChannelingTick(const float deltaTime) {
+void UCastDetachedActorSkill::_skillChannelingTick(float const deltaTime) {
     // This skill doesn't do anything on channeling
 }
 

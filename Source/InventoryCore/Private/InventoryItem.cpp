@@ -18,8 +18,8 @@ UInventoryItem::UInventoryItem() {
 #if WITH_EDITOR
 void UInventoryItem::PostEditChangeProperty(FPropertyChangedEvent& propertyChangedEvent) {
     Super::PostEditChangeProperty(propertyChangedEvent);
-    const auto property = propertyChangedEvent.Property;
-    const auto propertyName = property != nullptr ? property->GetFName() : NAME_None;
+    auto const property = propertyChangedEvent.Property;
+    auto const propertyName = property != nullptr ? property->GetFName() : NAME_None;
     if (propertyName == GET_MEMBER_NAME_CHECKED(UInventoryItem, _quantity)) {
         _quantity = FMath::Clamp(_quantity, 0, _bIsStackable ? _maxQuantity : 1);
     } else if (propertyName == GET_MEMBER_NAME_CHECKED(UInventoryItem, _bIsStackable) && !_bIsStackable) {
@@ -28,7 +28,7 @@ void UInventoryItem::PostEditChangeProperty(FPropertyChangedEvent& propertyChang
 }
 #endif
 
-void UInventoryItem::SetQuantity(const int32 newQuantity) {
+void UInventoryItem::SetQuantity(int32 const newQuantity) {
     if (_quantity == newQuantity) {
         return;
     }

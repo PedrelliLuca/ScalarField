@@ -14,11 +14,11 @@ void UCollisionsCollectionSubsystem::RemovePendingKillCollection(UCollisionsColl
     check(!IsValid(collection));
 
     for (auto element : collection->_collectionElements) {
-        [[maybe_unused]] const int32 nRemoved = _elementToCollection.Remove(element);
+        [[maybe_unused]] int32 const nRemoved = _elementToCollection.Remove(element);
         check(nRemoved == 1);
     }
 }
 
-TWeakObjectPtr<UCollisionsCollectionComponent> UCollisionsCollectionSubsystem::GetCollectionByElement(const UPrimitiveComponent* element) const {
+TWeakObjectPtr<UCollisionsCollectionComponent> UCollisionsCollectionSubsystem::GetCollectionByElement(UPrimitiveComponent const* element) const {
     return _elementToCollection.FindChecked(element);
 }

@@ -20,8 +20,8 @@ void UInteractorPlayerComponent::PerformFocusCheck() {
     FVector cursorLoc{};
     FVector cursorDir{};
     _ownerPlayerController->DeprojectMousePositionToWorld(cursorLoc, cursorDir);
-    const auto& traceStart = cursorLoc;
-    const auto traceEnd = traceStart + cursorDir * INTERACTION_TRACE_LENGTH;
+    auto const& traceStart = cursorLoc;
+    auto const traceEnd = traceStart + cursorDir * INTERACTION_TRACE_LENGTH;
 
     // Did we find an actor blocking the visibility channel?
     FHitResult traceHit{};
@@ -29,11 +29,11 @@ void UInteractorPlayerComponent::PerformFocusCheck() {
         // Does the actor we found have an interaction component?
         if (TWeakObjectPtr<UInteractableComponent> hitInteractableC = traceHit.GetActor()->FindComponentByClass<UInteractableComponent>();
             hitInteractableC.IsValid()) {
-            const auto pawn = _ownerPlayerController->GetPawn();
+            auto const pawn = _ownerPlayerController->GetPawn();
             check(IsValid(pawn));
 
             // Is the component within reach?
-            const double distance = (traceHit.ImpactPoint - pawn->GetActorLocation()).Size();
+            double const distance = (traceHit.ImpactPoint - pawn->GetActorLocation()).Size();
             if (distance <= hitInteractableC->GetInteractionDistance()) {
                 // Is the component the one we're already focusing? If it isn't we update the interaction data,
                 // otherwise we don't do anything

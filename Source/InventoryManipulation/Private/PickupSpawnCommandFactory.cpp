@@ -5,7 +5,7 @@
 #include "PickupSpawnCommand.h"
 
 TScriptInterface<IPauseCommand> UPickupSpawnCommandFactory::CreateCommand() {
-    const auto command = NewObject<UPickupSpawnCommand>(this, UPickupSpawnCommand::StaticClass());
+    auto const command = NewObject<UPickupSpawnCommand>(this, UPickupSpawnCommand::StaticClass());
     command->_item = MoveTemp(_item);
     command->_inventory = MoveTemp(_inventory);
     command->_quantity = _quantity;

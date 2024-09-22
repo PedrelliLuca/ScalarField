@@ -19,7 +19,7 @@ public:
      * reached, the next element is the 0th. */
     void UpdatePatrolObjective();
 
-    const FVector& GetCurrentPatrolObjective() const;
+    FVector const& GetCurrentPatrolObjective() const;
 
     float GetPatrolObjectiveTolerance() const { return _patrolObjectiveTolerance; }
 

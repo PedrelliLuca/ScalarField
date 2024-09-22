@@ -19,12 +19,12 @@ public:
 
     void TickComponent(float deltaTime, enum ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
-    void TrySetMovementDestination(const FVector& movementDestination);
+    void TrySetMovementDestination(FVector const& movementDestination);
     void TryStopMovement();
 
     TOptional<FSkillCastResult> TryCastSkillAtIndex(uint32 index);
     void TryAbort();
-    TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> TrySetSkillTarget(const FSkillTargetPacket& targetPacket);
+    TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> TrySetSkillTarget(FSkillTargetPacket const& targetPacket);
 
     void TryInteracting();
     void TryToggleInventory();

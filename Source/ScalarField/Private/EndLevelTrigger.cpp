@@ -11,8 +11,8 @@ void AEndLevelTrigger::BeginPlay() {
 }
 
 void AEndLevelTrigger::_onPlayerOverlap(AActor* overlappedActor, AActor* otherActor) {
-    if (const auto pawn = Cast<APawn>(otherActor); IsValid(otherActor)) {
-        if (const auto playerController = Cast<APlayerController>(pawn->GetController()); IsValid(playerController)) {
+    if (auto const pawn = Cast<APawn>(otherActor); IsValid(otherActor)) {
+        if (auto const playerController = Cast<APlayerController>(pawn->GetController()); IsValid(playerController)) {
             UGameplayStatics::OpenLevel(GetWorld(), FName{"SnowyMountain"});
         }
     }

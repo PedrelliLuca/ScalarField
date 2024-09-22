@@ -14,18 +14,18 @@ UInventoryComponent::UInventoryComponent() {
 }
 
 double UInventoryComponent::GetCurrentWeight() const {
-    return Algo::Accumulate(_items, 0.0, [](double accumulation, const TObjectPtr<UInventoryItem>& item) { return accumulation + item->GetStackWeight(); });
+    return Algo::Accumulate(_items, 0.0, [](double accumulation, TObjectPtr<UInventoryItem> const& item) { return accumulation + item->GetStackWeight(); });
 }
 
 double UInventoryComponent::GetCurrentVolume() const {
-    return Algo::Accumulate(_items, 0.0, [](double accumulation, const TObjectPtr<UInventoryItem>& item) { return accumulation + item->GetStackVolume(); });
+    return Algo::Accumulate(_items, 0.0, [](double accumulation, TObjectPtr<UInventoryItem> const& item) { return accumulation + item->GetStackVolume(); });
 }
 
 TArray<TWeakInterfacePtr<IItem>> UInventoryComponent::GetItems() const {
     TArray<TWeakInterfacePtr<IItem>> abstractItems;
     abstractItems.Reserve(_items.Num());
 
-    for (const auto& item : _items) {
+    for (auto const& item : _items) {
         TWeakInterfacePtr<IItem> abstractItem = Cast<IItem>(item);
         check(abstractItem.IsValid());
         abstractItems.Emplace(MoveTemp(abstractItem));
@@ -37,15 +37,15 @@ TArray<TWeakInterfacePtr<IItem>> UInventoryComponent::GetItems() const {
 FItemAddResult UInventoryComponent::TryAddItem(TWeakInterfacePtr<IItem> item) {
     check(item.IsValid());
 
-    const int32 amountToAdd = item->GetQuantity();
+    int32 const amountToAdd = item->GetQuantity();
 
     // Can we add at least one item? Let's check the weight and volume to find out
-    const double itemWeight = item->GetWeight();
+    double const itemWeight = item->GetWeight();
     if (!FMath::IsNearlyZero(itemWeight) && GetCurrentWeight() + itemWeight > _weightCapacity) {
         return FItemAddResult::AddedNone(amountToAdd, LOCTEXT("InventoryTooMuchWeightText", "Couldn't add item to inventory, carrying too much weight."));
     }
 
-    const double itemVolume = item->GetVolume();
+    double const itemVolume = item->GetVolume();
     if (!FMath::IsNearlyZero(itemVolume) && GetCurrentVolume() + itemVolume > _volumeCapacity) {
         return FItemAddResult::AddedNone(amountToAdd, LOCTEXT("InventoryTooLittleVolumeText", "Not enough space to carry item."));
     }
@@ -56,7 +56,7 @@ FItemAddResult UInventoryComponent::TryAddItem(TWeakInterfacePtr<IItem> item) {
     if (item->IsStackable()) {
         /* Do we already have a stack of this item in our inventory ? In this case we may need to modify the quantity to add based on how much we already have
          * on the existing stack */
-        const auto existingItem = FindItemByClass(item.GetObject()->GetClass());
+        auto const existingItem = FindItemByClass(item.GetObject()->GetClass());
         if (existingItem.IsValid() && existingItem->GetMaxQuantity() == existingItem->GetQuantity()) {
             return FItemAddResult::AddedNone(amountToAdd,
                 FText::Format(LOCTEXT("ItemStackOverflowText", "The existing stack of {ItemName} is full, can't add more {ItemName}."), item->GetNameText()));
@@ -70,7 +70,7 @@ FItemAddResult UInventoryComponent::TryAddItem(TWeakInterfacePtr<IItem> item) {
         }
 
         if (!FMath::IsNearlyZero(itemWeight) || !FMath::IsNearlyZero(itemVolume)) {
-            const int32 amountAddableBasedOnWeight =
+            int32 const amountAddableBasedOnWeight =
                 !FMath::IsNearlyZero(itemWeight) ? FMath::FloorToInt32((_weightCapacity - GetCurrentWeight()) / item->GetWeight()) : amountAddable;
             amountAddable = FMath::Min(amountAddable, amountAddableBasedOnWeight);
 
@@ -81,7 +81,7 @@ FItemAddResult UInventoryComponent::TryAddItem(TWeakInterfacePtr<IItem> item) {
                     item->GetNameText());
             }
 
-            const int32 amountAddableBasedOnVolume =
+            int32 const amountAddableBasedOnVolume =
                 !FMath::IsNearlyZero(itemVolume) ? FMath::FloorToInt32((_volumeCapacity - GetCurrentVolume()) / item->GetVolume()) : amountAddable;
             amountAddable = FMath::Min(amountAddable, amountAddableBasedOnVolume);
 
@@ -126,22 +126,22 @@ FItemAddResult UInventoryComponent::TryAddItem(TWeakInterfacePtr<IItem> item) {
     return FItemAddResult::AddedAll(item->GetQuantity());
 }
 
-FItemAddResult UInventoryComponent::TryAddItemFromClass(const TSubclassOf<UInventoryItem> itemClass, const int32 quantity) {
+FItemAddResult UInventoryComponent::TryAddItemFromClass(TSubclassOf<UInventoryItem> const itemClass, int32 const quantity) {
     TObjectPtr<UInventoryItem> item = NewObject<UInventoryItem>(this, itemClass);
     item->SetQuantity(quantity);
     return TryAddItem(item);
 }
 
-int32 UInventoryComponent::ConsumeAllOfItem(const TObjectPtr<UInventoryItem> item) {
+int32 UInventoryComponent::ConsumeAllOfItem(TObjectPtr<UInventoryItem> const item) {
     check(IsValid(item));
     return ConsumeItem(item, item->GetQuantity());
 }
 
 bool UInventoryComponent::RemoveItem(TWeakInterfacePtr<IItem> item) {
-    const auto concreteItem = Cast<UInventoryItem>(item.GetObject());
+    auto const concreteItem = Cast<UInventoryItem>(item.GetObject());
     check(IsValid(concreteItem));
 
-    const int32 nRemovedItems = _items.Remove(concreteItem);
+    int32 const nRemovedItems = _items.Remove(concreteItem);
     check(nRemovedItems < 2);
 
     if (nRemovedItems == 0) {
@@ -152,9 +152,9 @@ bool UInventoryComponent::RemoveItem(TWeakInterfacePtr<IItem> item) {
     return true;
 }
 
-int32 UInventoryComponent::ConsumeItem(TWeakInterfacePtr<IItem> item, const int32 quantity) {
+int32 UInventoryComponent::ConsumeItem(TWeakInterfacePtr<IItem> item, int32 const quantity) {
     check(item.IsValid());
-    const int32 quantityActuallyConsumed = FMath::Min(quantity, item->GetQuantity());
+    int32 const quantityActuallyConsumed = FMath::Min(quantity, item->GetQuantity());
 
     item->SetQuantity(item->GetQuantity() - quantityActuallyConsumed);
     if (item->GetQuantity() == 0) {
@@ -166,9 +166,9 @@ int32 UInventoryComponent::ConsumeItem(TWeakInterfacePtr<IItem> item, const int3
     return quantityActuallyConsumed;
 }
 
-bool UInventoryComponent::HasItemOfClass(const TSubclassOf<UInventoryItem> itemClass, const int32 quantity) const {
+bool UInventoryComponent::HasItemOfClass(TSubclassOf<UInventoryItem> const itemClass, int32 const quantity) const {
     return Algo::AnyOf(
-        _items, [&itemClass, &quantity](const TObjectPtr<UInventoryItem>& item) { return item->IsA(itemClass) && item->GetQuantity() >= quantity; });
+        _items, [&itemClass, &quantity](TObjectPtr<UInventoryItem> const& item) { return item->IsA(itemClass) && item->GetQuantity() >= quantity; });
 }
 
 TWeakInterfacePtr<IItem> UInventoryComponent::FindItemByClass(TSubclassOf<UObject> itemClass) {
@@ -176,7 +176,7 @@ TWeakInterfacePtr<IItem> UInventoryComponent::FindItemByClass(TSubclassOf<UObjec
         return nullptr;
     }
 
-    const auto itemPtr = Algo::FindByPredicate(_items, [&itemClass](const TObjectPtr<UInventoryItem>& item) {
+    auto const itemPtr = Algo::FindByPredicate(_items, [&itemClass](TObjectPtr<UInventoryItem> const& item) {
         check(IsValid(item));
         return item->IsA(itemClass);
     });
@@ -185,20 +185,20 @@ TWeakInterfacePtr<IItem> UInventoryComponent::FindItemByClass(TSubclassOf<UObjec
         return nullptr;
     }
 
-    const TWeakInterfacePtr<IItem> item = *itemPtr;
+    TWeakInterfacePtr<IItem> const item = *itemPtr;
     check(item.IsValid());
     return item;
 }
 
-TArray<TWeakObjectPtr<UInventoryItem>> UInventoryComponent::FindItemsByClass(const TSubclassOf<UInventoryItem> itemClass) {
-    const auto itemsOfClass = _items.FilterByPredicate([&itemClass](const TObjectPtr<UInventoryItem>& item) {
+TArray<TWeakObjectPtr<UInventoryItem>> UInventoryComponent::FindItemsByClass(TSubclassOf<UInventoryItem> const itemClass) {
+    auto const itemsOfClass = _items.FilterByPredicate([&itemClass](TObjectPtr<UInventoryItem> const& item) {
         check(IsValid(item));
         return item->IsA(itemClass);
     });
 
     TArray<TWeakObjectPtr<UInventoryItem>> outItems;
     outItems.Reserve(itemsOfClass.Num());
-    Algo::Transform(itemsOfClass, outItems, [](const TObjectPtr<UInventoryItem>& item) { return TWeakObjectPtr<UInventoryItem>(item); });
+    Algo::Transform(itemsOfClass, outItems, [](TObjectPtr<UInventoryItem> const& item) { return TWeakObjectPtr<UInventoryItem>(item); });
 
     return outItems;
 }
@@ -206,20 +206,20 @@ TArray<TWeakObjectPtr<UInventoryItem>> UInventoryComponent::FindItemsByClass(con
 void UInventoryComponent::BeginPlay() {
     Super::BeginPlay();
 
-    for (const auto startingItem : _startingItems) {
-        [[maybe_unused]] const auto itemAddResult = TryAddItem(startingItem);
+    for (auto const startingItem : _startingItems) {
+        [[maybe_unused]] auto const itemAddResult = TryAddItem(startingItem);
         ensureAlwaysMsgf(
             itemAddResult.Result == EItemAddResult::IAR_AllItemsAdded, TEXT("Couldn't add all starting items: %s"), *itemAddResult.ErrorText.ToString());
     }
 
     if (_dropItemsAtDeath) {
-        const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+        auto const inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
         check(IsValid(inventorySubsys));
         inventorySubsys->SetupDeathDropForActor(GetOwner());
     }
 }
 
-TObjectPtr<UInventoryItem> UInventoryComponent::_addItem(const TWeakInterfacePtr<IItem> item) {
+TObjectPtr<UInventoryItem> UInventoryComponent::_addItem(TWeakInterfacePtr<IItem> const item) {
     TObjectPtr<UInventoryItem> newItem = Cast<UInventoryItem>(item.GetObject());
     if (newItem->GetOuter() != this) {
         // The item we're trying to add is not owned by this inventory component => we make a copy of it with us as outer.

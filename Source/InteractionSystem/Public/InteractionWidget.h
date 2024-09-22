@@ -14,12 +14,12 @@ class INTERACTIONSYSTEM_API UInteractionWidget : public UUserWidget {
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Interaction")
-    void UpdateInteractionWidget(const UInteractableComponent* interactionComponent);
+    void UpdateInteractionWidget(UInteractableComponent const* interactionComponent);
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)
     void _onUpdateInteractionWidget();
 
     UPROPERTY(BlueprintReadOnly, Category = "Interaction", meta = (ExposeOnSpawn))
-    TWeakObjectPtr<const UInteractableComponent> _owningInteractionComponent;
+    TWeakObjectPtr<UInteractableComponent const> _owningInteractionComponent;
 };

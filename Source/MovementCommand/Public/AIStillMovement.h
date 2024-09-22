@@ -12,13 +12,13 @@ class MOVEMENTCOMMAND_API UAIStillMovement : public UAIMovementCommand {
     GENERATED_BODY()
 
 public:
-    void OnSetDestination(const FVector& destination) final { _aiController->StopMovement(); }
+    void OnSetDestination(FVector const& destination) final { _aiController->StopMovement(); }
 
     void OnStopMovement() final { _aiController->StopMovement(); }
 
     void OnMovementTick(float deltaTime) final {}
 
-    void SetMovementParameters(const FMovementParameters& params) final {}
+    void SetMovementParameters(FMovementParameters const& params) final {}
 
     bool IsMoving() const final { return false; }
 };

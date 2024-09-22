@@ -28,7 +28,7 @@ public:
     void Show() override;
     void Hide() override;
 
-    void InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine);
+    void InitSkillIconContainer(TObjectPtr<USkillsContainerComponent> const& skillsContainer, TObjectPtr<UNewStateComponent> const& stateMachine);
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)

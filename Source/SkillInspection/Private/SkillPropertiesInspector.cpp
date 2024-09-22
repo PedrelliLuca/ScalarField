@@ -4,7 +4,7 @@
 
 #include "AbstractSkill.h"
 
-FSkillPropertiesInspector::FSkillPropertiesInspector(const TObjectPtr<UAbstractSkill>& skill)
+FSkillPropertiesInspector::FSkillPropertiesInspector(TObjectPtr<UAbstractSkill> const& skill)
     : _skill(skill) {
 }
 
@@ -27,7 +27,7 @@ TSubclassOf<UObject> FSkillPropertiesInspector::GetTargetKind() const {
     return _skill->_targetKind;
 }
 
-const TArray<TObjectPtr<USkillTargetingCondition>>& FSkillPropertiesInspector::GetTargetingConditions() const {
+TArray<TObjectPtr<USkillTargetingCondition>> const& FSkillPropertiesInspector::GetTargetingConditions() const {
     check(_skill.IsValid());
     return _skill->_targetingConditions;
 }

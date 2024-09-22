@@ -2,7 +2,7 @@
 
 #include "SkillTargets/ActorSkillTarget.h"
 
-void UActorSkillTarget::Init(const FSkillTargetPacket& targetPacket) {
+void UActorSkillTarget::Init(FSkillTargetPacket const& targetPacket) {
     auto actor = targetPacket.TargetActor;
     // Make sure that the actor is not valid before setting it.
     if (ensureMsgf(!_actor.IsValid(), TEXT("Target Actor can be set only once and has already been set."))) {

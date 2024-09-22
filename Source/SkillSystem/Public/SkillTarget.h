@@ -21,7 +21,7 @@ class ISkillTarget {
     GENERATED_BODY()
 
 public:
-    virtual void Init(const FSkillTargetPacket& targetPacket) = 0;
+    virtual void Init(FSkillTargetPacket const& targetPacket) = 0;
 
     virtual bool IsValidTarget() const = 0;
 

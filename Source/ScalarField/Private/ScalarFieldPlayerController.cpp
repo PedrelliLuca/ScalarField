@@ -48,7 +48,7 @@ void AScalarFieldPlayerController::SetupInputComponent() {
 void AScalarFieldPlayerController::BeginPlay() {
     Super::BeginPlay();
 
-    const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
+    auto const pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
     pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &AScalarFieldPlayerController::_answerTacticalPauseToggle);
     _bIsTacticalPauseOn = pauseSubsys->IsTacticalPauseOn();
 
@@ -56,11 +56,11 @@ void AScalarFieldPlayerController::BeginPlay() {
 
     TObjectPtr<APawn> ownedPawn = GetPawn();
     if (IsValid(ownedPawn)) {
-        if (const auto healthC = ownedPawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
+        if (auto const healthC = ownedPawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
             healthC->OnDeath().AddUObject(this, &AScalarFieldPlayerController::_onControlledPawnDeath);
         }
 
-        if (const TObjectPtr<USkillsContainerComponent> skillsC = ownedPawn->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC)) {
+        if (TObjectPtr<USkillsContainerComponent> const skillsC = ownedPawn->FindComponentByClass<USkillsContainerComponent>(); IsValid(skillsC)) {
             skillsC->CreateAllSkills();
             _widgetsPresenterC->CreateHUD(skillsC, ownedPawn->FindComponentByClass<UNewStateComponent>());
         } else {
@@ -68,7 +68,7 @@ void AScalarFieldPlayerController::BeginPlay() {
         }
     }
 
-    const auto inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
+    auto const inventorySubsys = UGameplayStatics::GetGameInstance(GetWorld())->GetSubsystem<UInventoryManipulationSubsystem>();
     inventorySubsys->SetHUDToShowOnClose(_widgetsPresenterC->GetHUDWidget());
 
     _widgetsPresenterC->CreateInventoryMenu();
@@ -79,7 +79,7 @@ void AScalarFieldPlayerController::_onSetDestinationPressed() {
     // Very important: this must be called before each TrySetMovementDestination() call, point of failure.
     _movementCommandC->SetPlayerInputData(FPlayerInputData{IE_Pressed});
 
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         FHitResult hit;
         GetHitResultUnderCursor(ECC_Visibility, true, hit);
         stateC->TrySetMovementDestination(hit.Location);
@@ -96,7 +96,7 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
     // Very important: this must be called before each TrySetMovementDestination() call, point of failure.
     _movementCommandC->SetPlayerInputData(FPlayerInputData{IE_Released});
 
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TrySetMovementDestination(hit.Location);
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -106,8 +106,8 @@ void AScalarFieldPlayerController::_onSetDestinationReleased() {
 void AScalarFieldPlayerController::_onSetTargetPressed() {
     FHitResult hit;
     GetHitResultUnderCursor(ECC_Visibility, true, hit);
-    const auto pawn = GetPawn();
-    if (const auto stateC = pawn->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    auto const pawn = GetPawn();
+    if (auto const stateC = pawn->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         // We don't know what the skill we want to cast is going to need, so we'll provide it with everything we have.
         FSkillTargetPacket targetPacket;
         targetPacket.TargetActor = hit.GetActor();
@@ -115,8 +115,8 @@ void AScalarFieldPlayerController::_onSetTargetPressed() {
         FVector mouseLoc;
         FVector mouseDir;
         DeprojectMousePositionToWorld(mouseLoc, mouseDir);
-        const auto pawnPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
-        const auto pawnPlaneLocation = FMath::LinePlaneIntersection(mouseLoc, mouseLoc + mouseDir * PROJ_LINE_LENGTH, pawnPlane);
+        auto const pawnPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
+        auto const pawnPlaneLocation = FMath::LinePlaneIntersection(mouseLoc, mouseLoc + mouseDir * PROJ_LINE_LENGTH, pawnPlane);
         targetPacket.TargetCasterPlaneLocation = pawnPlaneLocation;
 
         // TODO: compute targetPacket.TargetGroundLocation by projecting onto the ground somehow, this will be needed for skills like "Spawn Tree"
@@ -130,7 +130,7 @@ void AScalarFieldPlayerController::_onSetTargetPressed() {
 void AScalarFieldPlayerController::_onSkill1Cast() {
     constexpr int32 skillKey = 1;
 
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -140,7 +140,7 @@ void AScalarFieldPlayerController::_onSkill1Cast() {
 void AScalarFieldPlayerController::_onSkill2Cast() {
     constexpr int32 skillKey = 2;
 
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -150,7 +150,7 @@ void AScalarFieldPlayerController::_onSkill2Cast() {
 void AScalarFieldPlayerController::_onSkill3Cast() {
     constexpr int32 skillKey = 3;
 
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -160,7 +160,7 @@ void AScalarFieldPlayerController::_onSkill3Cast() {
 void AScalarFieldPlayerController::_onSkill4Cast() {
     constexpr int32 skillKey = 4;
 
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -170,7 +170,7 @@ void AScalarFieldPlayerController::_onSkill4Cast() {
 void AScalarFieldPlayerController::_onSkill5Cast() {
     constexpr int32 skillKey = 5;
 
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -180,7 +180,7 @@ void AScalarFieldPlayerController::_onSkill5Cast() {
 void AScalarFieldPlayerController::_onSkill6Cast() {
     constexpr int32 skillKey = 6;
 
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryCastSkillAtIndex(_getSkillIdxFromKey(skillKey));
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -188,7 +188,7 @@ void AScalarFieldPlayerController::_onSkill6Cast() {
 }
 
 void AScalarFieldPlayerController::_onSkillAbort() {
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryAbort();
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -196,7 +196,7 @@ void AScalarFieldPlayerController::_onSkillAbort() {
 }
 
 void AScalarFieldPlayerController::_onInteraction() {
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryInteracting();
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -204,7 +204,7 @@ void AScalarFieldPlayerController::_onInteraction() {
 }
 
 void AScalarFieldPlayerController::_onInventoryToggle() {
-    if (const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
+    if (auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>(); IsValid(stateC)) {
         stateC->TryToggleInventory();
     } else {
         UE_LOG(LogTemp, Error, TEXT("%s: Invalid UNewStateComponent"), *FString(__FUNCTION__));
@@ -215,7 +215,7 @@ void AScalarFieldPlayerController::_onTacticalPauseToggled() {
     GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>()->ToggleWorldTacticalPauseStatus();
 }
 
-void AScalarFieldPlayerController::_answerTacticalPauseToggle(const bool bIsTacticalPauseOn, const double currentWorldTimeDilation) {
+void AScalarFieldPlayerController::_answerTacticalPauseToggle(bool const bIsTacticalPauseOn, double const currentWorldTimeDilation) {
     /* Here we're literally overriding whatever the UTacticalPauseWorldSubsystem just did.
      * The PlayerController must never, ever, have its time dilation close to zero, since
      * that would cause the player to not be able to send any kind of input. */
@@ -229,7 +229,7 @@ void AScalarFieldPlayerController::_onHeatmapVisualizationToggled() {
     thermoSubsys->OnHeatmapVisualizationToggle.Broadcast();
 }
 
-void AScalarFieldPlayerController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
+void AScalarFieldPlayerController::_onControlledPawnDeath(TObjectPtr<AActor> const deadActor) {
     // This stuff shouldn't be in the Player Controller!! It should be on a component located on the pawn.
     // Thing is, you'd have to port both the state machine and the movement system to the pawn for the above to happen.
     _onSkillAbort();
@@ -238,7 +238,7 @@ void AScalarFieldPlayerController::_onControlledPawnDeath(const TObjectPtr<AActo
     GetPawn()->GetMovementComponent()->StopMovementImmediately();
 }
 
-constexpr int32 AScalarFieldPlayerController::_getSkillIdxFromKey(const int32 key) {
+constexpr int32 AScalarFieldPlayerController::_getSkillIdxFromKey(int32 const key) {
     // keys [1, 2, ..., 9, 0] => indices [0, 1, ..., 8, 9]
     return key != 0 ? key - 1 : KEY_ASSIGNABLE_SKILLS - 1;
 }

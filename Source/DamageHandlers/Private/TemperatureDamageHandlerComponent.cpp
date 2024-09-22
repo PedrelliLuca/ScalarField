@@ -9,7 +9,7 @@ UTemperatureDamageHandlerComponent::UTemperatureDamageHandlerComponent() {
     PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UTemperatureDamageHandlerComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
+void UTemperatureDamageHandlerComponent::TickComponent(float const deltaTime, ELevelTick const tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
     // TickComponent() manages the cooldown of the temperature damage deltaTime
@@ -28,11 +28,11 @@ void UTemperatureDamageHandlerComponent::TickComponent(const float deltaTime, co
     }
 }
 
-void UTemperatureDamageHandlerComponent::SetMinComfortTemperature(const double minComfortTemperature) {
+void UTemperatureDamageHandlerComponent::SetMinComfortTemperature(double const minComfortTemperature) {
     _minComfortTemperature = minComfortTemperature > 0. ? minComfortTemperature : 0.;
 }
 
-void UTemperatureDamageHandlerComponent::SetMaxComfortTemperature(const double maxComfortTemperature) {
+void UTemperatureDamageHandlerComponent::SetMaxComfortTemperature(double const maxComfortTemperature) {
     _maxComfortTemperature = maxComfortTemperature > _minComfortTemperature ? maxComfortTemperature : _minComfortTemperature + DBL_EPSILON;
 }
 
@@ -41,11 +41,11 @@ void UTemperatureDamageHandlerComponent::PostEditChangeProperty(FPropertyChanged
     FProperty* const property = propertyChangedEvent.Property;
     FName propertyName = property != nullptr ? property->GetFName() : NAME_None;
     if (propertyName == GET_MEMBER_NAME_CHECKED(UTemperatureDamageHandlerComponent, _minComfortTemperature)) {
-        if (const auto initTempProperty = CastFieldChecked<FDoubleProperty>(property)) {
+        if (auto const initTempProperty = CastFieldChecked<FDoubleProperty>(property)) {
             SetMinComfortTemperature(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)));
         }
     } else if (propertyName == GET_MEMBER_NAME_CHECKED(UTemperatureDamageHandlerComponent, _maxComfortTemperature)) {
-        if (const auto initTempProperty = CastFieldChecked<FDoubleProperty>(property)) {
+        if (auto const initTempProperty = CastFieldChecked<FDoubleProperty>(property)) {
             SetMaxComfortTemperature(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<double>(this)));
         }
     }
@@ -81,9 +81,9 @@ bool UTemperatureDamageHandlerComponent::_isTemperatureCausingDamage() const {
     bool isTemperatureCausingDamage = false;
 
     check(_thermoInteractorC.IsValid());
-    const float temperature = _thermoInteractorC->GetTemperature();
+    float const temperature = _thermoInteractorC->GetTemperature();
 
-    const bool isTemperatureComfortable = temperature >= _minComfortTemperature && temperature <= _maxComfortTemperature;
+    bool const isTemperatureComfortable = temperature >= _minComfortTemperature && temperature <= _maxComfortTemperature;
     if (!isTemperatureComfortable) {
         check(_healthC.IsValid());
 
@@ -95,7 +95,7 @@ bool UTemperatureDamageHandlerComponent::_isTemperatureCausingDamage() const {
     return isTemperatureCausingDamage;
 }
 
-float UTemperatureDamageHandlerComponent::_computeDamageForTemperature(const float temperature) const {
+float UTemperatureDamageHandlerComponent::_computeDamageForTemperature(float const temperature) const {
     if (temperature < _minComfortTemperature) {
         return _minComfortTemperature - temperature;
     } else if (temperature > _maxComfortTemperature) {

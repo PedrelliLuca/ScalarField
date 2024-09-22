@@ -16,24 +16,24 @@ UBTTask_SetMovementTarget::UBTTask_SetMovementTarget() {
 }
 
 EBTNodeResult::Type UBTTask_SetMovementTarget::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
-    const auto aiController = ownerComp.GetAIOwner();
-    const auto aiMovementCommandC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
+    auto const aiController = ownerComp.GetAIOwner();
+    auto const aiMovementCommandC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
     if (!IsValid(aiMovementCommandC)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): AI Controller does not have a Movement Command Component"), *FString{__FUNCTION__});
         return EBTNodeResult::Failed;
     }
 
-    const auto blackboardC = ownerComp.GetBlackboardComponent();
+    auto const blackboardC = ownerComp.GetBlackboardComponent();
 
     FVector targetLocation{};
     if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass()) {
         targetLocation = blackboardC->GetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID());
 
     } else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass()) {
-        const auto keyValue = blackboardC->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
+        auto const keyValue = blackboardC->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
 
         // If the targetActor is not about to be killed by the garbage collector
-        if (const auto targetActor = Cast<AActor>(keyValue); IsValid(targetActor)) {
+        if (auto const targetActor = Cast<AActor>(keyValue); IsValid(targetActor)) {
             targetLocation = targetActor->GetActorLocation();
         }
     } else {

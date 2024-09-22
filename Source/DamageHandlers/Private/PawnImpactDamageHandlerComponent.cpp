@@ -45,7 +45,7 @@ void UPawnImpactDamageHandlerComponent::BeginPlay() {
     }
 }
 
-void UPawnImpactDamageHandlerComponent::HandleImpact(const FVector& velocity, const float damage) {
+void UPawnImpactDamageHandlerComponent::HandleImpact(FVector const& velocity, float const damage) {
     check(_healthC.IsValid());
     _healthC->TakeDamage(damage);
 

@@ -6,7 +6,7 @@
 #include "EnvironmentQuery/Items/EnvQueryItemType_Actor.h"
 #include "FactionComponent.h"
 
-UEnvQueryTest_Relationship::UEnvQueryTest_Relationship(const FObjectInitializer& objectInitializer)
+UEnvQueryTest_Relationship::UEnvQueryTest_Relationship(FObjectInitializer const& objectInitializer)
     : Super(objectInitializer) {
     _querier = UEnvQueryContext_Querier::StaticClass();
     Cost = EEnvTestCost::Low;
@@ -14,16 +14,16 @@ UEnvQueryTest_Relationship::UEnvQueryTest_Relationship(const FObjectInitializer&
 }
 
 void UEnvQueryTest_Relationship::RunTest(FEnvQueryInstance& queryInstance) const {
-    const auto queryOwner = queryInstance.Owner.Get();
+    auto const queryOwner = queryInstance.Owner.Get();
     if (queryOwner == nullptr) {
         return;
     }
 
     FloatValueMin.BindData(queryOwner, queryInstance.QueryID);
-    const float filterMinThreshold = FloatValueMin.GetValue();
+    float const filterMinThreshold = FloatValueMin.GetValue();
 
     FloatValueMax.BindData(queryOwner, queryInstance.QueryID);
-    const float filterMaxThreshold = FloatValueMax.GetValue();
+    float const filterMaxThreshold = FloatValueMax.GetValue();
 
     TArray<AActor*> contextActors;
     if (!queryInstance.PrepareContext(_querier, contextActors)) {
@@ -33,21 +33,21 @@ void UEnvQueryTest_Relationship::RunTest(FEnvQueryInstance& queryInstance) const
     // We expect a single querier
     check(contextActors.Num() == 1);
 
-    const auto contextFactionC = contextActors.Last()->FindComponentByClass<UFactionComponent>();
+    auto const contextFactionC = contextActors.Last()->FindComponentByClass<UFactionComponent>();
     if (!IsValid(contextFactionC)) {
         UE_LOG(LogTemp, Error, TEXT("%s: the Context Actor doesn't have a UFactionComponent"), *FString{__FUNCTION__});
         return;
     }
 
     for (FEnvQueryInstance::ItemIterator it(this, queryInstance); it; ++it) {
-        const auto otherActor = GetItemActor(queryInstance, it.GetIndex());
+        auto const otherActor = GetItemActor(queryInstance, it.GetIndex());
 
-        const auto otherFactionC = otherActor->FindComponentByClass<UFactionComponent>();
+        auto const otherFactionC = otherActor->FindComponentByClass<UFactionComponent>();
         if (!IsValid(otherFactionC)) {
             continue;
         }
 
-        const auto score = contextFactionC->GetRelationshipWithFaction(otherFactionC->GetFaction()) == _relationshipToSearchFor ? 1.0f : 0.0f;
+        auto const score = contextFactionC->GetRelationshipWithFaction(otherFactionC->GetFaction()) == _relationshipToSearchFor ? 1.0f : 0.0f;
         it.SetScore(TestPurpose, FilterType, score, filterMinThreshold, filterMaxThreshold);
     }
 }

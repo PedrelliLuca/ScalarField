@@ -6,7 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 
 void UPlayerRotoTranslationMovement::OnSetDestination(
-    const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData) {
+    TObjectPtr<APlayerController> const& playerController, FVector const& destination, FPlayerInputData const& inputData) {
     // Player is no longer pressing the input
     _bInputPressed = false;
 
@@ -19,14 +19,14 @@ void UPlayerRotoTranslationMovement::OnSetDestination(
     }
 }
 
-void UPlayerRotoTranslationMovement::OnStopMovement(const TObjectPtr<APlayerController>& playerController) {
+void UPlayerRotoTranslationMovement::OnStopMovement(TObjectPtr<APlayerController> const& playerController) {
     // We flag that the input is being pressed
     _bInputPressed = true;
     // Just in case the character was moving because of a previous short press we stop it
     playerController->StopMovement();
 }
 
-void UPlayerRotoTranslationMovement::OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) {
+void UPlayerRotoTranslationMovement::OnMovementTick(TObjectPtr<APlayerController> const& playerController, float deltaTime) {
     if (!_bInputPressed) {
         _followTime = 0;
         return;
@@ -37,11 +37,11 @@ void UPlayerRotoTranslationMovement::OnMovementTick(const TObjectPtr<APlayerCont
     // We look for the location in the world where the player has pressed the input
     FHitResult hit;
     playerController->GetHitResultUnderCursor(ECC_Visibility, true, hit);
-    const FVector hitLocation = hit.Location;
+    FVector const hitLocation = hit.Location;
 
     // Direct the Pawn towards that location
-    if (const auto pawn = playerController->GetPawn()) {
-        const FVector worldDirection = (hitLocation - pawn->GetActorLocation()).GetSafeNormal();
+    if (auto const pawn = playerController->GetPawn()) {
+        FVector const worldDirection = (hitLocation - pawn->GetActorLocation()).GetSafeNormal();
         pawn->AddMovementInput(worldDirection, 1.f, false);
     }
 }

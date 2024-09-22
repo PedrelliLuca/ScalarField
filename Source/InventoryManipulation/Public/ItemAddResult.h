@@ -29,8 +29,8 @@ public:
         , ItemQuantityActuallyGiven(itemQuantityActuallyGiven) {};
 
     // Functions that make building instances of this struct easier
-    static FItemAddResult AddedNone(int32 itemQuantity, const FText& errorText);
-    static FItemAddResult AddedSome(int32 itemQuantity, int32 itemQuantityActuallyGiven, const FText& errorText);
+    static FItemAddResult AddedNone(int32 itemQuantity, FText const& errorText);
+    static FItemAddResult AddedSome(int32 itemQuantity, int32 itemQuantityActuallyGiven, FText const& errorText);
     static FItemAddResult AddedAll(int32 itemQuantity);
 
     UPROPERTY(BlueprintReadOnly, Category = "Item Add Result")
@@ -48,7 +48,7 @@ public:
 
 #define LOCTEXT_NAMESPACE "ItemAddResult"
 
-FORCEINLINE FItemAddResult FItemAddResult::AddedNone(int32 itemQuantity, const FText& errorText) {
+FORCEINLINE FItemAddResult FItemAddResult::AddedNone(int32 itemQuantity, FText const& errorText) {
     FItemAddResult addResult{itemQuantity};
     addResult.Result = EItemAddResult::IAR_NoItemsAdded;
     addResult.ErrorText = errorText;
@@ -56,7 +56,7 @@ FORCEINLINE FItemAddResult FItemAddResult::AddedNone(int32 itemQuantity, const F
     return addResult;
 }
 
-FORCEINLINE FItemAddResult FItemAddResult::AddedSome(int32 itemQuantity, int32 itemQuantityActuallyGiven, const FText& errorText) {
+FORCEINLINE FItemAddResult FItemAddResult::AddedSome(int32 itemQuantity, int32 itemQuantityActuallyGiven, FText const& errorText) {
     FItemAddResult addResult{itemQuantity, itemQuantityActuallyGiven};
     addResult.Result = EItemAddResult::IAR_SomeItemsAdded;
     addResult.ErrorText = errorText;

@@ -14,11 +14,11 @@ class MOVEMENTCOMMAND_API UAIRotationOnlyMovement : public UAIMovementCommand {
     GENERATED_BODY()
 
 public:
-    void OnSetDestination(const FVector& destination) final;
+    void OnSetDestination(FVector const& destination) final;
     void OnStopMovement() final;
     void OnMovementTick(float deltaTime) final;
 
-    void SetMovementParameters(const FMovementParameters& params) final;
+    void SetMovementParameters(FMovementParameters const& params) final;
 
     bool IsMoving() const final;
 

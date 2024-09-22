@@ -24,8 +24,8 @@ public:
     /** \brief Returns whether the relationship with the given function is the expected one or not */
     bool HasRelationshipWithFaction(EFaction faction, ERelationship queryRelationship) const;
 
-    bool IsAlliedWithFaction(const EFaction faction) const { return HasRelationshipWithFaction(faction, ERelationship::Ally); }
-    bool IsEnemyWithFaction(const EFaction faction) const { return HasRelationshipWithFaction(faction, ERelationship::Enemy); }
+    bool IsAlliedWithFaction(EFaction const faction) const { return HasRelationshipWithFaction(faction, ERelationship::Ally); }
+    bool IsEnemyWithFaction(EFaction const faction) const { return HasRelationshipWithFaction(faction, ERelationship::Enemy); }
 
     /** \brief Returns all factions whose relationship with this component is the input one. */
     TSet<EFaction> GetFactionsWithRelationship(ERelationship queryRelationship) const;

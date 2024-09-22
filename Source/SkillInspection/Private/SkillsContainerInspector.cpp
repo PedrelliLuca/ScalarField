@@ -6,11 +6,11 @@
 #include "SkillPropertiesInspector.h"
 #include "SkillsContainerComponent.h"
 
-FSkillsContainerInspector::FSkillsContainerInspector(const TObjectPtr<USkillsContainerComponent>& skillsContainer)
+FSkillsContainerInspector::FSkillsContainerInspector(TObjectPtr<USkillsContainerComponent> const& skillsContainer)
     : _skillsContainer(skillsContainer) {
 }
 
-TOptional<FSkillPropertiesInspector> FSkillsContainerInspector::GetSkillPropertiesByIndex(const int32 skillIndex) const {
+TOptional<FSkillPropertiesInspector> FSkillsContainerInspector::GetSkillPropertiesByIndex(int32 const skillIndex) const {
     auto optionalSkillInsp = TOptional<FSkillPropertiesInspector>();
     if (_skillsContainer->_skills.IsValidIndex(skillIndex) && IsValid(_skillsContainer->_skills[skillIndex])) {
         optionalSkillInsp = FSkillPropertiesInspector(_skillsContainer->_skills[skillIndex]);
@@ -19,10 +19,10 @@ TOptional<FSkillPropertiesInspector> FSkillsContainerInspector::GetSkillProperti
     return optionalSkillInsp;
 }
 
-TOptional<int32> FSkillsContainerInspector::GetIndexOfSkill(const TSubclassOf<UAbstractSkill>& skillClass) const {
+TOptional<int32> FSkillsContainerInspector::GetIndexOfSkill(TSubclassOf<UAbstractSkill> const& skillClass) const {
     auto optionalIndex = TOptional<int32>{};
 
-    const auto index = _skillsContainer->_skills.IndexOfByPredicate([&skillClass](const auto& skill) { return skill->IsA(skillClass); });
+    auto const index = _skillsContainer->_skills.IndexOfByPredicate([&skillClass](auto const& skill) { return skill->IsA(skillClass); });
     if (index != INDEX_NONE) {
         optionalIndex = index;
     }
@@ -30,7 +30,7 @@ TOptional<int32> FSkillsContainerInspector::GetIndexOfSkill(const TSubclassOf<UA
     return optionalIndex;
 }
 
-void FSkillsContainerInspector::ForEachSkill(const TFunction<void(const FSkillPropertiesInspector&, int32)> skillPropertiesFunc) const {
+void FSkillsContainerInspector::ForEachSkill(TFunction<void(FSkillPropertiesInspector const&, int32)> const skillPropertiesFunc) const {
     check(_skillsContainer.IsValid());
 
     int32 skillIndex = 0;

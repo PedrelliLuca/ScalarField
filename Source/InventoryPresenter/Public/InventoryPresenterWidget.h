@@ -21,7 +21,7 @@ public:
     void HideInventory() override;
 
 protected:
-    FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+    FReply NativeOnMouseButtonDown(FGeometry const& inGeometry, FPointerEvent const& inMouseEvent) override;
 
 private:
     UFUNCTION(BlueprintCallable)
@@ -29,10 +29,10 @@ private:
 
     void _onItemFromInventoryBeingUsed(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory);
 
-    void _onItemFromInventoryBeingDiscarded(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory, const FPointerEvent& mouseEvent);
+    void _onItemFromInventoryBeingDiscarded(TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory, FPointerEvent const& mouseEvent);
 
     UFUNCTION()
-    void _onQuantitySetterCommit(const FText& quantityText, ETextCommit::Type commitType);
+    void _onQuantitySetterCommit(FText const& quantityText, ETextCommit::Type commitType);
 
     void _cleanupQuantityBeingSet();
 

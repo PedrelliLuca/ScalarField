@@ -8,7 +8,7 @@ UPickupComponent::UPickupComponent() {
     PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UPickupComponent::InitializePickup(const TSubclassOf<UObject> itemClass, const int32 quantity) {
+void UPickupComponent::InitializePickup(TSubclassOf<UObject> const itemClass, int32 const quantity) {
     check(itemClass && itemClass->ImplementsInterface(UItem::StaticClass()) && quantity > 0);
     _item = NewObject<UObject>(this, itemClass);
     _item->SetQuantity(quantity);
@@ -33,18 +33,18 @@ void UPickupComponent::_onItemModified() {
     _interactableC->RefreshWidget();
 }
 
-void UPickupComponent::_onTakePickup(const TScriptInterface<IInteractor> interactor) {
-    const TWeakObjectPtr<UActorComponent> interactorC = Cast<UActorComponent>(interactor.GetObject());
+void UPickupComponent::_onTakePickup(TScriptInterface<IInteractor> const interactor) {
+    TWeakObjectPtr<UActorComponent> const interactorC = Cast<UActorComponent>(interactor.GetObject());
     check(interactorC.IsValid());
 
-    const auto interactorController = Cast<AController>(interactorC->GetOwner());
+    auto const interactorController = Cast<AController>(interactorC->GetOwner());
     check(IsValid(interactorController));
 
-    const auto inventoryActorC = interactorController->GetPawn()->FindComponentByInterface(UInventory::StaticClass());
+    auto const inventoryActorC = interactorController->GetPawn()->FindComponentByInterface(UInventory::StaticClass());
     check(IsValid(inventoryActorC));
-    const TWeakInterfacePtr<IInventory> abstractInventory = Cast<IInventory>(inventoryActorC);
+    TWeakInterfacePtr<IInventory> const abstractInventory = Cast<IInventory>(inventoryActorC);
 
-    const auto addResult = abstractInventory->TryAddItem(_item.GetInterface());
+    auto const addResult = abstractInventory->TryAddItem(_item.GetInterface());
     if (addResult.Result != EItemAddResult::IAR_AllItemsAdded) {
         _item->SetQuantity(_item->GetQuantity() - addResult.ItemQuantityActuallyGiven);
     } else {

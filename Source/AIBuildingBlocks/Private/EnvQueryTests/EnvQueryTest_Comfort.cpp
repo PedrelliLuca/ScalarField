@@ -13,38 +13,38 @@ UEnvQueryTest_Comfort::UEnvQueryTest_Comfort() {
 }
 
 void UEnvQueryTest_Comfort::RunTest(FEnvQueryInstance& queryInstance) const {
-    const auto queryOwner = queryInstance.Owner.Get();
+    auto const queryOwner = queryInstance.Owner.Get();
     if (queryOwner == nullptr) {
         return;
     }
 
     FloatValueMin.BindData(queryOwner, queryInstance.QueryID);
-    const float filterMinThreshold = FloatValueMin.GetValue();
+    float const filterMinThreshold = FloatValueMin.GetValue();
 
     FloatValueMax.BindData(queryOwner, queryInstance.QueryID);
-    const float filterMaxThreshold = FloatValueMax.GetValue();
+    float const filterMaxThreshold = FloatValueMax.GetValue();
 
     switch (_testMode) {
         case EEnvTestComfort::Comfort:
             /* We look for actors that are comfortable with their temperature. */
             for (FEnvQueryInstance::ItemIterator it(this, queryInstance); it; ++it) {
-                const auto otherActor = GetItemActor(queryInstance, it.GetIndex());
+                auto const otherActor = GetItemActor(queryInstance, it.GetIndex());
 
-                const auto otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
-                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
+                auto const otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
+                auto const otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
                 if (!IsValid(otherThermoDmgHandlerC) || !IsValid(otherThermoC)) {
                     continue;
                 }
 
-                const auto lowerComfortT = otherThermoDmgHandlerC->GetMinComfortTemperature();
-                const auto upperComfortT = otherThermoDmgHandlerC->GetMaxComfortTemperature();
-                const auto temperature = otherThermoC->GetTemperature();
+                auto const lowerComfortT = otherThermoDmgHandlerC->GetMinComfortTemperature();
+                auto const upperComfortT = otherThermoDmgHandlerC->GetMaxComfortTemperature();
+                auto const temperature = otherThermoC->GetTemperature();
                 if (temperature < lowerComfortT || temperature > upperComfortT) {
                     continue;
                 }
 
-                const auto bestComfortT = (lowerComfortT + upperComfortT) * 0.5f;
-                const auto delta = FMath::Abs(bestComfortT - temperature);
+                auto const bestComfortT = (lowerComfortT + upperComfortT) * 0.5f;
+                auto const delta = FMath::Abs(bestComfortT - temperature);
 
                 /* In this case, with an Inverse Linear Scoring Equation the closer the other's temperature is to the mid of its
                  * comfort interval, the better it is. */
@@ -54,21 +54,21 @@ void UEnvQueryTest_Comfort::RunTest(FEnvQueryInstance& queryInstance) const {
         case EEnvTestComfort::DiscomfortCold:
             /* We look for actors that are unfortable because their temperature is too low */
             for (FEnvQueryInstance::ItemIterator it(this, queryInstance); it; ++it) {
-                const auto otherActor = GetItemActor(queryInstance, it.GetIndex());
+                auto const otherActor = GetItemActor(queryInstance, it.GetIndex());
 
-                const auto otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
-                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
+                auto const otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
+                auto const otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
                 if (!IsValid(otherThermoDmgHandlerC) || !IsValid(otherThermoC)) {
                     continue;
                 }
 
-                const auto lowerComfortT = otherThermoDmgHandlerC->GetMinComfortTemperature();
-                const auto temperature = otherThermoC->GetTemperature();
+                auto const lowerComfortT = otherThermoDmgHandlerC->GetMinComfortTemperature();
+                auto const temperature = otherThermoC->GetTemperature();
                 if (temperature > lowerComfortT) {
                     continue;
                 }
 
-                const auto delta = lowerComfortT - temperature;
+                auto const delta = lowerComfortT - temperature;
 
                 /* In this case, with an Inverse Linear Scoring Equation the closer the other's temperature is to its minimum comfort temperature and the better
                  * it is. */
@@ -78,21 +78,21 @@ void UEnvQueryTest_Comfort::RunTest(FEnvQueryInstance& queryInstance) const {
         case EEnvTestComfort::DiscomfortHot:
             /* We look for actors that are unfortable because their temperature is too high */
             for (FEnvQueryInstance::ItemIterator it(this, queryInstance); it; ++it) {
-                const auto otherActor = GetItemActor(queryInstance, it.GetIndex());
+                auto const otherActor = GetItemActor(queryInstance, it.GetIndex());
 
-                const auto otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
-                const auto otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
+                auto const otherThermoDmgHandlerC = otherActor->FindComponentByClass<UTemperatureDamageHandlerComponent>();
+                auto const otherThermoC = otherActor->FindComponentByClass<UThermodynamicsInteractorComponent>();
                 if (!IsValid(otherThermoDmgHandlerC) || !IsValid(otherThermoC)) {
                     continue;
                 }
 
-                const auto upperComfortT = otherThermoDmgHandlerC->GetMaxComfortTemperature();
-                const auto temperature = otherThermoC->GetTemperature();
+                auto const upperComfortT = otherThermoDmgHandlerC->GetMaxComfortTemperature();
+                auto const temperature = otherThermoC->GetTemperature();
                 if (temperature < upperComfortT) {
                     continue;
                 }
 
-                const auto delta = temperature - upperComfortT;
+                auto const delta = temperature - upperComfortT;
 
                 /* In this case, with an Inverse Linear Scoring Equation the closer the other's temperature is to its maximumx comfort temperature and the
                  * better it is. */

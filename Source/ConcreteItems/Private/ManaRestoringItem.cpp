@@ -14,7 +14,7 @@ UManaRestoringItem::UManaRestoringItem() {
 void UManaRestoringItem::Use(TWeakObjectPtr<AActor> actor) {
     Super::Use(actor);
 
-    const TWeakObjectPtr<UManaComponent> manaC = actor->FindComponentByClass<UManaComponent>();
+    TWeakObjectPtr<UManaComponent> const manaC = actor->FindComponentByClass<UManaComponent>();
     if (manaC.IsValid()) {
         manaC->RestoreMana(_manaRestoringAmount);
     }

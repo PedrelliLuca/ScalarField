@@ -6,11 +6,11 @@ bool UDistanceTargetingCondition::IsVerifiedForTarget(ISkillTarget* const skillT
     check(skillTarget != nullptr);
     check(_caster.IsValid());
 
-    const auto casterLocation = _caster->GetActorLocation();
-    const auto targetLocation = skillTarget->GetTargetLocation();
+    auto const casterLocation = _caster->GetActorLocation();
+    auto const targetLocation = skillTarget->GetTargetLocation();
 
-    const auto casterToTarget = targetLocation - casterLocation;
-    const auto actualDistance = casterToTarget.Length();
+    auto const casterToTarget = targetLocation - casterLocation;
+    auto const actualDistance = casterToTarget.Length();
 
     bool isVerified = false;
     switch (_distanceComparison) {

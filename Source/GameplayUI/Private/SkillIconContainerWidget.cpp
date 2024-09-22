@@ -9,15 +9,15 @@
 #include "SkillsContainerInspector.h"
 
 void USkillIconContainerWidget::BuildIconsFromContainer(
-    const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
+    TObjectPtr<USkillsContainerComponent> const& skillsContainer, TObjectPtr<UNewStateComponent> const& stateMachine) {
     _skillSlots->ClearChildren();
     _skillSlots->SetVisibility(ESlateVisibility::Visible);
-    const auto containerInspector = FSkillsContainerInspector(skillsContainer);
+    auto const containerInspector = FSkillsContainerInspector(skillsContainer);
 
     if (ensureMsgf(IsValid(_skillIconClass), TEXT(__FUNCTION__ ": Invalid Skill Icon Class, set it from Widget."))) {
         containerInspector.ForEachSkill([owner = GetOwningPlayer(), stateMachine, skillSlots = _skillSlots, skillIconClass = _skillIconClass](
-                                            const FSkillPropertiesInspector& skillProp, const int32 skillIndex) {
-            const TObjectPtr<USkillIconWidget> skillIconW = CreateWidget<USkillIconWidget>(owner, skillIconClass);
+                                            FSkillPropertiesInspector const& skillProp, int32 const skillIndex) {
+            TObjectPtr<USkillIconWidget> const skillIconW = CreateWidget<USkillIconWidget>(owner, skillIconClass);
             skillIconW->InitFromSkillProperties(skillProp, stateMachine, skillIndex);
             skillSlots->AddChildToWrapBox(skillIconW);
         });

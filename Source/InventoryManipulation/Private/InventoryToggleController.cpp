@@ -19,7 +19,7 @@ void UInventoryToggleController::OpenInventoryOfActor(TWeakObjectPtr<AActor>&& a
     check(_hudToShowOnClose.IsValid());
     _hudToShowOnClose->Hide();
 
-    const auto inventoryC = actor->FindComponentByInterface(UInventory::StaticClass());
+    auto const inventoryC = actor->FindComponentByInterface(UInventory::StaticClass());
     TWeakInterfacePtr<IInventory> inventory = Cast<IInventory>(inventoryC);
     check(inventory.IsValid() && _inventoryContainer.IsValid());
     _inventoryContainer->ShowInventory(MoveTemp(inventory));

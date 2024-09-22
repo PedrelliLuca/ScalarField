@@ -60,10 +60,10 @@ public:
     double GetInteractionPercentage() const;
 
     UFUNCTION(BlueprintCallable, Category = "Interaction")
-    void SetInteractableNameText(const FText& newInteractableNameText);
+    void SetInteractableNameText(FText const& newInteractableNameText);
 
     UFUNCTION(BlueprintCallable, Category = "Interaction")
-    void SetInteractableActionText(const FText& newInteractableActionText);
+    void SetInteractableActionText(FText const& newInteractableActionText);
 
     // To be called when data presented by the widget is updated
     void RefreshWidget();
@@ -73,7 +73,7 @@ protected:
 
     void Deactivate() override;
 
-    bool _canInteract(const TScriptInterface<IInteractor>& interactor) const;
+    bool _canInteract(TScriptInterface<IInteractor> const& interactor) const;
 
     // Every AController currently interacting with this (player controller, AI controllerS)
     TSet<TScriptInterface<IInteractor>> _interactors;

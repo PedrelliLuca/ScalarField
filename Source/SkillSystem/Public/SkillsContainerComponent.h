@@ -41,7 +41,7 @@ public:
 
     /** \brief If a skill is waiting for targets, tries adding it and returns the result of the operation. If no skill is waiting for targets, the returned
      * TOptional is unset. */
-    TOptional<FSkillTargetingResult> TryAddTargetToWaitingSkill(const FSkillTargetPacket& targetPacket);
+    TOptional<FSkillTargetingResult> TryAddTargetToWaitingSkill(FSkillTargetPacket const& targetPacket);
 
     FOnSkillExecutionStatusChanged& OnSkillInExecutionStatusChanged() { return _onSkillInExecutionStatusChanged; }
 

@@ -30,7 +30,7 @@ public:
 
     /** \brief Sets up a callback so that the given actor will drop the content of its inventory at death. The actor must have a UHealthComponent and a
      * UInventoryComponent for this to work. */
-    void BindPickupsDropAtDeath(const TObjectPtr<AActor> actor);
+    void BindPickupsDropAtDeath(TObjectPtr<AActor> const actor);
 
 private:
     void _spawnPickup(TWeakInterfacePtr<IItem> item, int32 quantity, TWeakInterfacePtr<IInventory> inventory);

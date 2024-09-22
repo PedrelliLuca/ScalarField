@@ -25,12 +25,12 @@ void UInventoryWidget::_filterItemsByClass(TSubclassOf<UObject> itemClass /*= nu
     }
 #endif
 
-    for (const auto& item : _inventory->GetItems()) {
+    for (auto const& item : _inventory->GetItems()) {
         if (IsValid(itemClass) && !item.GetObject()->IsA(itemClass)) {
             continue;
         }
 
-        const auto itemWidget = CreateWidget<UInventoryItemWidget>(GetOwningPlayer(), _itemWidgetClass);
+        auto const itemWidget = CreateWidget<UInventoryItemWidget>(GetOwningPlayer(), _itemWidgetClass);
         itemWidget->SetItem(item);
         itemWidget->OnItemUsage().AddUObject(this, &UInventoryWidget::_onItemBeingUsed);
         itemWidget->OnItemDiscarded().AddUObject(this, &UInventoryWidget::_onItemBeingDiscarded);
@@ -51,6 +51,6 @@ void UInventoryWidget::_onItemBeingUsed(TWeakInterfacePtr<IItem> item) {
     _onItemFromInventoryUsed.Broadcast(item, _inventory);
 }
 
-void UInventoryWidget::_onItemBeingDiscarded(TWeakInterfacePtr<IItem> item, const FPointerEvent& mouseEvent) {
+void UInventoryWidget::_onItemBeingDiscarded(TWeakInterfacePtr<IItem> item, FPointerEvent const& mouseEvent) {
     _onItemFromInventoryDiscarded.Broadcast(item, _inventory, mouseEvent);
 }

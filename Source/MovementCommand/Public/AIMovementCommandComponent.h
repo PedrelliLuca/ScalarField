@@ -20,14 +20,14 @@ public:
     void SetMovementMode(EMovementCommandMode mode) override;
     void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
-    void SetDestination(const FVector& destination) override;
+    void SetDestination(FVector const& destination) override;
     void StopMovement() override;
     void MovementTick(float deltaTime) override;
 
-    void SetMovementParameters(const FMovementParameters& params);
+    void SetMovementParameters(FMovementParameters const& params);
 
     bool IsMoving() const {
-        const auto activeCmd = _modesToCommands.Find(_activeMovementMode);
+        auto const activeCmd = _modesToCommands.Find(_activeMovementMode);
         check(activeCmd != nullptr);
         return (*activeCmd)->IsMoving();
     }

@@ -21,7 +21,7 @@ class GAMEPLAYUI_API USkillIconContainerWidget : public UUserWidget {
     GENERATED_BODY()
 
 public:
-    void BuildIconsFromContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine);
+    void BuildIconsFromContainer(TObjectPtr<USkillsContainerComponent> const& skillsContainer, TObjectPtr<UNewStateComponent> const& stateMachine);
 
 protected:
     UPROPERTY(EditDefaultsOnly, NoClear, Category = "Skill Icon Container Widget")

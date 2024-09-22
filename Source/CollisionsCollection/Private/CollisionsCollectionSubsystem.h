@@ -24,7 +24,7 @@ public:
     // TWeakObjectPtrs of pending kill objects crash when operator->() (aka FWeakObjectPtr::Get()) is called, which is way a raw pointer is used insted.
     void RemovePendingKillCollection(UCollisionsCollectionComponent* collection);
 
-    TWeakObjectPtr<UCollisionsCollectionComponent> GetCollectionByElement(const UPrimitiveComponent* element) const;
+    TWeakObjectPtr<UCollisionsCollectionComponent> GetCollectionByElement(UPrimitiveComponent const* element) const;
 
 private:
     TMap<TWeakObjectPtr<UPrimitiveComponent>, TWeakObjectPtr<UCollisionsCollectionComponent>> _elementToCollection;

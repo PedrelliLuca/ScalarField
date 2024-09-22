@@ -6,15 +6,15 @@
 #include "ThermodynamicsInteractorComponent.h"
 
 void USetTemperatureSkill::_skillCast() {
-    const auto& targets = _getTargets();
+    auto const& targets = _getTargets();
 
     check(!targets.IsEmpty());
 
     // TODO: generalize this in the future.
-    const auto abstractTarget = targets[0];
-    const auto skillTarget = Cast<UActorSkillTarget>(abstractTarget.GetObject());
+    auto const abstractTarget = targets[0];
+    auto const skillTarget = Cast<UActorSkillTarget>(abstractTarget.GetObject());
     check(IsValid(skillTarget));
-    const auto target = skillTarget->GetActor();
+    auto const target = skillTarget->GetActor();
 
     auto thermoC = target->FindComponentByClass<UThermodynamicsInteractorComponent>();
 
@@ -23,7 +23,7 @@ void USetTemperatureSkill::_skillCast() {
     thermoC->SetTemperature(_temperatureToSet);
 }
 
-void USetTemperatureSkill::_skillChannelingTick(const float deltaTime) {
+void USetTemperatureSkill::_skillChannelingTick(float const deltaTime) {
 }
 
 void USetTemperatureSkill::_skillAbort() {

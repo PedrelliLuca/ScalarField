@@ -20,12 +20,12 @@ void Deinitialize();
 
 // Realizes a thermodynamic interaction between the given interactor (transform, thermodynamicsCollision, temperature) and the grid in the time deltaTime.
 // Returns the grid-normalized currDeltaT, i.e. the sum of all the currDeltaTs with the interacting cells divided by the number of interacting cells.
-float Interact(const FTransform& interactorTransform, UCollisionsCollectionComponent* collisionsCollection, float interactorTemperature, float deltaTime);
+float Interact(FTransform const& interactorTransform, UCollisionsCollectionComponent* collisionsCollection, float interactorTemperature, float deltaTime);
 
 // Realizes thermodynamic interactions between each cell and its orthogonal neighbors.
 void SelfInteract(float deltaTime);
 
 THERMODYNAMICSCORE_API const TArray<float>& GetTemperatures();
 
-void DrawDebugHeatmap(const UWorld* world, float height);
+void DrawDebugHeatmap(UWorld const* world, float height);
 } // namespace HeatmapGrid

@@ -23,7 +23,7 @@ ARotatingDoor::ARotatingDoor() {
 void ARotatingDoor::BeginPlay() {
     Super::BeginPlay();
 
-    const auto rotationParams = FOpeningParameters{_timeToOpen, _openRotation, _closedRotation};
+    auto const rotationParams = FOpeningParameters{_timeToOpen, _openRotation, _closedRotation};
     _openingsC->SetOpening(_rotatingMeshC, rotationParams);
     _openingsC->OnOpeningStateChange().AddUObject(this, &ARotatingDoor::_onOpeningPhaseChange);
 
@@ -31,13 +31,13 @@ void ARotatingDoor::BeginPlay() {
 }
 
 void ARotatingDoor::_onDoorInteractedBy(TScriptInterface<IInteractor> interactor) {
-    const auto concreteInteractor = Cast<UInteractorPlayerComponent>(interactor.GetObject());
+    auto const concreteInteractor = Cast<UInteractorPlayerComponent>(interactor.GetObject());
     check(IsValid(concreteInteractor));
 
-    const auto interactingController = Cast<AController>(concreteInteractor->GetOwner());
+    auto const interactingController = Cast<AController>(concreteInteractor->GetOwner());
     check(IsValid(interactingController));
 
-    const auto inventoryComponent = Cast<IInventory>(interactingController->GetPawn()->FindComponentByInterface(UInventory::StaticClass()));
+    auto const inventoryComponent = Cast<IInventory>(interactingController->GetPawn()->FindComponentByInterface(UInventory::StaticClass()));
     if (inventoryComponent == nullptr) {
         interactor->EndInteraction();
         return;
@@ -50,7 +50,7 @@ void ARotatingDoor::_onDoorInteractedBy(TScriptInterface<IInteractor> interactor
     interactor->EndInteraction();
 }
 
-void ARotatingDoor::_onOpeningPhaseChange(const EOpeningPhase newOpeningState) {
+void ARotatingDoor::_onOpeningPhaseChange(EOpeningPhase const newOpeningState) {
     auto actionText = FText{};
 
     switch (newOpeningState) {

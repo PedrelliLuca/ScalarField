@@ -2,7 +2,7 @@
 
 #include "InteractionWidget.h"
 
-void UInteractionWidget::UpdateInteractionWidget(const UInteractableComponent* interactionComponent) {
+void UInteractionWidget::UpdateInteractionWidget(UInteractableComponent const* interactionComponent) {
     check(interactionComponent != nullptr);
     _owningInteractionComponent = interactionComponent;
     _onUpdateInteractionWidget();

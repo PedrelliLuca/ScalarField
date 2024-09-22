@@ -11,7 +11,7 @@
 #include "InventoryWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemFromInventoryUsed, TWeakInterfacePtr<IItem>, TWeakInterfacePtr<IInventory>);
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemFromInventoryDiscarded, TWeakInterfacePtr<IItem>, TWeakInterfacePtr<IInventory>, const FPointerEvent&);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnItemFromInventoryDiscarded, TWeakInterfacePtr<IItem>, TWeakInterfacePtr<IInventory>, FPointerEvent const&);
 
 UCLASS()
 class INVENTORYPRESENTER_API UInventoryWidget : public UUserWidget {
@@ -40,7 +40,7 @@ private:
     void _refreshInventoryItems();
 
     void _onItemBeingUsed(TWeakInterfacePtr<IItem> item);
-    void _onItemBeingDiscarded(TWeakInterfacePtr<IItem> item, const FPointerEvent& mouseEvent);
+    void _onItemBeingDiscarded(TWeakInterfacePtr<IItem> item, FPointerEvent const& mouseEvent);
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UWrapBox> _inventoryItemsBox;

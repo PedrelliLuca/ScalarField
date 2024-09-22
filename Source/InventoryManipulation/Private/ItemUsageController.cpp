@@ -29,9 +29,9 @@ void UItemUsageController::UnbindItemUsage() {
     _itemUsageHandle.Reset();
 }
 
-void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, const int32 quantity, TWeakInterfacePtr<IInventory> inventory) {
+void UItemUsageController::_useItemOfInventory(TWeakInterfacePtr<IItem> item, int32 const quantity, TWeakInterfacePtr<IInventory> inventory) {
     check(item.IsValid() && inventory.IsValid());
-    const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
+    auto const pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
 
     if (!pauseSubsys->IsTacticalPauseOn()) {
         // We are using the item from the inventory => we expect that the inventory contains the item

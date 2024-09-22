@@ -20,7 +20,7 @@ class GAMEPLAYUI_API USkillIconWidget : public UUserWidget {
     GENERATED_BODY()
 
 public:
-    void InitFromSkillProperties(const FSkillPropertiesInspector& skillProp, const TObjectPtr<UNewStateComponent>& stateMachine, int32 skillIndex);
+    void InitFromSkillProperties(FSkillPropertiesInspector const& skillProp, TObjectPtr<UNewStateComponent> const& stateMachine, int32 skillIndex);
 
 protected:
     UFUNCTION(BlueprintImplementableEvent)

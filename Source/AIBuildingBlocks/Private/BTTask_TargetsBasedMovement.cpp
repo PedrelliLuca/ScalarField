@@ -14,20 +14,20 @@ UBTTask_TargetsBasedMovement::UBTTask_TargetsBasedMovement() {
 }
 
 EBTNodeResult::Type UBTTask_TargetsBasedMovement::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
-    const auto aiController = ownerComp.GetAIOwner();
-    const auto aiMovementCommandC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
+    auto const aiController = ownerComp.GetAIOwner();
+    auto const aiMovementCommandC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
     if (!IsValid(aiMovementCommandC)) {
         UE_LOG(LogTemp, Error, TEXT("%s(): AI Controller does not have a Movement Command Component"), *FString{__FUNCTION__});
         return EBTNodeResult::Failed;
     }
 
-    const auto runEQSC = aiController->FindComponentByClass<URunEQSComponent>();
+    auto const runEQSC = aiController->FindComponentByClass<URunEQSComponent>();
     if (!ensureMsgf(IsValid(runEQSC), TEXT("AI-controlled Pawn trying to perform target-based movement without a RunEQSComponent"))) {
         return EBTNodeResult::Failed;
     }
 
     // TODO: edit this once EQ with vector item types will be supported
-    [[maybe_unused]] const auto itemsType = runEQSC->GetQueryItemsType();
+    [[maybe_unused]] auto const itemsType = runEQSC->GetQueryItemsType();
     if (!ensureMsgf(itemsType.IsSet() && *itemsType == UEnvQueryItemType_Actor::StaticClass(),
             TEXT("AI-controlled Pawn trying to perform target-based movement without a RunEQSComponent"))) {
         return EBTNodeResult::Failed;
@@ -48,7 +48,7 @@ EBTNodeResult::Type UBTTask_TargetsBasedMovement::ExecuteTask(UBehaviorTreeCompo
     aiMovementCommandC->SetMovementParameters(_movementParameters);
     aiMovementCommandC->SetDestination(targetLocation); // TODO: use state component here
 
-    const auto blackboardC = ownerComp.GetBlackboardComponent();
+    auto const blackboardC = ownerComp.GetBlackboardComponent();
     blackboardC->SetValueAsVector(BlackboardKey.SelectedKeyName, targetLocation);
 
     return EBTNodeResult::Succeeded;
@@ -69,7 +69,7 @@ FVector UBTTask_TargetsBasedMovement::_getLocation_MoveToFirstTargetStrategy(FQu
     check(!itemsIter.IsDone());
     auto itemRawData = *itemsIter;
     auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
-    const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
+    auto const rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
     return rawActor->GetActorLocation();
 }
 
@@ -81,7 +81,7 @@ FVector UBTTask_TargetsBasedMovement::_getLocation_MidPointStrategy(FQueryItemsI
     for (; !itemsIter.IsDone(); ++itemsIter) {
         auto itemRawData = *itemsIter;
         auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
-        const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
+        auto const rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
         if (IsValid(rawActor)) { // Necessary, the raw actor might be dead by the time you get here
             location += rawActor->GetActorLocation();
             ++i;

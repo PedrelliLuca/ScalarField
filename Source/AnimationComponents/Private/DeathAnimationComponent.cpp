@@ -48,7 +48,7 @@ void UDeathAnimationComponent::_playDeathMontage(TObjectPtr<AActor> _) {
     }
 
     constexpr float playRate = 1.0f;
-    const bool playedSuccessfully = _ownerCharacter->PlayAnimMontage(_deathMontage, playRate) > 0.0f;
+    bool const playedSuccessfully = _ownerCharacter->PlayAnimMontage(_deathMontage, playRate) > 0.0f;
     if (playedSuccessfully) {
         UAnimInstance* const animInstance = _ownerCharacter->GetMesh()->GetAnimInstance();
 
@@ -61,7 +61,7 @@ void UDeathAnimationComponent::_playDeathMontage(TObjectPtr<AActor> _) {
     }
 }
 
-void UDeathAnimationComponent::_onDeathMontageEnded(UAnimMontage* const montage, const bool bInterrupted) const {
+void UDeathAnimationComponent::_onDeathMontageEnded(UAnimMontage* const montage, bool const bInterrupted) const {
     // This component should be the one responsible for destroying the owner, how can it be already invalid?
     check(_ownerCharacter.IsValid());
     _ownerCharacter->Destroy();

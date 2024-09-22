@@ -8,7 +8,7 @@
 
 #define LOCTEXT_NAMESPACE "AIRotoTranslationMovement"
 
-void UAIRotoTranslationMovement::OnSetDestination(const FVector& destination) {
+void UAIRotoTranslationMovement::OnSetDestination(FVector const& destination) {
     check(_aiController.IsValid());
 
     // Always enter if you can't ever ignore OnSetDestination() calls. If you can, then enter only if you're not already following a path.
@@ -30,7 +30,7 @@ void UAIRotoTranslationMovement::OnStopMovement() {
 void UAIRotoTranslationMovement::OnMovementTick(float deltaTime) {
 }
 
-void UAIRotoTranslationMovement::SetMovementParameters(const FMovementParameters& params) {
+void UAIRotoTranslationMovement::SetMovementParameters(FMovementParameters const& params) {
     _movementParameters = params.RotoTranslationMovementParameters;
 }
 
@@ -56,7 +56,7 @@ UPathFollowingComponent* UAIRotoTranslationMovement::_initNavigationControl(ACon
     return PathFollowingComp;
 }
 
-void UAIRotoTranslationMovement::_moveToLocation(AController* Controller, const FVector& GoalLocation) {
+void UAIRotoTranslationMovement::_moveToLocation(AController* Controller, FVector const& GoalLocation) {
     UNavigationSystemV1* NavSys = Controller ? FNavigationSystem::GetCurrent<UNavigationSystemV1>(Controller->GetWorld()) : nullptr;
     if (NavSys == nullptr || Controller == nullptr || Controller->GetPawn() == nullptr) {
         UE_LOG(LogNavigation, Warning,
@@ -80,7 +80,7 @@ void UAIRotoTranslationMovement::_moveToLocation(AController* Controller, const 
         return;
     }
 
-    const bool bAlreadyAtGoal = PFollowComp->HasReached(
+    bool const bAlreadyAtGoal = PFollowComp->HasReached(
         GoalLocation, EPathFollowingReachMode::OverlapAgent, _movementParameters.AcceptanceRadius); // My addition: injection of acceptance radius
 
     // script source, keep only one move request at time
@@ -97,8 +97,8 @@ void UAIRotoTranslationMovement::_moveToLocation(AController* Controller, const 
     if (bAlreadyAtGoal) {
         PFollowComp->RequestMoveWithImmediateFinish(EPathFollowingResult::Success);
     } else {
-        const FVector AgentNavLocation = Controller->GetNavAgentLocation();
-        const ANavigationData* NavData = NavSys->GetNavDataForProps(Controller->GetNavAgentPropertiesRef(), AgentNavLocation);
+        FVector const AgentNavLocation = Controller->GetNavAgentLocation();
+        ANavigationData const* NavData = NavSys->GetNavDataForProps(Controller->GetNavAgentPropertiesRef(), AgentNavLocation);
         if (NavData) {
             FPathFindingQuery Query(Controller, *NavData, AgentNavLocation, GoalLocation);
             FPathFindingResult Result = NavSys->FindPathSync(Query);

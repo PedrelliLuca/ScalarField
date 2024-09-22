@@ -16,29 +16,29 @@ AEnemyStabilizerController::AEnemyStabilizerController() {
 }
 
 void AEnemyStabilizerController::_checkTargetAllyForAttachment() {
-    const auto blackBoard = GetBlackboardComponent();
-    if (const auto targetAlly = Cast<AActor>(blackBoard->GetValueAsObject(_bbTargetAllyKeyName)); IsValid(targetAlly)) {
+    auto const blackBoard = GetBlackboardComponent();
+    if (auto const targetAlly = Cast<AActor>(blackBoard->GetValueAsObject(_bbTargetAllyKeyName)); IsValid(targetAlly)) {
         TArray<AActor*> pawnAttachedActors;
         targetAlly->GetAttachedActors(pawnAttachedActors);
 
-        const auto foundInfluencerActor = Algo::AnyOf(
+        auto const foundInfluencerActor = Algo::AnyOf(
             pawnAttachedActors, [castInfluencerActor = _castInfluencerActor](AActor* const attachedActor) { return attachedActor->IsA(castInfluencerActor); });
         blackBoard->SetValueAsBool(_bbIsTargetAttachedToActor, foundInfluencerActor);
     }
 }
 
-void AEnemyStabilizerController::Tick(const float deltaTime) {
+void AEnemyStabilizerController::Tick(float const deltaTime) {
     Super::Tick(deltaTime);
 
     if (!_patrolC.IsValid()) {
         return;
     }
 
-    if (const auto pawn = GetPawn(); IsValid(pawn)) {
-        const auto blackBoard = GetBlackboardComponent();
+    if (auto const pawn = GetPawn(); IsValid(pawn)) {
+        auto const blackBoard = GetBlackboardComponent();
 
         // Did we reach our current patrol objective?
-        const auto pawnLocation = GetPawn()->GetActorLocation();
+        auto const pawnLocation = GetPawn()->GetActorLocation();
         if (_patrolC.IsValid() && pawnLocation.Equals(_patrolC->GetCurrentPatrolObjective(), _patrolC->GetPatrolObjectiveTolerance())) {
             _patrolC->UpdatePatrolObjective();
 
@@ -74,11 +74,11 @@ void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
 
     RunBehaviorTree(_behaviorTree);
 
-    const auto blackBoard = GetBlackboardComponent();
+    auto const blackBoard = GetBlackboardComponent();
 
     // Making sure the controlled pawn has a patrolC and setting the first objective for the BB.
-    if (const auto pawn = GetPawn(); IsValid(pawn)) {
-        if (const auto healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
+    if (auto const pawn = GetPawn(); IsValid(pawn)) {
+        if (auto const healthC = pawn->FindComponentByClass<UHealthComponent>(); IsValid(healthC)) {
             healthC->OnDeath().AddUObject(this, &AEnemyStabilizerController::_onControlledPawnDeath);
         }
 
@@ -105,7 +105,7 @@ void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
     }
 
     // Setting up the logic that lets the BT know if the Target Ally has just changed or not.
-    const auto targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetAllyKeyName);
+    auto const targetEnemyKeyId = blackBoard->GetKeyID(_bbTargetAllyKeyName);
     if (targetEnemyKeyId != FBlackboard::InvalidKey) {
         _runEQSC->OnQueryResultChange().AddUObject(this, &AEnemyStabilizerController::_newOnTargetAllyChange);
     } else {
@@ -115,7 +115,7 @@ void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
     _movementCommandC->SetDefaultMovementMode();
 
     if (IsValid(GetPawn())) {
-        const auto skillsContainerC = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
+        auto const skillsContainerC = GetPawn()->FindComponentByClass<USkillsContainerComponent>();
         check(IsValid(skillsContainerC));
 
         skillsContainerC->CreateAllSkills();
@@ -123,7 +123,7 @@ void AEnemyStabilizerController::OnPossess(APawn* inPawn) {
     }
 }
 
-EBlackboardNotificationResult AEnemyStabilizerController::_onTargetAllyChange(const UBlackboardComponent& blackboard, const FBlackboard::FKey changedKeyID) {
+EBlackboardNotificationResult AEnemyStabilizerController::_onTargetAllyChange(UBlackboardComponent const& blackboard, FBlackboard::FKey const changedKeyID) {
     // I might be pushing my luck here...
     auto& nonConstBB = const_cast<UBlackboardComponent&>(blackboard);
     nonConstBB.SetValueAsBool(_bbTargetRecentlyChangedKeyName, true);
@@ -159,22 +159,22 @@ void AEnemyStabilizerController::_newOnTargetAllyChange() {
 }
 
 void AEnemyStabilizerController::_onSkillExecutionBegin() {
-    const auto blackBoard = GetBlackboardComponent();
+    auto const blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, true);
 }
 
 void AEnemyStabilizerController::_onSkillExecutionEnd() {
-    const auto blackBoard = GetBlackboardComponent();
+    auto const blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, false);
 }
 
 void AEnemyStabilizerController::_onSkillInExecutionStatusChanged(bool isExecutingSomeSkill) {
-    const auto blackBoard = GetBlackboardComponent();
+    auto const blackBoard = GetBlackboardComponent();
     blackBoard->SetValueAsBool(_bbIsCastingKeyName, isExecutingSomeSkill);
 }
 
-void AEnemyStabilizerController::_onControlledPawnDeath(const TObjectPtr<AActor> deadActor) {
-    const auto stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
+void AEnemyStabilizerController::_onControlledPawnDeath(TObjectPtr<AActor> const deadActor) {
+    auto const stateC = GetPawn()->FindComponentByClass<UNewStateComponent>();
     check(IsValid(stateC));
 
     stateC->TryAbort();

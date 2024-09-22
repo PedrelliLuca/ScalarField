@@ -13,11 +13,11 @@ void UInventoryManipulationSubsystem::Initialize(FSubsystemCollectionBase& colle
     _pickupSpawnController = NewObject<UPickupSpawnController>(this, UPickupSpawnController::StaticClass());
 
     // TODO: this should only be a default value, this class should provide an API for this callback to be decided by the users.
-    _pickupSpawnController->SetPickupTransformCallbackForDeathDrop([](const TObjectPtr<AActor> deadActor) {
+    _pickupSpawnController->SetPickupTransformCallbackForDeathDrop([](TObjectPtr<AActor> const deadActor) {
         check(IsValid(deadActor));
         auto transform = deadActor->GetActorTransform();
 
-        if (const auto deadCharacter = Cast<ACharacter>(deadActor)) {
+        if (auto const deadCharacter = Cast<ACharacter>(deadActor)) {
             FVector location = deadCharacter->GetActorLocation();
             location.Z -= deadCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
             transform.SetLocation(MoveTemp(location));
@@ -44,7 +44,7 @@ void UInventoryManipulationSubsystem::OpenInventoryOfActor(TWeakObjectPtr<AActor
         check(actor.IsValid());
         FTransform transform = actor->GetActorTransform();
 
-        if (const auto character = Cast<ACharacter>(actor)) {
+        if (auto const character = Cast<ACharacter>(actor)) {
             FVector location = character->GetActorLocation();
             location.Z -= character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
             transform.SetLocation(MoveTemp(location));

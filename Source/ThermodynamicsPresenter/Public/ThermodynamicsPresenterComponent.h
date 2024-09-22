@@ -48,5 +48,5 @@ private:
     FLinearColor _thermodynamicsColor = FLinearColor::Black;
 
     // TODO: this should be read via UDeveloperSettings
-    inline static const char* THERMODYNAMICS_MESH_TAG = "ThermodynamicsMesh";
+    inline static char const* THERMODYNAMICS_MESH_TAG = "ThermodynamicsMesh";
 };

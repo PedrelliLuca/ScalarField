@@ -5,7 +5,7 @@
 FSkillCastResult UAbstractSkill::TryCast() {
     check(_caster.IsValid());
 
-    const bool isOnCooldown = GetWorld()->GetTimerManager().IsTimerActive(_cooldownTimer);
+    bool const isOnCooldown = GetWorld()->GetTimerManager().IsTimerActive(_cooldownTimer);
     if (isOnCooldown) {
         _setMovementModeIfPossible(EMovementModeToSet::Default);
         return FSkillCastResult::CastFail_Cooldown();
@@ -31,7 +31,7 @@ FSkillCastResult UAbstractSkill::TryCast() {
     }
 
     if (FMath::IsNearlyZero(_castSeconds)) {
-        const auto currentMana = _casterManaC->GetCurrentMana();
+        auto const currentMana = _casterManaC->GetCurrentMana();
         if (currentMana < _castManaCost) {
             _setMovementModeIfPossible(EMovementModeToSet::Default);
             return FSkillCastResult::CastFail_InsufficientMana();
@@ -40,7 +40,7 @@ FSkillCastResult UAbstractSkill::TryCast() {
 
         _skillCast();
 
-        const auto castResult = _endCast();
+        auto const castResult = _endCast();
         return castResult;
     }
 
@@ -54,13 +54,13 @@ FSkillCastResult UAbstractSkill::TryCast() {
     return FSkillCastResult::CastDeferred();
 }
 
-void UAbstractSkill::Abort(const bool shouldResetMovement) {
+void UAbstractSkill::Abort(bool const shouldResetMovement) {
     // An abort prompted by clients can start the skill's cooldown only if the skill is channeling.
-    const bool isChanneling = _castSeconds < _elapsedExecutionSeconds && _elapsedExecutionSeconds < _castSeconds + _channelingSeconds;
+    bool const isChanneling = _castSeconds < _elapsedExecutionSeconds && _elapsedExecutionSeconds < _castSeconds + _channelingSeconds;
     _abort(shouldResetMovement, isChanneling);
 }
 
-FSkillTargetingResult UAbstractSkill::TryAddTarget(const FSkillTargetPacket& targetPacket) {
+FSkillTargetingResult UAbstractSkill::TryAddTarget(FSkillTargetPacket const& targetPacket) {
     if (_targets.Num() == _nTargets) {
         return FSkillTargetingResult::TargetingFail_AlreadyAvailableTargets();
     }
@@ -83,7 +83,7 @@ FSkillTargetingResult UAbstractSkill::TryAddTarget(const FSkillTargetPacket& tar
     return FSkillTargetingResult::TargetingFail_InvalidTarget();
 }
 
-void UAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
+void UAbstractSkill::SetCaster(TObjectPtr<AActor> const caster) {
     // Make sure that the caster is not valid before setting it.
     if (ensureMsgf(!_caster.IsValid(), TEXT("Caster can be set only once and has already been set."))) {
         check(IsValid(caster));
@@ -92,17 +92,17 @@ void UAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
         // We don't check(_casterManaC.IsValid()), casters are allowed to not have a mana component. In such case, they're special casters that do not pay mana.
         _casterManaC = _caster->FindComponentByClass<UManaComponent>();
 
-        for (const auto targetingCondition : _targetingConditions) {
+        for (auto const targetingCondition : _targetingConditions) {
             targetingCondition->SetSkillCaster(caster);
         }
 
-        for (const auto castCondition : _castConditions) {
+        for (auto const castCondition : _castConditions) {
             castCondition->SetSkillCaster(caster);
         }
 
-        if (const auto casterAsPawn = Cast<APawn>(caster); IsValid(casterAsPawn)) {
+        if (auto const casterAsPawn = Cast<APawn>(caster); IsValid(casterAsPawn)) {
             // TODO: update this once the IMovementCommandSetter will be on the pawn
-            if (const auto casterController = casterAsPawn->GetController(); IsValid(casterController)) {
+            if (auto const casterController = casterAsPawn->GetController(); IsValid(casterController)) {
                 // We don't check(_casterMovementSetterC.IsValid()), casters are allowed to not have a movement setter. In such case, the skill won't change
                 // their movement mode.
                 _casterMovementSetterC = Cast<IMovementCommandSetter>(casterController->FindComponentByInterface<UMovementCommandSetter>());
@@ -111,7 +111,7 @@ void UAbstractSkill::SetCaster(const TObjectPtr<AActor> caster) {
     }
 }
 
-void UAbstractSkill::Tick(const float deltaTime) {
+void UAbstractSkill::Tick(float const deltaTime) {
     if (!_pauseSubSys.IsValid()) {
         _pauseSubSys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
         check(_pauseSubSys.IsValid());
@@ -140,7 +140,7 @@ bool UAbstractSkill::IsAllowedToTick() const {
     return _isTickAllowed;
 }
 
-void UAbstractSkill::_abort(const bool shouldResetMovement, const bool shouldStartCooldownTimer) {
+void UAbstractSkill::_abort(bool const shouldResetMovement, bool const shouldStartCooldownTimer) {
     if (shouldResetMovement) {
         _setMovementModeIfPossible(EMovementModeToSet::Default);
     }
@@ -161,9 +161,9 @@ void UAbstractSkill::_abort(const bool shouldResetMovement, const bool shouldSta
     }
 }
 
-void UAbstractSkill::_castTick(const float deltaTime) {
+void UAbstractSkill::_castTick(float const deltaTime) {
     // Targeting conditions must be verified during the entire cast phase.
-    for (const auto& target : _targets) {
+    for (auto const& target : _targets) {
         if (!target->IsValidTarget() || !_areTargetingConditionsVerifiedForTarget(target)) {
             _abort(true, false);
             return;
@@ -179,7 +179,7 @@ void UAbstractSkill::_castTick(const float deltaTime) {
     // Last tick in cast phase
     if (_elapsedExecutionSeconds + deltaTime >= _castSeconds) {
         if (_casterManaC.IsValid()) { // No mana component == free skill
-            const auto currentMana = _casterManaC->GetCurrentMana();
+            auto const currentMana = _casterManaC->GetCurrentMana();
             if (currentMana < _castManaLeftToPay) {
                 _casterManaC->SetCurrentMana(0.0f);
 
@@ -196,8 +196,8 @@ void UAbstractSkill::_castTick(const float deltaTime) {
     }
 
     if (_casterManaC.IsValid()) { // No mana component == free skill
-        const auto currentMana = _casterManaC->GetCurrentMana();
-        const auto manaCostThisFrame = (deltaTime / _castSeconds) * _castManaCost;
+        auto const currentMana = _casterManaC->GetCurrentMana();
+        auto const manaCostThisFrame = (deltaTime / _castSeconds) * _castManaCost;
 
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
@@ -214,7 +214,7 @@ void UAbstractSkill::_castTick(const float deltaTime) {
 void UAbstractSkill::_channelingTick(float deltaTime) {
     if (_checkTargetingConditionsWhenChanneling) {
         // Targeting conditions must be verified during the entire cast phase.
-        for (const auto& target : _targets) {
+        for (auto const& target : _targets) {
             if (!target->IsValidTarget() || !_areTargetingConditionsVerifiedForTarget(target)) {
                 _abort(true, true);
                 return;
@@ -224,7 +224,7 @@ void UAbstractSkill::_channelingTick(float deltaTime) {
 
     // TODO: implement channeling conditions
 
-    const auto executionSeconds = _castSeconds + _channelingSeconds;
+    auto const executionSeconds = _castSeconds + _channelingSeconds;
     if (_elapsedExecutionSeconds + deltaTime >= executionSeconds) {
         // Apply one last mana payment with reduced deltaTime
         deltaTime = executionSeconds - _elapsedExecutionSeconds;
@@ -232,8 +232,8 @@ void UAbstractSkill::_channelingTick(float deltaTime) {
 
     // No mana component == free skill
     if (_casterManaC.IsValid()) {
-        const double currentMana = _casterManaC->GetCurrentMana();
-        const double manaCostThisFrame = (deltaTime / _channelingSeconds) * _channelingManaCost;
+        double const currentMana = _casterManaC->GetCurrentMana();
+        double const manaCostThisFrame = (deltaTime / _channelingSeconds) * _channelingManaCost;
 
         if (currentMana < manaCostThisFrame) {
             _casterManaC->SetCurrentMana(0.0f);
@@ -272,7 +272,7 @@ FSkillCastResult UAbstractSkill::_endCast() {
 
 bool UAbstractSkill::_areTargetingConditionsVerifiedForTarget(TScriptInterface<ISkillTarget> target) const {
     // TODO: When you'll have a proper error management system, this function will have to collect and return all errors thrown by the cast conditions.
-    for (const auto targetingCondition : _targetingConditions) {
+    for (auto const targetingCondition : _targetingConditions) {
         if (!targetingCondition->IsVerifiedForTarget(target.GetInterface())) {
             return false;
         }
@@ -282,7 +282,7 @@ bool UAbstractSkill::_areTargetingConditionsVerifiedForTarget(TScriptInterface<I
 
 bool UAbstractSkill::_areCastConditionsVerified() const {
     // TODO: When you'll have a proper error management system, this function will have to collect and return all errors thrown by the cast conditions.
-    for (const auto castCondition : _castConditions) {
+    for (auto const castCondition : _castConditions) {
         if (!castCondition->IsVerified()) {
             return false;
         }
@@ -290,7 +290,7 @@ bool UAbstractSkill::_areCastConditionsVerified() const {
     return true;
 }
 
-void UAbstractSkill::_setMovementModeIfPossible(const EMovementModeToSet movementModeToSet) const {
+void UAbstractSkill::_setMovementModeIfPossible(EMovementModeToSet const movementModeToSet) const {
     // It's ok for the caster to not have a movement setter. In such case, the skill won't affect its movement.
     if (!_casterMovementSetterC.IsValid()) {
         return;

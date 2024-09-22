@@ -14,11 +14,11 @@ class MOVEMENTCOMMAND_API UAIRotoTranslationMovement : public UAIMovementCommand
     GENERATED_BODY()
 
 public:
-    void OnSetDestination(const FVector& destination) final;
+    void OnSetDestination(FVector const& destination) final;
     void OnStopMovement() final;
     void OnMovementTick(float deltaTime) final;
 
-    void SetMovementParameters(const FMovementParameters& params) final;
+    void SetMovementParameters(FMovementParameters const& params) final;
 
     bool IsMoving() const final;
 
@@ -27,7 +27,7 @@ private:
 
     // NOTE: this function is a copy of UAIBlueprintHelperLibrary::SimpleMoveToLocation. Why not using the original then? Because I need to inject
     // the _movementParameters such as the AcceptanceRadius
-    void _moveToLocation(AController* Controller, const FVector& GoalLocation);
+    void _moveToLocation(AController* Controller, FVector const& GoalLocation);
 
     UPROPERTY(EditDefaultsOnly)
     FRotoTranslationMovementParameters _movementParameters;

@@ -13,15 +13,15 @@
 #define WFUNCTION WIDE1(__FUNCTION__)
 
 namespace CollectionParameterHelpers {
-void BoxSidesFiller(FCollectionBoxParameters& box, const FVector& boxExtent) {
-    const auto v1 = FVector(-boxExtent.X, -boxExtent.Y, -boxExtent.Z);
-    const auto v2 = FVector(-boxExtent.X, boxExtent.Y, -boxExtent.Z);
-    const auto v3 = FVector(-boxExtent.X, boxExtent.Y, boxExtent.Z);
-    const auto v4 = FVector(-boxExtent.X, -boxExtent.Y, boxExtent.Z);
-    const auto v5 = FVector(boxExtent.X, -boxExtent.Y, -boxExtent.Z);
-    const auto v6 = FVector(boxExtent.X, boxExtent.Y, -boxExtent.Z);
-    const auto v7 = FVector(boxExtent.X, boxExtent.Y, boxExtent.Z);
-    const auto v8 = FVector(boxExtent.X, -boxExtent.Y, boxExtent.Z);
+void BoxSidesFiller(FCollectionBoxParameters& box, FVector const& boxExtent) {
+    auto const v1 = FVector(-boxExtent.X, -boxExtent.Y, -boxExtent.Z);
+    auto const v2 = FVector(-boxExtent.X, boxExtent.Y, -boxExtent.Z);
+    auto const v3 = FVector(-boxExtent.X, boxExtent.Y, boxExtent.Z);
+    auto const v4 = FVector(-boxExtent.X, -boxExtent.Y, boxExtent.Z);
+    auto const v5 = FVector(boxExtent.X, -boxExtent.Y, -boxExtent.Z);
+    auto const v6 = FVector(boxExtent.X, boxExtent.Y, -boxExtent.Z);
+    auto const v7 = FVector(boxExtent.X, boxExtent.Y, boxExtent.Z);
+    auto const v8 = FVector(boxExtent.X, -boxExtent.Y, boxExtent.Z);
 
     box.FrontFace[0] = v5;
     box.FrontFace[1] = v6;
@@ -86,24 +86,24 @@ void UCollisionsCollectionComponent::GetOverlappingComponents(TSet<UPrimitiveCom
     // Collection elements must ignore each other, they must look like a single collision for client classes. UPrimitiveComponent::GetOverlappingComponents(),
     // so we need to take care of removing collection elements from the out parameter.
     for (auto element : _collectionElements) {
-        [[maybe_unused]] const int32 nRemoved = componentsOverlappingCollection.Remove(element.Get());
+        [[maybe_unused]] int32 const nRemoved = componentsOverlappingCollection.Remove(element.Get());
         check(nRemoved == 0 || nRemoved == 1);
     }
 }
 
-bool UCollisionsCollectionComponent::HasElement(const UPrimitiveComponent* collectionElement) const {
+bool UCollisionsCollectionComponent::HasElement(UPrimitiveComponent const* collectionElement) const {
     return _collectionElements.Find(collectionElement) != nullptr;
 }
 
-const TArray<FCollectionSphereParameters>& UCollisionsCollectionComponent::GetCollectionSpheres() const {
+TArray<FCollectionSphereParameters> const& UCollisionsCollectionComponent::GetCollectionSpheres() const {
     return _collectionSpheres;
 }
 
-const TArray<FCollectionBoxParameters>& UCollisionsCollectionComponent::GetCollectionBoxes() const {
+TArray<FCollectionBoxParameters> const& UCollisionsCollectionComponent::GetCollectionBoxes() const {
     return _collectionBoxes;
 }
 
-const TArray<FCollectionCapsuleParameters>& UCollisionsCollectionComponent::GetCollectionCapsules() const {
+TArray<FCollectionCapsuleParameters> const& UCollisionsCollectionComponent::GetCollectionCapsules() const {
     return _collectionCapsules;
 }
 
@@ -132,14 +132,14 @@ void UCollisionsCollectionComponent::BeginPlay() {
 }
 
 void UCollisionsCollectionComponent::_collectSpheres() {
-    const TArray<UActorComponent*> sphereActors = GetOwner()->GetComponentsByTag(USphereComponent::StaticClass(), _collectionTag);
+    TArray<UActorComponent*> const sphereActors = GetOwner()->GetComponentsByTag(USphereComponent::StaticClass(), _collectionTag);
     _collectionSpheres.Reserve(sphereActors.Num());
 
-    for (const auto sphereActor : sphereActors) {
-        const auto sphere = Cast<USphereComponent>(sphereActor);
+    for (auto const sphereActor : sphereActors) {
+        auto const sphere = Cast<USphereComponent>(sphereActor);
         check(sphere);
 
-        const auto collisionProfile = sphere->GetCollisionProfileName();
+        auto const collisionProfile = sphere->GetCollisionProfileName();
         if (collisionProfile != _collectionCollisionProfileName) {
             UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Sphere collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
                 *collisionProfile.ToString(), *_collectionCollisionProfileName.ToString());
@@ -147,10 +147,10 @@ void UCollisionsCollectionComponent::_collectSpheres() {
             sphere->SetCollisionProfileName(_collectionCollisionProfileName);
         }
 
-        const bool generateOverlapEvents = sphere->GetGenerateOverlapEvents();
+        bool const generateOverlapEvents = sphere->GetGenerateOverlapEvents();
         if (generateOverlapEvents != _generateOverlapEvents) {
-            const auto collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
-            const auto collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
+            auto const collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
+            auto const collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
             UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Sphere collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
                 collectionString);
 
@@ -170,14 +170,14 @@ void UCollisionsCollectionComponent::_collectSpheres() {
 }
 
 void UCollisionsCollectionComponent::_collectBoxes() {
-    const TArray<UActorComponent*> boxActors = GetOwner()->GetComponentsByTag(UBoxComponent::StaticClass(), _collectionTag);
+    TArray<UActorComponent*> const boxActors = GetOwner()->GetComponentsByTag(UBoxComponent::StaticClass(), _collectionTag);
     _collectionBoxes.Reserve(boxActors.Num());
 
-    for (const auto boxActor : boxActors) {
-        const auto box = Cast<UBoxComponent>(boxActor);
+    for (auto const boxActor : boxActors) {
+        auto const box = Cast<UBoxComponent>(boxActor);
         check(box);
 
-        const auto collisionProfile = box->GetCollisionProfileName();
+        auto const collisionProfile = box->GetCollisionProfileName();
         if (collisionProfile != _collectionCollisionProfileName) {
             UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Box collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
                 *collisionProfile.ToString(), *_collectionCollisionProfileName.ToString());
@@ -185,10 +185,10 @@ void UCollisionsCollectionComponent::_collectBoxes() {
             box->SetCollisionProfileName(_collectionCollisionProfileName);
         }
 
-        const bool generateOverlapEvents = box->GetGenerateOverlapEvents();
+        bool const generateOverlapEvents = box->GetGenerateOverlapEvents();
         if (generateOverlapEvents != _generateOverlapEvents) {
-            const auto collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
-            const auto collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
+            auto const collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
+            auto const collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
             UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Box collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
                 collectionString);
 
@@ -197,7 +197,7 @@ void UCollisionsCollectionComponent::_collectBoxes() {
 
         auto boxParameters = FCollectionBoxParameters();
         boxParameters.RootRelativeTransform = box->GetRelativeTransform();
-        const FVector boxExtent = box->GetScaledBoxExtent();
+        FVector const boxExtent = box->GetScaledBoxExtent();
         CollectionParameterHelpers::BoxSidesFiller(boxParameters, boxExtent);
         _collectionBoxes.Add(MoveTemp(boxParameters));
 
@@ -209,14 +209,14 @@ void UCollisionsCollectionComponent::_collectBoxes() {
 }
 
 void UCollisionsCollectionComponent::_collectCapsules() {
-    const TArray<UActorComponent*> capsuleActors = GetOwner()->GetComponentsByTag(UCapsuleComponent::StaticClass(), _collectionTag);
+    TArray<UActorComponent*> const capsuleActors = GetOwner()->GetComponentsByTag(UCapsuleComponent::StaticClass(), _collectionTag);
     _collectionBoxes.Reserve(capsuleActors.Num());
 
-    for (const auto capsuleActor : capsuleActors) {
-        const auto capsule = Cast<UCapsuleComponent>(capsuleActor);
+    for (auto const capsuleActor : capsuleActors) {
+        auto const capsule = Cast<UCapsuleComponent>(capsuleActor);
         check(capsule);
 
-        const auto collisionProfile = capsule->GetCollisionProfileName();
+        auto const collisionProfile = capsule->GetCollisionProfileName();
         if (collisionProfile != _collectionCollisionProfileName) {
             UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Capsule collision tagged as %s has Profile %s instead of %s, replacing."), *_collectionTag.ToString(),
                 *collisionProfile.ToString(), *_collectionCollisionProfileName.ToString());
@@ -224,23 +224,23 @@ void UCollisionsCollectionComponent::_collectCapsules() {
             capsule->SetCollisionProfileName(_collectionCollisionProfileName);
         }
 
-        const bool generateOverlapEvents = capsule->GetGenerateOverlapEvents();
+        bool const generateOverlapEvents = capsule->GetGenerateOverlapEvents();
         if (generateOverlapEvents != _generateOverlapEvents) {
-            const auto collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
-            const auto collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
+            auto const collisionString = generateOverlapEvents ? TEXT("true") : TEXT("false");
+            auto const collectionString = _generateOverlapEvents ? TEXT("true") : TEXT("false");
             UE_LOG(LogTemp, Warning, WFUNCTION TEXT(" Capsule collision has \"generate overlap events\" set to %s instead of %s, replacing."), collisionString,
                 collectionString);
 
             capsule->SetGenerateOverlapEvents(_generateOverlapEvents);
         }
 
-        const float halfHeight = capsule->GetScaledCapsuleHalfHeight();
-        const float radius = capsule->GetScaledCapsuleRadius();
+        float const halfHeight = capsule->GetScaledCapsuleHalfHeight();
+        float const radius = capsule->GetScaledCapsuleRadius();
 
         auto capsuleParameters = FCollectionCapsuleParameters();
         FCollectionBoxParameters& box = capsuleParameters.CylinderBox;
         box.RootRelativeTransform = capsule->GetRelativeTransform();
-        const auto boxExtent = FVector(radius, radius, halfHeight);
+        auto const boxExtent = FVector(radius, radius, halfHeight);
         CollectionParameterHelpers::BoxSidesFiller(box, boxExtent);
 
         FCollectionSphereParameters& upperSphere = capsuleParameters.UpperSphere;
@@ -261,7 +261,7 @@ void UCollisionsCollectionComponent::_collectCapsules() {
 }
 
 void UCollisionsCollectionComponent::_collectionElementBeginOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor,
-    UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {
+    UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, FHitResult const& sweepResult) {
     // Collection elements must not fire overlap events with each other, they must look like a single collision for client classes.
     if (!_collectionElements.Find(otherComp)) {
         TMap<TWeakObjectPtr<UPrimitiveComponent>, int>* elementsToOverlaps = nullptr;

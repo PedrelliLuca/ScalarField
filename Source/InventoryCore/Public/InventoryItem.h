@@ -42,7 +42,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "Item")
     double GetStackVolume() const { return _quantity * _volume; }
 
-    const FText& GetNameText() const override { return _nameText; }
+    FText const& GetNameText() const override { return _nameText; }
     TObjectPtr<UTexture2D> GetThumbnail() override { return _inventoryThumbnail; }
     TObjectPtr<UStaticMesh> GetMesh() override { return _worldMesh; }
     FORCEINLINE const FText& GetActionText() const { return _actionText; }

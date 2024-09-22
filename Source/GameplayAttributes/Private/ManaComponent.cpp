@@ -6,10 +6,10 @@ UManaComponent::UManaComponent() {
     PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UManaComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
+void UManaComponent::TickComponent(float const deltaTime, ELevelTick const tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-    const float manaRegenPerFrame = _manaRegenPerSecond * deltaTime;
+    float const manaRegenPerFrame = _manaRegenPerSecond * deltaTime;
     SetCurrentMana(_currentMana + manaRegenPerFrame);
 }
 
@@ -18,7 +18,7 @@ void UManaComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyChang
     FProperty* const property = propertyChangedEvent.Property;
     FName propertyName = property != nullptr ? property->GetFName() : NAME_None;
     if (propertyName == GET_MEMBER_NAME_CHECKED(UManaComponent, _maxMana)) {
-        if (const auto initTempProperty = CastFieldChecked<FFloatProperty>(property)) {
+        if (auto const initTempProperty = CastFieldChecked<FFloatProperty>(property)) {
             SetMaxMana(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<float>(this)));
         }
     }
@@ -27,12 +27,12 @@ void UManaComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyChang
 }
 #endif
 
-void UManaComponent::SetCurrentMana(const float mana) {
+void UManaComponent::SetCurrentMana(float const mana) {
     _currentMana = FMath::Clamp(mana, 0., _maxMana);
     _onManaChanged.Broadcast(_currentMana);
 }
 
-void UManaComponent::SetMaxMana(float maxMana, const bool bUpdateMana /*= true*/) {
+void UManaComponent::SetMaxMana(float maxMana, bool const bUpdateMana /*= true*/) {
     maxMana = FMath::Clamp(maxMana, 0., TNumericLimits<float>::Max());
 
     _maxMana = maxMana;

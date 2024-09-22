@@ -7,12 +7,12 @@
 
 bool UFlammabilityTargetingCondition::IsVerifiedForTarget(ISkillTarget* const skillTarget) const {
     check(skillTarget != nullptr);
-    const auto actorSkillTarget = Cast<UActorSkillTarget>(skillTarget);
+    auto const actorSkillTarget = Cast<UActorSkillTarget>(skillTarget);
     if (!ensureMsgf(IsValid(actorSkillTarget), TEXT("This condition should only be applied to targets of type UActorSkillTarget!"))) {
         return false;
     }
 
-    const auto materialsC = actorSkillTarget->GetActor()->FindComponentByClass<UMaterialsContainerComponent>();
+    auto const materialsC = actorSkillTarget->GetActor()->FindComponentByClass<UMaterialsContainerComponent>();
 
     bool isVerified = false;
 

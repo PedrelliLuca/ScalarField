@@ -11,7 +11,7 @@
 #include "InventoryItemWidget.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemUsage, TWeakInterfacePtr<IItem>);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemDiscarded, TWeakInterfacePtr<IItem>, const FPointerEvent&);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemDiscarded, TWeakInterfacePtr<IItem>, FPointerEvent const&);
 
 UCLASS()
 class INVENTORYPRESENTER_API UInventoryItemWidget : public UUserWidget {
@@ -30,8 +30,8 @@ public:
     FOnItemDiscarded& OnItemDiscarded() { return _onItemDiscarded; }
 
 protected:
-    FReply NativeOnMouseButtonDoubleClick(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
-    FReply NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) override;
+    FReply NativeOnMouseButtonDoubleClick(FGeometry const& inGeometry, FPointerEvent const& inMouseEvent) override;
+    FReply NativeOnMouseButtonDown(FGeometry const& inGeometry, FPointerEvent const& inMouseEvent) override;
 
     TWeakInterfacePtr<IItem> _item = nullptr;
 

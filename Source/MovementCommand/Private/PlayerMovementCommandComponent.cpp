@@ -11,11 +11,11 @@ void UPlayerMovementCommandComponent::SetMovementMode(EMovementCommandMode mode)
 
     _activeMovementMode = mode;
 
-    const auto& cmdClass = _modesToCommandClasses[_activeMovementMode];
+    auto const& cmdClass = _modesToCommandClasses[_activeMovementMode];
     _activeMovementCommand = NewObject<UPlayerMovementCommand>(this, cmdClass);
 }
 
-void UPlayerMovementCommandComponent::SetDestination(const FVector& destination) {
+void UPlayerMovementCommandComponent::SetDestination(FVector const& destination) {
     check(_ownerPC.IsValid());
     check(_inputData.IsSet());
 
@@ -29,7 +29,7 @@ void UPlayerMovementCommandComponent::StopMovement() {
     _getMovementCommand()->OnStopMovement(_ownerPC.Get());
 }
 
-void UPlayerMovementCommandComponent::MovementTick(const float deltaTime) {
+void UPlayerMovementCommandComponent::MovementTick(float const deltaTime) {
     check(_ownerPC.IsValid());
     _getMovementCommand()->OnMovementTick(_ownerPC.Get(), deltaTime);
 }

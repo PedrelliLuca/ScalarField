@@ -29,7 +29,7 @@ void UInventoryPresenterWidget::HideInventory() {
     _cleanupQuantityBeingSet();
 }
 
-FReply UInventoryPresenterWidget::NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) {
+FReply UInventoryPresenterWidget::NativeOnMouseButtonDown(FGeometry const& inGeometry, FPointerEvent const& inMouseEvent) {
     /* We don't want to perform the box check if one of the following is true:
      * 1. The setter was drawn this frame, because the paint space geometry would be invalid in such case, causing the
      * "is inside" check below to cleanup the setter immediately.
@@ -42,9 +42,9 @@ FReply UInventoryPresenterWidget::NativeOnMouseButtonDown(const FGeometry& inGeo
     }
 
     // Box check. Did we click outside the quantitySetter? If so, we make it disappear, aborting the setting of the quantity
-    const auto location = _quantitySetter->GetPaintSpaceGeometry().GetAbsolutePosition();
-    const auto size = _quantitySetter->GetPaintSpaceGeometry().GetAbsoluteSize();
-    const FBox2d quantitySetterWidgetBox{location, location + size};
+    auto const location = _quantitySetter->GetPaintSpaceGeometry().GetAbsolutePosition();
+    auto const size = _quantitySetter->GetPaintSpaceGeometry().GetAbsoluteSize();
+    FBox2d const quantitySetterWidgetBox{location, location + size};
 
     if (!quantitySetterWidgetBox.IsInside(inMouseEvent.GetScreenSpacePosition())) {
         _cleanupQuantityBeingSet();
@@ -64,7 +64,7 @@ void UInventoryPresenterWidget::_onItemFromInventoryBeingUsed(TWeakInterfacePtr<
 }
 
 void UInventoryPresenterWidget::_onItemFromInventoryBeingDiscarded(
-    TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory, const FPointerEvent& mouseEvent) {
+    TWeakInterfacePtr<IItem> item, TWeakInterfacePtr<IInventory> inventory, FPointerEvent const& mouseEvent) {
     if (!mouseEvent.IsShiftDown() || !item->IsStackable()) {
         OnItemFromInventoryBeingDropped().Broadcast(MoveTemp(item), item->GetQuantity(), MoveTemp(inventory));
         return;
@@ -83,9 +83,9 @@ void UInventoryPresenterWidget::_onItemFromInventoryBeingDiscarded(
     }
 
     // Make the UQuantitySetterWidget appear where the user clicked
-    const auto quantitySetterSlot = _mainOverlay->AddChildToOverlay(_quantitySetter);
-    const auto worldToOverlay = _mainOverlay->GetCachedGeometry().GetAccumulatedRenderTransform().Inverse();
-    const auto mouseInOverlayRF = worldToOverlay.TransformPoint(mouseEvent.GetScreenSpacePosition());
+    auto const quantitySetterSlot = _mainOverlay->AddChildToOverlay(_quantitySetter);
+    auto const worldToOverlay = _mainOverlay->GetCachedGeometry().GetAccumulatedRenderTransform().Inverse();
+    auto const mouseInOverlayRF = worldToOverlay.TransformPoint(mouseEvent.GetScreenSpacePosition());
     quantitySetterSlot->SetPadding(FMargin{static_cast<float>(mouseInOverlayRF.X), static_cast<float>(mouseInOverlayRF.Y)});
 
     // Tell NativeOnMouseButtonDown() that this frame we won't perform the box check
@@ -104,7 +104,7 @@ void UInventoryPresenterWidget::_onItemFromInventoryBeingDiscarded(
     _itemDropPayload = {MoveTemp(item), MoveTemp(inventory)};
 }
 
-void UInventoryPresenterWidget::_onQuantitySetterCommit(const FText& quantityText, const ETextCommit::Type commitType) {
+void UInventoryPresenterWidget::_onQuantitySetterCommit(FText const& quantityText, ETextCommit::Type const commitType) {
     if (commitType != ETextCommit::OnEnter) {
         // Fun fact: this is called if SetKeyboardFocus() on the _quantitySetter. This is why we don't RemoveDynamic here;
         // the setter would disappear immediately

@@ -17,13 +17,13 @@ class USkillsContainerComponent;
  */
 class SKILLINSPECTION_API FSkillsContainerInspector {
 public:
-    FSkillsContainerInspector(const TObjectPtr<USkillsContainerComponent>& skillsContainer);
+    FSkillsContainerInspector(TObjectPtr<USkillsContainerComponent> const& skillsContainer);
 
-    TOptional<FSkillPropertiesInspector> GetSkillPropertiesByIndex(const int32 skillIndex) const;
+    TOptional<FSkillPropertiesInspector> GetSkillPropertiesByIndex(int32 const skillIndex) const;
 
-    TOptional<int32> GetIndexOfSkill(const TSubclassOf<UAbstractSkill>& skillClass) const;
+    TOptional<int32> GetIndexOfSkill(TSubclassOf<UAbstractSkill> const& skillClass) const;
 
-    void ForEachSkill(const TFunction<void(const FSkillPropertiesInspector&, int32)> skillPropertiesFunc) const;
+    void ForEachSkill(TFunction<void(FSkillPropertiesInspector const&, int32)> const skillPropertiesFunc) const;
 
 private:
     TWeakObjectPtr<USkillsContainerComponent> _skillsContainer = nullptr;

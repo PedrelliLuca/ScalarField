@@ -17,7 +17,7 @@ class AIBUILDINGBLOCKS_API UEnvQueryTest_Relationship : public UEnvQueryTest {
     GENERATED_BODY()
 
 public:
-    UEnvQueryTest_Relationship(const FObjectInitializer& objectInitializer);
+    UEnvQueryTest_Relationship(FObjectInitializer const& objectInitializer);
 
 private:
     void RunTest(FEnvQueryInstance& QueryInstance) const override;

@@ -29,14 +29,14 @@ protected:
     void OnPossess(APawn* inPawn) override;
 
 private:
-    EBlackboardNotificationResult _onTargetEnemyChange(const UBlackboardComponent& blackboard, FBlackboard::FKey changedKeyID);
+    EBlackboardNotificationResult _onTargetEnemyChange(UBlackboardComponent const& blackboard, FBlackboard::FKey changedKeyID);
 
     void _onSkillExecutionBegin();
     void _onSkillExecutionEnd();
 
     void _onSkillInExecutionStatusChanged(bool isExeuctingSomeSkill);
 
-    void _onControlledPawnDeath(const TObjectPtr<AActor> deadActor);
+    void _onControlledPawnDeath(TObjectPtr<AActor> const deadActor);
 
     UPROPERTY(VisibleAnywhere, Category = "Chaser | Movement Commands")
     TObjectPtr<UAIMovementCommandComponent> _movementCommandC;

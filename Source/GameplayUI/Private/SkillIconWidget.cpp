@@ -10,11 +10,11 @@
 #include "SkillPropertiesInspector.h"
 
 void USkillIconWidget::InitFromSkillProperties(
-    const FSkillPropertiesInspector& skillProp, const TObjectPtr<UNewStateComponent>& stateMachine, const int32 skillIndex) {
+    FSkillPropertiesInspector const& skillProp, TObjectPtr<UNewStateComponent> const& stateMachine, int32 const skillIndex) {
     _skillCooldownSeconds = skillProp.GetCooldownSeconds();
     _skillThumbnail->SetBrushFromTexture(skillProp.GetSkillThumbnail());
 
-    auto skillStatusChangedCallback = [this](const ESkillStatus newStatus) {
+    auto skillStatusChangedCallback = [this](ESkillStatus const newStatus) {
         _onSkillStatusChanged(newStatus);
 
         if (newStatus == ESkillStatus::Cooldown) {
@@ -31,7 +31,7 @@ void USkillIconWidget::InitFromSkillProperties(
     }
 }
 
-void USkillIconWidget::_setupCooldownTimer(const ESkillStatus newStatus) {
+void USkillIconWidget::_setupCooldownTimer(ESkillStatus const newStatus) {
     FTimerManager& timerManager = GetWorld()->GetTimerManager();
 
     // We can't be entering cooldown when we're already on cooldown, something went horribly wrong (either here or in UAbstractSkill).

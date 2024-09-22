@@ -8,14 +8,14 @@ UNewStateComponent::UNewStateComponent() {
     PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UNewStateComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
+void UNewStateComponent::TickComponent(float const deltaTime, ELevelTick const tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
     auto newState = _state->Tick(deltaTime);
     _performStateTransition(MoveTemp(newState));
 }
 
-void UNewStateComponent::TrySetMovementDestination(const FVector& movementDestination) {
+void UNewStateComponent::TrySetMovementDestination(FVector const& movementDestination) {
     auto newState = _state->TrySetMovementDestination(movementDestination);
     _performStateTransition(MoveTemp(newState));
 }
@@ -25,7 +25,7 @@ void UNewStateComponent::TryStopMovement() {
     _performStateTransition(MoveTemp(newState));
 }
 
-TOptional<FSkillCastResult> UNewStateComponent::TryCastSkillAtIndex(const uint32 index) {
+TOptional<FSkillCastResult> UNewStateComponent::TryCastSkillAtIndex(uint32 const index) {
     auto tryCastSkillResponse = _state->TryCastSkillAtIndex(index);
     _performStateTransition(MoveTemp(tryCastSkillResponse.StateResponse));
 
@@ -37,7 +37,7 @@ void UNewStateComponent::TryAbort() {
     _performStateTransition(MoveTemp(newState));
 }
 
-TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> UNewStateComponent::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>> UNewStateComponent::TrySetSkillTarget(FSkillTargetPacket const& targetPacket) {
     auto trySetSkillTargetResponse = _state->TrySetSkillTarget(targetPacket);
     _performStateTransition(MoveTemp(trySetSkillTargetResponse.StateResponse));
 

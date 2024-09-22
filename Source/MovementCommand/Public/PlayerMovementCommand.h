@@ -12,9 +12,9 @@ class UPlayerMovementCommand : public UObject {
     GENERATED_BODY()
 
 public:
-    virtual void OnSetDestination(const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData)
+    virtual void OnSetDestination(TObjectPtr<APlayerController> const& playerController, FVector const& destination, FPlayerInputData const& inputData)
         PURE_VIRTUAL(UPlayerMovementCommand::OnSetDestination, return;);
-    virtual void OnStopMovement(const TObjectPtr<APlayerController>& playerController) PURE_VIRTUAL(UPlayerMovementCommand::OnStopMovement, return;);
-    virtual void OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime)
+    virtual void OnStopMovement(TObjectPtr<APlayerController> const& playerController) PURE_VIRTUAL(UPlayerMovementCommand::OnStopMovement, return;);
+    virtual void OnMovementTick(TObjectPtr<APlayerController> const& playerController, float deltaTime)
         PURE_VIRTUAL(UPlayerMovementCommand::OnMovementTick, return;);
 };

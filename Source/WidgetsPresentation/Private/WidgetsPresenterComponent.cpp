@@ -18,7 +18,7 @@ TWeakInterfacePtr<IInventoryContainerWidget> UWidgetsPresenterComponent::GetInve
 }
 
 void UWidgetsPresenterComponent::CreateHUD() {
-    const TObjectPtr<APlayerController> ownerPlayerC = Cast<APlayerController>(GetOwner());
+    TObjectPtr<APlayerController> const ownerPlayerC = Cast<APlayerController>(GetOwner());
     check(IsValid(ownerPlayerC));
     check(IsValid(_hudWidgetClass));
 
@@ -27,13 +27,13 @@ void UWidgetsPresenterComponent::CreateHUD() {
     _hudWidget->Show();
 }
 
-void UWidgetsPresenterComponent::CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
+void UWidgetsPresenterComponent::CreateHUD(TObjectPtr<USkillsContainerComponent> const& skillsContainer, TObjectPtr<UNewStateComponent> const& stateMachine) {
     CreateHUD();
     _hudWidget->InitSkillIconContainer(skillsContainer, stateMachine);
 }
 
 void UWidgetsPresenterComponent::CreateInventoryMenu() {
-    const TObjectPtr<APlayerController> ownerPlayerC = Cast<APlayerController>(GetOwner());
+    TObjectPtr<APlayerController> const ownerPlayerC = Cast<APlayerController>(GetOwner());
     check(IsValid(ownerPlayerC));
     check(IsValid(_inventoryPresenterWidgetClass));
 

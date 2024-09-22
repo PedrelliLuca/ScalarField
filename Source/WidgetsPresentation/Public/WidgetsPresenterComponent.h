@@ -27,7 +27,7 @@ public:
     TWeakInterfacePtr<IInventoryContainerWidget> GetInventoryContainerWidget();
 
     void CreateHUD();
-    void CreateHUD(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine);
+    void CreateHUD(TObjectPtr<USkillsContainerComponent> const& skillsContainer, TObjectPtr<UNewStateComponent> const& stateMachine);
     void CreateInventoryMenu();
 
 private:

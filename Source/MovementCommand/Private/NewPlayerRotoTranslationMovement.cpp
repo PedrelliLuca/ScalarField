@@ -6,7 +6,7 @@
 #include "NiagaraFunctionLibrary.h"
 
 void UNewPlayerRotoTranslationMovement::OnSetDestination(
-    const TObjectPtr<APlayerController>& playerController, const FVector& destination, const FPlayerInputData& inputData) {
+    TObjectPtr<APlayerController> const& playerController, FVector const& destination, FPlayerInputData const& inputData) {
     _inputEvent = inputData.SetDestinationInputEvent;
 
     if (_inputEvent == IE_Pressed) {
@@ -19,11 +19,11 @@ void UNewPlayerRotoTranslationMovement::OnSetDestination(
     }
 }
 
-void UNewPlayerRotoTranslationMovement::OnStopMovement(const TObjectPtr<APlayerController>& playerController) {
+void UNewPlayerRotoTranslationMovement::OnStopMovement(TObjectPtr<APlayerController> const& playerController) {
     playerController->StopMovement();
 }
 
-void UNewPlayerRotoTranslationMovement::OnMovementTick(const TObjectPtr<APlayerController>& playerController, float deltaTime) {
+void UNewPlayerRotoTranslationMovement::OnMovementTick(TObjectPtr<APlayerController> const& playerController, float deltaTime) {
     if (_inputEvent == IE_Released) {
         _followTime = 0;
         return;
@@ -34,11 +34,11 @@ void UNewPlayerRotoTranslationMovement::OnMovementTick(const TObjectPtr<APlayerC
     // We look for the location in the world where the player has pressed the input
     FHitResult hit;
     playerController->GetHitResultUnderCursor(ECC_Visibility, true, hit);
-    const FVector hitLocation = hit.Location;
+    FVector const hitLocation = hit.Location;
 
     // Direct the Pawn towards that location
-    if (const auto pawn = playerController->GetPawn()) {
-        const FVector worldDirection = (hitLocation - pawn->GetActorLocation()).GetSafeNormal();
+    if (auto const pawn = playerController->GetPawn()) {
+        FVector const worldDirection = (hitLocation - pawn->GetActorLocation()).GetSafeNormal();
         pawn->AddMovementInput(worldDirection, 1.f, false);
     }
 }

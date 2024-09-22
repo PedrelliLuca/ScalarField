@@ -32,7 +32,7 @@ void UInteractingState::OnLeave() {
     _interactor->EndInteraction();
 }
 
-TScriptInterface<IFSMState> UInteractingState::Tick(const float deltaTime) {
+TScriptInterface<IFSMState> UInteractingState::Tick(float const deltaTime) {
     _interactor->PerformFocusCheck();
 
     if (_interactor->IsInteracting()) {
@@ -45,7 +45,7 @@ TScriptInterface<IFSMState> UInteractingState::Tick(const float deltaTime) {
     return MoveTemp(executionState);
 }
 
-TScriptInterface<IFSMState> UInteractingState::TrySetMovementDestination(const FVector& movementDestination) {
+TScriptInterface<IFSMState> UInteractingState::TrySetMovementDestination(FVector const& movementDestination) {
     return _keepCurrentState();
 }
 
@@ -53,7 +53,7 @@ TScriptInterface<IFSMState> UInteractingState::TryStopMovement() {
     return _keepCurrentState();
 }
 
-FStateResponse_TryCastSkill UInteractingState::TryCastSkillAtIndex(const int32 index) {
+FStateResponse_TryCastSkill UInteractingState::TryCastSkillAtIndex(int32 const index) {
     auto skillCastResult = _subjectSkillsContainerC->TryCastSkillAtIndex(index);
 
     if (skillCastResult.IsFailure()) {
@@ -74,7 +74,7 @@ TScriptInterface<IFSMState> UInteractingState::TryAbort() {
     return MoveTemp(executionState);
 }
 
-FStateResponse_TrySetSkillTarget UInteractingState::TrySetSkillTarget(const FSkillTargetPacket& targetPacket) {
+FStateResponse_TrySetSkillTarget UInteractingState::TrySetSkillTarget(FSkillTargetPacket const& targetPacket) {
     return FStateResponse_TrySetSkillTarget{_keepCurrentState(), TOptional<TVariant<FSkillTargetingResult, FSkillCastResult>>{}};
 }
 

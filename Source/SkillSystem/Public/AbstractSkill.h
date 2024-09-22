@@ -47,7 +47,7 @@ public:
 
     /** \brief Adds a target to the skill. This function can have many outcomes, you can see all of them in ESkillTargetingResult. Calling this function before
      * SetCaster() will trigger a check. */
-    FSkillTargetingResult TryAddTarget(const FSkillTargetPacket& targetPacket);
+    FSkillTargetingResult TryAddTarget(FSkillTargetPacket const& targetPacket);
 
     void SetCaster(TObjectPtr<AActor> caster);
 
@@ -69,8 +69,8 @@ public:
     FOnSkillStatusChanged& OnSkillStatusChanged() { return _onSkillStatusChanged; }
 
 protected:
-    const TWeakObjectPtr<AActor>& _getCaster() const { return _caster; }
-    const TArray<TScriptInterface<ISkillTarget>>& _getTargets() const { return _targets; }
+    TWeakObjectPtr<AActor> const& _getCaster() const { return _caster; }
+    TArray<TScriptInterface<ISkillTarget>> const& _getTargets() const { return _targets; }
 
     float _getChannelingSeconds() const { return _channelingSeconds; }
 

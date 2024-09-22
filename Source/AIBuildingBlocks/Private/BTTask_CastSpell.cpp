@@ -18,26 +18,26 @@ UBTTask_CastSpell::UBTTask_CastSpell() {
 }
 
 EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& ownerComp, uint8* nodeMemory) {
-    const auto pawn = ownerComp.GetAIOwner()->GetPawn();
+    auto const pawn = ownerComp.GetAIOwner()->GetPawn();
     check(IsValid(pawn));
 
-    const auto stateC = pawn->FindComponentByClass<UNewStateComponent>();
+    auto const stateC = pawn->FindComponentByClass<UNewStateComponent>();
     if (!ensureMsgf(IsValid(stateC), TEXT("AI-controlled Pawn does not have a State Component"))) {
         return EBTNodeResult::Failed;
     }
 
-    const auto skillsContainerC = TObjectPtr<USkillsContainerComponent>{pawn->FindComponentByClass<USkillsContainerComponent>()};
+    auto const skillsContainerC = TObjectPtr<USkillsContainerComponent>{pawn->FindComponentByClass<USkillsContainerComponent>()};
     if (!ensureMsgf(IsValid(skillsContainerC), TEXT("AI-controlled Pawn does not have a Skills Container Component"))) {
         return EBTNodeResult::Failed;
     }
 
-    const auto skillsContainerInsp = FSkillsContainerInspector{skillsContainerC};
-    const auto optionalSkillIdx = skillsContainerInsp.GetIndexOfSkill(_newSkillToCast);
+    auto const skillsContainerInsp = FSkillsContainerInspector{skillsContainerC};
+    auto const optionalSkillIdx = skillsContainerInsp.GetIndexOfSkill(_newSkillToCast);
     if (!ensureMsgf(optionalSkillIdx.IsSet(), TEXT("AI-controlled Pawn does not have the selected Skill"))) {
         return EBTNodeResult::Failed;
     }
 
-    const auto optionalSkillPropertiesInsp = skillsContainerInsp.GetSkillPropertiesByIndex(*optionalSkillIdx);
+    auto const optionalSkillPropertiesInsp = skillsContainerInsp.GetSkillPropertiesByIndex(*optionalSkillIdx);
     check(optionalSkillPropertiesInsp.IsSet());
 
     if (_needsManaAvailabilityToCast && !_newIsManaAvailableForSkill(pawn, optionalSkillPropertiesInsp->GetTotalManaCost())) {
@@ -45,7 +45,7 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
         return EBTNodeResult::Failed;
     }
 
-    const auto optionalSkillCastResult = stateC->TryCastSkillAtIndex(*optionalSkillIdx);
+    auto const optionalSkillCastResult = stateC->TryCastSkillAtIndex(*optionalSkillIdx);
     if (!optionalSkillIdx.IsSet()) {
         // The AI-controlled pawn is in a state where they can't cast any skill.
         return EBTNodeResult::Failed;
@@ -59,7 +59,7 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
         return EBTNodeResult::Failed;
     }
 
-    const auto eqsComponent = ownerComp.GetAIOwner()->FindComponentByClass<URunEQSComponent>();
+    auto const eqsComponent = ownerComp.GetAIOwner()->FindComponentByClass<URunEQSComponent>();
     if (!ensureMsgf(IsValid(eqsComponent), TEXT("AI-controlled Pawn trying to cast a targeting spell without a RunEQSComponent"))) {
         return EBTNodeResult::Failed;
     }
@@ -70,25 +70,25 @@ EBTNodeResult::Type UBTTask_CastSpell::ExecuteTask(UBehaviorTreeComponent& owner
 
         FSkillTargetPacket targetPacket{};
 
-        const auto targetKind = optionalSkillPropertiesInsp->GetTargetKind();
+        auto const targetKind = optionalSkillPropertiesInsp->GetTargetKind();
 
         // TODO: add another else if here managing UGroundLocationSkillTarget when you'll have skills using this kind of target, e.g. "Spawn Tree" or something
 
         // UBTService_RunEQS::OnQueryFinished() calls UEnvQueryItemType_ActorBase::StoreInBlackboard(). This causes...
         if (targetKind == UCasterPlaneLocationSkillTarget::StaticClass()) {
             // ... Super::StoreInBlackboard() to be called => UEnvQueryItemType_Point::GetItemLocation() into UEnvQueryItemType_Point::GetValue() is called.
-            const auto navLocation = *reinterpret_cast<FNavLocation*>(const_cast<uint8*>(itemRawData));
+            auto const navLocation = *reinterpret_cast<FNavLocation*>(const_cast<uint8*>(itemRawData));
 
-            const auto location = navLocation.Location;
-            const auto casterPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
-            const auto casterPlaneLocation = FMath::LinePlaneIntersection(
+            auto const location = navLocation.Location;
+            auto const casterPlane = FPlane{0.0f, 0.0f, 1.0f, pawn->GetActorLocation().Z};
+            auto const casterPlaneLocation = FMath::LinePlaneIntersection(
                 location + FVector::UpVector * PROJ_LINE_HALF_LENGTH, location - FVector::UpVector * PROJ_LINE_HALF_LENGTH, casterPlane);
 
             targetPacket.TargetCasterPlaneLocation = casterPlaneLocation;
         } else if (targetKind == UActorSkillTarget::StaticClass()) {
             // ... EnvQueryItemType_Actor::GetActor() into UEnvQueryItemType_Actor::GetValue() to be called.
             auto weakObjPtr = *reinterpret_cast<FWeakObjectPtr*>(const_cast<uint8*>(itemRawData));
-            const auto rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
+            auto const rawActor = reinterpret_cast<AActor*>(weakObjPtr.Get());
             if (!IsValid(rawActor)) {
                 continue;
             }
@@ -128,8 +128,8 @@ FString UBTTask_CastSpell::GetStaticDescription() const {
     return FString::Printf(TEXT("%s: %s"), *Super::GetStaticDescription(), *skillDesc);
 }
 
-bool UBTTask_CastSpell::_newIsManaAvailableForSkill(const TObjectPtr<APawn>& pawn, float skillManaCost) const {
-    if (const auto manaC = pawn->FindComponentByClass<UManaComponent>(); IsValid(manaC)) {
+bool UBTTask_CastSpell::_newIsManaAvailableForSkill(TObjectPtr<APawn> const& pawn, float skillManaCost) const {
+    if (auto const manaC = pawn->FindComponentByClass<UManaComponent>(); IsValid(manaC)) {
         return manaC->GetCurrentMana() >= skillManaCost;
     }
 

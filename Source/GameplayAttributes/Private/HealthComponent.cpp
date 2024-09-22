@@ -6,10 +6,10 @@ UHealthComponent::UHealthComponent() {
     PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UHealthComponent::TickComponent(const float deltaTime, const ELevelTick tickType, FActorComponentTickFunction* const thisTickFunction) {
+void UHealthComponent::TickComponent(float const deltaTime, ELevelTick const tickType, FActorComponentTickFunction* const thisTickFunction) {
     Super::TickComponent(deltaTime, tickType, thisTickFunction);
 
-    const float healthRegenPerFrame = _healthRegenPerSecond * deltaTime;
+    float const healthRegenPerFrame = _healthRegenPerSecond * deltaTime;
     SetCurrentHealth(_currentHealth + healthRegenPerFrame);
 }
 
@@ -18,7 +18,7 @@ void UHealthComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyCha
     FProperty* const property = propertyChangedEvent.Property;
     FName propertyName = property != nullptr ? property->GetFName() : NAME_None;
     if (propertyName == GET_MEMBER_NAME_CHECKED(UHealthComponent, _maxHealth)) {
-        if (const auto initTempProperty = CastFieldChecked<FFloatProperty>(property)) {
+        if (auto const initTempProperty = CastFieldChecked<FFloatProperty>(property)) {
             SetMaxHealth(initTempProperty->GetFloatingPointPropertyValue(property->ContainerPtrToValuePtr<float>(this)));
         }
     }
@@ -27,7 +27,7 @@ void UHealthComponent::PostEditChangeProperty(FPropertyChangedEvent& propertyCha
 }
 #endif
 
-void UHealthComponent::SetCurrentHealth(const float health) {
+void UHealthComponent::SetCurrentHealth(float const health) {
     if (!IsDead()) {
         _currentHealth = FMath::Clamp(health, 0.0f, _maxHealth);
         _onHealthChanged.Broadcast(_currentHealth);
@@ -39,7 +39,7 @@ void UHealthComponent::SetCurrentHealth(const float health) {
     }
 }
 
-void UHealthComponent::SetMaxHealth(float maxHealth, const bool bUpdateHealth /*= true*/) {
+void UHealthComponent::SetMaxHealth(float maxHealth, bool const bUpdateHealth /*= true*/) {
     maxHealth = FMath::Clamp(maxHealth, 0., TNumericLimits<float>::Max());
 
     _maxHealth = maxHealth;

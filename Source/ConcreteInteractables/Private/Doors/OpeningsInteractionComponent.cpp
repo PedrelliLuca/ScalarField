@@ -27,8 +27,8 @@ void UOpeningsInteractionComponent::TickComponent(float deltaTime, ELevelTick ti
         }
 
         openingState.CurrentRotationTime += deltaTime;
-        const auto timeRatio = FMath::Clamp(openingState.CurrentRotationTime / openingState.RequiredRotationTime, 0.0f, 1.0f);
-        const auto rotationThisFrame = FMath::Lerp(openingState.StartRotation, openingState.TargetRotation, timeRatio);
+        auto const timeRatio = FMath::Clamp(openingState.CurrentRotationTime / openingState.RequiredRotationTime, 0.0f, 1.0f);
+        auto const rotationThisFrame = FMath::Lerp(openingState.StartRotation, openingState.TargetRotation, timeRatio);
         opening->SetWorldRotation(rotationThisFrame);
 
         if (FMath::IsNearlyEqual(timeRatio, 1.0f)) {
@@ -113,7 +113,7 @@ void UOpeningsInteractionComponent::Toggle() {
     _numOpeningsThatEndedTransition = 0;
 }
 
-void UOpeningsInteractionComponent::SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningParameters& openingParams) {
+void UOpeningsInteractionComponent::SetOpening(TObjectPtr<UStaticMeshComponent> opening, FOpeningParameters const& openingParams) {
     if (!ensureMsgf(!_openingToState.Contains(opening), TEXT("Since _opening has already been set, it won't be set again"))) {
         return;
     }

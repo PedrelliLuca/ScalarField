@@ -18,7 +18,7 @@ public:
     void SetMovementMode(EMovementCommandMode mode) override;
     void SetDefaultMovementMode() override { SetMovementMode(_defaultMovementMode); }
 
-    void SetDestination(const FVector& destination) override;
+    void SetDestination(FVector const& destination) override;
     void StopMovement() override;
     void MovementTick(float deltaTime) override;
 

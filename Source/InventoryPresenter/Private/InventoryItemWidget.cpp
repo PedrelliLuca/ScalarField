@@ -8,14 +8,14 @@ void UInventoryItemWidget::SetItem(TWeakInterfacePtr<IItem> item) {
     RefreshWidget();
 }
 
-FReply UInventoryItemWidget::NativeOnMouseButtonDoubleClick(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) {
+FReply UInventoryItemWidget::NativeOnMouseButtonDoubleClick(FGeometry const& inGeometry, FPointerEvent const& inMouseEvent) {
     check(_item.IsValid());
     OnItemUsage().Broadcast(_item);
 
     return Super::NativeOnMouseButtonDoubleClick(inGeometry, inMouseEvent);
 }
 
-FReply UInventoryItemWidget::NativeOnMouseButtonDown(const FGeometry& inGeometry, const FPointerEvent& inMouseEvent) {
+FReply UInventoryItemWidget::NativeOnMouseButtonDown(FGeometry const& inGeometry, FPointerEvent const& inMouseEvent) {
     // https://michaeljcole.github.io/wiki.unrealengine.com/List_of_Key/Gamepad_Input_Names/
     if (inMouseEvent.IsMouseButtonDown(FKey{"RightMouseButton"})) {
         check(_item.IsValid());

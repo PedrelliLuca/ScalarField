@@ -42,7 +42,7 @@ public:
 
     void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
     void Toggle();
-    void SetOpening(TObjectPtr<UStaticMeshComponent> opening, const FOpeningParameters& openingParams);
+    void SetOpening(TObjectPtr<UStaticMeshComponent> opening, FOpeningParameters const& openingParams);
     FOnOpeningPhaseChange& OnOpeningStateChange() { return _onOpeningPhaseChange; }
 
 protected:

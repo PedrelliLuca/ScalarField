@@ -24,7 +24,7 @@ protected:
     void BeginPlay() override;
 
 public:
-    void HandleImpact(const FVector& velocity, float damage) override;
+    void HandleImpact(FVector const& velocity, float damage) override;
 
     TWeakObjectPtr<UHealthComponent> _healthC;
 

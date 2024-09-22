@@ -6,8 +6,8 @@
 #include "AIMovementCommandComponent.h"
 
 bool UBTDecorator_IsMoving::CalculateRawConditionValue(UBehaviorTreeComponent& ownerComp, uint8* const nodeMemory) const {
-    const auto aiController = ownerComp.GetAIOwner();
-    const auto aiMovementC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
+    auto const aiController = ownerComp.GetAIOwner();
+    auto const aiMovementC = aiController->FindComponentByClass<UAIMovementCommandComponent>();
     if (!ensureMsgf(IsValid(aiMovementC), TEXT("AI-controlled Pawn does not have a valid AI Movement Command Component"))) {
         return EBTNodeResult::Failed;
     }

@@ -17,7 +17,7 @@ class AIBUILDINGBLOCKS_API UEnvQueryTest_IsValidTargetForSkill : public UEnvQuer
     GENERATED_BODY()
 
 public:
-    UEnvQueryTest_IsValidTargetForSkill(const FObjectInitializer& objectInitializer);
+    UEnvQueryTest_IsValidTargetForSkill(FObjectInitializer const& objectInitializer);
 
 private:
     void RunTest(FEnvQueryInstance& QueryInstance) const override;

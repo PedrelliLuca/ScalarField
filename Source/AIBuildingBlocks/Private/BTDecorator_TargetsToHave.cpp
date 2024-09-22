@@ -6,10 +6,10 @@
 #include "Components/RunEQSComponent.h"
 
 bool UBTDecorator_TargetsToHave::CalculateRawConditionValue(UBehaviorTreeComponent& ownerComp, uint8* const nodeMemory) const {
-    const auto aiController = ownerComp.GetAIOwner();
+    auto const aiController = ownerComp.GetAIOwner();
     check(IsValid(aiController));
 
-    const auto runEQSC = aiController->FindComponentByClass<URunEQSComponent>();
+    auto const runEQSC = aiController->FindComponentByClass<URunEQSComponent>();
     if (!ensureMsgf(IsValid(runEQSC), TEXT("AI-Controlled pawn does not have a Run EQS Component"))) {
         return false;
     }

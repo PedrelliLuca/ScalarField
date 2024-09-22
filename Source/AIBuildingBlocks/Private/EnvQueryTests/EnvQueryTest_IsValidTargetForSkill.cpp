@@ -9,7 +9,7 @@
 #include "SkillsContainerComponent.h"
 #include "SkillsContainerInspector.h"
 
-UEnvQueryTest_IsValidTargetForSkill::UEnvQueryTest_IsValidTargetForSkill(const FObjectInitializer& objectInitializer)
+UEnvQueryTest_IsValidTargetForSkill::UEnvQueryTest_IsValidTargetForSkill(FObjectInitializer const& objectInitializer)
     : Super(objectInitializer) {
     _querier = UEnvQueryContext_Querier::StaticClass();
     Cost = EEnvTestCost::Low;
@@ -17,16 +17,16 @@ UEnvQueryTest_IsValidTargetForSkill::UEnvQueryTest_IsValidTargetForSkill(const F
 }
 
 void UEnvQueryTest_IsValidTargetForSkill::RunTest(FEnvQueryInstance& queryInstance) const {
-    const auto queryOwner = queryInstance.Owner.Get();
+    auto const queryOwner = queryInstance.Owner.Get();
     if (queryOwner == nullptr) {
         return;
     }
 
     FloatValueMin.BindData(queryOwner, queryInstance.QueryID);
-    const float filterMinThreshold = FloatValueMin.GetValue();
+    float const filterMinThreshold = FloatValueMin.GetValue();
 
     FloatValueMax.BindData(queryOwner, queryInstance.QueryID);
-    const float filterMaxThreshold = FloatValueMax.GetValue();
+    float const filterMaxThreshold = FloatValueMax.GetValue();
 
     TArray<AActor*> contextActors;
     if (!queryInstance.PrepareContext(_querier, contextActors)) {
@@ -36,37 +36,37 @@ void UEnvQueryTest_IsValidTargetForSkill::RunTest(FEnvQueryInstance& queryInstan
     // We expect a single querier
     check(contextActors.Num() == 1);
 
-    const auto skillsContainerC = contextActors.Last()->FindComponentByClass<USkillsContainerComponent>();
+    auto const skillsContainerC = contextActors.Last()->FindComponentByClass<USkillsContainerComponent>();
     if (!ensureMsgf(IsValid(skillsContainerC), TEXT("The Context Actor doesn't have a USkillsContainerComponent"))) {
         return;
     }
 
-    const auto containerInspector = FSkillsContainerInspector{skillsContainerC};
-    const auto optionalIdx = containerInspector.GetIndexOfSkill(_skill);
+    auto const containerInspector = FSkillsContainerInspector{skillsContainerC};
+    auto const optionalIdx = containerInspector.GetIndexOfSkill(_skill);
     if (!ensureMsgf(optionalIdx.IsSet(), TEXT("The Context Actor doesn't have the selected skill"))) {
         return;
     }
 
-    const auto optionalSkillInspector = containerInspector.GetSkillPropertiesByIndex(*optionalIdx);
+    auto const optionalSkillInspector = containerInspector.GetSkillPropertiesByIndex(*optionalIdx);
     check(optionalSkillInspector.IsSet());
 
-    const auto& targetingConditions = optionalSkillInspector->GetTargetingConditions();
+    auto const& targetingConditions = optionalSkillInspector->GetTargetingConditions();
     for (FEnvQueryInstance::ItemIterator it(this, queryInstance); it; ++it) {
-        const auto otherActor = GetItemActor(queryInstance, it.GetIndex());
+        auto const otherActor = GetItemActor(queryInstance, it.GetIndex());
 
         bool otherVerifiesAllConditions = true;
 
         ISkillTarget* target = NewObject<UActorSkillTarget>(const_cast<UEnvQueryTest_IsValidTargetForSkill*>(this), UActorSkillTarget::StaticClass());
         target->Init(FSkillTargetPacket{otherActor});
 
-        for (const auto& targetingCondition : targetingConditions) {
+        for (auto const& targetingCondition : targetingConditions) {
             if (!targetingCondition->IsVerifiedForTarget(target)) {
                 otherVerifiesAllConditions = false;
                 break;
             }
         }
 
-        const auto score = otherVerifiesAllConditions ? 1.0f : 0.0f;
+        auto const score = otherVerifiesAllConditions ? 1.0f : 0.0f;
         it.SetScore(TestPurpose, FilterType, score, filterMinThreshold, filterMaxThreshold);
     }
 }

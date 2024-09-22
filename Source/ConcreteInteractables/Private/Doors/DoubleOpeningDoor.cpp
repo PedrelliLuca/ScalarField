@@ -33,13 +33,13 @@ void ADoubleOpeningDoor::BeginPlay() {
 }
 
 void ADoubleOpeningDoor::_onDoorInteractedBy(TScriptInterface<IInteractor> interactor) {
-    const auto concreteInteractor = Cast<UInteractorPlayerComponent>(interactor.GetObject());
+    auto const concreteInteractor = Cast<UInteractorPlayerComponent>(interactor.GetObject());
     check(IsValid(concreteInteractor));
 
-    const auto interactingController = Cast<AController>(concreteInteractor->GetOwner());
+    auto const interactingController = Cast<AController>(concreteInteractor->GetOwner());
     check(IsValid(interactingController));
 
-    const auto inventoryComponent = Cast<IInventory>(interactingController->GetPawn()->FindComponentByInterface(UInventory::StaticClass()));
+    auto const inventoryComponent = Cast<IInventory>(interactingController->GetPawn()->FindComponentByInterface(UInventory::StaticClass()));
     if (inventoryComponent == nullptr) {
         interactor->EndInteraction();
         return;
@@ -52,7 +52,7 @@ void ADoubleOpeningDoor::_onDoorInteractedBy(TScriptInterface<IInteractor> inter
     interactor->EndInteraction();
 }
 
-void ADoubleOpeningDoor::_onOpeningPhaseChange(const EOpeningPhase newOpeningState) {
+void ADoubleOpeningDoor::_onOpeningPhaseChange(EOpeningPhase const newOpeningState) {
     auto actionText = FText{};
 
     switch (newOpeningState) {

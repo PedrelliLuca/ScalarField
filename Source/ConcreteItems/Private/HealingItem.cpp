@@ -14,7 +14,7 @@ UHealingItem::UHealingItem() {
 void UHealingItem::Use(TWeakObjectPtr<AActor> actor) {
     Super::Use(actor);
 
-    const TWeakObjectPtr<UHealthComponent> healthC = actor->FindComponentByClass<UHealthComponent>();
+    TWeakObjectPtr<UHealthComponent> const healthC = actor->FindComponentByClass<UHealthComponent>();
     if (healthC.IsValid()) {
         healthC->Heal(_healAmount);
     }

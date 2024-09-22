@@ -9,7 +9,7 @@
 #include "TacticalPauseWorldSubsystem.h"
 #include "ThermometerWidget.h"
 
-void UHUDWidget::SetPawn(const TWeakObjectPtr<APawn> pawn) {
+void UHUDWidget::SetPawn(TWeakObjectPtr<APawn> const pawn) {
     ForgetCurrentPawn();
 
     _healthC = pawn->FindComponentByClass<UHealthComponent>();
@@ -41,7 +41,7 @@ void UHUDWidget::Hide() {
     _thermometerWidget->Hide();
 }
 
-void UHUDWidget::InitSkillIconContainer(const TObjectPtr<USkillsContainerComponent>& skillsContainer, const TObjectPtr<UNewStateComponent>& stateMachine) {
+void UHUDWidget::InitSkillIconContainer(TObjectPtr<USkillsContainerComponent> const& skillsContainer, TObjectPtr<UNewStateComponent> const& stateMachine) {
     _skillIconContainer->BuildIconsFromContainer(skillsContainer, stateMachine);
 }
 
@@ -51,7 +51,7 @@ void UHUDWidget::_bindAll() {
     }
 
     check(!_pauseToggleHandle.IsValid());
-    const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
+    auto const pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
     _setPauseStatus(pauseSubsys->IsTacticalPauseOn());
     _pauseToggleHandle = pauseSubsys->OnTacticalPauseToggle().AddUObject(this, &UHUDWidget::_onTacticalPauseToggle);
 }
@@ -62,7 +62,7 @@ void UHUDWidget::_unbindAll() {
     }
 
     if (_pauseToggleHandle.IsValid()) {
-        const auto pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
+        auto const pauseSubsys = GetWorld()->GetSubsystem<UTacticalPauseWorldSubsystem>();
         pauseSubsys->OnTacticalPauseToggle().Remove(_pauseToggleHandle);
         _pauseToggleHandle.Reset();
     }
@@ -75,6 +75,6 @@ void UHUDWidget::_onDeath(TObjectPtr<AActor> _) {
     ForgetCurrentPawn();
 }
 
-void UHUDWidget::_onTacticalPauseToggle(const bool bIsTacticalPauseOn, double) {
+void UHUDWidget::_onTacticalPauseToggle(bool const bIsTacticalPauseOn, double) {
     _setPauseStatus(bIsTacticalPauseOn);
 }

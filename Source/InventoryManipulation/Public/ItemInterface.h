@@ -24,7 +24,7 @@ public:
     virtual double GetStackWeight() const = 0;
     virtual double GetVolume() const = 0;
     virtual double GetStackVolume() const = 0;
-    virtual const FText& GetNameText() const = 0;
+    virtual FText const& GetNameText() const = 0;
     virtual TObjectPtr<UTexture2D> GetThumbnail() = 0;
     virtual TObjectPtr<UStaticMesh> GetMesh() = 0;
 

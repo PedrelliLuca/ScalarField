@@ -46,7 +46,7 @@ private:
 
     void _onHeatmapVisualizationToggled();
 
-    void _onControlledPawnDeath(const TObjectPtr<AActor> deadActor);
+    void _onControlledPawnDeath(TObjectPtr<AActor> const deadActor);
 
     constexpr int32 _getSkillIdxFromKey(int32 key);
 
