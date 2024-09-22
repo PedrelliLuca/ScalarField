@@ -8,8 +8,8 @@
 
 #include "HUDWidget.generated.h"
 
+class UGameplayAttributesWidget;
 class UHealthComponent;
-class UManaComponent;
 class UNewStateComponent;
 class USkillsContainerComponent;
 class USkillIconContainerWidget;
@@ -47,44 +47,25 @@ protected:
     UFUNCTION(BlueprintImplementableEvent)
     void _setPauseStatus(bool bIsGamePaused);
 
-    UPROPERTY(BlueprintReadOnly, Category = "Health")
-    float _currentHealth = 0.;
-    UPROPERTY(BlueprintReadOnly, Category = "Health")
-    float _maxHealth = 0.;
-
-    UPROPERTY(BlueprintReadOnly, Category = "Mana")
-    double _currentMana = 0.;
-    UPROPERTY(BlueprintReadOnly, Category = "Mana")
-    double _maxMana = 0.;
-
 private:
     void _bindAll();
     void _unbindAll();
 
-    void _setMaxHealth(float newMaxHealth);
-    void _setCurrentHealth(float newCurrentHealth);
     void _onDeath(TObjectPtr<AActor> _);
-
-    void _setMaxMana(double newMaxMana);
-    void _setCurrentMana(double newCurrentMana);
 
     void _onTacticalPauseToggle(bool bIsTacticalPauseOn, double);
 
-    FDelegateHandle _healthChangedHandle;
-    FDelegateHandle _maxHealthChangedHandle;
-    FDelegateHandle _healthRegenChangedHandle;
     FDelegateHandle _onDeathHandle;
-    FDelegateHandle _manaChangedHandle;
-    FDelegateHandle _maxManaChangedHandle;
-    FDelegateHandle _manaRegenChangedHandle;
     FDelegateHandle _pauseToggleHandle;
 
     TWeakObjectPtr<UHealthComponent> _healthC = nullptr;
-    TWeakObjectPtr<UManaComponent> _manaC = nullptr;
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<USkillIconContainerWidget> _skillIconContainer = nullptr;
 
     UPROPERTY(meta = (BindWidget))
     TObjectPtr<UThermometerWidget> _thermometerWidget = nullptr;
+
+    UPROPERTY(meta = (BindWidget))
+    TObjectPtr<UGameplayAttributesWidget> _gameplayAttributesWidget = nullptr;
 };
