@@ -21,15 +21,13 @@ namespace UnrealBuildTool.Rules
                 new string[]
                 {
 					"ThermodynamicsCore",
+    			    "Voxel",
 				}
                 );
 
-            DynamicallyLoadedModuleNames.AddRange(
-                new string[]
-                {
-					// ... add any modules that your module loads dynamically here ...
-				}
-                );
+            PrivateIncludePaths.AddRange(new string[] {
+                "Voxel/Public"
+            });
         }
     }
 }
